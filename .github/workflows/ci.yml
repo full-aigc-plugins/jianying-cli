@@ -1,5 +1,6 @@
+---
 name: ci
-on:
+"on":
   pull_request:
   push:
     branches: [main]
@@ -29,16 +30,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Clone the reference implementation (pinned)
+      - name: Clone the pinned reference implementation
         run: |
           git clone https://github.com/GuanYixuan/pyJianYingDraft.git /tmp/pyjyd
-          git -C /tmp/pyjyd checkout ${{ env.PYJYD_REF }}
+          git -C /tmp/pyjyd checkout "$PYJYD_REF"
       - name: Install probe/runtime deps
         run: |
           brew install mediainfo
           python3 -m pip install --quiet pymediainfo
       - run: cargo build --release
-      - name: Dual-source parity suite (30 scenarios)
+      - name: Dual-source parity suite (50 scenarios)
         run: python3 tools/parity_run.py --pyjyd-src /tmp/pyjyd/pyJianYingDraft
 
   catalog-freshness:
@@ -48,6 +49,6 @@ jobs:
       - name: Clone pyJianYingDraft at the pinned ref
         run: |
           git clone https://github.com/GuanYixuan/pyJianYingDraft.git /tmp/pyjyd
-          git -C /tmp/pyjyd checkout ${{ env.PYJYD_REF }}
+          git -C /tmp/pyjyd checkout "$PYJYD_REF"
       - name: Catalogs must match the pinned metadata
         run: python3 tools/gen_catalogs.py /tmp/pyjyd/pyJianYingDraft --check
