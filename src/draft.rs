@@ -385,9 +385,13 @@ fn mask_entry(materials: &mut Value, mask: &crate::plan::Mask, info: &MediaInfo)
     let aspect = entry["default_aspect"].as_f64().unwrap_or(1.0);
     let shape = entry["shape"].as_str().unwrap_or("circle");
     let size = if mask.size != 0.0 { mask.size } else { 0.5 };
-    let width = mask
-        .rect_width
-        .unwrap_or(size * info.height.max(1) as f64 * aspect / info.width.max(1) as f64);
+    // pyJYD add_mask: 矩形 defaults width to size; other shapes derive from
+    // the material's height/width ratio times the shape aspect
+    let width = match mask.rect_width {
+        Some(w) => w,
+        None if mask.name == "矩形" => size,
+        None => size * info.height.max(1) as f64 * aspect / info.width.max(1) as f64,
+    };
     let id = hex_id();
     materials["masks"].as_array_mut().unwrap().push(json!({
         "config": {
@@ -594,6 +598,15 @@ pub fn build(
                                     vip_ok(),
                                 )
                             })?;
+                            // character effects ride the same bucket with wire
+                            // type face_effect (pyJYD authority)
+                            let wire = if catalogs::find(catalogs::video_scene_effects(), &e.name)
+                                .is_some()
+                            {
+                                "video_effect"
+                            } else {
+                                "face_effect"
+                            };
                             let eid = hex_id();
                             materials["video_effects"].as_array_mut().unwrap().push(json!({
                                 "adjust_params": catalogs::adjust_params(entry, Some(&e.params)),
@@ -604,7 +617,7 @@ pub fn build(
                                 "platform": "all", "render_index": 11000,
                                 "resource_id": entry["resource_id"], "source_platform": 0,
                                 "time_range": null, "track_render_index": 0,
-                                "type": "video_effect", "value": 1.0, "version": ""
+                                "type": wire, "value": 1.0, "version": ""
                             }));
                             refs.push(eid);
                         }

@@ -1,0 +1,102 @@
+{
+ "name": "p49",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p49",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 500000,
+      "source": "a.mp4",
+      "volume": 0.2,
+      "filters": [
+       {
+        "name": "1980",
+        "intensity": 30
+       }
+      ],
+      "transition_out": {
+       "name": "3D空间"
+      }
+     },
+     {
+      "start_us": 500000,
+      "duration_us": 500000,
+      "source": "b.mp4",
+      "volume": 0.30000000000000004,
+      "animation_in": {
+       "name": "Kira游动"
+      },
+      "transition_out": {
+       "name": "上下翻页"
+      }
+     },
+     {
+      "start_us": 1000000,
+      "duration_us": 500000,
+      "source": "a.mp4",
+      "volume": 0.4,
+      "transition_out": {
+       "name": "上移"
+      }
+     },
+     {
+      "start_us": 1500000,
+      "duration_us": 500000,
+      "source": "b.mp4",
+      "volume": 0.5,
+      "filters": [
+       {
+        "name": "1980",
+        "intensity": 60
+       }
+      ],
+      "transition_out": {
+       "name": "下移"
+      }
+     },
+     {
+      "start_us": 2000000,
+      "duration_us": 500000,
+      "source": "a.mp4",
+      "volume": 0.6000000000000001,
+      "animation_in": {
+       "name": "Kira游动"
+      },
+      "transition_out": {
+       "name": "中心旋转"
+      }
+     },
+     {
+      "start_us": 2500000,
+      "duration_us": 500000,
+      "source": "b.mp4",
+      "volume": 0.7
+     }
+    ]
+   }
+  ]
+ }
+}

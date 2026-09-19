@@ -60,12 +60,11 @@ ffmpeg 代理预览：平铺主视频轨 + 混音全部音频轨（含淡入淡�
 
 字段手册见 [`plan-format.md`](plan-format.md)。硬校验（违规即 build 报错）：
 主视频轨（如存在）必须第一轨且首段 0 起连续；同轨递增不重叠；fps∈{24,25,30,50,60}；
-speed 0.1-8、volume 0-4；关键帧线性、首点 at_us=0、≥2 点、要求 speed=1 且
-source_start_us=0；转场仅视频轨非末段 ≤1s；蒙版/滤镜/特效/动画名须命中目录且
+speed 0.1-8、volume 0-4；关键帧线性、首点 at_us=0、≥2 点（关键帧优先于静态值；贴纸段同视频通道）；转场仅视频轨非末段、时长>0（省略取目录默认）；蒙版/滤镜/特效/动画名须命中目录且
 参数 0-100；文本 styles 区间按 UTF-16 升序不越界。
 
 ## 4. 双源一致性（维护者）
 
-`tools/parity_run.py`：30 场景（10 个组合动作）同一计划过 pyJYD 与 jianying-cli
+`tools/parity_run.py`：50 场景（20 个组合动作 + 逐域多样性）同一计划过 pyJYD 与 jianying-cli
 语义比对，30/30 必须保持全绿。`tools/gen_catalogs.py --check`：目录与 pyJYD
 metadata 一致性校验。两者都在 CI 强制执行。

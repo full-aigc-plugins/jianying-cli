@@ -1,0 +1,45 @@
+{
+ "name": "p39",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p39",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "text",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 1500000,
+      "text": "字体一",
+      "font": "3D 만화"
+     },
+     {
+      "start_us": 1500000,
+      "duration_us": 1500000,
+      "text": "字体二",
+      "font": "A1明朝"
+     }
+    ]
+   }
+  ]
+ }
+}

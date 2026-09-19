@@ -395,6 +395,14 @@ impl Plan {
             let main_video = ti == 0 && track.kind == "video";
             let mut prior_end: i64 = 0;
             for (si, seg) in track.segments.iter().enumerate() {
+                if main_video && si > 0 && (seg.start_us - prior_end).abs() > 1 {
+                    bail!(
+                        "main video must be continuous (gap of {}us at {}); \
+                         place gaps on overlay tracks only",
+                        seg.start_us - prior_end,
+                        prior_end
+                    );
+                }
                 let last = main_video && si + 1 == track.segments.len();
                 self.validate_segment(track, seg, prior_end, last)?;
                 prior_end = seg.start_us + seg.duration_us;
@@ -579,8 +587,9 @@ impl Plan {
             let dur = t
                 .duration_us
                 .unwrap_or_else(|| entry["duration_us"].as_i64().unwrap_or(500_000));
-            if dur <= 0 || dur > 1_000_000 {
-                bail!("transition duration_us must be within 1..1000000");
+            // pyJYD imposes no ceiling; keep only positivity
+            if dur <= 0 {
+                bail!("transition duration_us must be positive");
             }
             crate::catalogs::resolve(
                 crate::catalogs::transitions(),
@@ -716,13 +725,13 @@ impl Plan {
 
         if let Some(kfs) = &seg.keyframes {
             let allowed: &[(&str, f64, f64)] = match track.kind.as_str() {
-                "video" => KEY_CHANNELS_VIDEO,
+                "video" | "sticker" => KEY_CHANNELS_VIDEO,
                 "text" => KEY_CHANNELS_TEXT,
                 _ => KEY_CHANNELS_AUDIO,
             };
-            if speed != 1.0 || seg.source_start_us != 0 {
-                bail!("keyframes require speed == 1 and source_start_us == 0");
-            }
+            // pyJYD allows keyframes on trimmed/speed-adjusted sources; the
+            // time-mapping caveat lives in docs (剪映's own interpretation)
+
             for (channel, points) in kfs {
                 let (_, lo, hi) =
                     allowed
@@ -747,20 +756,6 @@ impl Plan {
                 }
                 if points[0].at_us != 0 {
                     bail!("keyframe channel {channel} must start at at_us 0");
-                }
-                let static_conflict = match channel.as_str() {
-                    "scale" => seg.scale,
-                    "x" => seg.x,
-                    "y" => seg.y,
-                    "rotation" => seg.rotation,
-                    "opacity" => seg.opacity,
-                    "volume" => seg.volume,
-                    _ => None,
-                };
-                if let Some(v) = static_conflict {
-                    if (v - points[0].value).abs() > 1e-7 {
-                        bail!("static {channel} conflicts with its first keyframe value");
-                    }
                 }
             }
         }

@@ -30,12 +30,26 @@ def member(enum, name):
 def tim(v):
     if not isinstance(v, str):
         return v
+    # SRT timestamp form first (HH:MM:SS,mmm)
+    if v.count(":") == 2:
+        h, m, rest = v.split(":")
+        sec = float(rest.replace(",", "."))
+        return int(round((int(h) * 3600 + int(m) * 60 + sec) * 1e6))
     total = 0.0
     matched = False
     for num, unit in _re_findall_times(v):
         total += float(num) * {"h": 3.6e9, "m": 6e7, "s": 1e6, "ms": 1e3, "us": 1}[unit]
         matched = True
     return int(round(total)) if matched else v
+
+
+def find_effect_meta(name):
+    """Scene effects and character effects live in different enums — search both."""
+    for enum in (draft.VideoSceneEffectType, draft.VideoCharacterEffectType):
+        for x in enum:
+            if getattr(x.value, "name", getattr(x.value, "title", None)) == name:
+                return x
+    raise KeyError(f"{name} not in scene/character effect enums")
 
 
 def _re_findall_times(v):
@@ -107,11 +121,8 @@ def main():
         if kind == "effect":
             for seg in track["segments"]:
                 e = seg["effects"][0]
-                meta = (member(draft.VideoSceneEffectType, e["name"])
-                        if any(getattr(x.value, "name", getattr(x.value, "title", None)) == e["name"]
-                               for x in draft.VideoSceneEffectType)
-                        else member(draft.VideoCharacterEffectType, e["name"]))
-                script.add_effect(meta, Timerange(seg["start_us"], seg["duration_us"]))
+                script.add_effect(find_effect_meta(e["name"]),
+                                  Timerange(seg["start_us"], seg["duration_us"]))
             continue
         for seg in track["segments"]:
             if kind == "video":
@@ -155,7 +166,7 @@ def main():
                     vs.add_filter(member(draft.FilterType, f["name"]),
                                   intensity=f.get("intensity", 100.0))
                 for e in seg.get("effects", []):
-                    meta = member(draft.VideoSceneEffectType, e["name"])
+                    meta = find_effect_meta(e["name"])
                     params = ordered_params(meta, e.get("params", {}))
                     vs.add_effect(meta, params=params or None)
                 if seg.get("mix_mode"):
@@ -211,9 +222,17 @@ def main():
                             continue
                 script.add_segment(aus, ref)
             elif kind == "sticker":
-                from pyJianYingDraft import StickerSegment
+                from pyJianYingDraft import ClipSettings as _CS2, StickerSegment
+                cs = None
+                if any(k in seg for k in ("opacity", "scale", "x", "y", "rotation")):
+                    cs = _CS2(
+                        alpha=seg.get("opacity", 1.0),
+                        scale_x=seg.get("scale", 1.0), scale_y=seg.get("scale", 1.0),
+                        transform_x=seg.get("x", 0.0), transform_y=seg.get("y", 0.0),
+                        rotation=seg.get("rotation", 0.0))
                 ss = StickerSegment(seg["resource_id"],
-                                    Timerange(seg["start_us"], seg["duration_us"]))
+                                    Timerange(seg["start_us"], seg["duration_us"]),
+                                    clip_settings=cs)
                 script.add_segment(ss, ref)
             elif kind == "text":
                 from pyJianYingDraft import ClipSettings, TextBackground, TextBorder, TextShadow, TextStyle

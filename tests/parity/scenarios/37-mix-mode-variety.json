@@ -1,0 +1,69 @@
+{
+ "name": "p37",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p37",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 800000,
+      "source": "b.mp4",
+      "mix_mode": "正片叠底"
+     },
+     {
+      "start_us": 800000,
+      "duration_us": 800000,
+      "source": "a.mp4",
+      "mix_mode": "颜色减淡"
+     },
+     {
+      "start_us": 1600000,
+      "duration_us": 800000,
+      "source": "b.mp4",
+      "mix_mode": "颜色加深"
+     },
+     {
+      "start_us": 2400000,
+      "duration_us": 800000,
+      "source": "a.mp4",
+      "mix_mode": "线性加深"
+     },
+     {
+      "start_us": 3200000,
+      "duration_us": 800000,
+      "source": "b.mp4",
+      "mix_mode": "柔光"
+     },
+     {
+      "start_us": 4000000,
+      "duration_us": 800000,
+      "source": "a.mp4",
+      "mix_mode": "强光"
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,74 @@
+{
+ "name": "p38",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p38",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 2000000,
+      "source": "a.mp4",
+      "animation_in": {
+       "name": "Kira游动"
+      },
+      "animation_out": {
+       "name": "Kira游动"
+      },
+      "animation_group": {
+       "name": "三分割"
+      }
+     },
+     {
+      "start_us": 2000000,
+      "duration_us": 2000000,
+      "source": "b.mp4",
+      "animation_in": {
+       "name": "上下抖动"
+      },
+      "animation_out": {
+       "name": "冰雪融化"
+      }
+     }
+    ]
+   },
+   {
+    "type": "text",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 2000000,
+      "text": "动画组",
+      "animation_in": {
+       "name": "冲屏位移"
+      },
+      "animation_group": {
+       "name": "VHS"
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

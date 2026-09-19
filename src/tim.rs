@@ -33,7 +33,17 @@ pub fn parse(s: &str) -> Result<i64> {
             chars.next();
             continue;
         }
-        let unit: String = chars.by_ref().take_while(|c| c.is_alphabetic()).collect();
+        // consume the alphabetic unit run WITHOUT swallowing the terminator
+        // (Iterator::take_while would eat the first non-matching char)
+        let mut unit = String::new();
+        while let Some(&c) = chars.peek() {
+            if c.is_alphabetic() {
+                unit.push(c);
+                chars.next();
+            } else {
+                break;
+            }
+        }
         let v: f64 = num
             .parse()
             .map_err(|_| anyhow::anyhow!("bad number before {unit:?} in {s:?}"))?;

@@ -1,0 +1,58 @@
+{
+ "name": "p44",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p44",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": "0us",
+      "duration_us": "1s",
+      "source": "a.mp4",
+      "transition_out": {
+       "name": "3D空间",
+       "duration_us": "300ms"
+      }
+     },
+     {
+      "start_us": "00:00:01,000",
+      "duration_us": "1500ms",
+      "source": "b.mp4"
+     }
+    ]
+   },
+   {
+    "type": "text",
+    "segments": [
+     {
+      "start_us": "250ms",
+      "duration_us": "750ms",
+      "text": "全时间字符串",
+      "size": 5
+     }
+    ]
+   }
+  ]
+ }
+}

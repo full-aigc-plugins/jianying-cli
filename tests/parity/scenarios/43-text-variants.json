@@ -1,0 +1,59 @@
+{
+ "name": "p43",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p43",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "text",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 1000000,
+      "text": "左对齐斜体",
+      "alignment": 0,
+      "italic": true
+     },
+     {
+      "start_us": 1000000,
+      "duration_us": 1000000,
+      "text": "右对齐下划线",
+      "alignment": 2,
+      "underline": true
+     },
+     {
+      "start_us": 2000000,
+      "duration_us": 1000000,
+      "text": "圆角背景",
+      "background": {
+       "color": "#00AA88",
+       "style": 1,
+       "round_radius": 20,
+       "width": 0.5,
+       "height": 0.2
+      }
+     }
+    ]
+   }
+  ]
+ }
+}
