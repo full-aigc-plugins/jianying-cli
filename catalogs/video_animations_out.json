@@ -1,0 +1,994 @@
+[
+ {
+  "name": "Kira游动",
+  "vip": false,
+  "duration_us": 2267000,
+  "resource_id": "7312343337199997450",
+  "effect_id": "34389264",
+  "md5": "2cefeb684db271dc288ec225f0854264"
+ },
+ {
+  "name": "冰雪融化",
+  "vip": false,
+  "duration_us": 2830000,
+  "resource_id": "7447044440864068122",
+  "effect_id": "96136047",
+  "md5": "c3806ca50307f798df80d69543b14233"
+ },
+ {
+  "name": "向上滑动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6798333612958683656",
+  "effect_id": "624737",
+  "md5": "43ef6ea305ccdd352da4b99ad32e38db"
+ },
+ {
+  "name": "向上转出",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6818747115934585357",
+  "effect_id": "701963",
+  "md5": "1df50f9f9efc23d2851835537221b787"
+ },
+ {
+  "name": "向上转出 II",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6818747169017696781",
+  "effect_id": "701965",
+  "md5": "c79f370e70e40c577391e4a59da76c70"
+ },
+ {
+  "name": "向下滑动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6798333787986989576",
+  "effect_id": "624733",
+  "md5": "d39ba8884ffc4004118c2fa801d6ea97"
+ },
+ {
+  "name": "向右滑动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6798333350487527950",
+  "effect_id": "624741",
+  "md5": "b768f38810fc11df947c6196a6d882ec"
+ },
+ {
+  "name": "向左滑动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6798332972098392584",
+  "effect_id": "624745",
+  "md5": "2d14982cf9f87f4eda4e5443df0b4b9e"
+ },
+ {
+  "name": "折叠闭幕",
+  "vip": false,
+  "duration_us": 1500000,
+  "resource_id": "7239273967310082621",
+  "effect_id": "14506017",
+  "md5": "340da8c2704438c157adff1a55f3df0f"
+ },
+ {
+  "name": "放大",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6798332801864176142",
+  "effect_id": "624749",
+  "md5": "01497dc221d288e623a10cac94a5ceca"
+ },
+ {
+  "name": "斜切",
+  "vip": false,
+  "duration_us": 700000,
+  "resource_id": "7210659943051956797",
+  "effect_id": "10697199",
+  "md5": "93fd7d9c4f059c26cd3681dd512c20ed"
+ },
+ {
+  "name": "旋转",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6798334141323547143",
+  "effect_id": "624729",
+  "md5": "ae8bdfafbae781ad29bc60b438ff461c"
+ },
+ {
+  "name": "旋转闭幕",
+  "vip": false,
+  "duration_us": 1000000,
+  "resource_id": "6942482728335970823",
+  "effect_id": "1221132",
+  "md5": "b235b8a2a8647a211494856315cde2a9"
+ },
+ {
+  "name": "渐隐",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6798320902548230669",
+  "effect_id": "624707",
+  "md5": "07d916d9179660641ae0f427315c5591"
+ },
+ {
+  "name": "漩涡旋转",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6778418947361346061",
+  "effect_id": "634701",
+  "md5": "1af131118c1c8f0f97898aeebcb4c38e"
+ },
+ {
+  "name": "灼烧出现",
+  "vip": false,
+  "duration_us": 2960000,
+  "resource_id": "7447044440859873801",
+  "effect_id": "96136048",
+  "md5": "cfae1a683f11299f0c1d133d436b2746"
+ },
+ {
+  "name": "缩小",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6798332648814023181",
+  "effect_id": "624753",
+  "md5": "2ef923500a3c5501236774f26ea6855c"
+ },
+ {
+  "name": "翻出",
+  "vip": false,
+  "duration_us": 1170000,
+  "resource_id": "7452359860659687986",
+  "effect_id": "98425486",
+  "md5": "a8e91c830363162a11e80acb6665e426"
+ },
+ {
+  "name": "跳转闭幕",
+  "vip": false,
+  "duration_us": 733000,
+  "resource_id": "7280420767378969143",
+  "effect_id": "23302677",
+  "md5": "82992a12a8ae1227579be0f66d87d75f"
+ },
+ {
+  "name": "轻微放大",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6800268611807089166",
+  "effect_id": "629083",
+  "md5": "fb575b5c3655a74e8cccb6bdf5d54230"
+ },
+ {
+  "name": "镜像翻转",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6738353628215513613",
+  "effect_id": "645999",
+  "md5": "a24594428fdd0c8078b74659fc1f2679"
+ },
+ {
+  "name": "2024",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7311958876406944266",
+  "effect_id": "34158075",
+  "md5": "93bcb64554588e6f3a0a4ffffa0bb3b5"
+ },
+ {
+  "name": "2025",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7446306392748593714",
+  "effect_id": "95801179",
+  "md5": "2717769c8ba0483349180e1c46e95baf"
+ },
+ {
+  "name": "PASSION",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7432237078710063643",
+  "effect_id": "88544141",
+  "md5": "ed1934d9148fbc73e8edf76c7ddb45cd"
+ },
+ {
+  "name": "三屏下滑",
+  "vip": true,
+  "duration_us": 1830000,
+  "resource_id": "7436273288604553766",
+  "effect_id": "90036503",
+  "md5": "11fafef6fa74aabd1c2b99bd29ee4f78"
+ },
+ {
+  "name": "三屏切闪",
+  "vip": true,
+  "duration_us": 1040000,
+  "resource_id": "7434412782293881395",
+  "effect_id": "89308379",
+  "md5": "604869cd6d8c9b0a932d2000c906d3c6"
+ },
+ {
+  "name": "九宫格",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7434746460190544411",
+  "effect_id": "89406874",
+  "md5": "f832a0fb8b57751e82f0ffcef0fb0317"
+ },
+ {
+  "name": "交叉震动",
+  "vip": true,
+  "duration_us": 466000,
+  "resource_id": "7223227564670587452",
+  "effect_id": "12330095",
+  "md5": "3a711c053dcadb7856d19778f72a58c1"
+ },
+ {
+  "name": "交错闭幕",
+  "vip": true,
+  "duration_us": 1100000,
+  "resource_id": "7280797214186672701",
+  "effect_id": "23387942",
+  "md5": "1804a8bb6a3eb61c8e5720428d4648e7"
+ },
+ {
+  "name": "侧滑",
+  "vip": true,
+  "duration_us": 400000,
+  "resource_id": "7239559574095663671",
+  "effect_id": "14524385",
+  "md5": "1a661b1d0728177d889353174bfb0bf8"
+ },
+ {
+  "name": "便利贴",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7379884133268328996",
+  "effect_id": "70741835",
+  "md5": "ce8f5846f77edba5099b042ef7b6958b"
+ },
+ {
+  "name": "冬季雪花",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7447044440868262410",
+  "effect_id": "96136049",
+  "md5": "fe72ee1d6384b9f5a489a56beb5dacd6"
+ },
+ {
+  "name": "冰块",
+  "vip": true,
+  "duration_us": 1300000,
+  "resource_id": "7413731112406487604",
+  "effect_id": "82396222",
+  "md5": "103cbd9c8058716c95bf41fd65a182a8"
+ },
+ {
+  "name": "冲撞",
+  "vip": true,
+  "duration_us": 767000,
+  "resource_id": "7215555273501446716",
+  "effect_id": "11325221",
+  "md5": "16e01aa5454653bc89d3b1d8e86ce3a2"
+ },
+ {
+  "name": "分屏横移",
+  "vip": true,
+  "duration_us": 880000,
+  "resource_id": "7257879855063110205",
+  "effect_id": "18746674",
+  "md5": "7382c7210c95548bfc88486be3964284"
+ },
+ {
+  "name": "分屏组合",
+  "vip": true,
+  "duration_us": 2960000,
+  "resource_id": "7434746460186350117",
+  "effect_id": "89406873",
+  "md5": "eacdb5c2875d937855253ffea04ac13e"
+ },
+ {
+  "name": "分屏翻转",
+  "vip": true,
+  "duration_us": 560000,
+  "resource_id": "7259341241031070268",
+  "effect_id": "19063130",
+  "md5": "392b91fd262e9b95e1dcd18274297393"
+ },
+ {
+  "name": "分身模糊",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7434746460182155827",
+  "effect_id": "89406876",
+  "md5": "3ee97e0d0ed3a62f4b0d3a218e669418"
+ },
+ {
+  "name": "划水",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7226632692354257445",
+  "effect_id": "12811717",
+  "md5": "f30ab9f83934eafedb4ee01a3d87a995"
+ },
+ {
+  "name": "区域色块滑动",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7436273288604553755",
+  "effect_id": "90036504",
+  "md5": "0f266778630aeea62a69ed0dd471fff5"
+ },
+ {
+  "name": "十字震动",
+  "vip": true,
+  "duration_us": 533000,
+  "resource_id": "7352824282289803814",
+  "effect_id": "54685998",
+  "md5": "969e17d5d65494d0b10b9111d66802d8"
+ },
+ {
+  "name": "卡片扫光",
+  "vip": true,
+  "duration_us": 1830000,
+  "resource_id": "7437386424036381211",
+  "effect_id": "90546052",
+  "md5": "e2711c17d261ee1aef022bbb2110be51"
+ },
+ {
+  "name": "发光矩形",
+  "vip": true,
+  "duration_us": 1133000,
+  "resource_id": "7346510998771077659",
+  "effect_id": "51093596",
+  "md5": "ccac330a683da920a9638b597ce1f869"
+ },
+ {
+  "name": "变速扩大",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7450031573958660617",
+  "effect_id": "97484974",
+  "md5": "430709c96a8a5fb7cc6e7d36f5babf5b"
+ },
+ {
+  "name": "变速时空",
+  "vip": true,
+  "duration_us": 1210000,
+  "resource_id": "7437386424027976230",
+  "effect_id": "90546051",
+  "md5": "9ef1912cc3f221218c32bc41bb61a548"
+ },
+ {
+  "name": "向上滚动",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7312341715220697650",
+  "effect_id": "34388502",
+  "md5": "92d44450f8557fc1d8d93eb6cbe2a832"
+ },
+ {
+  "name": "向上闪出",
+  "vip": true,
+  "duration_us": 700000,
+  "resource_id": "7273389599978689079",
+  "effect_id": "21816912",
+  "md5": "4e39075df8d20d1d938c5bf23b2604fb"
+ },
+ {
+  "name": "向下甩动",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7338638617322983976",
+  "effect_id": "47191669",
+  "md5": "178fe900252c316f5301d805a735ce8e"
+ },
+ {
+  "name": "四屏转换",
+  "vip": true,
+  "duration_us": 900000,
+  "resource_id": "7341284613165158921",
+  "effect_id": "48492502",
+  "md5": "cf7d3bd0e7973868861d1e466cb238eb"
+ },
+ {
+  "name": "圆形闭幕",
+  "vip": true,
+  "duration_us": 900000,
+  "resource_id": "7218210114052821561",
+  "effect_id": "11680737",
+  "md5": "0acd6d992db52febb66a63a3cfc6ea00"
+ },
+ {
+  "name": "多层环形",
+  "vip": true,
+  "duration_us": 1633000,
+  "resource_id": "7329445038604161536",
+  "effect_id": "42686393",
+  "md5": "c684bdf866bada10acb647e5339397a3"
+ },
+ {
+  "name": "多屏分割I",
+  "vip": true,
+  "duration_us": 1460000,
+  "resource_id": "7434055685572153907",
+  "effect_id": "89192583",
+  "md5": "e1697eeef0685ec658e50900df941cf4"
+ },
+ {
+  "name": "多屏分割II",
+  "vip": true,
+  "duration_us": 2040000,
+  "resource_id": "7434055685572137482",
+  "effect_id": "89192581",
+  "md5": "f892339326d234719c3069399b6b3e76"
+ },
+ {
+  "name": "多维空间",
+  "vip": true,
+  "duration_us": 1380000,
+  "resource_id": "7449596462645662235",
+  "effect_id": "97260826",
+  "md5": "90d9f339bfada65f43af655eb0905427"
+ },
+ {
+  "name": "幕布",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7448986761297924618",
+  "effect_id": "97077809",
+  "md5": "b393d8f37b6df766bb7df35fca846169"
+ },
+ {
+  "name": "幸运圣诞树",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7447044440868262450",
+  "effect_id": "96136050",
+  "md5": "177e050b5e468a62a4f36e7c7de7811c"
+ },
+ {
+  "name": "弹力分割",
+  "vip": true,
+  "duration_us": 1060000,
+  "resource_id": "7343902820808004123",
+  "effect_id": "49678364",
+  "md5": "62adcd0cd61c98d0640e657e63b0be8a"
+ },
+ {
+  "name": "弹远",
+  "vip": true,
+  "duration_us": 1200000,
+  "resource_id": "7314925770181186075",
+  "effect_id": "35749432",
+  "md5": "310e6755e6441af5d3405bc80a3be26d"
+ },
+ {
+  "name": "录像带分屏",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7436273288608748041",
+  "effect_id": "90036505",
+  "md5": "a7bead6f8b55f1cbcbfcffcbd88fb573"
+ },
+ {
+  "name": "心形缩小",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7034346969086562824",
+  "effect_id": "1463778",
+  "md5": "677ec2564241df326a921fa9dc58bd81"
+ },
+ {
+  "name": "快速翻页",
+  "vip": true,
+  "duration_us": 200000,
+  "resource_id": "7296416099606729225",
+  "effect_id": "27895223",
+  "md5": "00b26549833daf565f2660d0abcb0462"
+ },
+ {
+  "name": "手写云朵",
+  "vip": true,
+  "duration_us": 1530000,
+  "resource_id": "7468589970832232997",
+  "effect_id": "104144380",
+  "md5": "e975928331a96536e27764fbc53f6315"
+ },
+ {
+  "name": "扫描",
+  "vip": true,
+  "duration_us": 633000,
+  "resource_id": "7316816362305753609",
+  "effect_id": "36871694",
+  "md5": "a89a479b5228737e62ccd7e77059315f"
+ },
+ {
+  "name": "抖动变焦",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7153942002696983047",
+  "effect_id": "5188733",
+  "md5": "6e14698c240bfa454836d26eaa44d3bc"
+ },
+ {
+  "name": "抖动横移",
+  "vip": true,
+  "duration_us": 400000,
+  "resource_id": "7265946879060349477",
+  "effect_id": "20437843",
+  "md5": "bcebbe81fc2243a3685ab8e550e3415f"
+ },
+ {
+  "name": "折叠",
+  "vip": true,
+  "duration_us": 300000,
+  "resource_id": "7221420528148419133",
+  "effect_id": "12091673",
+  "md5": "7968ce8b7391c3725f2b7667d0e0f80a"
+ },
+ {
+  "name": "报纸拼贴",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7449589619038884389",
+  "effect_id": "97255862",
+  "md5": "248c4117dda85e37e36b9174c7f7ec42"
+ },
+ {
+  "name": "报纸拼贴Ⅱ",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7449589619038884378",
+  "effect_id": "97255861",
+  "md5": "1d139e5602c9b848ae55d3132739c0e5"
+ },
+ {
+  "name": "拉丝滑出",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7114172789287817758",
+  "effect_id": "3240292",
+  "md5": "e3018d5ee625a58fdeaa5ccd75d0e2e2"
+ },
+ {
+  "name": "拼图",
+  "vip": true,
+  "duration_us": 1100000,
+  "resource_id": "7369889275233440265",
+  "effect_id": "64963293",
+  "md5": "9e1b296804c2f10ce26fcf727d1dd9af"
+ },
+ {
+  "name": "探灯聚焦",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7435897594074632730",
+  "effect_id": "89895171",
+  "md5": "3bd76848821228cc1c1a35e4da0f9ea8"
+ },
+ {
+  "name": "斜向拉丝",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7360531353458184715",
+  "effect_id": "58777523",
+  "md5": "71a267bc37d3dc0afa3aaae12ec995e7"
+ },
+ {
+  "name": "旋转圆球",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7381753028732260916",
+  "effect_id": "71750513",
+  "md5": "e824e3d74a50eba64dd87ac11b9bbfb8"
+ },
+ {
+  "name": "晃动抽帧",
+  "vip": true,
+  "duration_us": 2960000,
+  "resource_id": "7435897594078827035",
+  "effect_id": "89895170",
+  "md5": "91c1553757cd96ea14e8cb88fc5d40be"
+ },
+ {
+  "name": "曝光放射",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7158753896624558628",
+  "effect_id": "5529791",
+  "md5": "70911371ae8ec475600c4e30c9db8994"
+ },
+ {
+  "name": "枫叶遮罩",
+  "vip": true,
+  "duration_us": 2300000,
+  "resource_id": "7436273288608748058",
+  "effect_id": "90036506",
+  "md5": "b4061ff63d82958d6d828f54682b9527"
+ },
+ {
+  "name": "模糊聚焦",
+  "vip": true,
+  "duration_us": 833000,
+  "resource_id": "7338742568592609801",
+  "effect_id": "47267179",
+  "md5": "2cf9380884a5e9853ecdbb4869b01b0e"
+ },
+ {
+  "name": "横向模糊",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7301943351320777267",
+  "effect_id": "29824130",
+  "md5": "294f0f8ecbe4b4a8b8f2c01f579739f1"
+ },
+ {
+  "name": "水墨",
+  "vip": true,
+  "duration_us": 2033000,
+  "resource_id": "7322073757080621606",
+  "effect_id": "39326538",
+  "md5": "533ce039619091d6b9886c2c78ac4aa2"
+ },
+ {
+  "name": "水滴遮罩",
+  "vip": true,
+  "duration_us": 1960000,
+  "resource_id": "7441475431309513254",
+  "effect_id": "93637552",
+  "md5": "06ee7696792a5aa607cecc0d14e7dd91"
+ },
+ {
+  "name": "油画描边变色",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7439276108022813235",
+  "effect_id": "92053923",
+  "md5": "eb20d401959db40399b8fa89b27e7f38"
+ },
+ {
+  "name": "波纹弹动",
+  "vip": true,
+  "duration_us": 1200000,
+  "resource_id": "7345803511390540288",
+  "effect_id": "50691424",
+  "md5": "660ff84eabd735769a72978914e8e82d"
+ },
+ {
+  "name": "流金",
+  "vip": true,
+  "duration_us": 1133000,
+  "resource_id": "7322857522648322586",
+  "effect_id": "39682247",
+  "md5": "646fc008978735fbf5b5d3cde382fc22"
+ },
+ {
+  "name": "滑片滑动",
+  "vip": true,
+  "duration_us": 1200000,
+  "resource_id": "7447351620637037106",
+  "effect_id": "96240814",
+  "md5": "0e879f2bb18535b827df1e78eca89f90"
+ },
+ {
+  "name": "烟雾弹",
+  "vip": true,
+  "duration_us": 900000,
+  "resource_id": "7229149181762343484",
+  "effect_id": "13090999",
+  "md5": "e70e26e7aa770d0deedca54e3eac0323"
+ },
+ {
+  "name": "照片回忆",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7436273288612942386",
+  "effect_id": "90036502",
+  "md5": "b78111677093071510de457f1a8f2019"
+ },
+ {
+  "name": "爱心碰撞",
+  "vip": true,
+  "duration_us": 2300000,
+  "resource_id": "7328249133079204352",
+  "effect_id": "42112174",
+  "md5": "1cf69aac7b9478f5628413aada8c0707"
+ },
+ {
+  "name": "玫瑰",
+  "vip": true,
+  "duration_us": 1400000,
+  "resource_id": "7397378784028004891",
+  "effect_id": "77061996",
+  "md5": "e19beddf933ed59e1f1d85c8273d9cb1"
+ },
+ {
+  "name": "玻璃爆开",
+  "vip": true,
+  "duration_us": 733000,
+  "resource_id": "7347865496508699170",
+  "effect_id": "51922869",
+  "md5": "620f6fe34184e1f3cc2284d830c3d1e8"
+ },
+ {
+  "name": "画出爱心",
+  "vip": true,
+  "duration_us": 1100000,
+  "resource_id": "7248951676420231735",
+  "effect_id": "16231427",
+  "md5": "ad5c127255cc8f2c941f7406f8a36f19"
+ },
+ {
+  "name": "画面擦除",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7448898555617497626",
+  "effect_id": "97032678",
+  "md5": "0ac1cfe94bb7f54b8a38dc0de67b05ca"
+ },
+ {
+  "name": "砸出波纹",
+  "vip": true,
+  "duration_us": 1366000,
+  "resource_id": "7255599483226952249",
+  "effect_id": "18161234",
+  "md5": "87e9baa63de40d76f862bb8aa4349de3"
+ },
+ {
+  "name": "空间扭曲",
+  "vip": true,
+  "duration_us": 930000,
+  "resource_id": "7298918355841323529",
+  "effect_id": "28775864",
+  "md5": "04c885b1dbbcf51bcc01e4df931bff72"
+ },
+ {
+  "name": "立体交叉",
+  "vip": true,
+  "duration_us": 670000,
+  "resource_id": "7434746460190544394",
+  "effect_id": "89406875",
+  "md5": "75e703c9c10c62dfab467c17f0439261"
+ },
+ {
+  "name": "立体翻转",
+  "vip": true,
+  "duration_us": 1100000,
+  "resource_id": "7351333213068857892",
+  "effect_id": "53792520",
+  "md5": "82f13f68eb475cfaabaf2a674b50ac8a"
+ },
+ {
+  "name": "立方合体",
+  "vip": true,
+  "duration_us": 1600000,
+  "resource_id": "7405509410396574242",
+  "effect_id": "79925188",
+  "md5": "75c1649483edeac1c8defd88b45839cf"
+ },
+ {
+  "name": "竖向拼接",
+  "vip": true,
+  "duration_us": 2460000,
+  "resource_id": "7434412782285492773",
+  "effect_id": "89308380",
+  "md5": "3536cc7c83df33546ece9319b2fcd3ec"
+ },
+ {
+  "name": "粒子爱心",
+  "vip": true,
+  "duration_us": 3000000,
+  "resource_id": "7468589804356112946",
+  "effect_id": "104144349",
+  "md5": "1410ac0223ef9473376a151bcabacdfa"
+ },
+ {
+  "name": "翻卡",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7431509039437058586",
+  "effect_id": "88301520",
+  "md5": "bd316e6651f053f591dee39cc1460662"
+ },
+ {
+  "name": "老电视",
+  "vip": true,
+  "duration_us": 1600000,
+  "resource_id": "7283429462924857914",
+  "effect_id": "24079477",
+  "md5": "50d67778f791d56b12ab5c6da30c37b6"
+ },
+ {
+  "name": "能量立方",
+  "vip": true,
+  "duration_us": 1133000,
+  "resource_id": "7361364150229930506",
+  "effect_id": "59265410",
+  "md5": "f6c5b98ea69f3b2c3265bb3249973250"
+ },
+ {
+  "name": "脉冲",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7379909625870553654",
+  "effect_id": "70764127",
+  "md5": "f916cc354e9c5b80698d612397a0c4f7"
+ },
+ {
+  "name": "色散波纹",
+  "vip": true,
+  "duration_us": 767000,
+  "resource_id": "7305961286762762790",
+  "effect_id": "31248281",
+  "md5": "5477505f844e9bad12dc9074631564b1"
+ },
+ {
+  "name": "荧光爆闪",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7347994415576650255",
+  "effect_id": "52020801",
+  "md5": "6558ab016ce06546d3c380b43480baab"
+ },
+ {
+  "name": "负片闪屏",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7434055685567943194",
+  "effect_id": "89192582",
+  "md5": "15fe80d4264c5a689efd712535ce51c7"
+ },
+ {
+  "name": "转圈圈",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7246706359381529125",
+  "effect_id": "15754757",
+  "md5": "c03fc00075c5b7e53f8bdc0c6f5c360f"
+ },
+ {
+  "name": "迷幻流光",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7395482925006852647",
+  "effect_id": "76594275",
+  "md5": "4095d8d554571c3356eefa787c7cdfe9"
+ },
+ {
+  "name": "金沙",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7441139691694330378",
+  "effect_id": "93472419",
+  "md5": "8eb1d7a9fbcbc2c8df45affa0c13e8a9"
+ },
+ {
+  "name": "钱币遮罩",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7461942340328886835",
+  "effect_id": "102049160",
+  "md5": "65b2eab128ce90c90193c62c29013f22"
+ },
+ {
+  "name": "镜面拆分",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7405495700961628683",
+  "effect_id": "79917713",
+  "md5": "5e549cebedbc7a9453bfc24490b94e67"
+ },
+ {
+  "name": "闪屏",
+  "vip": true,
+  "duration_us": 833000,
+  "resource_id": "7243999104114627132",
+  "effect_id": "15215961",
+  "md5": "e4ef6b01ae37409046d089c73cd16702"
+ },
+ {
+  "name": "闪现",
+  "vip": true,
+  "duration_us": 250000,
+  "resource_id": "7186978468087730749",
+  "effect_id": "8303609",
+  "md5": "f170e9020eaf5a6f6180c6fd30775400"
+ },
+ {
+  "name": "闪电分屏",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7437386424032170506",
+  "effect_id": "90546050",
+  "md5": "e9950ce2750bab69fe23a91b4e803473"
+ },
+ {
+  "name": "雪花遮罩",
+  "vip": true,
+  "duration_us": 1750000,
+  "resource_id": "7442590863349256754",
+  "effect_id": "94174789",
+  "md5": "11b7e97fceba9cf1d7babfe764d1bdcb"
+ },
+ {
+  "name": "震动波纹",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7307196476340310554",
+  "effect_id": "31806349",
+  "md5": "cdb162bc674e495b24d38a2cf4bd04b6"
+ },
+ {
+  "name": "震波 III",
+  "vip": true,
+  "duration_us": 733000,
+  "resource_id": "7289005562124046907",
+  "effect_id": "25555607",
+  "md5": "70a42c94712b15ff4fbf198be0336400"
+ },
+ {
+  "name": "鞭炮遮罩",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7461923788343480841",
+  "effect_id": "102029466",
+  "md5": "0e395a1c73b9bb3e83ae101d4df3f850"
+ },
+ {
+  "name": "音量大小",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7462226526260433418",
+  "effect_id": "102188408",
+  "md5": "210be278f95cc7cce8fde314de29ab07"
+ },
+ {
+  "name": "飘散",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7305957010518839846",
+  "effect_id": "31245441",
+  "md5": "286553fb78795b8044746938e4327d5e"
+ },
+ {
+  "name": "飞远",
+  "vip": true,
+  "duration_us": 1600000,
+  "resource_id": "7394730499492549158",
+  "effect_id": "76392667",
+  "md5": "d897f0f656870ca1469ac30d61e9490a"
+ },
+ {
+  "name": "马赛克",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7283415427328250405",
+  "effect_id": "24073041",
+  "md5": "6be9c2fd05f76e3902a9967139706468"
+ },
+ {
+  "name": "魔法粒子I",
+  "vip": true,
+  "duration_us": 3000000,
+  "resource_id": "7446622476928291378",
+  "effect_id": "95912176",
+  "md5": "118e1dc5094d45b278111675f99fe4d7"
+ },
+ {
+  "name": "魔法粒子II",
+  "vip": true,
+  "duration_us": 3000000,
+  "resource_id": "7446673724146717221",
+  "effect_id": "95966045",
+  "md5": "ff56bdebbd3863db982d845635b3c42e"
+ },
+ {
+  "name": "黑白画中画",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7436273288612942374",
+  "effect_id": "90036501",
+  "md5": "3bdba83de89cf27167d319f5e727647f"
+ }
+]

@@ -1,0 +1,1385 @@
+[
+ {
+  "name": "8bit",
+  "vip": false,
+  "resource_id": "7161319747584266766",
+  "effect_id": "5723961",
+  "md5": "8d24238329ea5c250e33ae241d5adae2",
+  "params": [
+   {
+    "name": "change_voice_param_pitch_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "change_voice_param_timbre",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "change_voice_param_strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "低保真",
+  "vip": false,
+  "resource_id": "7024390914537689614",
+  "effect_id": "2672762",
+  "md5": "7ddbd39a691a66a021f684cab756a89a",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "合成器",
+  "vip": false,
+  "resource_id": "7018011500577034759",
+  "effect_id": "2672753",
+  "md5": "394efea5922637bcd8288e0fb3c2372e",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "回音",
+  "vip": false,
+  "resource_id": "7018011608408396325",
+  "effect_id": "5723901",
+  "md5": "5377f66109693f2d473df5ea6ec8f791",
+  "params": [
+   {
+    "name": "change_voice_param_quantity",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "change_voice_param_strength",
+    "default": 0.762,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "扩音器",
+  "vip": false,
+  "resource_id": "7018011975514853924",
+  "effect_id": "2672749",
+  "md5": "13169f6ab9957ff005d316239bef0045",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "水下",
+  "vip": false,
+  "resource_id": "7106404450444513806",
+  "effect_id": "2673077",
+  "md5": "53956694a8b68b2855faa2adc043b5b1",
+  "params": [
+   {
+    "name": "深度",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "没电了",
+  "vip": false,
+  "resource_id": "7018012193769656845",
+  "effect_id": "2672747",
+  "md5": "87f91614bac060840ad5a57ef2b0c9ca",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "环绕音",
+  "vip": false,
+  "resource_id": "7161319847819743780",
+  "effect_id": "5723960",
+  "md5": "fa9a4cb20d3488bf79e176571d5841f5",
+  "params": [
+   {
+    "name": "change_voice_param_center_position",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "change_voice_param_surrounding_frequency",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电音",
+  "vip": false,
+  "resource_id": "7018011438379700773",
+  "effect_id": "2672754",
+  "md5": "d893a319d5175d9f09f70ddef1f79980",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "颤音",
+  "vip": false,
+  "resource_id": "7018011370289369637",
+  "effect_id": "2672755",
+  "md5": "c5e4874f83337e1cb9f8322fb843c901",
+  "params": [
+   {
+    "name": "频率",
+    "default": 0.714,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "幅度",
+    "default": 0.905,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "麦霸",
+  "vip": false,
+  "resource_id": "7018012141332468260",
+  "effect_id": "2672748",
+  "md5": "3eedef5ef82b32912203a1f4fb901182",
+  "params": [
+   {
+    "name": "空间大小",
+    "default": 0.052,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "强弱",
+    "default": 0.45,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "黑胶",
+  "vip": false,
+  "resource_id": "7024391411764040205",
+  "effect_id": "2672761",
+  "md5": "59e61d687a0f612bfae43bccf770f090",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "噪点",
+    "default": 0.743,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "360度环绕音",
+  "vip": true,
+  "resource_id": "7410254975328064040",
+  "effect_id": "81298963",
+  "md5": "cc1709e1be9bb76d98cf54f28efda236",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "3d环绕音",
+  "vip": true,
+  "resource_id": "7350214888242811455",
+  "effect_id": "53187169",
+  "md5": "577c3d8e5312012b1d98ba5fc0b206d0",
+  "params": [
+   {
+    "name": "强度",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "Autotune",
+  "vip": true,
+  "resource_id": "7360900806851170828",
+  "effect_id": "58979352",
+  "md5": "1477f4ca8307e2fa4ee2243d98d8b837",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "Livehouse",
+  "vip": true,
+  "resource_id": "7413661671941476904",
+  "effect_id": "82364386",
+  "md5": "d626c7854922c9fabb2a777e40f05aff",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "下雨",
+  "vip": true,
+  "resource_id": "7375069649446113804",
+  "effect_id": "68076030",
+  "md5": "0633c88a5d6344a5ac1c00aa05e43d5f",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "noise",
+    "default": 0.743,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "乡村大喇叭",
+  "vip": true,
+  "resource_id": "7282691036197950009",
+  "effect_id": "23897651",
+  "md5": "c996243ac50d235f00e5931e5ecadc52",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "人声增强",
+  "vip": true,
+  "resource_id": "7106404399756349983",
+  "effect_id": "2673078",
+  "md5": "626f988dbd2cbd17acaa24d08451e314",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "人声增强3",
+  "vip": true,
+  "resource_id": "7425556785693463090",
+  "effect_id": "86419033",
+  "md5": "9324a8dd6d5f67820bb50577a129a577",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "低保真扩音器",
+  "vip": true,
+  "resource_id": "7467815819540435506",
+  "effect_id": "103845136",
+  "md5": "6955de18e7c318f8b0a91c7b06377a69",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "低音增强",
+  "vip": true,
+  "resource_id": "7106404304247853604",
+  "effect_id": "2673080",
+  "md5": "e7c09c96d10c163269fc4e35c1f4b1ee",
+  "params": [
+   {
+    "name": "change_voice_param_strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "低音增强2",
+  "vip": true,
+  "resource_id": "7410254814539420195",
+  "effect_id": "81298965",
+  "md5": "b5b8e03035ed0e9bc1d23895366869ff",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "停车场",
+  "vip": true,
+  "resource_id": "7372150242524795446",
+  "effect_id": "66413024",
+  "md5": "d2dd515293081a8573485159db5a71e0",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "冥想",
+  "vip": true,
+  "resource_id": "7467815749931766322",
+  "effect_id": "103845143",
+  "md5": "1785bb1a52982661c7fc475f130d1b7b",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "冰川之下",
+  "vip": true,
+  "resource_id": "7375068986829967883",
+  "effect_id": "68076029",
+  "md5": "6b9cda93f6d75b9a3b19b2e8eb6ad40f",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "noise",
+    "default": 0.743,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "刮风",
+  "vip": true,
+  "resource_id": "7375069247275274771",
+  "effect_id": "68076028",
+  "md5": "33e99402b2b056ce4f44f820ceac5cb5",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "noise",
+    "default": 0.743,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "午夜电台",
+  "vip": true,
+  "resource_id": "7431088998652580378",
+  "effect_id": "88155751",
+  "md5": "94ce3c12b4f9e72469bccbba9d3c020e",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "噪音混响",
+  "vip": true,
+  "resource_id": "7382844688987853349",
+  "effect_id": "72110975",
+  "md5": "3b3b09b530b0a64666f1c5b6d20d4018",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "回声",
+  "vip": true,
+  "resource_id": "7425556970339308083",
+  "effect_id": "86419034",
+  "md5": "edbfe18f8479b3da7e091b6d8bb2b592",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "回忆人声",
+  "vip": true,
+  "resource_id": "7400653027557773865",
+  "effect_id": "78208789",
+  "md5": "5a1681f3a09b861ef3e4a65b2f9b794d",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "地狱",
+  "vip": true,
+  "resource_id": "7375069113988682281",
+  "effect_id": "68076027",
+  "md5": "5ec03c41ada16530949daa4106c85a90",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "noise",
+    "default": 0.743,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "复古收音机",
+  "vip": true,
+  "resource_id": "7350215379714576907",
+  "effect_id": "53187166",
+  "md5": "301d642d131aabff7ea8c3b717b36a79",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "复古收音机2",
+  "vip": true,
+  "resource_id": "7431088943560397339",
+  "effect_id": "88155750",
+  "md5": "ef070459bb3eb2c02b0d65277369424c",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "复古电视",
+  "vip": true,
+  "resource_id": "7431089082647712282",
+  "effect_id": "88155749",
+  "md5": "a2e9b297a1acdb997c3f71bb4273bf77",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "失真电子",
+  "vip": true,
+  "resource_id": "7350215296801575443",
+  "effect_id": "53187167",
+  "md5": "a1c00df42076ed1bd6a81f2d30b94566",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "宽阔人声",
+  "vip": true,
+  "resource_id": "7400653260320674343",
+  "effect_id": "78208785",
+  "md5": "8472328fd44653bd18d871357da26dd7",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "对讲机",
+  "vip": true,
+  "resource_id": "7350214704284832275",
+  "effect_id": "53187168",
+  "md5": "016dbdb3c786896c92bb936ece11acf6",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "山洞",
+  "vip": true,
+  "resource_id": "7392070412865114659",
+  "effect_id": "75411128",
+  "md5": "4335ffa39cfdd4b7635fb6beb49dea80",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "广播",
+  "vip": true,
+  "resource_id": "7418519152467382794",
+  "effect_id": "84093261",
+  "md5": "d3378900221ac03887cb608f1bae981c",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "延迟回声",
+  "vip": true,
+  "resource_id": "7425556912709571110",
+  "effect_id": "86419029",
+  "md5": "26201a59916f7616c4706788aceee188",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "恐怖音效",
+  "vip": true,
+  "resource_id": "7431088801579012645",
+  "effect_id": "88155748",
+  "md5": "5e8778aa2e2e8270fba1b5e677b8e5fc",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "背景音",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "房间",
+  "vip": true,
+  "resource_id": "7282691385872880165",
+  "effect_id": "23880629",
+  "md5": "639f5c0c6b20418aaeb0e144da21151c",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "捂嘴",
+  "vip": true,
+  "resource_id": "7372405649684042292",
+  "effect_id": "66552320",
+  "md5": "9f9a8270c0005a480547d6ddf2a9293a",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "教堂",
+  "vip": true,
+  "resource_id": "7282691146759803429",
+  "effect_id": "23882063",
+  "md5": "96dc71756d0025e96a504b42d988b2ac",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "教室",
+  "vip": true,
+  "resource_id": "7282687783833965113",
+  "effect_id": "23897703",
+  "md5": "678c14a6f63f75e03daa062a254081f7",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "时光扭曲",
+  "vip": true,
+  "resource_id": "7410254477246075407",
+  "effect_id": "81298964",
+  "md5": "b4abdda11160d663308aeb0dab6063de",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "森林",
+  "vip": true,
+  "resource_id": "7413270049080742415",
+  "effect_id": "82210570",
+  "md5": "147be719531ade36bd6959338a3caa29",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "背景音",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "楼道",
+  "vip": true,
+  "resource_id": "7410254596020376064",
+  "effect_id": "81298960",
+  "md5": "c1806a2578d126dd74433640f5e09bab",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "楼道回声",
+  "vip": true,
+  "resource_id": "7425556847509115401",
+  "effect_id": "86419032",
+  "md5": "4e418df9c1cb821c20e10fcf304b7e93",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "氦气",
+  "vip": true,
+  "resource_id": "7400653188803596836",
+  "effect_id": "78208787",
+  "md5": "9c59009886c059e20d3914089afbc82f",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "沙漠",
+  "vip": true,
+  "resource_id": "7375069515530375691",
+  "effect_id": "68076025",
+  "md5": "5bd2772879c6273189d3fc7f07581e71",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "noise",
+    "default": 0.743,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "洞穴回声",
+  "vip": true,
+  "resource_id": "7425557093597319689",
+  "effect_id": "86419031",
+  "md5": "bec3da95c2b4c70e8e1202972aeaf8e3",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "派对",
+  "vip": true,
+  "resource_id": "7381685442795541042",
+  "effect_id": "71718513",
+  "md5": "723386ab87f938779a3369436234d903",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "noise",
+    "default": 0.743,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "浴室",
+  "vip": true,
+  "resource_id": "7392070514686038543",
+  "effect_id": "75411129",
+  "md5": "543fa76977e80084f25067c94e4c08a8",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "深海回声",
+  "vip": true,
+  "resource_id": "7350215168413929995",
+  "effect_id": "53187172",
+  "md5": "37a16a2dc77540b7d70fe301e482d4f2",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "深邃人声",
+  "vip": true,
+  "resource_id": "7400653111255110183",
+  "effect_id": "78208786",
+  "md5": "1d79f2c0660e1f4a2441255b9e34be6e",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "清澈人声",
+  "vip": true,
+  "resource_id": "7410254648440787456",
+  "effect_id": "81298967",
+  "md5": "b99fbb6dd42a759572f4ba13efb516ae",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "演唱会",
+  "vip": true,
+  "resource_id": "7413661596611777076",
+  "effect_id": "82364387",
+  "md5": "8ceb67756bd822b7ee9728903c8e3efa",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "演讲舞台",
+  "vip": true,
+  "resource_id": "7431088715092464155",
+  "effect_id": "88155747",
+  "md5": "6452fbaa8d66c01c491fc6d5816afc77",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "环绕回声",
+  "vip": true,
+  "resource_id": "7425557028694659635",
+  "effect_id": "86419030",
+  "md5": "0fe55903f86c3fdad33275b04c04cba0",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电台播音",
+  "vip": true,
+  "resource_id": "7418519267659747877",
+  "effect_id": "84093262",
+  "md5": "752c3df02caa20b12bfa3154ed025bff",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电话",
+  "vip": true,
+  "resource_id": "7264894634285863483",
+  "effect_id": "20255003",
+  "md5": "5da5a98b8c926c0dcc1c3c8bc3f3012f",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "留声机",
+  "vip": true,
+  "resource_id": "7282687663872676408",
+  "effect_id": "23897797",
+  "md5": "e692fae669650c948451b5811a04e7e6",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "百老汇",
+  "vip": true,
+  "resource_id": "7372150379150053907",
+  "effect_id": "66413025",
+  "md5": "73e3a35496b9766d0400165844be72f1",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "空灵感",
+  "vip": true,
+  "resource_id": "7350215092975178252",
+  "effect_id": "53187171",
+  "md5": "aa1887a8b3375d20df6bf9438d62083a",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "空谷回声",
+  "vip": true,
+  "resource_id": "7350214991628210727",
+  "effect_id": "53187170",
+  "md5": "9913daa32167a17c1f41ad2f5596c411",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "立体声",
+  "vip": true,
+  "resource_id": "7418519209996456498",
+  "effect_id": "84093260",
+  "md5": "4381314f6906919781ea17c0d51f36a0",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "管道",
+  "vip": true,
+  "resource_id": "7410254536234766863",
+  "effect_id": "81298962",
+  "md5": "37233b9d5efed3324a4c6a9d05831f40",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "老式电话",
+  "vip": true,
+  "resource_id": "7282691476843139621",
+  "effect_id": "23880011",
+  "md5": "2eb835175e1e72e9d86b09bf513077cf",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "蚊子变声",
+  "vip": true,
+  "resource_id": "7467815685876355622",
+  "effect_id": "103845137",
+  "md5": "b34cc53f1adf2f9decb0111a0082eb0a",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "言灵术",
+  "vip": true,
+  "resource_id": "7382844601435951653",
+  "effect_id": "72110974",
+  "md5": "7184386e75226a36942c60a5d5bb5618",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "豪宅回声",
+  "vip": true,
+  "resource_id": "7360900963294515775",
+  "effect_id": "58979353",
+  "md5": "7c20b5fba991f3188f14d7cdb0de1fa1",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "超市广播",
+  "vip": true,
+  "resource_id": "7431088660709118514",
+  "effect_id": "88155744",
+  "md5": "14a9154302878be941c993ff6dfd0f3d",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "背景音",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "超级混响",
+  "vip": true,
+  "resource_id": "7400652941318689299",
+  "effect_id": "78208790",
+  "md5": "c1a87e3affc5c812609b4eded7609e81",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "超重低音",
+  "vip": true,
+  "resource_id": "7410254867232461364",
+  "effect_id": "81298961",
+  "md5": "db9c654a48e01c71bfb097d70d21a42d",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "迷幻",
+  "vip": true,
+  "resource_id": "7410254415921156643",
+  "effect_id": "81298966",
+  "md5": "1f549f0d21a5e7729268e6d443857364",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "迷幻电子",
+  "vip": true,
+  "resource_id": "7375069381769826879",
+  "effect_id": "68076026",
+  "md5": "65ef01ba4626318fab4f007fec136e1e",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "noise",
+    "default": 0.743,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "闷响",
+  "vip": true,
+  "resource_id": "7413269872307606016",
+  "effect_id": "82210571",
+  "md5": "8d966ef5950315b96dcd02bfc511d5e0",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "震撼全景音",
+  "vip": true,
+  "resource_id": "7400653333456753163",
+  "effect_id": "78208788",
+  "md5": "1b65723d3e25e82a3ab99af289728498",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "音乐厅",
+  "vip": true,
+  "resource_id": "7404798608395997723",
+  "effect_id": "79701150",
+  "md5": "e819bbe1cd586bd9a2118ca39758ac22",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "颤抖电音",
+  "vip": true,
+  "resource_id": "7467815889602089523",
+  "effect_id": "103845138",
+  "md5": "8fbf024a96e0c659e8b3d3ca975f1042",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "马路边",
+  "vip": true,
+  "resource_id": "7413269976628335119",
+  "effect_id": "82210569",
+  "md5": "1c0c1e3be5ead093b685f451033de74e",
+  "params": [
+   {
+    "name": "强度",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "背景音",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "高解析人声",
+  "vip": true,
+  "resource_id": "7410254695169528355",
+  "effect_id": "81298968",
+  "md5": "3bcf82243ef574064bb53f99a2f59d5d",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "高音增强",
+  "vip": true,
+  "resource_id": "7410254923037676047",
+  "effect_id": "81298959",
+  "md5": "59b5cc1fc51c2557d9d20e0d7494edc8",
+  "params": [
+   {
+    "name": "strength",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ }
+]

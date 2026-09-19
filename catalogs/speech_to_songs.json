@@ -1,0 +1,50 @@
+[
+ {
+  "name": "Lofi",
+  "vip": false,
+  "resource_id": "7252917861948068410",
+  "effect_id": "17345060",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "民谣",
+  "vip": false,
+  "resource_id": "7251868698170888759",
+  "effect_id": "17046923",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "嘻哈",
+  "vip": true,
+  "resource_id": "7252918249036190245",
+  "effect_id": "17344948",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "爵士",
+  "vip": true,
+  "resource_id": "7264413578860433978",
+  "effect_id": "20120940",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "节奏蓝调",
+  "vip": true,
+  "resource_id": "7252918101958726200",
+  "effect_id": "17345046",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "雷鬼",
+  "vip": true,
+  "resource_id": "7264413386962637368",
+  "effect_id": "20120864",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ }
+]

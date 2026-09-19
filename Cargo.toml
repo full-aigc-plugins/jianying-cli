@@ -1,0 +1,21 @@
+[package]
+name = "jianying-cli"
+version = "1.0.0"
+edition = "2021"
+description = "Local JianYing/CapCut draft CLI in Rust — full-capability draft building from jianying-cli-plan/v1, verified and publishable, no account, no upload."
+license = "Apache-2.0"
+
+[[bin]]
+name = "jianying"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+uuid = { version = "1", features = ["v4"] }
+
+[profile.release]
+strip = true
+lto = true

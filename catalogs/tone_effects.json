@@ -1,0 +1,543 @@
+[
+ {
+  "name": "台湾小哥",
+  "vip": false,
+  "resource_id": "7255565276819755576",
+  "effect_id": "18149602",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "圣诞精灵",
+  "vip": false,
+  "resource_id": "7310059412062736946",
+  "effect_id": "33214695",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "圣诞老人",
+  "vip": false,
+  "resource_id": "7310059178133819930",
+  "effect_id": "33214489",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "广告男声",
+  "vip": false,
+  "resource_id": "7328088579811316263",
+  "effect_id": "42060748",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "港普男声",
+  "vip": false,
+  "resource_id": "7328087687548637732",
+  "effect_id": "42060743",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "老婆婆",
+  "vip": false,
+  "resource_id": "7328089253114548799",
+  "effect_id": "42060746",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "解说小帅",
+  "vip": false,
+  "resource_id": "7332473259369173540",
+  "effect_id": "44254166",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "大叔",
+  "vip": false,
+  "resource_id": "7020344898033291790",
+  "effect_id": "2672760",
+  "md5": "2509bbd71e127b04a29f52a54e82c53c",
+  "params": [
+   {
+    "name": "音调",
+    "default": 0.834,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "音色",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "女生",
+  "vip": false,
+  "resource_id": "7020345715901600270",
+  "effect_id": "2672757",
+  "md5": "0ce1aade5958506c97bffea150772b6e",
+  "params": [
+   {
+    "name": "音调",
+    "default": 0.834,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "音色",
+    "default": 0.334,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "怪物",
+  "vip": false,
+  "resource_id": "7020344978794615327",
+  "effect_id": "2672759",
+  "md5": "2130ffa21e5980196e014ec0baade179",
+  "params": [
+   {
+    "name": "音调",
+    "default": 0.65,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "音色",
+    "default": 0.78,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "机器人",
+  "vip": false,
+  "resource_id": "7018011705414259213",
+  "effect_id": "2672750",
+  "md5": "4b87db25aecd2f6f71927930110c4a1e",
+  "params": [
+   {
+    "name": "强弱",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "男生",
+  "vip": false,
+  "resource_id": "7020345085233467917",
+  "effect_id": "2672758",
+  "md5": "ffd7a609207fd849efc9f63bf31697b1",
+  "params": [
+   {
+    "name": "音调",
+    "default": 0.375,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "音色",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "花栗鼠",
+  "vip": false,
+  "resource_id": "7018011553081332231",
+  "effect_id": "2672752",
+  "md5": "e30b1922b8300423f21f9f84eff41ced",
+  "params": [
+   {
+    "name": "音调",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "音色",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "萝莉",
+  "vip": false,
+  "resource_id": "7020345789599715848",
+  "effect_id": "2672756",
+  "md5": "00b7ed2ccfe4d6076f78c8d751347a53",
+  "params": [
+   {
+    "name": "音调",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "音色",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "TVB女声",
+  "vip": true,
+  "resource_id": "7260024060417937978",
+  "effect_id": "19186454",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "东厂公公",
+  "vip": true,
+  "resource_id": "7328092524612948491",
+  "effect_id": "42060742",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "云龙哥",
+  "vip": true,
+  "resource_id": "7376558114830553612",
+  "effect_id": "68856989",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "侠客",
+  "vip": true,
+  "resource_id": "7328089134331859468",
+  "effect_id": "42060738",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "做作夹子音",
+  "vip": true,
+  "resource_id": "7367676929496846911",
+  "effect_id": "63231108",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "八戒",
+  "vip": true,
+  "resource_id": "7265891792766112314",
+  "effect_id": "20427371",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "军事解说",
+  "vip": true,
+  "resource_id": "7328092289480266252",
+  "effect_id": "42060734",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "动漫小新",
+  "vip": true,
+  "resource_id": "7360901047662940708",
+  "effect_id": "58979441",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "动漫海绵",
+  "vip": true,
+  "resource_id": "7367676859883983379",
+  "effect_id": "63231109",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "咆哮哥",
+  "vip": true,
+  "resource_id": "7332473122605503039",
+  "effect_id": "44254278",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "商务殷语",
+  "vip": true,
+  "resource_id": "7328085477267870249",
+  "effect_id": "42060747",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "四郎",
+  "vip": true,
+  "resource_id": "7250403044414722621",
+  "effect_id": "16627073",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "太白",
+  "vip": true,
+  "resource_id": "7328091247308968484",
+  "effect_id": "42060736",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "如来佛祖",
+  "vip": true,
+  "resource_id": "7376558174049931830",
+  "effect_id": "68856990",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "姜饼人",
+  "vip": true,
+  "resource_id": "7310059267384414747",
+  "effect_id": "33214539",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "容嬷嬷",
+  "vip": true,
+  "resource_id": "7332472945366798860",
+  "effect_id": "44254320",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "小孩",
+  "vip": true,
+  "resource_id": "7262648951948448315",
+  "effect_id": "19716244",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "强势妹",
+  "vip": true,
+  "resource_id": "7328091624427229759",
+  "effect_id": "42060740",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "快板",
+  "vip": true,
+  "resource_id": "7328088454183522827",
+  "effect_id": "42060741",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "恐怖电影",
+  "vip": true,
+  "resource_id": "7325710953247412787",
+  "effect_id": "40932465",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "悬疑解说",
+  "vip": true,
+  "resource_id": "7325711304390349362",
+  "effect_id": "40932811",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "懒小羊",
+  "vip": true,
+  "resource_id": "7332473035116515859",
+  "effect_id": "44254304",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "搞笑解说",
+  "vip": true,
+  "resource_id": "7262648842238038584",
+  "effect_id": "19716150",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "文艺女声",
+  "vip": true,
+  "resource_id": "7379565719991620132",
+  "effect_id": "70562787",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "樱桃丸子",
+  "vip": true,
+  "resource_id": "7325709643332719113",
+  "effect_id": "40931609",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "樱花小哥",
+  "vip": true,
+  "resource_id": "7328091741678998055",
+  "effect_id": "42060735",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "武则天",
+  "vip": true,
+  "resource_id": "7328088300474864167",
+  "effect_id": "42060744",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "沉稳解说",
+  "vip": true,
+  "resource_id": "7367676791164506636",
+  "effect_id": "63231110",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "温柔姐姐",
+  "vip": true,
+  "resource_id": "7379565769190806079",
+  "effect_id": "70562785",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "熊二",
+  "vip": true,
+  "resource_id": "7250403222798471740",
+  "effect_id": "16627311",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "猴哥",
+  "vip": true,
+  "resource_id": "7236944659547689531",
+  "effect_id": "14477015",
+  "md5": "4f6a1fbc0000e178c724d355efea1d9f",
+  "params": []
+ },
+ {
+  "name": "甜美悦悦",
+  "vip": true,
+  "resource_id": "7325710673978069530",
+  "effect_id": "40932253",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "生活小妙招",
+  "vip": true,
+  "resource_id": "7328092409525441065",
+  "effect_id": "42060737",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "电竞解说",
+  "vip": true,
+  "resource_id": "7325711893551649330",
+  "effect_id": "40933559",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "电视广告",
+  "vip": true,
+  "resource_id": "7360901109667336743",
+  "effect_id": "58979440",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "紫薇",
+  "vip": true,
+  "resource_id": "7281175506391667257",
+  "effect_id": "23475307",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "舌尖解说",
+  "vip": true,
+  "resource_id": "7328091500753982015",
+  "effect_id": "42060739",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "蜡笔小妮",
+  "vip": true,
+  "resource_id": "7379565670398169619",
+  "effect_id": "70562786",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "语音助手",
+  "vip": true,
+  "resource_id": "7325710335455793714",
+  "effect_id": "40931973",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "那姐",
+  "vip": true,
+  "resource_id": "7369177370873303587",
+  "effect_id": "64206631",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "锤子哥",
+  "vip": true,
+  "resource_id": "7328091348098093580",
+  "effect_id": "42060745",
+  "md5": "f554735f65a98cc4da17a1c53ef6a886",
+  "params": []
+ },
+ {
+  "name": "顾姐",
+  "vip": true,
+  "resource_id": "7250403134923608631",
+  "effect_id": "16627197",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ },
+ {
+  "name": "黛玉",
+  "vip": true,
+  "resource_id": "7255565592093004343",
+  "effect_id": "18149634",
+  "md5": "8dd8889045e6c065177df791ddb3dfb8",
+  "params": []
+ }
+]

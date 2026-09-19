@@ -1,0 +1,74 @@
+{
+  "叠化": {
+    "name": "叠化",
+    "vip": false,
+    "resource_id": "6724845717472416269",
+    "effect_id": "322577",
+    "md5": "2d641adc4bb63e37e3a0067d8c8cc3c3",
+    "default_duration_us": 500000,
+    "is_overlap": true
+  },
+  "闪黑": {
+    "name": "闪黑",
+    "vip": false,
+    "resource_id": "6724239388189921806",
+    "effect_id": "321493",
+    "md5": "3bca53e9f3dfa2c184fbee96438ea097",
+    "default_duration_us": 500000,
+    "is_overlap": false
+  },
+  "闪白": {
+    "name": "闪白",
+    "vip": false,
+    "resource_id": "6724845376098013708",
+    "effect_id": "322575",
+    "md5": "9732e719b858a6dbb648d4fb459fde08",
+    "default_duration_us": 500000,
+    "is_overlap": false
+  },
+  "模糊": {
+    "name": "模糊",
+    "vip": false,
+    "resource_id": "6911569618171597320",
+    "effect_id": "4212596",
+    "md5": "fc1352435f88c6f284b6c6dce8552ffe",
+    "default_duration_us": 500000,
+    "is_overlap": true
+  },
+  "百叶窗": {
+    "name": "百叶窗",
+    "vip": false,
+    "resource_id": "6789847331060584974",
+    "effect_id": "521326",
+    "md5": "9f37c3f6f5e84b37b3a0560803a16c30",
+    "default_duration_us": 500000,
+    "is_overlap": true
+  },
+  "水墨": {
+    "name": "水墨",
+    "vip": false,
+    "resource_id": "6789847231873683976",
+    "effect_id": "521328",
+    "md5": "d1dd3dd8905f0b96be756bd34be1a84d",
+    "default_duration_us": 500000,
+    "is_overlap": true
+  },
+  "翻页": {
+    "name": "翻页",
+    "vip": false,
+    "resource_id": "6747979085894390279",
+    "effect_id": "368701",
+    "md5": "2f157ee5d78c197efc26f8ed37490573",
+    "default_duration_us": 500000,
+    "is_overlap": true
+  },
+  "叠化扭曲": {
+    "name": "叠化扭曲",
+    "vip": true,
+    "resource_id": "7439255870896083466",
+    "effect_id": "92006146",
+    "md5": "c0d00a409f16dab9ebe8a94802a3a757",
+    "default_duration_us": 500000,
+    "is_overlap": true
+  }
+}

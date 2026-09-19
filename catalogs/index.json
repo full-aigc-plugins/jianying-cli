@@ -1,0 +1,86 @@
+{
+ "source": "GuanYixuan/pyJianYingDraft (Apache-2.0)",
+ "source_ref": "c3318066d964744e2bfc66f75c71745fe8cea52a 2026-07-08T21:58:33+08:00",
+ "catalogs": {
+  "transitions": {
+   "count": 453,
+   "vip": 323,
+   "sha256": "ddf77d75ee814d88d3975f0b5bfa097e4bfbabfff5162d3956ccecfbaf3fe4f0"
+  },
+  "filters": {
+   "count": 1052,
+   "vip": 802,
+   "sha256": "6e6f202770bc13089807257872420c4de6b41857e324d2b8997a2da733fb327f"
+  },
+  "fonts": {
+   "count": 798,
+   "vip": 318,
+   "sha256": "b82b73d200b3ec2d0fd9032d967ad268f5066a13ad5e73be408aa309c2b613b7"
+  },
+  "video_scene_effects": {
+   "count": 1097,
+   "vip": 462,
+   "sha256": "31821c940c832eaa009d71c74d991017c10e5b76ccc19b019fad7dd16ee7191a"
+  },
+  "video_character_effects": {
+   "count": 240,
+   "vip": 81,
+   "sha256": "44642e68b47fbcd105a666ce70c6a10b9c518e18e5197d56f363fb29fdd2c4ad"
+  },
+  "audio_scene_effects": {
+   "count": 85,
+   "vip": 73,
+   "sha256": "44f807cce91491bfac9dfe6a1bdf2210bf0179f84a527aaa24cf1d33c4ff8d39"
+  },
+  "tone_effects": {
+   "count": 57,
+   "vip": 43,
+   "sha256": "5507427f8caf4c737b839a93d04aa866c62b9dd1771fd848be3e8a41559b90a0"
+  },
+  "speech_to_songs": {
+   "count": 6,
+   "vip": 4,
+   "sha256": "babb2df5a950d73445a75f5b4ac7dc4516a618bfdb4c3f8f5629e86715c244f0"
+  },
+  "video_animations_in": {
+   "count": 155,
+   "vip": 117,
+   "sha256": "cb816626172c1bc589572474bfad434d99c108f1d2115c6a06e334c699c1662d"
+  },
+  "video_animations_out": {
+   "count": 124,
+   "vip": 103,
+   "sha256": "82f59fc2b2ded56eeac4d5a496736e06dbf62bb50ba99cc8fd6bbb572926c7f1"
+  },
+  "video_animations_group": {
+   "count": 123,
+   "vip": 16,
+   "sha256": "84a3d972e979c9011b4a5f20ff150140d82b8e30394e8883abe8dec02d492cd4"
+  },
+  "text_animations_in": {
+   "count": 145,
+   "vip": 78,
+   "sha256": "075f7c7b5b85bcbe5ef1fdb570fc16253037c39ddb07704fd9253db20e6626c9"
+  },
+  "text_animations_out": {
+   "count": 97,
+   "vip": 46,
+   "sha256": "d782efec8aec4f9ed2b004d6af6ac3f9360b7628ed6bf3257ab0fded320f4cca"
+  },
+  "text_animations_loop": {
+   "count": 93,
+   "vip": 52,
+   "sha256": "e4eed9ef698271edc6391b92ee45880d11b99e9d69d289dbde2c9c3b86c54f44"
+  },
+  "masks": {
+   "count": 6,
+   "vip": 0,
+   "sha256": "7c0f5bed4b3555bf4867b3f585e9fa1b342f7a3599dc35a445d023bbff9bff77"
+  },
+  "mix_modes": {
+   "count": 10,
+   "vip": 0,
+   "sha256": "8170667b77eaea48001277ade127fe6aa5d7f6851a7ba1c07eb9280b6c0dbb70"
+  }
+ }
+}

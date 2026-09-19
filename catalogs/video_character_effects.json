@@ -1,0 +1,6167 @@
+[
+ {
+  "name": "BOOM！",
+  "vip": false,
+  "resource_id": "6999560597230588429",
+  "effect_id": "1378605",
+  "md5": "a7d5d3fbae39950e51bff93b92ad7792",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "X",
+  "vip": false,
+  "resource_id": "7037006820749087246",
+  "effect_id": "1464226",
+  "md5": "ec38784544361583ed45aa333ebdf2c9",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "crash！",
+  "vip": false,
+  "resource_id": "6999887184018805285",
+  "effect_id": "1378609",
+  "md5": "47b6f315a86918e23d94d35c69946fe1",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "中刀",
+  "vip": false,
+  "resource_id": "7029514054179754510",
+  "effect_id": "1436386",
+  "md5": "ad3377fb7ed70663017b8f4dcecc8441",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "主体冲破屏幕",
+  "vip": false,
+  "resource_id": "7390265515056304681",
+  "effect_id": "74731169",
+  "md5": "f36c6922e91c3036495591591aba39d9",
+  "params": []
+ },
+ {
+  "name": "九尾狐",
+  "vip": false,
+  "resource_id": "7011416501160776228",
+  "effect_id": "1404740",
+  "md5": "12afdb69b18ec5127874f04d6f3fdefd",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "人影爆闪",
+  "vip": false,
+  "resource_id": "7260741462269104697",
+  "effect_id": "19799492",
+  "md5": "f307677e792d2970045b653267fca93b",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.45,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "光环 I",
+  "vip": false,
+  "resource_id": "6999584193848021535",
+  "effect_id": "1378551",
+  "md5": "ce2098aa7d557cfc63d896fc63ec2846",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "光环 II",
+  "vip": false,
+  "resource_id": "6999882629893853726",
+  "effect_id": "1378552",
+  "md5": "adb70b2ea060371bb7d91ec43c031989",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "几何拖尾 I",
+  "vip": false,
+  "resource_id": "6985081270208303653",
+  "effect_id": "1404702",
+  "md5": "dbc19689b9dae201897fce9e894ce5fe",
+  "params": []
+ },
+ {
+  "name": "几何拖尾 II",
+  "vip": false,
+  "resource_id": "7008079206181507615",
+  "effect_id": "1404705",
+  "md5": "9c57ea460222d55e1bbab56600ca3b71",
+  "params": []
+ },
+ {
+  "name": "击中",
+  "vip": false,
+  "resource_id": "7008009586581967397",
+  "effect_id": "1404729",
+  "md5": "b0a79d87265c9f181f9875a626ad7c66",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "分头行动",
+  "vip": false,
+  "resource_id": "7065570293552517646",
+  "effect_id": "1570064",
+  "md5": "50b8be675fac5e23d3bc5d96013c027e",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.35,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.4,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "分身",
+  "vip": false,
+  "resource_id": "7194734735434715704",
+  "effect_id": "9010351",
+  "md5": "dca7518f6eb90654d1c2473406db2890",
+  "params": [
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_number",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "动感爱心",
+  "vip": false,
+  "resource_id": "6998039666024780318",
+  "effect_id": "1238121",
+  "md5": "9d3838036dedfd21be7f340273fde034",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "卡通脸",
+  "vip": false,
+  "resource_id": "7205481536240489019",
+  "effect_id": "10092161",
+  "md5": "d01b570f71818e6f6d04bc6c9b1ef766",
+  "params": []
+ },
+ {
+  "name": "变身",
+  "vip": false,
+  "resource_id": "6998018272557797924",
+  "effect_id": "1238120",
+  "md5": "f78c282c0147f997f1c7624bda919cc3",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "可爱女生",
+  "vip": false,
+  "resource_id": "6971317732948054542",
+  "effect_id": "1182270",
+  "md5": "305aaa38fa724b8fceba4a0be1bd49a8",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "可爱猪",
+  "vip": false,
+  "resource_id": "6971317650219602446",
+  "effect_id": "1182274",
+  "md5": "483efc4867b85d9bf7c39a6b1d878b8d",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "吻痕坏笑",
+  "vip": false,
+  "resource_id": "7197741530751177274",
+  "effect_id": "9392743",
+  "md5": "df256252c27055c7434212ca51caf7d0",
+  "params": [
+   {
+    "name": "effects_adjust_texture",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "哈哈哈",
+  "vip": false,
+  "resource_id": "6993187958685700638",
+  "effect_id": "1217040",
+  "md5": "803508bffb42714235dcdbddb1d30834",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "图腾",
+  "vip": false,
+  "resource_id": "6999820560528052743",
+  "effect_id": "1378608",
+  "md5": "006d822d0f49a4e20e539d18ed6cda96",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "圣诞小熊",
+  "vip": false,
+  "resource_id": "7175084803874624061",
+  "effect_id": "7126277",
+  "md5": "c66c5f67cc2eeb2827a24fd5558cedfe",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.35,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "圣诞帽",
+  "vip": false,
+  "resource_id": "7034784053609894430",
+  "effect_id": "1457102",
+  "md5": "b3bf8d22530db2a310a8c38abed2fd09",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "圣诞树",
+  "vip": false,
+  "resource_id": "7173942106061279781",
+  "effect_id": "6993587",
+  "md5": "865c067b3fc9fd7d8fb9d32bfe88cea3",
+  "params": []
+ },
+ {
+  "name": "圣诞胡子",
+  "vip": false,
+  "resource_id": "7034831862597947918",
+  "effect_id": "1457484",
+  "md5": "35b6dc4b15d10db2100509cf349f5b5c",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.77,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "圣诞辣妹",
+  "vip": false,
+  "resource_id": "7165705324777705992",
+  "effect_id": "7406471",
+  "md5": "7c9b779e2382630c01d33528a013b8fb",
+  "params": [
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "圣诞铃铛",
+  "vip": false,
+  "resource_id": "7175084694940160568",
+  "effect_id": "7126337",
+  "md5": "5b59cf441d783d507c2b4b3a0aabf4e9",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.35,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "声波",
+  "vip": false,
+  "resource_id": "7008055446397260319",
+  "effect_id": "1404731",
+  "md5": "f0e9e247eabb12c558de273a8e51c515",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "多屏圣诞树",
+  "vip": false,
+  "resource_id": "7175084576950194725",
+  "effect_id": "7126387",
+  "md5": "1a70506d54ba37021e8dd157358aa76a",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.35,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "大头",
+  "vip": false,
+  "resource_id": "6986556887818834462",
+  "effect_id": "1201644",
+  "md5": "7518e7eb3e186350b688bf712b960c97",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "大眼睛",
+  "vip": false,
+  "resource_id": "7044080818544710152",
+  "effect_id": "1489516",
+  "md5": "b53f3fda1f03d0d1f703fb71a009d790",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "天使环",
+  "vip": false,
+  "resource_id": "7019228748775952933",
+  "effect_id": "1400400",
+  "md5": "5782ef42472fd9771f9113d98b6e4e58",
+  "params": []
+ },
+ {
+  "name": "太阳神",
+  "vip": false,
+  "resource_id": "7009186849444860453",
+  "effect_id": "1404735",
+  "md5": "9c009ca6bf736eba0dd3152bb863fc6d",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "好吃",
+  "vip": false,
+  "resource_id": "7075218981442818596",
+  "effect_id": "1626122",
+  "md5": "6a55240ce1f00f078b50fd5e34b5afd3",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.2
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.6,
+    "min": 0.3,
+    "max": 2.6
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.3,
+    "max": 2.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "妖气",
+  "vip": false,
+  "resource_id": "6729410038047183364",
+  "effect_id": "1558942",
+  "md5": "8ff658c7bcf3814f91693f906d5eba8b",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "委屈丑丑脸",
+  "vip": false,
+  "resource_id": "7130874026733343268",
+  "effect_id": "4192363",
+  "md5": "596971eaa17dbe64f62f52fc75c9998a",
+  "params": []
+ },
+ {
+  "name": "害羞",
+  "vip": false,
+  "resource_id": "6979931248890221069",
+  "effect_id": "1187976",
+  "md5": "6904d753832ee54a39f46fb23e0c47fc",
+  "params": [
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "小恶魔",
+  "vip": false,
+  "resource_id": "6995534946311868958",
+  "effect_id": "1225626",
+  "md5": "7dba67f137a50da13db71188fc6df71f",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "小鹿角",
+  "vip": false,
+  "resource_id": "7035938555683672612",
+  "effect_id": "1459882",
+  "md5": "a77b46457ff3ea5a5c75c0d127e9cdd2",
+  "params": []
+ },
+ {
+  "name": "尴尬住了",
+  "vip": false,
+  "resource_id": "7156141357008949790",
+  "effect_id": "5481035",
+  "md5": "cc08bdab9e913aa015d61631abf8fa7d",
+  "params": []
+ },
+ {
+  "name": "局部扭曲",
+  "vip": false,
+  "resource_id": "7038521452668129822",
+  "effect_id": "1470210",
+  "md5": "da8f3f99ca659d2710b2f9dcecf5fe4c",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "局部马赛克",
+  "vip": false,
+  "resource_id": "7034092576726585869",
+  "effect_id": "1454112",
+  "md5": "6f37c16b7d7904bc8489e66455f6d78b",
+  "params": [
+   {
+    "name": "effects_adjust_range",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "巴哥犬",
+  "vip": false,
+  "resource_id": "6971317662567633421",
+  "effect_id": "1182273",
+  "md5": "6764c992938b5c0e62dfc6e46255bde7",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "帅气男生",
+  "vip": false,
+  "resource_id": "6971317748542476814",
+  "effect_id": "1182269",
+  "md5": "71d88fb7f6ae9e19df3f8b491b7355bf",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "幻影 I",
+  "vip": false,
+  "resource_id": "7212904257043829307",
+  "effect_id": "11357751",
+  "md5": "6699feabadc4f59732b8087620fc95a6",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "幽灵",
+  "vip": false,
+  "resource_id": "7000630410275197470",
+  "effect_id": "1378554",
+  "md5": "9f6758469c2a948cadfbeff53bbc5b6d",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "弥散流光",
+  "vip": false,
+  "resource_id": "7034508334157795876",
+  "effect_id": "1455764",
+  "md5": "eabd69cd578279cf0dc892e088f60da6",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_noise",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "彩色负片",
+  "vip": false,
+  "resource_id": "7035876641083494926",
+  "effect_id": "1459050",
+  "md5": "2cd6462bd0bde3023d5f7069cd549b17",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.4,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "彩色重影",
+  "vip": false,
+  "resource_id": "6995746173772370469",
+  "effect_id": "1235614",
+  "md5": "99b7fa2ef6210832f1d6dccfce4ed759",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "微笑摇摆头",
+  "vip": false,
+  "resource_id": "7166825483902915109",
+  "effect_id": "6253239",
+  "md5": "ff4053845ced3ff3b9fbe9d1429a908b",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.45,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.35,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "心动",
+  "vip": false,
+  "resource_id": "6986186073814602277",
+  "effect_id": "1204190",
+  "md5": "bab33144cacb0cdade5a3d1f18d9c6e7",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "心动信号",
+  "vip": false,
+  "resource_id": "7040012457842053662",
+  "effect_id": "1478394",
+  "md5": "a4758810ef78bfca76c45486faeac99d",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "心心眼",
+  "vip": false,
+  "resource_id": "7196943722523660858",
+  "effect_id": "9126233",
+  "md5": "aebda718fd41b71cbef713df0b12ac0f",
+  "params": [
+   {
+    "name": "effects_adjust_distortion",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "恶灵骑士",
+  "vip": false,
+  "resource_id": "7000301210993431053",
+  "effect_id": "1378618",
+  "md5": "c0f232fc4435c4bf8a4861efa6bcf671",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "恶魔印记",
+  "vip": false,
+  "resource_id": "7000647554337608222",
+  "effect_id": "1378619",
+  "md5": "abab6563284c7ef292d1acaaf5a1be3e",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "恶魔尾巴",
+  "vip": false,
+  "resource_id": "7001021232371995149",
+  "effect_id": "1404725",
+  "md5": "7ab5f92c75beb4747dc81731b447f53c",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "恶魔角",
+  "vip": false,
+  "resource_id": "7019228817549955597",
+  "effect_id": "1400399",
+  "md5": "e3331ccd99a663f0561f82ac87441dcf",
+  "params": []
+ },
+ {
+  "name": "惨",
+  "vip": false,
+  "resource_id": "6992836065245532680",
+  "effect_id": "1225625",
+  "md5": "f5f8238bef302a2a27cae95c0d2304f1",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "意识流",
+  "vip": false,
+  "resource_id": "7000629338529862151",
+  "effect_id": "1378555",
+  "md5": "17dcd65459f769802c3d02fa00af0a48",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "憔悴",
+  "vip": false,
+  "resource_id": "6986160256103485989",
+  "effect_id": "1197947",
+  "md5": "709a178794856095bfcc215cabc3f91c",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "懵",
+  "vip": false,
+  "resource_id": "6980272649066779143",
+  "effect_id": "1187977",
+  "md5": "32325e03b4b27a426af4f3c3916cd718",
+  "params": [
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "我不听",
+  "vip": false,
+  "resource_id": "7001058741571293709",
+  "effect_id": "1353102",
+  "md5": "a56ac41521ef7b1e1ad7e09ec2253082",
+  "params": [
+   {
+    "name": "effects_adjust_number",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "我服了",
+  "vip": false,
+  "resource_id": "7029509874862002724",
+  "effect_id": "1436336",
+  "md5": "6ec666bfc6a45aa53f82f794d75d9976",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "手印涂抹",
+  "vip": false,
+  "resource_id": "7153950763348136478",
+  "effect_id": "5190085",
+  "md5": "c617ff4e68e61de777f52149851b782c",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "手绘描边",
+  "vip": false,
+  "resource_id": "7406177019404227109",
+  "effect_id": "80106342",
+  "md5": "07d72dd2e34f4fd41cbdabe05464454d",
+  "params": []
+ },
+ {
+  "name": "打击",
+  "vip": false,
+  "resource_id": "6971302911317905956",
+  "effect_id": "1169502",
+  "md5": "b310c3ede33e6e0819859dbc67ffab7e",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.55,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "打脸",
+  "vip": false,
+  "resource_id": "6992915114051506725",
+  "effect_id": "1217039",
+  "md5": "ade99f5a3c5dc73639e55dbf4157b0eb",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "扫描 II",
+  "vip": false,
+  "resource_id": "7000630959565443614",
+  "effect_id": "1378580",
+  "md5": "c6c224fb2fec72f0a0432ccad29546aa",
+  "params": [
+   {
+    "name": "effects_adjust_range",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "拼贴抽帧",
+  "vip": false,
+  "resource_id": "7142777693707178533",
+  "effect_id": "4574525",
+  "md5": "602c047f7cafe02427da4b327fd260cf",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_chromatic",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_chromatic",
+    "default": 0.1,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.661,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.65,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "拼贴风暴",
+  "vip": false,
+  "resource_id": "7037019101402763806",
+  "effect_id": "1464400",
+  "md5": "1a39707de66987a9048c2e495b5a1c96",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "拽酷红眼",
+  "vip": false,
+  "resource_id": "6979861988935471623",
+  "effect_id": "1185226",
+  "md5": "3528fdf176336d1ae503e85611d96347",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "掉小珍珠啦",
+  "vip": false,
+  "resource_id": "7132336135748981255",
+  "effect_id": "4080159",
+  "md5": "91cb59a743f8089684fcf7c420861e74",
+  "params": []
+ },
+ {
+  "name": "故障描边 I",
+  "vip": false,
+  "resource_id": "6998080413587477005",
+  "effect_id": "1238132",
+  "md5": "226bca50364904c231246c72b0a9e5c1",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "敲打",
+  "vip": false,
+  "resource_id": "6986918523704447501",
+  "effect_id": "1197949",
+  "md5": "67737d95f8256e6915b26c3efd41f305",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "新年星黛露",
+  "vip": false,
+  "resource_id": "7182406780733887033",
+  "effect_id": "7823781",
+  "md5": "6e4e73454d92da43cd9e90cf7c350c7d",
+  "params": [
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "无信号",
+  "vip": false,
+  "resource_id": "7039965830192304671",
+  "effect_id": "1478054",
+  "md5": "c6c413df67a97d81b29355a0e1e89f16",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "日系大头贴",
+  "vip": false,
+  "resource_id": "7309039877796925978",
+  "effect_id": "32668223",
+  "md5": "04f1ebf5bf63743f1bb12f518ede4b5e",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 0.1,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "星光放射",
+  "vip": false,
+  "resource_id": "6999904379822150158",
+  "effect_id": "1378610",
+  "md5": "aa85bd31e3f47e7bd01383b6aacc9508",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "星星拖尾",
+  "vip": false,
+  "resource_id": "7007679689388986888",
+  "effect_id": "1404703",
+  "md5": "7dabcaa49244e8faeaf61bfa184d53fb",
+  "params": []
+ },
+ {
+  "name": "未来眼镜",
+  "vip": false,
+  "resource_id": "6989160247034122789",
+  "effect_id": "1238126",
+  "md5": "66983702ac8ca5f68aa9ec32c92c4b3b",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "机械几何",
+  "vip": false,
+  "resource_id": "6997682380454498824",
+  "effect_id": "1238116",
+  "md5": "2b469e181b8e5be26a0e09678a9974b0",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "机械姬 I",
+  "vip": false,
+  "resource_id": "6978809529215488548",
+  "effect_id": "1238098",
+  "md5": "11d60d8c8de82453c697bed883e64671",
+  "params": []
+ },
+ {
+  "name": "机械姬 II",
+  "vip": false,
+  "resource_id": "6997969810822795813",
+  "effect_id": "1238099",
+  "md5": "601bc1f8fd6dfcb9226fa7e54aba9f14",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "机灵怪",
+  "vip": false,
+  "resource_id": "7158373218724614664",
+  "effect_id": "5510681",
+  "md5": "6fa4f54d22b420c8c0a3e59246d1c8b7",
+  "params": []
+ },
+ {
+  "name": "欧美女性",
+  "vip": false,
+  "resource_id": "6971317800098861576",
+  "effect_id": "1182266",
+  "md5": "6d9b6990df1d66bad249c5defd435576",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "欧美男性",
+  "vip": false,
+  "resource_id": "6971317784085008909",
+  "effect_id": "1182267",
+  "md5": "b09c7a6c2134a95aeac139f06217cdde",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "气泡 I",
+  "vip": false,
+  "resource_id": "6999560743653741087",
+  "effect_id": "1378604",
+  "md5": "53133594bcb0ca9cf9cb48b80aa8eec1",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "气泡 II",
+  "vip": false,
+  "resource_id": "6999560859986956813",
+  "effect_id": "1378603",
+  "md5": "1b75e11acadf9069723dc387751d68c5",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "气波",
+  "vip": false,
+  "resource_id": "7008459080452805133",
+  "effect_id": "1404693",
+  "md5": "d49684beffa531728f6d0b2f5823a465",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "氛围大头贴",
+  "vip": false,
+  "resource_id": "7309480138486321715",
+  "effect_id": "32919263",
+  "md5": "13daa7e7f44f245155737d4a8017d0e2",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 0.1,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "沉沦",
+  "vip": false,
+  "resource_id": "7000286535568331294",
+  "effect_id": "1378579",
+  "md5": "7f1cef9ddfd657188f2ae2f069c9433b",
+  "params": [
+   {
+    "name": "effects_adjust_range",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "流光描边",
+  "vip": false,
+  "resource_id": "7156203771352060424",
+  "effect_id": "6699941",
+  "md5": "43de1121773eea81624460ed929b17e8",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.85,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.15,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "流口水",
+  "vip": false,
+  "resource_id": "7072912940101276196",
+  "effect_id": "1610044",
+  "md5": "50dec319b04a96990ed59c7a237ed700",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.5,
+    "min": 0.4,
+    "max": 0.7
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.8,
+    "min": 0.5,
+    "max": 1.2
+   }
+  ]
+ },
+ {
+  "name": "漩涡",
+  "vip": false,
+  "resource_id": "7007639691797205511",
+  "effect_id": "1404726",
+  "md5": "c027fc134ee686578a887120774ae49b",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "潮流入侵",
+  "vip": false,
+  "resource_id": "7039588403897176583",
+  "effect_id": "1475552",
+  "md5": "fff9a2112e2f1befcbe793a348d9b49e",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "潮酷女孩",
+  "vip": false,
+  "resource_id": "6973998028587799076",
+  "effect_id": "1182282",
+  "md5": "43567fd71493d00bc90873169a742c7b",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "潮酷男孩",
+  "vip": false,
+  "resource_id": "6971317770835202574",
+  "effect_id": "1182268",
+  "md5": "8db29277f098685e305a341ae6256482",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "激光几何",
+  "vip": false,
+  "resource_id": "6998130105188880909",
+  "effect_id": "1238146",
+  "md5": "3b57818e4d021368a6a71792ff5efffd",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "火焰拖尾",
+  "vip": false,
+  "resource_id": "7008060347789611551",
+  "effect_id": "1404704",
+  "md5": "f5e51b968426e15e4e185285a4e8558f",
+  "params": []
+ },
+ {
+  "name": "火焰环绕",
+  "vip": false,
+  "resource_id": "7009186695157387784",
+  "effect_id": "1404737",
+  "md5": "0336f00d05b706cf8ab9742af8ee16c7",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "火焰翅膀 I",
+  "vip": false,
+  "resource_id": "7009186539762618910",
+  "effect_id": "1404738",
+  "md5": "bab3b65e0ca81daf7fbef82971d57527",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "火焰翅膀 II",
+  "vip": false,
+  "resource_id": "7007998245511107108",
+  "effect_id": "1404728",
+  "md5": "93fa02d91dd5f7fd2c41314358ba462d",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "灵机一动",
+  "vip": false,
+  "resource_id": "6982806720867209765",
+  "effect_id": "1187978",
+  "md5": "9a0be515180211c4c30a1757d3622ca0",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "灵魂出走",
+  "vip": false,
+  "resource_id": "6994263736991093278",
+  "effect_id": "1220234",
+  "md5": "b78e2e42d51b354ad3a2c9af04da43f1",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "爱心光波",
+  "vip": false,
+  "resource_id": "7058944699737838116",
+  "effect_id": "1552114",
+  "md5": "2198438e43c9ff1147958bf750b61b90",
+  "params": [
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.204,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.753,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "爱心焰火",
+  "vip": false,
+  "resource_id": "6999550440639566350",
+  "effect_id": "1378601",
+  "md5": "2f8b37a399b2b45ca57717a6244c3c9f",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "狼人",
+  "vip": false,
+  "resource_id": "7156899280374993416",
+  "effect_id": "5413619",
+  "md5": "f3d6cf02114d17bad33a3003557f5ff5",
+  "params": [
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "猩猩脸",
+  "vip": false,
+  "resource_id": "7112786295771894285",
+  "effect_id": "3186064",
+  "md5": "3afa515823ec425b359bf9102a7cfa28",
+  "params": []
+ },
+ {
+  "name": "猫耳女孩",
+  "vip": false,
+  "resource_id": "6971317673699316261",
+  "effect_id": "1182272",
+  "md5": "486df1ec5de1ca0a69210b844b912534",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电光描边",
+  "vip": false,
+  "resource_id": "7171723380003967496",
+  "effect_id": "6738041",
+  "md5": "1a5266ab56ea0645c20f0160aee7743e",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.9,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电光放射",
+  "vip": false,
+  "resource_id": "7011414375130993188",
+  "effect_id": "1404739",
+  "md5": "092db1dc71adf758d4ab5b19b5b43873",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电击",
+  "vip": false,
+  "resource_id": "6999560974638256671",
+  "effect_id": "1378602",
+  "md5": "b1659d113dda06df2115cd948ed09e23",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电子屏故障",
+  "vip": false,
+  "resource_id": "6997976386413531661",
+  "effect_id": "1238119",
+  "md5": "05d9292d4d2ef2ea3b84854f4771ff25",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "真的会谢",
+  "vip": false,
+  "resource_id": "7179493200904589881",
+  "effect_id": "7600931",
+  "md5": "bdfc580a5e4155e95c3568dcea50d341",
+  "params": []
+ },
+ {
+  "name": "真香",
+  "vip": false,
+  "resource_id": "6995535089975169549",
+  "effect_id": "1225627",
+  "md5": "81a9d2b55a363059acb95c637e49d65d",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "破碎的心",
+  "vip": false,
+  "resource_id": "7008077860397126158",
+  "effect_id": "1404734",
+  "md5": "7ddd6f7b9c206935ac79bfc814467ae4",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "神明少女",
+  "vip": false,
+  "resource_id": "6906817277316829703",
+  "effect_id": "1169466",
+  "md5": "20a22b74a6a7a30f2dcab48dbc5276b6",
+  "params": [
+   {
+    "name": "effects_adjust_soft",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "科技氛围 I",
+  "vip": false,
+  "resource_id": "6989160173826740767",
+  "effect_id": "1238115",
+  "md5": "bdfd8e3165875ca7084b62d7e6204079",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "科技氛围 III",
+  "vip": false,
+  "resource_id": "6983927792010269214",
+  "effect_id": "1238118",
+  "md5": "8e1024fd3f6bd41f09d16cf27de0f210",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "秘密",
+  "vip": false,
+  "resource_id": "7023684632591733284",
+  "effect_id": "1418782",
+  "md5": "72f525012ca8744325138a89981b3e84",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "箭头环绕",
+  "vip": false,
+  "resource_id": "6999943971162034702",
+  "effect_id": "1378553",
+  "md5": "c4543904bdf336051dee6e64c8b5ebdd",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "粉色便便",
+  "vip": false,
+  "resource_id": "6971317685216875044",
+  "effect_id": "1182271",
+  "md5": "0c843a5ba39df7e037f4995040f79263",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "背景拖影",
+  "vip": false,
+  "resource_id": "7012512877038801415",
+  "effect_id": "1379270",
+  "md5": "e6c9f05435c8a8912b1321bfa9f39a4a",
+  "params": [
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.85,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "背景氛围II",
+  "vip": false,
+  "resource_id": "7007713075486790152",
+  "effect_id": "1404727",
+  "md5": "f69d913fb2414b485d7d03770049a5fa",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "脸红",
+  "vip": false,
+  "resource_id": "7025808257306333732",
+  "effect_id": "1424210",
+  "md5": "9946c014663314c93786a0a8fc27b347",
+  "params": [
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.802,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "脸绿了",
+  "vip": false,
+  "resource_id": "7023661644853023263",
+  "effect_id": "1418056",
+  "md5": "a4af7d2a30dac7d4be34f96c8d27f556",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.802,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "脸部故障",
+  "vip": false,
+  "resource_id": "7260774105073324602",
+  "effect_id": "19351944",
+  "md5": "b00871e8d7e141731a2fe3ca29bb857a",
+  "params": [
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "舞者",
+  "vip": false,
+  "resource_id": "6978809631678140935",
+  "effect_id": "1238134",
+  "md5": "80d431c5d76932b3f3fb8418267afdb5",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "舞者 II",
+  "vip": false,
+  "resource_id": "7000629698401145352",
+  "effect_id": "1378611",
+  "md5": "de4d77dc2f920e92503d9553c0cf1a21",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "萤火",
+  "vip": false,
+  "resource_id": "6979415063106949639",
+  "effect_id": "1378556",
+  "md5": "000701418e2acde7230cfdcc680ef895",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "虚拟人生 I",
+  "vip": false,
+  "resource_id": "6998017546452472351",
+  "effect_id": "1238100",
+  "md5": "54fd9f289f28e1a2f060f4e569c31359",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "虚拟人生 II",
+  "vip": false,
+  "resource_id": "6998017726589440519",
+  "effect_id": "1238101",
+  "md5": "2bc7ecc4b79a372c9fed9a86b850d8a5",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "衰",
+  "vip": false,
+  "resource_id": "6995855600764588557",
+  "effect_id": "1225628",
+  "md5": "80bb667cb6e39b17554321df89c41a86",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "视线遮挡",
+  "vip": false,
+  "resource_id": "7034507846305714696",
+  "effect_id": "1455754",
+  "md5": "9d6829ecbc85a6653ca44ccd18c9243f",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "赛博朋克 I",
+  "vip": false,
+  "resource_id": "6975112087659876895",
+  "effect_id": "1238114",
+  "md5": "3f5f8d770decd3fe853778e00f3ab589",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "赛博朋克 II",
+  "vip": false,
+  "resource_id": "6997261680803582494",
+  "effect_id": "1238113",
+  "md5": "0bbcda72ffc36a7aa6dc7d5ec7cdc0b6",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "赛博眼镜",
+  "vip": false,
+  "resource_id": "7055586958050857503",
+  "effect_id": "1536126",
+  "md5": "ce551db43d4cd0e9abf3e69a35513113",
+  "params": []
+ },
+ {
+  "name": "轻金属",
+  "vip": false,
+  "resource_id": "7036946127320519182",
+  "effect_id": "1463702",
+  "md5": "6f5edc9d13d681afe8ee4f3224014a1e",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "运动轨迹",
+  "vip": false,
+  "resource_id": "7389547512987652658",
+  "effect_id": "74470467",
+  "md5": "91ac684d7b70b28e9fd1f3c1f99c97e9",
+  "params": [
+   {
+    "name": "effects_adjust_number",
+    "default": 0.4,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "迷茫",
+  "vip": false,
+  "resource_id": "6979931594408595975",
+  "effect_id": "1185225",
+  "md5": "19618c1e22b607642e7b27dc2602832f",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "闪影",
+  "vip": false,
+  "resource_id": "7090458377901314568",
+  "effect_id": "1825212",
+  "md5": "864dcb150b85814ca7615946c7265941",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "闪烁",
+  "vip": false,
+  "resource_id": "7008060861528936991",
+  "effect_id": "1404733",
+  "md5": "b8648c0ede65749dcc4af04b7d5fa54c",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "闪电炸裂",
+  "vip": false,
+  "resource_id": "6999539022812942884",
+  "effect_id": "1378606",
+  "md5": "be8011441a484bf6661aa33604cd06bd",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "阳光",
+  "vip": false,
+  "resource_id": "6986176759725036039",
+  "effect_id": "1197948",
+  "md5": "7ea97e6b6156a1066459a400f0c26692",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "阴云密布",
+  "vip": false,
+  "resource_id": "7025527915320185375",
+  "effect_id": "1427592",
+  "md5": "25dc89f2e7cbe9ffb52d1da8f2cade5c",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "阴暗面",
+  "vip": false,
+  "resource_id": "7000679723906896397",
+  "effect_id": "1378620",
+  "md5": "f1efe71ae45c60bc94d1fcb168b8bf4d",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "难吃",
+  "vip": false,
+  "resource_id": "7075326356585714207",
+  "effect_id": "1627088",
+  "md5": "22f5c7f78d72ed2767d8673414519e4b",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.2
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.55,
+    "min": 0.3,
+    "max": 2.6
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.3,
+    "max": 2.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "难过",
+  "vip": false,
+  "resource_id": "6979931396827517477",
+  "effect_id": "1187975",
+  "md5": "0d1f3c1ea1287cd2de9193f5a6c55d20",
+  "params": [
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "雪花眼泪",
+  "vip": false,
+  "resource_id": "7174694873897898553",
+  "effect_id": "7078531",
+  "md5": "b078f5583b67f9bfa95e30bf612e3482",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.85,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_sharpen",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "霓虹特技",
+  "vip": false,
+  "resource_id": "7389546043534217778",
+  "effect_id": "74469969",
+  "md5": "a30c2949ccfc35417421caf68261ae0b",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.51,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_chromatic",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "音符拖尾",
+  "vip": false,
+  "resource_id": "7008458769675850248",
+  "effect_id": "1404706",
+  "md5": "7c1a10956911f225d514aab1ecfb7aeb",
+  "params": []
+ },
+ {
+  "name": "音符拖尾 II",
+  "vip": false,
+  "resource_id": "7002176395312894494",
+  "effect_id": "1238188",
+  "md5": "c768fa0ad974298284a8adb66678e93a",
+  "params": []
+ },
+ {
+  "name": "飓风",
+  "vip": false,
+  "resource_id": "7008458952451035678",
+  "effect_id": "1404694",
+  "md5": "a0bf72f591c6dbba8a211894f618976f",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "飞翔的帽子",
+  "vip": false,
+  "resource_id": "6999892125697446414",
+  "effect_id": "1404708",
+  "md5": "ec71eec4c8788ed43133f0a5a775e0c6",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "鬼火",
+  "vip": false,
+  "resource_id": "7008470453366821389",
+  "effect_id": "1404696",
+  "md5": "6dcf3bafc5efbf4f3509dae601f57f54",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "黑人女孩",
+  "vip": false,
+  "resource_id": "6971317836648026661",
+  "effect_id": "1182265",
+  "md5": "bde6e304a5de9614c0f44644fd3d15be",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "黑人男生",
+  "vip": false,
+  "resource_id": "6971317847318336031",
+  "effect_id": "1182264",
+  "md5": "a6e9afde1f86efbb91c49ecd9d6a8fdc",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "鼻血",
+  "vip": false,
+  "resource_id": "7153900212623249950",
+  "effect_id": "5182539",
+  "md5": "fc3d1f3cca541ced7f24b226eff114ee",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "3D兔兔",
+  "vip": true,
+  "resource_id": "7098954198204551716",
+  "effect_id": "1924176",
+  "md5": "78c9a5106ea815c821911a10f7631163",
+  "params": [
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "Love u",
+  "vip": true,
+  "resource_id": "7058892012358996510",
+  "effect_id": "1551894",
+  "md5": "2aa9298939a522ca05e5219ab6e91cf6",
+  "params": [
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "X瞬移",
+  "vip": true,
+  "resource_id": "7265629618424517157",
+  "effect_id": "20387617",
+  "md5": "366528fe2ee5c5c851a694073cf4b855",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "分身 III",
+  "vip": true,
+  "resource_id": "7281245666309837349",
+  "effect_id": "23497249",
+  "md5": "5b218df611d57e62c26029c0df884b13",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 0.6
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "分身ll",
+  "vip": true,
+  "resource_id": "7207269616299545149",
+  "effect_id": "10287363",
+  "md5": "a42da906cd114315f798ba59b1692264",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.62,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.4,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.55,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "发光分身",
+  "vip": true,
+  "resource_id": "7233250530292666939",
+  "effect_id": "13661053",
+  "md5": "dbff6732319cf9488da4816c188d9f1a",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.84,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.35,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.102,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "变老-美颜",
+  "vip": true,
+  "resource_id": "7226689898118386237",
+  "effect_id": "12825757",
+  "md5": "bd4037e779bb8ecd6ac12258853974b2",
+  "params": []
+ },
+ {
+  "name": "可爱龙龙",
+  "vip": true,
+  "resource_id": "7327508217590714931",
+  "effect_id": "41751981",
+  "md5": "9ac3a781a5aa5b33ddc73be905a2b270",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "吸血鬼",
+  "vip": true,
+  "resource_id": "7154356694376518158",
+  "effect_id": "5226581",
+  "md5": "c560f8982d276a2824147698951751cd",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_texture",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "哥特",
+  "vip": true,
+  "resource_id": "7154061273838129672",
+  "effect_id": "5199947",
+  "md5": "94bd5a2ec19553d8e91423ab41b1bfee",
+  "params": [
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_rotate",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "嘻哈眼镜",
+  "vip": true,
+  "resource_id": "6998017895024300557",
+  "effect_id": "1238128",
+  "md5": "3a23ea8d16fe9ec18850783595877e4b",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "天使",
+  "vip": true,
+  "resource_id": "7156481333189939720",
+  "effect_id": "5374123",
+  "md5": "14336b246c295332eee8b29c5dc807c4",
+  "params": [
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_number",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.9,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "天使翅膀",
+  "vip": true,
+  "resource_id": "6999514637767021070",
+  "effect_id": "1378600",
+  "md5": "f7acdf6cab043dbe7401ac89e572f6ff",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "奇行种",
+  "vip": true,
+  "resource_id": "7168749461206733342",
+  "effect_id": "6432361",
+  "md5": "ca795d0b1827bcd27231c7c5a10825e3",
+  "params": []
+ },
+ {
+  "name": "局部模糊",
+  "vip": true,
+  "resource_id": "7036282000780562981",
+  "effect_id": "1461580",
+  "md5": "d61e04351e9ead6669cb6db1f4bdce05",
+  "params": [
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_noise",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_chromatic",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_chromatic",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "幻彩流光",
+  "vip": true,
+  "resource_id": "7303422113812058633",
+  "effect_id": "30319544",
+  "md5": "5926b9713b3de1fe23a6b1790ba5d204",
+  "params": [
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.95,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "幻影平移",
+  "vip": true,
+  "resource_id": "7259667629357404730",
+  "effect_id": "19114588",
+  "md5": "4f4946b896cb4675e8514fa8d5af517a",
+  "params": [
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "彩虹流体",
+  "vip": true,
+  "resource_id": "7273753115604554295",
+  "effect_id": "21883974",
+  "md5": "2725088e1378997bea428c8b04e2b15f",
+  "params": [
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.9,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "彩虹边缘",
+  "vip": true,
+  "resource_id": "7306769922535723558",
+  "effect_id": "31771661",
+  "md5": "e59040f43c25146de23341ac4b47a8bf",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.55,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_rotate",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.15,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "影分身",
+  "vip": true,
+  "resource_id": "7306822259186864691",
+  "effect_id": "31622417",
+  "md5": "8088e845f5e6b8aecd6a9245cf033cfb",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.333,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "恶魔之翼",
+  "vip": true,
+  "resource_id": "7008049313305596446",
+  "effect_id": "1404730",
+  "md5": "99cdde82bb5587966f1a2bac10d024f2",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "情绪定格",
+  "vip": true,
+  "resource_id": "7298250619167445531",
+  "effect_id": "28662656",
+  "md5": "b60fd80757a580b75be83ea1b8905ef3",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.1,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "我太可爱了",
+  "vip": true,
+  "resource_id": "7132773677086544398",
+  "effect_id": "4104909",
+  "md5": "76739264135fb0471d1ac7d9fa8b2027",
+  "params": []
+ },
+ {
+  "name": "我爱了",
+  "vip": true,
+  "resource_id": "7182098630935843385",
+  "effect_id": "9267743",
+  "md5": "9ea5207040ca8a6c673eee1c8f4213e9",
+  "params": []
+ },
+ {
+  "name": "我麻了",
+  "vip": true,
+  "resource_id": "7030722591358718494",
+  "effect_id": "1441766",
+  "md5": "b3078ea7691c02789dec4360d7ebd5a5",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "手写描边",
+  "vip": true,
+  "resource_id": "7108559446065811998",
+  "effect_id": "2869818",
+  "md5": "59694d712050ddb032105f620b50ffe6",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.21,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "捕梦",
+  "vip": true,
+  "resource_id": "7038866261677183524",
+  "effect_id": "1471454",
+  "md5": "24df2e977ac4752adaeb8f4495e98aeb",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "撕纸拼贴",
+  "vip": true,
+  "resource_id": "7406207253583237682",
+  "effect_id": "80787899",
+  "md5": "e2b5e11e2f24940b65c91615723613f6",
+  "params": []
+ },
+ {
+  "name": "旋转分身",
+  "vip": true,
+  "resource_id": "7259667753731101244",
+  "effect_id": "19114658",
+  "md5": "f2a47eb17a20c6272e939350cf2268d3",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 0.75
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 0.4,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_number",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "无限穿越",
+  "vip": true,
+  "resource_id": "7293870099738399269",
+  "effect_id": "27074734",
+  "md5": "f6bed6028a99ff60118167854f1f6ed1",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_number",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "有事吗？",
+  "vip": true,
+  "resource_id": "7322382230930592266",
+  "effect_id": "39451195",
+  "md5": "2cab81a0a4cad0393890f3eaad56a191",
+  "params": [
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "机械环绕 I",
+  "vip": true,
+  "resource_id": "6986465789259813406",
+  "effect_id": "1238184",
+  "md5": "bff38e9886478c86635d990f78ca68cd",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "机械环绕 II",
+  "vip": true,
+  "resource_id": "6997731822104744478",
+  "effect_id": "1238185",
+  "md5": "66eb2b1b98e4ada7cacba9c39d37be74",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "梦境",
+  "vip": true,
+  "resource_id": "7039963252612141598",
+  "effect_id": "1478040",
+  "md5": "9f78e88b23ebbef1edc3439c2fc34c52",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "气炸了",
+  "vip": true,
+  "resource_id": "7026548629498237454",
+  "effect_id": "1426832",
+  "md5": "979ebc680f1241a86545102632c79dff",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "波点分身",
+  "vip": true,
+  "resource_id": "7086779590768595469",
+  "effect_id": "1826180",
+  "md5": "47f63e0ad4dd5f9c3d2045075b6795d4",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "流体故障",
+  "vip": true,
+  "resource_id": "7287114240089920061",
+  "effect_id": "24949284",
+  "md5": "f6cfc884ea840da552785ed2c1a3309b",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_chromatic",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "涂鸦鬼影",
+  "vip": true,
+  "resource_id": "7153917024723276325",
+  "effect_id": "5185037",
+  "md5": "9570d183c3973de1498c638834c5136d",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "漩涡溶解",
+  "vip": true,
+  "resource_id": "7201020527501120057",
+  "effect_id": "9583557",
+  "md5": "3281d02205f102f70c4b07021be5bc71",
+  "params": [
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.45,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.45,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.45,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.45,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.45,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "火焰图腾",
+  "vip": true,
+  "resource_id": "7009186785662079524",
+  "effect_id": "1404736",
+  "md5": "35e9cbe081d47066558a717ce3a774d8",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "点赞",
+  "vip": true,
+  "resource_id": "7072663671096218143",
+  "effect_id": "1609620",
+  "md5": "9f934cf082ec4d56a6f86e6e1aa2c8f6",
+  "params": [
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_number",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "热力光谱 I",
+  "vip": true,
+  "resource_id": "7033284501253919268",
+  "effect_id": "1451182",
+  "md5": "b578d3e33d8c650dc445c19875f9613f",
+  "params": [
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.801,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "热力光谱 II",
+  "vip": true,
+  "resource_id": "7033338062113346056",
+  "effect_id": "1451606",
+  "md5": "b711586fdabf06e7975e4bc2f2d906e6",
+  "params": [
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.801,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "焰火",
+  "vip": true,
+  "resource_id": "7008459945590919716",
+  "effect_id": "1404695",
+  "md5": "3dc040bd8a6d3853428cc18030e7872a",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "熬夜冠军",
+  "vip": true,
+  "resource_id": "7330555999801053746",
+  "effect_id": "43238686",
+  "md5": "071e4eb6e85a9778b415bcb9303fd867",
+  "params": [
+   {
+    "name": "effects_adjust_texture",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "爱心",
+  "vip": true,
+  "resource_id": "7068191600148484638",
+  "effect_id": "1587990",
+  "md5": "cda6bba22c1e6038233c0aaf3ec7c0ee",
+  "params": [
+   {
+    "name": "effects_adjust_number",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "爱心发射",
+  "vip": true,
+  "resource_id": "7057403623004705294",
+  "effect_id": "1551876",
+  "md5": "665453673ccb652b012a46f63d32109d",
+  "params": [
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.35,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "爱心泡泡",
+  "vip": true,
+  "resource_id": "7055592805174874632",
+  "effect_id": "1551930",
+  "md5": "62cf1078f3a0e623c349cb4200f3de26",
+  "params": [
+   {
+    "name": "effects_adjust_size",
+    "default": 0.35,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "爱心眼",
+  "vip": true,
+  "resource_id": "7104647986176594463",
+  "effect_id": "2491250",
+  "md5": "aeee56c74c823b2afda571c023d0f992",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.15,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.05,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "爱心美瞳",
+  "vip": true,
+  "resource_id": "7194734371872444965",
+  "effect_id": "8950197",
+  "md5": "23b70724f639f5020f4a4f6a53011868",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "狱火",
+  "vip": true,
+  "resource_id": "7007676026406834725",
+  "effect_id": "1404692",
+  "md5": "29903a65ede13673b23ac1eedc118b5d",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "生气",
+  "vip": true,
+  "resource_id": "7068227476035473928",
+  "effect_id": "1588764",
+  "md5": "5c652a8c8a664b41ec7c59fa569ee3e8",
+  "params": [
+   {
+    "name": "effects_adjust_number",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电光描边 II",
+  "vip": true,
+  "resource_id": "7265989852099777061",
+  "effect_id": "20444547",
+  "md5": "3a3aee848d3e7c13822281957ef09093",
+  "params": [
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.65,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.11,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电光灼烧",
+  "vip": true,
+  "resource_id": "7259649795571061305",
+  "effect_id": "19106834",
+  "md5": "3e5d0b31ae925f24539d89b017879815",
+  "params": [
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.73,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电光眼",
+  "vip": true,
+  "resource_id": "7106778883143242271",
+  "effect_id": "2724384",
+  "md5": "12aed71e7e62dafe99b6ff5ef264a36d",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "电光耳机",
+  "vip": true,
+  "resource_id": "6998018067154342408",
+  "effect_id": "1238127",
+  "md5": "19a87efa0bebe59cdf36eda727a66664",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "眼神光",
+  "vip": true,
+  "resource_id": "7091874262364983815",
+  "effect_id": "1793042",
+  "md5": "665fec8aacac1d793e7917a0a0ec3ab3",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.75,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.85,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "瞬移",
+  "vip": true,
+  "resource_id": "7322735107280736805",
+  "effect_id": "39618119",
+  "md5": "29e526f7936cb5e985f77da6c51498ef",
+  "params": [
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "碎片分身",
+  "vip": true,
+  "resource_id": "7207691092655870523",
+  "effect_id": "10339835",
+  "md5": "86532426a7e3c08c229dd518c51a893c",
+  "params": [
+   {
+    "name": "effects_adjust_range",
+    "default": 0.1,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.95,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "碎闪边缘",
+  "vip": true,
+  "resource_id": "7306471467397419547",
+  "effect_id": "31771693",
+  "md5": "7c1311ff7b01577587a28252b3cd5d46",
+  "params": [
+   {
+    "name": "effects_adjust_range",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.2,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.15,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "科技氛围 II",
+  "vip": true,
+  "resource_id": "6982572496356643359",
+  "effect_id": "1238117",
+  "md5": "d4b1ba4f4bb11a26860cd7f493853661",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "移形回位",
+  "vip": true,
+  "resource_id": "7270801008094089784",
+  "effect_id": "21811668",
+  "md5": "4d2d96869fab0fa65766a52360c9fcef",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.333,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "移形幻影 I",
+  "vip": true,
+  "resource_id": "7201010922742092325",
+  "effect_id": "9583559",
+  "md5": "c89c34b83924f3fb5c88f2ece2e095b8",
+  "params": [
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "移形幻影 II",
+  "vip": true,
+  "resource_id": "7194734891353772603",
+  "effect_id": "9010339",
+  "md5": "c4ce763e7fcd977c98e4b4a8be0b85a1",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "空气流体",
+  "vip": true,
+  "resource_id": "7283548311217246781",
+  "effect_id": "24123133",
+  "md5": "9882eb0caf97221ac6bd4161ead3a263",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.4,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_horizontal_chromatic",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.72,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.66,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "笑哭",
+  "vip": true,
+  "resource_id": "7072173200418804231",
+  "effect_id": "1606772",
+  "md5": "9b86bc9942f7848d7ee7e7e74a077a4b",
+  "params": [
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.3,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "粒子弥散",
+  "vip": true,
+  "resource_id": "7283038170826936892",
+  "effect_id": "23970537",
+  "md5": "7a72cd5b5950e933ca7f6df425537c21",
+  "params": [
+   {
+    "name": "effects_adjust_horizontal_shift",
+    "default": 0.66,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "美味召唤",
+  "vip": true,
+  "resource_id": "7073398095186235935",
+  "effect_id": "1612792",
+  "md5": "1e09bf5fc9f3bc36e9fdb479c832365b",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.2
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "sticker",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "蝴蝶翅膀",
+  "vip": true,
+  "resource_id": "6999567409677865486",
+  "effect_id": "1378607",
+  "md5": "69eaf245462b3777f94dfc5aabe18791",
+  "params": [
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "轮廓扫描",
+  "vip": true,
+  "resource_id": "7260773990178755129",
+  "effect_id": "19351962",
+  "md5": "82f3b4a76091dda533a0ca1b0b2265e8",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_soft",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "迷幻分身",
+  "vip": true,
+  "resource_id": "7280421849974968889",
+  "effect_id": "23303207",
+  "md5": "e2bd87ba0c294b5340a8b74cf7c3f954",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_number",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_blur",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_rotate",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.9,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.85,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "金币掉落",
+  "vip": true,
+  "resource_id": "7021362776404660743",
+  "effect_id": "1543838",
+  "md5": "06be5783fa794fc209023a283a47a7d3",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.333,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_background_animation",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "镭射眼 I",
+  "vip": true,
+  "resource_id": "7106778448344912421",
+  "effect_id": "2724386",
+  "md5": "ea9d0666a569334a0c6b27c14ade2674",
+  "params": [
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.9,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "镭射眼 II",
+  "vip": true,
+  "resource_id": "7106778621326397983",
+  "effect_id": "2724385",
+  "md5": "3891948240e1594b7ea8025222341a9d",
+  "params": [
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 0.62,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "闪光放大",
+  "vip": true,
+  "resource_id": "7304912977180758537",
+  "effect_id": "33838202",
+  "md5": "a64dcdf7a22d382739051486535a4704",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.6,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_distortion",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "闪电",
+  "vip": true,
+  "resource_id": "7088198349324554766",
+  "effect_id": "1711412",
+  "md5": "9c97ab760617a5c3bc75491b3ad8406b",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.1,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.7,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "闪电环绕",
+  "vip": true,
+  "resource_id": "6998102186068546078",
+  "effect_id": "1238186",
+  "md5": "d2459fb754b3d9dbb469d29f6af77423",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.33,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_vertical_shift",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_size",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_color",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "闪电眼",
+  "vip": true,
+  "resource_id": "7106763566262260231",
+  "effect_id": "2722184",
+  "md5": "6b6b4e9eb53581fea08118f62d55c1a9",
+  "params": [
+   {
+    "name": "effects_adjust_color",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_luminance",
+    "default": 0.25,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 1.0,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_range",
+    "default": 0.85,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "霓虹爱心",
+  "vip": true,
+  "resource_id": "7194734553288675895",
+  "effect_id": "9221893",
+  "md5": "cf3b121f71539f6fc039062473db7c43",
+  "params": [
+   {
+    "name": "effects_adjust_speed",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ },
+ {
+  "name": "高光人物",
+  "vip": true,
+  "resource_id": "7406179353362436645",
+  "effect_id": "80107647",
+  "md5": "4264ef0b6e1ada149ba0580b36001e2c",
+  "params": []
+ },
+ {
+  "name": "黑色眼泪",
+  "vip": true,
+  "resource_id": "7154231632604434981",
+  "effect_id": "5208347",
+  "md5": "0343aabd4b0ef59cc829bd1732be0bbd",
+  "params": [
+   {
+    "name": "effects_adjust_intensity",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   },
+   {
+    "name": "effects_adjust_filter",
+    "default": 0.8,
+    "min": 0.0,
+    "max": 1.0
+   }
+  ]
+ }
+]

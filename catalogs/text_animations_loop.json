@@ -1,0 +1,746 @@
+[
+ {
+  "name": "VHS",
+  "vip": false,
+  "duration_us": 2000000,
+  "resource_id": "7399879467457319463",
+  "effect_id": "77851352",
+  "md5": "f82d0f25b2cc4f0696dce7d97c7b02be"
+ },
+ {
+  "name": "上弧",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7075224569421763079",
+  "effect_id": "1626238",
+  "md5": "a0362ebaa2f5016487abfab05d47605b"
+ },
+ {
+  "name": "刷屏",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7308280358691148315",
+  "effect_id": "32284703",
+  "md5": "e92c576feca5efb75feda14004b269c5"
+ },
+ {
+  "name": "发光模糊多行",
+  "vip": false,
+  "duration_us": 800000,
+  "resource_id": "7397688001356108339",
+  "effect_id": "77132594",
+  "md5": "ee68176782c8b62a207c04f4a979957a"
+ },
+ {
+  "name": "吹泡泡",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7045155566003425823",
+  "effect_id": "1644539",
+  "md5": "6db3746838af18903d01968e6af07185"
+ },
+ {
+  "name": "吹泡泡 II",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7052257626897256968",
+  "effect_id": "1644528",
+  "md5": "b378734fd7a0e8ec78e53987823fad79"
+ },
+ {
+  "name": "呐喊",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7119024816480326157",
+  "effect_id": "4002167",
+  "md5": "04933b5e575c54cbf09c57c5e933f0ec"
+ },
+ {
+  "name": "复古涂鸦",
+  "vip": false,
+  "duration_us": 1000000,
+  "resource_id": "7400234025392017956",
+  "effect_id": "77997810",
+  "md5": "4bc57fba68e0cce14e2ea8ab652dabc2"
+ },
+ {
+  "name": "字体变换",
+  "vip": false,
+  "duration_us": 800000,
+  "resource_id": "7402185694732358170",
+  "effect_id": "78763194",
+  "md5": "06c685c00a9c1a7a484c7841ac45742a"
+ },
+ {
+  "name": "弹幕滚动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6790247082155315719",
+  "effect_id": "1644518",
+  "md5": "4ca7b3a27da98849561b21c9c6d964fc"
+ },
+ {
+  "name": "彩虹",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6908592625406710280",
+  "effect_id": "990096",
+  "md5": "fac0ebef55c57c31b3142f5840299b03"
+ },
+ {
+  "name": "彩虹-情人节",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6916820108211917325",
+  "effect_id": "1012617",
+  "md5": "c45282c8e30b8639a71345769060f3d5"
+ },
+ {
+  "name": "彩虹-新年",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6916820045519655432",
+  "effect_id": "1012618",
+  "md5": "dd9fcbbcfc17cad31ab42e886769c66e"
+ },
+ {
+  "name": "彩虹-马卡龙",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6921528300573561358",
+  "effect_id": "1022790",
+  "md5": "a614b3dd7d4b852f1a126afe4c5ee50f"
+ },
+ {
+  "name": "扫光",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7051843475892867598",
+  "effect_id": "1520868",
+  "md5": "0495742cdb3a26ff28dfabf7f8ef236b"
+ },
+ {
+  "name": "投影颤抖 II",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7070332370963927559",
+  "effect_id": "1599696",
+  "md5": "673aa54d5519360162ea8ec38986ea1c"
+ },
+ {
+  "name": "折叠",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7064823078542381581",
+  "effect_id": "1567212",
+  "md5": "c9b3ef10e455a3916dbef47a7f711eaa"
+ },
+ {
+  "name": "拼贴纹理",
+  "vip": false,
+  "duration_us": 800000,
+  "resource_id": "7399983060806013479",
+  "effect_id": "77918388",
+  "md5": "922ca4e87c7eed7e60d062c18e928bc6"
+ },
+ {
+  "name": "描边粉笔",
+  "vip": false,
+  "duration_us": 2000000,
+  "resource_id": "7399879712140431883",
+  "effect_id": "77851433",
+  "md5": "05c3c10997b885c71ed0dd64aff14dd2"
+ },
+ {
+  "name": "摇摆",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6724920869363126795",
+  "effect_id": "1644515",
+  "md5": "8af4da60a802e3ca6c9fe2184fbe22d0"
+ },
+ {
+  "name": "摇荡",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6840710593289130503",
+  "effect_id": "1644523",
+  "md5": "61f24344eb8bf86582d6140ad985ef14"
+ },
+ {
+  "name": "故障闪动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6857714281136263687",
+  "effect_id": "1644524",
+  "md5": "51d9ee83fbaf2dfa049885676ec2d5d9"
+ },
+ {
+  "name": "旋转",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6763900973946507784",
+  "effect_id": "1644510",
+  "md5": "151421d4de4d49e65b050cb413482cd5"
+ },
+ {
+  "name": "晃动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6790246693674684942",
+  "effect_id": "1644520",
+  "md5": "383dabd75d7fe7985d990ebb34d63732"
+ },
+ {
+  "name": "爆闪",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7308279705252139530",
+  "effect_id": "32284413",
+  "md5": "61951bd303975761bc99f187bdb8fdab"
+ },
+ {
+  "name": "环绕",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6980916124976157220",
+  "effect_id": "1644542",
+  "md5": "e81fcebf0885fa5d698f6ca7d027a556"
+ },
+ {
+  "name": "翻转",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6763897586328801805",
+  "effect_id": "1644511",
+  "md5": "e4983ce92d02628087780832ef631c7d"
+ },
+ {
+  "name": "色差故障",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6835878163575214605",
+  "effect_id": "1644522",
+  "md5": "e0295a9f4f19fe21692c405f7c00d1e5"
+ },
+ {
+  "name": "蓝黄滑动",
+  "vip": false,
+  "duration_us": 2000000,
+  "resource_id": "7398492769628459539",
+  "effect_id": "77383265",
+  "md5": "bb717e125d34532ec904d1bc01ec25da"
+ },
+ {
+  "name": "超强晃动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7065208406633615909",
+  "effect_id": "1568854",
+  "md5": "b129b0e6bed4f9835f871848db646763"
+ },
+ {
+  "name": "超强晃动 II",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7069965879437431303",
+  "effect_id": "1597286",
+  "md5": "daec618afd4429f3f97085d3b7029bcc"
+ },
+ {
+  "name": "超强波浪",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6857036499389518349",
+  "effect_id": "872098",
+  "md5": "87f7332abda9ac46d5dc81f69c48daab"
+ },
+ {
+  "name": "超强波浪 II",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7065219379687854623",
+  "effect_id": "1568964",
+  "md5": "bdd007527d0eda9d64bfbf6aef103e97"
+ },
+ {
+  "name": "跳动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6724920002958332420",
+  "effect_id": "1644512",
+  "md5": "784250e657b472a46a3b3ce0a838e4f7"
+ },
+ {
+  "name": "轻微跳动",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6884155832838132231",
+  "effect_id": "1644525",
+  "md5": "ac5c4160fae860fd74e5b7ab6d053252"
+ },
+ {
+  "name": "钟摆",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6724921579517514248",
+  "effect_id": "1644516",
+  "md5": "320b71150105629f7ab1b318716181eb"
+ },
+ {
+  "name": "闪烁",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6724921437930394120",
+  "effect_id": "1644514",
+  "md5": "6fe3f0fcd14e11e70b7510f42444b86c"
+ },
+ {
+  "name": "雨刷",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6799874389669057037",
+  "effect_id": "1644521",
+  "md5": "6a4c40e24db5027cb42892d8ade9df38"
+ },
+ {
+  "name": "频闪边框",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7308280718302384690",
+  "effect_id": "32284883",
+  "md5": "36184bd37eae10c2d8247fb5bd59c6f2"
+ },
+ {
+  "name": "颤抖",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "6764189482871689742",
+  "effect_id": "1644509",
+  "md5": "9d16d8998abe172511399c3158bddddd"
+ },
+ {
+  "name": "颤抖 III",
+  "vip": false,
+  "duration_us": 500000,
+  "resource_id": "7070036604429013535",
+  "effect_id": "1598082",
+  "md5": "c6f744d4c3d208abf97a3af3afe9d356"
+ },
+ {
+  "name": "加字符",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7441532971082846758",
+  "effect_id": "93688629",
+  "md5": "f9c72d34da0c6e7b2b4263a37892ae6c"
+ },
+ {
+  "name": "喷涌",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7134190113780666887",
+  "effect_id": "4175399",
+  "md5": "76cc53a7bb20385d208c858a13cf06fd"
+ },
+ {
+  "name": "喷绘",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7110160318529016350",
+  "effect_id": "2999942",
+  "md5": "fbd35399a1880d2637731d20eb619d29"
+ },
+ {
+  "name": "圆形涂鸦",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7276420462131810874",
+  "effect_id": "22362181",
+  "md5": "696d3b443b4c6ed8b9f0f28825c08a8c"
+ },
+ {
+  "name": "声波震动",
+  "vip": true,
+  "duration_us": 2000000,
+  "resource_id": "7239526343833031223",
+  "effect_id": "14518651",
+  "md5": "9098085cd316045cf912e54a73d845a4"
+ },
+ {
+  "name": "字幕滚动",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "6790246884683289102",
+  "effect_id": "1644519",
+  "md5": "9aa4e0d045c61892c2b2e3fdfaf1b093"
+ },
+ {
+  "name": "尾巴摇摆",
+  "vip": true,
+  "duration_us": 1600000,
+  "resource_id": "7212897307782550053",
+  "effect_id": "10967121",
+  "md5": "c1585ff28130b111d0458c6490d20ef2"
+ },
+ {
+  "name": "弹幕",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7107592133472686606",
+  "effect_id": "2795622",
+  "md5": "8d0a44c1f51ea9cd7a8174f72751d2b7"
+ },
+ {
+  "name": "弹幕 II",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7096375845773644318",
+  "effect_id": "1826548",
+  "md5": "11bcd8965488f2c70e27c8dc5112c6cb"
+ },
+ {
+  "name": "强调三遍",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7129767866894651917",
+  "effect_id": "3966601",
+  "md5": "f34d9d771c836c5e4e836d4789788a82"
+ },
+ {
+  "name": "彩色切换",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7303430211519910451",
+  "effect_id": "30322872",
+  "md5": "e2c7f4ec20555abe1e50c1920e81a0f9"
+ },
+ {
+  "name": "彩色火焰",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7308278472541999654",
+  "effect_id": "32283417",
+  "md5": "94dd9722a4b46d248c5e1d3d4b7c71fb"
+ },
+ {
+  "name": "影像叠加",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7193989785319379515",
+  "effect_id": "8882439",
+  "md5": "018a39f66ba7ceb39f4d61e4446624f8"
+ },
+ {
+  "name": "心跳",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7210283971316290085",
+  "effect_id": "10650869",
+  "md5": "3c2c6a7f6b8b102e9ae5f918600f83c0"
+ },
+ {
+  "name": "急了",
+  "vip": true,
+  "duration_us": 2400000,
+  "resource_id": "7134634461588623909",
+  "effect_id": "4200435",
+  "md5": "4f01b8c42b2d4a26a89aa528e6cc1544"
+ },
+ {
+  "name": "悸动",
+  "vip": true,
+  "duration_us": 1200000,
+  "resource_id": "7229526981807706680",
+  "effect_id": "13139395",
+  "md5": "dc1aa28b54954465640c40928fae55f7"
+ },
+ {
+  "name": "情绪加载",
+  "vip": true,
+  "duration_us": 2200000,
+  "resource_id": "7130142075995034119",
+  "effect_id": "3983735",
+  "md5": "6293429c9f4e12407d38089ee43b77cd"
+ },
+ {
+  "name": "扩音器",
+  "vip": true,
+  "duration_us": 1200000,
+  "resource_id": "7277870806552547895",
+  "effect_id": "22619881",
+  "md5": "ba24954b91039982fabf75ad533e7ff1"
+ },
+ {
+  "name": "扭动",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7123093247672455711",
+  "effect_id": "3733565",
+  "md5": "5380b570671074788541d13e389daa4f"
+ },
+ {
+  "name": "投影颤抖",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7070332284934558245",
+  "effect_id": "1599698",
+  "md5": "4f4bebc9ab74f05801dca7b9b2ffa047"
+ },
+ {
+  "name": "抖动故障",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7283103017526628921",
+  "effect_id": "23998441",
+  "md5": "55749de55fe55fc230a31952790142f3"
+ },
+ {
+  "name": "拉住",
+  "vip": true,
+  "duration_us": 1200000,
+  "resource_id": "7221747595884892731",
+  "effect_id": "12135594",
+  "md5": "98db2339ea77225948ed8b7f8d72fc36"
+ },
+ {
+  "name": "拉开",
+  "vip": true,
+  "duration_us": 60000000,
+  "resource_id": "7223675733606928957",
+  "effect_id": "12390761",
+  "md5": "41f672adaa1cdccdb81c8d0b2b1124a4"
+ },
+ {
+  "name": "排队入场",
+  "vip": true,
+  "duration_us": 1000000,
+  "resource_id": "7225496399817740855",
+  "effect_id": "12628547",
+  "md5": "0a7a9cb49305092f638d65888f149348"
+ },
+ {
+  "name": "摇摆 I",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "6908281696253121038",
+  "effect_id": "1520478",
+  "md5": "ea2f688a517d18a9de5912fa09f3bd56"
+ },
+ {
+  "name": "放大缩小",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7224077152587616805",
+  "effect_id": "12453543",
+  "md5": "3e1538ad9a9f723238bb922423e20aed"
+ },
+ {
+  "name": "放大镜",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7272339163142165050",
+  "effect_id": "21635790",
+  "md5": "e9f8437306ec0f948c1eb485f09692a3"
+ },
+ {
+  "name": "文字泛光",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7124226995231134239",
+  "effect_id": "3740251",
+  "md5": "879231435782ed4b72f278290070f20a"
+ },
+ {
+  "name": "波浪",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "6724927688047333891",
+  "effect_id": "1644517",
+  "md5": "176a075543ef82c04df1dd40d181ac5b"
+ },
+ {
+  "name": "波浪 II",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7067046171381862919",
+  "effect_id": "1576246",
+  "md5": "62245c9799544b75258689eb1ff222bb"
+ },
+ {
+  "name": "波浪 III",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7067812686557352456",
+  "effect_id": "1583302",
+  "md5": "b57dd58b3c8090eae268bae843655c79"
+ },
+ {
+  "name": "流光",
+  "vip": true,
+  "duration_us": 1600000,
+  "resource_id": "7308277700492268042",
+  "effect_id": "32283005",
+  "md5": "fd7091c4e298df2433e9433c8d58a427"
+ },
+ {
+  "name": "涂鸦手绘",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7276407256965452346",
+  "effect_id": "22361305",
+  "md5": "1ae8ceff3f65dd62f36b3eb43baff6b4"
+ },
+ {
+  "name": "涂鸦手绘 II",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7276407576625943100",
+  "effect_id": "22361304",
+  "md5": "f72282b1f43b0d5e59144bbca7fbeda8"
+ },
+ {
+  "name": "渐变拖尾",
+  "vip": true,
+  "duration_us": 800000,
+  "resource_id": "7308277117622424090",
+  "effect_id": "32282151",
+  "md5": "950687cffad02a7b17bc9b672c9585f2"
+ },
+ {
+  "name": "漂浮",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7213291988500615738",
+  "effect_id": "11017729",
+  "md5": "451fbb332b33ec6ba683dc9d22055810"
+ },
+ {
+  "name": "漩涡",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7099419657290912286",
+  "effect_id": "1936778",
+  "md5": "416be3d42ae0d037597209d2a2f843c4"
+ },
+ {
+  "name": "环形滚动",
+  "vip": true,
+  "duration_us": 1200000,
+  "resource_id": "7179135028343870012",
+  "effect_id": "7564487",
+  "md5": "e167e03db93ab98c4917ff53f59162c1"
+ },
+ {
+  "name": "环绕 II",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7114181846086193701",
+  "effect_id": "3240866",
+  "md5": "6df622ca3b91909a8d23ae24f1c2a675"
+ },
+ {
+  "name": "甜甜圈",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7070415354656199181",
+  "effect_id": "1600378",
+  "md5": "23a8cee8851ad7e169a094cee8ca9513"
+ },
+ {
+  "name": "福袋炸开",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7047088638932292127",
+  "effect_id": "1531460",
+  "md5": "2646a21f26faeb4103acacaa74c171f6"
+ },
+ {
+  "name": "空间翻转 I",
+  "vip": true,
+  "duration_us": 1500000,
+  "resource_id": "7163896186972148261",
+  "effect_id": "5965291",
+  "md5": "540b96331793d162cf80a099cd00dc55"
+ },
+ {
+  "name": "空间翻转 II",
+  "vip": true,
+  "duration_us": 1100000,
+  "resource_id": "7163901901589713444",
+  "effect_id": "5966503",
+  "md5": "ce769779dfa1d9c69eb593318bf1bc28"
+ },
+ {
+  "name": "空间翻转 III",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7163892769176424991",
+  "effect_id": "5964737",
+  "md5": "f9c82b94ebd990e6734ddef5ebba68cb"
+ },
+ {
+  "name": "竖向渐变",
+  "vip": true,
+  "duration_us": 2200000,
+  "resource_id": "7430669972088558090",
+  "effect_id": "87963946",
+  "md5": "db87c31a4c3252000f04f61d814e96d0"
+ },
+ {
+  "name": "翻页I",
+  "vip": true,
+  "duration_us": 1200000,
+  "resource_id": "7168819879183651359",
+  "effect_id": "6443365",
+  "md5": "6f49e16f12b0518b2c3b38a12d07466d"
+ },
+ {
+  "name": "调皮",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "6917143282690560526",
+  "effect_id": "1644527",
+  "md5": "b832fcbb8ea3bcc64ddbd70c56166956"
+ },
+ {
+  "name": "逐字放大",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "6908592686781960717",
+  "effect_id": "1644526",
+  "md5": "4cd5a5c4144a3a713469043722579306"
+ },
+ {
+  "name": "错位",
+  "vip": true,
+  "duration_us": 3000000,
+  "resource_id": "7243633488249754173",
+  "effect_id": "15140783",
+  "md5": "cc869e81ac3b5d769afa6836bab5937b"
+ },
+ {
+  "name": "随机弹跳",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "7045150354672980516",
+  "effect_id": "1644538",
+  "md5": "8656e9848f862adf1adfa30c26113a80"
+ },
+ {
+  "name": "颤抖 II",
+  "vip": true,
+  "duration_us": 500000,
+  "resource_id": "6986920909927879199",
+  "effect_id": "1446098",
+  "md5": "8c985874e1b508c4bfb9552735228143"
+ },
+ {
+  "name": "飘起",
+  "vip": true,
+  "duration_us": 3000000,
+  "resource_id": "7211060597352305189",
+  "effect_id": "10749797",
+  "md5": "1ab6d9a8761c108da6989633b933647e"
+ }
+]
