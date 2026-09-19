@@ -56,8 +56,8 @@ pub fn resolve(
     allow_vip: bool,
 ) -> Result<&'static Value> {
     let entry = find(catalog, name).ok_or_else(|| {
-        anyhow::anyhow!("{domain} {name:?} is not in the bundled catalog (name is case-sensitive)"
-    )})?;
+        anyhow::anyhow!("{domain} {name:?} is not in the bundled catalog (name is case-sensitive)")
+    })?;
     if entry["vip"].as_bool().unwrap_or(false) && !allow_vip {
         bail!(
             "{domain} {name:?} is a VIP resource; the plan sets allow_vip=false \

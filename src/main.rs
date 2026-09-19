@@ -205,7 +205,13 @@ fn run(cmd: Command) -> Result<()> {
     match cmd {
         Command::Doctor => print_json(store::doctor()?),
         Command::Probe { media } => print_json(serde_json::to_value(probe::probe(&media)?)?),
-        Command::Build { plan, out, srt, seed, template } => {
+        Command::Build {
+            plan,
+            out,
+            srt,
+            seed,
+            template,
+        } => {
             let mut plan = plan::Plan::load(&plan)?;
             if let Some(srt_path) = srt {
                 let cues = srt::parse(&std::fs::read_to_string(&srt_path)?)?;
@@ -218,9 +224,9 @@ fn run(cmd: Command) -> Result<()> {
             })?;
             if let Some(tpl) = template {
                 // load_template parity: overlay the plan tracks onto the template timeline
-                let mut tl: serde_json::Value = serde_json::from_str(
-                    &std::fs::read_to_string(Path::new(&report.out_dir).join("draft_content.json"))?,
-                )?;
+                let mut tl: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(
+                    Path::new(&report.out_dir).join("draft_content.json"),
+                )?)?;
                 template::build_on_template(&tpl, &mut tl, &report.name)?;
                 let s = serde_json::to_string_pretty(&tl)?;
                 std::fs::write(Path::new(&report.out_dir).join("draft_content.json"), &s)?;
@@ -241,27 +247,50 @@ fn run(cmd: Command) -> Result<()> {
             let root = store::resolve_root(root.as_deref())?;
             print_json(store::publish(&draft, &root, force)?)
         }
-        Command::Render { draft, out, scale, burn_captions, crf } => {
-            print_json(render::render(&draft, &out, scale, burn_captions, crf)?)
-        }
+        Command::Render {
+            draft,
+            out,
+            scale,
+            burn_captions,
+            crf,
+        } => print_json(render::render(&draft, &out, scale, burn_captions, crf)?),
         Command::Template { op } => match op {
             TemplateOp::Inspect { draft } => print_json(template::inspect_materials(&draft)?),
-            TemplateOp::Duplicate { draft, new_name, root } => {
-                print_json(template::duplicate(&draft, &new_name, root.as_deref())?)
-            }
-            TemplateOp::ReplaceText { draft, track, index, text } => {
-                print_json(template::replace_text(&draft, &track, index, &text)?)
-            }
-            TemplateOp::ReplaceMaterial { draft, source, name, track, index } => {
-                print_json(template::replace_material(&draft, name.as_deref(), track.as_deref(), index, &source)?)
-            }
-            TemplateOp::ImportTrack { draft, source, track } => {
-                print_json(template::import_track(&draft, &source, &track)?)
-            }
+            TemplateOp::Duplicate {
+                draft,
+                new_name,
+                root,
+            } => print_json(template::duplicate(&draft, &new_name, root.as_deref())?),
+            TemplateOp::ReplaceText {
+                draft,
+                track,
+                index,
+                text,
+            } => print_json(template::replace_text(&draft, &track, index, &text)?),
+            TemplateOp::ReplaceMaterial {
+                draft,
+                source,
+                name,
+                track,
+                index,
+            } => print_json(template::replace_material(
+                &draft,
+                name.as_deref(),
+                track.as_deref(),
+                index,
+                &source,
+            )?),
+            TemplateOp::ImportTrack {
+                draft,
+                source,
+                track,
+            } => print_json(template::import_track(&draft, &source, &track)?),
         },
-        Command::Catalog { domain, search, include_vip } => {
-            catalog_query(domain.as_deref(), search.as_deref(), include_vip)?
-        }
+        Command::Catalog {
+            domain,
+            search,
+            include_vip,
+        } => catalog_query(domain.as_deref(), search.as_deref(), include_vip)?,
         Command::Store { op } => match op {
             StoreOp::List { root } => {
                 let root = store::resolve_root(root.as_deref())?;
@@ -285,7 +314,8 @@ fn run(cmd: Command) -> Result<()> {
 
 fn catalog_query(domain: Option<&str>, search: Option<&str>, include_vip: bool) -> Result<()> {
     use jianying_cli::catalogs;
-    const DOMAINS: &[(&str, fn() -> &'static serde_json::Value)] = &[
+    type CatalogFn = fn() -> &'static serde_json::Value;
+    const DOMAINS: &[(&str, CatalogFn)] = &[
         ("transitions", catalogs::transitions),
         ("filters", catalogs::filters),
         ("fonts", catalogs::fonts),
@@ -308,7 +338,11 @@ fn catalog_query(domain: Option<&str>, search: Option<&str>, include_vip: bool) 
             if !DOMAINS.iter().any(|(name, _)| *name == d) {
                 bail!(
                     "unknown domain {d:?}; available: {}",
-                    DOMAINS.iter().map(|(n, _)| *n).collect::<Vec<_>>().join(", ")
+                    DOMAINS
+                        .iter()
+                        .map(|(n, _)| *n)
+                        .collect::<Vec<_>>()
+                        .join(", ")
                 );
             }
             vec![d]
@@ -322,7 +356,11 @@ fn catalog_query(domain: Option<&str>, search: Option<&str>, include_vip: bool) 
                 let all = load().as_array().map(|a| a.len()).unwrap_or(0);
                 let non_vip = load()
                     .as_array()
-                    .map(|a| a.iter().filter(|e| !e["vip"].as_bool().unwrap_or(false)).count())
+                    .map(|a| {
+                        a.iter()
+                            .filter(|e| !e["vip"].as_bool().unwrap_or(false))
+                            .count()
+                    })
                     .unwrap_or(0);
                 serde_json::json!({"domain": name, "entries": all, "non_vip": non_vip})
             })

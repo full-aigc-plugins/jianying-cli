@@ -48,7 +48,7 @@ pub struct Track {
     pub segments: Vec<Segment>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 #[serde(deny_unknown_fields)]
 pub struct Segment {
     pub start_us: i64,
@@ -344,7 +344,10 @@ impl Plan {
 
     pub fn validate(&self) -> Result<()> {
         if self.schema != SCHEMA {
-            bail!("unsupported plan schema {} (expected {SCHEMA})", self.schema);
+            bail!(
+                "unsupported plan schema {} (expected {SCHEMA})",
+                self.schema
+            );
         }
         let name = &self.name;
         if name.is_empty()
@@ -354,8 +357,7 @@ impl Plan {
         {
             bail!("draft name must be a visible single directory component");
         }
-        if !(16..=8192).contains(&self.canvas.width) || !(16..=8192).contains(&self.canvas.height)
-        {
+        if !(16..=8192).contains(&self.canvas.width) || !(16..=8192).contains(&self.canvas.height) {
             bail!("canvas dimensions must be 16..8192");
         }
         if !FPS_VALUES.contains(&self.canvas.fps) {
@@ -381,7 +383,10 @@ impl Plan {
             if matches!(track.kind.as_str(), "filter" | "effect") {
                 let same_kind = self.tracks.iter().filter(|t| t.kind == track.kind).count();
                 if same_kind > 1 {
-                    bail!("multiple {} tracks need separate native acceptance", track.kind);
+                    bail!(
+                        "multiple {} tracks need separate native acceptance",
+                        track.kind
+                    );
                 }
             }
             if track.segments.is_empty() {
@@ -402,15 +407,20 @@ impl Plan {
     }
 
     fn resolve_effect(&self, name: &str) -> Result<&'static Value> {
-        crate::catalogs::resolve(crate::catalogs::video_scene_effects(), "effect", name, self.allow_vip)
-            .or_else(|_| {
-                crate::catalogs::resolve(
-                    crate::catalogs::video_character_effects(),
-                    "effect",
-                    name,
-                    self.allow_vip,
-                )
-            })
+        crate::catalogs::resolve(
+            crate::catalogs::video_scene_effects(),
+            "effect",
+            name,
+            self.allow_vip,
+        )
+        .or_else(|_| {
+            crate::catalogs::resolve(
+                crate::catalogs::video_character_effects(),
+                "effect",
+                name,
+                self.allow_vip,
+            )
+        })
     }
 
     fn validate_segment(
@@ -457,7 +467,12 @@ impl Plan {
                 }
             }
             "sticker" => {
-                if seg.resource_id.as_deref().map(str::is_empty).unwrap_or(true) {
+                if seg
+                    .resource_id
+                    .as_deref()
+                    .map(str::is_empty)
+                    .unwrap_or(true)
+                {
                     bail!("sticker segment at {} needs resource_id", seg.start_us);
                 }
             }
@@ -465,7 +480,12 @@ impl Plan {
                 let name = seg.filters.first().map(|f| f.name.clone()).ok_or_else(|| {
                     anyhow::anyhow!("filter-track segment at {} needs filters[0]", seg.start_us)
                 })?;
-                crate::catalogs::resolve(crate::catalogs::filters(), "filter", &name, self.allow_vip)?;
+                crate::catalogs::resolve(
+                    crate::catalogs::filters(),
+                    "filter",
+                    &name,
+                    self.allow_vip,
+                )?;
                 if let Some(i) = seg.intensity.or_else(|| seg.filters[0].intensity) {
                     check_range(i, 0.0, 100.0, "filter intensity")?;
                 }
@@ -520,8 +540,12 @@ impl Plan {
                     bail!("chroma requires a video segment");
                 }
                 rgba_hex(&c.color)?;
-                for (label, v) in [("intensity", c.intensity), ("shadow", c.shadow),
-                                   ("edge_smooth", c.edge_smooth), ("spill", c.spill)] {
+                for (label, v) in [
+                    ("intensity", c.intensity),
+                    ("shadow", c.shadow),
+                    ("edge_smooth", c.edge_smooth),
+                    ("spill", c.spill),
+                ] {
                     check_range(v, 0.0, 100.0, &format!("chroma {label}"))?;
                 }
             }
@@ -547,15 +571,23 @@ impl Plan {
                 bail!("a transition needs a following segment (cannot be on the last one)");
             }
             let entry = crate::catalogs::resolve(
-                crate::catalogs::transitions(), "transition", &t.name, self.allow_vip,
+                crate::catalogs::transitions(),
+                "transition",
+                &t.name,
+                self.allow_vip,
             )?;
-            let dur = t.duration_us.unwrap_or_else(|| {
-                entry["duration_us"].as_i64().unwrap_or(500_000)
-            });
+            let dur = t
+                .duration_us
+                .unwrap_or_else(|| entry["duration_us"].as_i64().unwrap_or(500_000));
             if dur <= 0 || dur > 1_000_000 {
                 bail!("transition duration_us must be within 1..1000000");
             }
-            crate::catalogs::resolve(crate::catalogs::transitions(), "transition", &t.name, self.allow_vip)?;
+            crate::catalogs::resolve(
+                crate::catalogs::transitions(),
+                "transition",
+                &t.name,
+                self.allow_vip,
+            )?;
         }
 
         if let Some(m) = &seg.mask {
@@ -580,7 +612,12 @@ impl Plan {
         }
         if track.kind == "video" {
             for f in &seg.filters {
-                crate::catalogs::resolve(crate::catalogs::filters(), "filter", &f.name, self.allow_vip)?;
+                crate::catalogs::resolve(
+                    crate::catalogs::filters(),
+                    "filter",
+                    &f.name,
+                    self.allow_vip,
+                )?;
                 if let Some(i) = f.intensity {
                     check_range(i, 0.0, 100.0, "filter intensity")?;
                 }
@@ -590,7 +627,12 @@ impl Plan {
                 Self::check_params_static(entry, Some(&e.params))?;
             }
             if let Some(mm) = &seg.mix_mode {
-                crate::catalogs::resolve(crate::catalogs::mix_modes(), "mix mode", mm, self.allow_vip)?;
+                crate::catalogs::resolve(
+                    crate::catalogs::mix_modes(),
+                    "mix mode",
+                    mm,
+                    self.allow_vip,
+                )?;
             }
         }
         for (kind, a) in [
@@ -646,11 +688,9 @@ impl Plan {
             if let Some(w) = seg.border_width {
                 check_range(w, 0.0, 100.0, "border_width")?;
             }
-            for raw in [&seg.text_effect, &seg.bubble] {
-                if let Some(r) = raw {
-                    if r.effect_id.is_empty() || r.resource_id.is_empty() {
-                        bail!("text effect/bubble ids must be non-empty");
-                    }
+            for r in [&seg.text_effect, &seg.bubble].into_iter().flatten() {
+                if r.effect_id.is_empty() || r.resource_id.is_empty() {
+                    bail!("text effect/bubble ids must be non-empty");
                 }
             }
             let text = seg.text.as_deref().unwrap_or_default();
@@ -684,12 +724,16 @@ impl Plan {
                 bail!("keyframes require speed == 1 and source_start_us == 0");
             }
             for (channel, points) in kfs {
-                let (_, lo, hi) = allowed
-                    .iter()
-                    .find(|(c, _, _)| c == channel)
-                    .ok_or_else(|| {
-                        anyhow::anyhow!("unsupported keyframe channel {channel} on {} track", track.kind)
-                    })?;
+                let (_, lo, hi) =
+                    allowed
+                        .iter()
+                        .find(|(c, _, _)| c == channel)
+                        .ok_or_else(|| {
+                            anyhow::anyhow!(
+                                "unsupported keyframe channel {channel} on {} track",
+                                track.kind
+                            )
+                        })?;
                 if points.len() < 2 {
                     bail!("keyframe channel {channel} needs at least two points");
                 }
@@ -763,58 +807,6 @@ impl Plan {
             .map(|s| s.start_us + s.duration_us)
             .max()
             .unwrap_or(0)
-    }
-}
-
-impl Default for Segment {
-    fn default() -> Self {
-        Segment {
-            start_us: 0,
-            duration_us: 0,
-            source: None,
-            source_start_us: 0,
-            source_duration_us: None,
-            speed: None,
-            volume: None,
-            photo: false,
-            scale: None,
-            x: None,
-            y: None,
-            rotation: None,
-            opacity: None,
-            keyframes: None,
-            mask: None,
-            chroma: None,
-            background_filling: None,
-            filters: Vec::new(),
-            effects: Vec::new(),
-            mix_mode: None,
-            animation_in: None,
-            animation_out: None,
-            animation_group: None,
-            transition_out: None,
-            fade: None,
-            audio_effects: Vec::new(),
-            text: None,
-            size: None,
-            color: None,
-            border_color: None,
-            border_width: None,
-            bold: None,
-            italic: None,
-            underline: None,
-            alignment: None,
-            font: None,
-            background: None,
-            shadow: None,
-            styles: Vec::new(),
-            text_effect: None,
-            bubble: None,
-            sticker_id: None,
-            resource_id: None,
-            intensity: None,
-            params: None,
-        }
     }
 }
 

@@ -29,8 +29,8 @@ pub fn render(
     crf: i32,
 ) -> Result<Value> {
     let tl = load_timeline(draft_dir)?;
-    let ff = crate::probe::ffmpeg_path()
-        .ok_or_else(|| anyhow::anyhow!("ffmpeg not found on PATH"))?;
+    let ff =
+        crate::probe::ffmpeg_path().ok_or_else(|| anyhow::anyhow!("ffmpeg not found on PATH"))?;
     let width = tl["canvas_config"]["width"].as_u64().unwrap_or(1920);
     let height = tl["canvas_config"]["height"].as_u64().unwrap_or(1080);
     let out_w = ((width as f64 * scale).round() as i64) & !1;
@@ -67,8 +67,8 @@ pub fn render(
                 .find(|m| m["id"] == s["material_id"])
                 .map(|m| m["type"] == "photo")
                 .unwrap_or(false);
-                        let mut chain = if is_photo {
-                format!("loop=loop=-1:size=1:start=0")
+            let mut chain = if is_photo {
+                "loop=loop=-1:size=1:start=0".to_string()
             } else {
                 format!(
                     "trim=start={}:duration={},setpts=(PTS-STARTPTS)/{}",
@@ -98,7 +98,9 @@ pub fn render(
                 .unwrap()
                 .iter()
                 .find(|m| m["id"] == s["material_id"]);
-            let Some(path) = mat.and_then(|m| m["path"].as_str()) else { continue };
+            let Some(path) = mat.and_then(|m| m["path"].as_str()) else {
+                continue;
+            };
             inputs.push("-i".into());
             inputs.push(path.to_string());
             let src_start = s["source_timerange"]["start"].as_i64().unwrap_or(0);
@@ -110,7 +112,12 @@ pub fn render(
                 .as_array()
                 .unwrap()
                 .iter()
-                .find(|f| s["extra_material_refs"].as_array().map(|r| r.contains(&f["id"])).unwrap_or(false));
+                .find(|f| {
+                    s["extra_material_refs"]
+                        .as_array()
+                        .map(|r| r.contains(&f["id"]))
+                        .unwrap_or(false)
+                });
             let (fi, fo) = fade
                 .map(|f| {
                     (
@@ -146,7 +153,10 @@ pub fn render(
     let has_audio = !apart.is_empty();
     if has_audio {
         let amix_in: String = (input_idx..aidx).map(|i| format!("[a{i}]")).collect();
-        apart.push(format!("{amix_in}amix=inputs={}:normalize=0[aout]", aidx - input_idx));
+        apart.push(format!(
+            "{amix_in}amix=inputs={}:normalize=0[aout]",
+            aidx - input_idx
+        ));
     }
 
     let mut filter = vparts.join(";");
@@ -166,8 +176,7 @@ pub fn render(
                     .iter()
                     .find(|m| m["id"] == s["material_id"]);
                 let Some(mat) = mat else { continue };
-                let content: Value =
-                    serde_json::from_str(mat["content"].as_str().unwrap_or("{}"))?;
+                let content: Value = serde_json::from_str(mat["content"].as_str().unwrap_or("{}"))?;
                 let text = content["text"].as_str().unwrap_or_default();
                 if text.is_empty() {
                     continue;
@@ -192,7 +201,11 @@ pub fn render(
             filter.push_str(&format!(";[vout]{}[vfinal]", drawtext.join(",")));
         }
     }
-    let vmap = if burn_captions && !drawtext.is_empty() { "[vfinal]" } else { "[vout]" };
+    let vmap = if burn_captions && !drawtext.is_empty() {
+        "[vfinal]"
+    } else {
+        "[vout]"
+    };
 
     let mut cmd = Command::new(&ff);
     cmd.arg("-y").arg("-v").arg("error");
@@ -205,17 +218,21 @@ pub fn render(
         cmd.args(["-map", "[aout]"]);
     }
     cmd.args([
-        "-c:v", "libx264", "-preset", "veryfast", "-crf", &crf.to_string(),
-        "-pix_fmt", "yuv420p",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        &crf.to_string(),
+        "-pix_fmt",
+        "yuv420p",
     ]);
     if has_audio {
         cmd.args(["-c:a", "aac", "-b:a", "128k", "-shortest"]);
     }
     cmd.arg(out);
 
-    let output = cmd
-        .output()
-        .with_context(|| format!("running {ff}"))?;
+    let output = cmd.output().with_context(|| format!("running {ff}"))?;
     if !output.status.success() {
         bail!(
             "ffmpeg render failed: {}",

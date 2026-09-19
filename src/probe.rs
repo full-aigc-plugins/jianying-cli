@@ -66,7 +66,10 @@ pub fn probe(media: &Path) -> Result<MediaInfo> {
         );
     }
     let v: Value = serde_json::from_slice(&out.stdout)?;
-    let format_name_early = v["format"]["format_name"].as_str().unwrap_or_default().to_string();
+    let format_name_early = v["format"]["format_name"]
+        .as_str()
+        .unwrap_or_default()
+        .to_string();
     let is_image_early = format_name_early.contains("image")
         || (format_name_early.ends_with("_pipe")
             && !format_name_early.starts_with("mov")
@@ -75,9 +78,8 @@ pub fn probe(media: &Path) -> Result<MediaInfo> {
                 .any(|f| format_name_early.contains(f)));
     let stream_duration = || {
         v["streams"].as_array().and_then(|ss| {
-            ss.iter().find_map(|s| {
-                s["duration"].as_str().and_then(|d| d.parse::<f64>().ok())
-            })
+            ss.iter()
+                .find_map(|s| s["duration"].as_str().and_then(|d| d.parse::<f64>().ok()))
         })
     };
     let parsed = v["format"]["duration"]

@@ -80,10 +80,18 @@ fn seed_from_donor(root: &Path, content: &mut Value) -> Option<String> {
         if !dir.is_dir() {
             continue;
         }
-        for name in ["draft_info.json", "draft_content.json", "draft_meta_info.json"] {
+        for name in [
+            "draft_info.json",
+            "draft_content.json",
+            "draft_meta_info.json",
+        ] {
             let p = dir.join(name);
-            let Ok(raw) = std::fs::read_to_string(&p) else { continue };
-            let Ok(v) = serde_json::from_str::<Value>(&raw) else { continue };
+            let Ok(raw) = std::fs::read_to_string(&p) else {
+                continue;
+            };
+            let Ok(v) = serde_json::from_str::<Value>(&raw) else {
+                continue;
+            };
             let is_timeline = v["tracks"].is_array() && v["materials"].is_object();
             let has_markers = v["version"].is_number()
                 || v["new_version"].is_string()
@@ -104,7 +112,12 @@ fn seed_from_donor(root: &Path, content: &mut Value) -> Option<String> {
         }
     }
     let (_, path, donor) = best?;
-    for field in ["version", "new_version", "color_space", "last_modified_platform"] {
+    for field in [
+        "version",
+        "new_version",
+        "color_space",
+        "last_modified_platform",
+    ] {
         if let Some(v) = donor.get(field) {
             content[field] = v.clone();
         }
@@ -187,12 +200,15 @@ fn apply_keyframes(seg_v: &mut Value, seg: &Segment) {
             .collect::<Vec<_>>())
     };
     let mut push = |property: &str, points: &[KeyPoint]| {
-        seg_v["common_keyframes"].as_array_mut().unwrap().push(json!({
-            "id": hex_id(),
-            "property_type": property,
-            "keyframe_list": points_json(points),
-            "material_id": ""
-        }));
+        seg_v["common_keyframes"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!({
+                "id": hex_id(),
+                "property_type": property,
+                "keyframe_list": points_json(points),
+                "material_id": ""
+            }));
     };
     for (channel, points) in kfs {
         match channel.as_str() {
@@ -213,19 +229,28 @@ fn make_companions(materials: &mut Value, speed: f64, video: bool) -> Vec<String
         "id": speed_id, "type": "speed", "speed": speed, "mode": 0, "curve_speed": null
     }));
     let placeholder_id = hex_id();
-    materials["placeholders"].as_array_mut().unwrap().push(json!({
-        "id": placeholder_id, "type": "placeholder_info", "error_path": "", "error_text": "",
-        "meta_type": "none", "res_path": "", "res_text": ""
-    }));
+    materials["placeholders"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!({
+            "id": placeholder_id, "type": "placeholder_info", "error_path": "", "error_text": "",
+            "meta_type": "none", "res_path": "", "res_text": ""
+        }));
     let scm_id = hex_id();
-    materials["sound_channel_mappings"].as_array_mut().unwrap().push(json!({
-        "id": scm_id, "type": "none", "audio_channel_mapping": 0, "is_config_open": false
-    }));
+    materials["sound_channel_mappings"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!({
+            "id": scm_id, "type": "none", "audio_channel_mapping": 0, "is_config_open": false
+        }));
     let vocal_id = hex_id();
-    materials["vocal_separations"].as_array_mut().unwrap().push(json!({
-        "id": vocal_id, "type": "vocal_separation", "choice": 0, "enter_from": "",
-        "final_algorithm": "", "production_path": "", "removed_sounds": [], "time_range": null
-    }));
+    materials["vocal_separations"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!({
+            "id": vocal_id, "type": "vocal_separation", "choice": 0, "enter_from": "",
+            "final_algorithm": "", "production_path": "", "removed_sounds": [], "time_range": null
+        }));
     let mut refs = vec![speed_id, placeholder_id, scm_id, vocal_id];
     if video {
         let canvas_id = hex_id();
@@ -234,11 +259,14 @@ fn make_companions(materials: &mut Value, speed: f64, video: bool) -> Vec<String
             "image": "", "image_id": "", "image_name": "", "source_platform": 0, "team_id": ""
         }));
         let color_id = hex_id();
-        materials["material_colors"].as_array_mut().unwrap().push(json!({
-            "id": color_id, "type": "material_color", "gradient_angle": 90,
-            "gradient_colors": [], "gradient_percents": [], "height": 0,
-            "is_color_clip": false, "is_gradient": false, "solid_color": "", "width": 0
-        }));
+        materials["material_colors"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!({
+                "id": color_id, "type": "material_color", "gradient_angle": 90,
+                "gradient_colors": [], "gradient_percents": [], "height": 0,
+                "is_color_clip": false, "is_gradient": false, "solid_color": "", "width": 0
+            }));
         refs.push(canvas_id);
         refs.push(color_id);
     }
@@ -285,7 +313,8 @@ fn build_text_content(seg: &Segment, font_entry: Option<&Value>) -> Result<Strin
                      bold: bool,
                      italic: bool,
                      underline: bool,
-                     color: [f64; 3]| -> Value {
+                     color: [f64; 3]|
+     -> Value {
         let mut s = json!({
             "range": range,
             "size": size,
@@ -450,7 +479,11 @@ pub fn build(
 
                     let (material_id, companions) = if track.kind == "video" {
                         let id = hex_id();
-                        let mtype = if seg.photo || info.is_image { "photo" } else { "video" };
+                        let mtype = if seg.photo || info.is_image {
+                            "photo"
+                        } else {
+                            "video"
+                        };
                         materials["videos"].as_array_mut().unwrap().push(json!({
                             "audio_fade": null, "category_id": "", "category_name": "local",
                             "check_flag": 63487,
@@ -521,8 +554,12 @@ pub fn build(
                             refs.push(mask_entry(materials, m, &info)?);
                         }
                         for f in &seg.filters {
-                            let entry =
-                                catalogs::resolve(catalogs::filters(), "filter", &f.name, vip_ok())?;
+                            let entry = catalogs::resolve(
+                                catalogs::filters(),
+                                "filter",
+                                &f.name,
+                                vip_ok(),
+                            )?;
                             let fid = hex_id();
                             materials["effects"].as_array_mut().unwrap().push(json!({
                                 "adjust_params": [], "algorithm_artifact_path": "",
@@ -544,9 +581,19 @@ pub fn build(
                         }
                         for e in &seg.effects {
                             let entry = catalogs::resolve(
-                                catalogs::video_scene_effects(), "effect", &e.name, vip_ok())
-                                .or_else(|_| catalogs::resolve(
-                                    catalogs::video_character_effects(), "effect", &e.name, vip_ok()))?;
+                                catalogs::video_scene_effects(),
+                                "effect",
+                                &e.name,
+                                vip_ok(),
+                            )
+                            .or_else(|_| {
+                                catalogs::resolve(
+                                    catalogs::video_character_effects(),
+                                    "effect",
+                                    &e.name,
+                                    vip_ok(),
+                                )
+                            })?;
                             let eid = hex_id();
                             materials["video_effects"].as_array_mut().unwrap().push(json!({
                                 "adjust_params": catalogs::adjust_params(entry, Some(&e.params)),
@@ -606,24 +653,44 @@ pub fn build(
                         }
                         if !anims.is_empty() {
                             let aid = hex_id();
-                            materials["material_animations"].as_array_mut().unwrap().push(json!({
-                                "id": aid, "type": "sticker_animation",
-                                "multi_language_current": "none", "animations": anims
-                            }));
+                            materials["material_animations"]
+                                .as_array_mut()
+                                .unwrap()
+                                .push(json!({
+                                    "id": aid, "type": "sticker_animation",
+                                    "multi_language_current": "none", "animations": anims
+                                }));
                             refs.push(aid);
                         }
                     }
                     if track.kind == "audio" {
                         for e in &seg.audio_effects {
                             let entry = catalogs::resolve(
-                                catalogs::audio_scene_effects(), "audio effect", &e.name, vip_ok())
-                                .or_else(|_| catalogs::resolve(
-                                    catalogs::tone_effects(), "audio effect", &e.name, vip_ok()))
-                                .or_else(|_| catalogs::resolve(
-                                    catalogs::speech_to_songs(), "audio effect", &e.name, vip_ok()))?;
+                                catalogs::audio_scene_effects(),
+                                "audio effect",
+                                &e.name,
+                                vip_ok(),
+                            )
+                            .or_else(|_| {
+                                catalogs::resolve(
+                                    catalogs::tone_effects(),
+                                    "audio effect",
+                                    &e.name,
+                                    vip_ok(),
+                                )
+                            })
+                            .or_else(|_| {
+                                catalogs::resolve(
+                                    catalogs::speech_to_songs(),
+                                    "audio effect",
+                                    &e.name,
+                                    vip_ok(),
+                                )
+                            })?;
                             let aid = hex_id();
-                            let domain = if catalogs::find(
-                                catalogs::audio_scene_effects(), &e.name).is_some() {
+                            let domain = if catalogs::find(catalogs::audio_scene_effects(), &e.name)
+                                .is_some()
+                            {
                                 ("sound_effect", "场景音")
                             } else if catalogs::find(catalogs::tone_effects(), &e.name).is_some() {
                                 ("timbre", "音色")
@@ -644,11 +711,14 @@ pub fn build(
                     }
                     if let Some(f) = &seg.fade {
                         let fid = hex_id();
-                        materials["audio_fades"].as_array_mut().unwrap().push(json!({
-                            "id": fid, "fade_in_duration": f.in_us,
-                            "fade_out_duration": f.out_us, "fade_type": 0,
-                            "type": "audio_fade"
-                        }));
+                        materials["audio_fades"]
+                            .as_array_mut()
+                            .unwrap()
+                            .push(json!({
+                                "id": fid, "fade_in_duration": f.in_us,
+                                "fade_out_duration": f.out_us, "fade_type": 0,
+                                "type": "audio_fade"
+                            }));
                         refs.push(fid);
                     }
                     if let Some(c) = &seg.chroma {
@@ -669,7 +739,11 @@ pub fn build(
                     }
                     if let Some(bf) = &seg.background_filling {
                         let bid = hex_id();
-                        let ftype = if bf.fill_type == "blur" { "canvas_blur" } else { "canvas_color" };
+                        let ftype = if bf.fill_type == "blur" {
+                            "canvas_blur"
+                        } else {
+                            "canvas_color"
+                        };
                         materials["canvases"].as_array_mut().unwrap().push(json!({
                             "id": bid, "type": ftype, "blur": bf.blur,
                             "color": rgba_normalize(if bf.color.is_empty() { "#00000000" } else { &bf.color }),
@@ -711,8 +785,11 @@ pub fn build(
                     });
                     if border > 0.0 {
                         text_material["has_border"] = json!(true);
-                        text_material["border_color"] = json!(seg.border_color.clone()
-                            .unwrap_or_else(|| "#000000".into()).to_uppercase());
+                        text_material["border_color"] = json!(seg
+                            .border_color
+                            .clone()
+                            .unwrap_or_else(|| "#000000".into())
+                            .to_uppercase());
                         text_material["border_width"] = json!(border);
                         text_material["border_alpha"] = json!(1);
                     }
@@ -720,7 +797,8 @@ pub fn build(
                         text_material["background_style"] = json!(b.style.unwrap_or(1));
                         text_material["background_color"] = json!(b.color.to_uppercase());
                         text_material["background_alpha"] = json!(b.alpha.unwrap_or(1.0));
-                        text_material["background_round_radius"] = json!(b.round_radius.unwrap_or(0.0));
+                        text_material["background_round_radius"] =
+                            json!(b.round_radius.unwrap_or(0.0));
                         text_material["background_height"] = json!(b.height.unwrap_or(0.14));
                         text_material["background_width"] = json!(b.width.unwrap_or(0.14));
                         text_material["background_horizontal_offset"] =
@@ -728,10 +806,16 @@ pub fn build(
                         text_material["background_vertical_offset"] =
                             json!(b.vertical_offset.unwrap_or(0.0));
                     }
-                    materials["texts"].as_array_mut().unwrap().push(text_material);
+                    materials["texts"]
+                        .as_array_mut()
+                        .unwrap()
+                        .push(text_material);
 
                     refs = Vec::new();
-                    for (raw, kind) in [(&seg.text_effect, "text_shape"), (&seg.bubble, "text_shape")] {
+                    for (raw, kind) in [
+                        (&seg.text_effect, "text_shape"),
+                        (&seg.bubble, "text_shape"),
+                    ] {
                         if let Some(r) = raw {
                             let tid = hex_id();
                             materials["effects"].as_array_mut().unwrap().push(json!({
@@ -766,9 +850,9 @@ pub fn build(
                                 _ => catalogs::text_animations_loop(),
                             };
                             let entry = catalogs::resolve(catalog, "animation", &a.name, vip_ok())?;
-                            let dur = a
-                                .duration_us
-                                .unwrap_or_else(|| entry["duration_us"].as_i64().unwrap_or(500_000));
+                            let dur = a.duration_us.unwrap_or_else(|| {
+                                entry["duration_us"].as_i64().unwrap_or(500_000)
+                            });
                             let start = match kind {
                                 "out" => (seg.duration_us - dur).max(0),
                                 _ => 0,
@@ -786,10 +870,13 @@ pub fn build(
                     }
                     if !anims.is_empty() {
                         let aid = hex_id();
-                        materials["material_animations"].as_array_mut().unwrap().push(json!({
-                            "id": aid, "type": "sticker_animation",
-                            "multi_language_current": "none", "animations": anims
-                        }));
+                        materials["material_animations"]
+                            .as_array_mut()
+                            .unwrap()
+                            .push(json!({
+                                "id": aid, "type": "sticker_animation",
+                                "multi_language_current": "none", "animations": anims
+                            }));
                         refs.push(aid);
                     }
                     apply_keyframes(&mut seg_v, seg);
@@ -810,13 +897,29 @@ pub fn build(
                 "filter" | "effect" => {
                     let (entry, is_filter) = if track.kind == "filter" {
                         let f = &seg.filters[0];
-                        (catalogs::resolve(catalogs::filters(), "filter", &f.name, vip_ok())?, true)
+                        (
+                            catalogs::resolve(catalogs::filters(), "filter", &f.name, vip_ok())?,
+                            true,
+                        )
                     } else {
                         let e = &seg.effects[0];
-                        (catalogs::resolve(
-                            catalogs::video_scene_effects(), "effect", &e.name, vip_ok())
-                            .or_else(|_| catalogs::resolve(
-                                catalogs::video_character_effects(), "effect", &e.name, vip_ok()))?, false)
+                        (
+                            catalogs::resolve(
+                                catalogs::video_scene_effects(),
+                                "effect",
+                                &e.name,
+                                vip_ok(),
+                            )
+                            .or_else(|_| {
+                                catalogs::resolve(
+                                    catalogs::video_character_effects(),
+                                    "effect",
+                                    &e.name,
+                                    vip_ok(),
+                                )
+                            })?,
+                            false,
+                        )
                     };
                     let material_id = hex_id();
                     if is_filter {
@@ -842,17 +945,20 @@ pub fn build(
                             .clone()
                             .or_else(|| Some(seg.effects[0].params.clone()))
                             .unwrap_or_default();
-                        materials["video_effects"].as_array_mut().unwrap().push(json!({
-                            "adjust_params": catalogs::adjust_params(entry, Some(&params)),
-                            "apply_target_type": 2, "apply_time_range": null,
-                            "category_id": "", "category_name": "", "common_keyframes": [],
-                            "disable_effect_faces": [], "effect_id": entry["effect_id"],
-                            "formula_id": "", "id": material_id, "name": entry["name"],
-                            "platform": "all", "render_index": 11000,
-                            "resource_id": entry["resource_id"], "source_platform": 0,
-                            "time_range": null, "track_render_index": 0,
-                            "type": "video_effect", "value": 1.0, "version": ""
-                        }));
+                        materials["video_effects"]
+                            .as_array_mut()
+                            .unwrap()
+                            .push(json!({
+                                "adjust_params": catalogs::adjust_params(entry, Some(&params)),
+                                "apply_target_type": 2, "apply_time_range": null,
+                                "category_id": "", "category_name": "", "common_keyframes": [],
+                                "disable_effect_faces": [], "effect_id": entry["effect_id"],
+                                "formula_id": "", "id": material_id, "name": entry["name"],
+                                "platform": "all", "render_index": 11000,
+                                "resource_id": entry["resource_id"], "source_platform": 0,
+                                "time_range": null, "track_render_index": 0,
+                                "type": "video_effect", "value": 1.0, "version": ""
+                            }));
                     }
                     seg_v = base_segment(&material_id, seg, ti as i64);
                     seg_v["extra_material_refs"] = json!([material_id]);
@@ -866,19 +972,22 @@ pub fn build(
                 let entry =
                     catalogs::resolve(catalogs::transitions(), "transition", &t.name, vip_ok())?;
                 let transition_id = hex_id();
-                materials["transitions"].as_array_mut().unwrap().push(json!({
-                    "category_id": "", "category_name": "",
-                    "duration": t.duration_us.unwrap_or_else(|| {
-                        entry["duration_us"].as_i64().unwrap_or(500_000)
-                    }),
-                    "effect_id": entry["effect_id"],
-                    "id": transition_id,
-                    "is_overlap": entry["is_overlap"],
-                    "name": entry["name"],
-                    "platform": "all",
-                    "resource_id": entry["resource_id"],
-                    "type": "transition"
-                }));
+                materials["transitions"]
+                    .as_array_mut()
+                    .unwrap()
+                    .push(json!({
+                        "category_id": "", "category_name": "",
+                        "duration": t.duration_us.unwrap_or_else(|| {
+                            entry["duration_us"].as_i64().unwrap_or(500_000)
+                        }),
+                        "effect_id": entry["effect_id"],
+                        "id": transition_id,
+                        "is_overlap": entry["is_overlap"],
+                        "name": entry["name"],
+                        "platform": "all",
+                        "resource_id": entry["resource_id"],
+                        "type": "transition"
+                    }));
                 refs.push(transition_id);
             }
 
@@ -904,8 +1013,10 @@ pub fn build(
         .canonicalize()
         .unwrap_or_else(|_| out_dir.to_path_buf())
         .to_string_lossy());
-    meta["draft_root_path"] =
-        json!(out_dir.parent().map(|p| p.to_string_lossy()).unwrap_or_default());
+    meta["draft_root_path"] = json!(out_dir
+        .parent()
+        .map(|p| p.to_string_lossy())
+        .unwrap_or_default());
     meta["draft_json_file"] = json!(out_dir.join("draft_content.json").to_string_lossy());
     meta["tm_draft_create"] = json!(now);
     meta["tm_draft_modified"] = json!(now);
@@ -962,12 +1073,27 @@ pub fn verify(draft_dir: &Path) -> Result<Value> {
             issues.push("a video track exists but is not the first track".into());
         }
     }
-    let ref_buckets = ["speeds", "placeholders", "sound_channel_mappings", "vocal_separations",
-        "canvases", "material_colors", "transitions", "masks", "chromas", "effects",
-        "video_effects", "audio_fades", "audio_effects", "material_animations"];
+    let ref_buckets = [
+        "speeds",
+        "placeholders",
+        "sound_channel_mappings",
+        "vocal_separations",
+        "canvases",
+        "material_colors",
+        "transitions",
+        "masks",
+        "chromas",
+        "effects",
+        "video_effects",
+        "audio_fades",
+        "audio_effects",
+        "material_animations",
+    ];
     let mut max_end: i64 = 0;
     for (ti, t) in tracks.iter().enumerate() {
-        let segs = t["segments"].as_array().context("segments must be an array")?;
+        let segs = t["segments"]
+            .as_array()
+            .context("segments must be an array")?;
         let mut prior_end: i64 = 0;
         for s in segs {
             let start = s["target_timerange"]["start"].as_i64().unwrap_or(0);
@@ -1010,7 +1136,9 @@ pub fn verify(draft_dir: &Path) -> Result<Value> {
             }
         }
         if ti == 0 && t["type"] == "video" {
-            let first = t["segments"][0]["target_timerange"]["start"].as_i64().unwrap_or(-1);
+            let first = t["segments"][0]["target_timerange"]["start"]
+                .as_i64()
+                .unwrap_or(-1);
             if first != 0 {
                 issues.push("main video must start at 0".into());
             }
@@ -1018,7 +1146,9 @@ pub fn verify(draft_dir: &Path) -> Result<Value> {
     }
     let declared = tl["duration"].as_i64().unwrap_or(0);
     if declared != max_end {
-        issues.push(format!("top duration {declared} != max segment end {max_end}"));
+        issues.push(format!(
+            "top duration {declared} != max segment end {max_end}"
+        ));
     }
     Ok(json!({
         "ok": issues.is_empty(),
@@ -1049,4 +1179,3 @@ pub fn inspect(draft_dir: &Path) -> Result<Value> {
         "platform": tl["platform"], "tracks": tracks,
     }))
 }
-

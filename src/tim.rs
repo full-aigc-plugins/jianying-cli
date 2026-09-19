@@ -34,7 +34,9 @@ pub fn parse(s: &str) -> Result<i64> {
             continue;
         }
         let unit: String = chars.by_ref().take_while(|c| c.is_alphabetic()).collect();
-        let v: f64 = num.parse().map_err(|_| anyhow::anyhow!("bad number before {unit:?} in {s:?}"))?;
+        let v: f64 = num
+            .parse()
+            .map_err(|_| anyhow::anyhow!("bad number before {unit:?} in {s:?}"))?;
         num.clear();
         let mult: i64 = match unit.to_lowercase().as_str() {
             "h" => 3_600_000_000,
@@ -70,10 +72,7 @@ pub fn preprocess(v: &mut Value) {
         Value::Object(map) => {
             let conversions: Vec<String> = map
                 .iter()
-                .filter(|(k, val)| {
-                    k.ends_with("_us")
-                        && matches!(val, Value::String(_))
-                })
+                .filter(|(k, val)| k.ends_with("_us") && matches!(val, Value::String(_)))
                 .map(|(k, _)| k.clone())
                 .collect();
             for k in conversions {

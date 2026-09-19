@@ -2,10 +2,8 @@
 //! inspect materials, duplicate, replace text, replace materials, import a
 //! track from another draft, and build on top of a template.
 
-use crate::plan::{hex_rgb, StyleRange};
 use crate::probe;
 use anyhow::{bail, Context, Result};
-use serde::Deserialize;
 use serde_json::{json, Value};
 use std::path::Path;
 use uuid::Uuid;
@@ -130,7 +128,12 @@ fn copy_dir(src: &Path, dest: &Path) -> Result<()> {
 /// `replace_text` parity: rewrite a text segment's content on a text track.
 /// `recalc_style` semantics: the base style range is recomputed to the new
 /// UTF-16 length and styled ranges are clamped.
-pub fn replace_text(draft: &Path, track_name: &str, seg_index: usize, new_text: &str) -> Result<Value> {
+pub fn replace_text(
+    draft: &Path,
+    track_name: &str,
+    seg_index: usize,
+    new_text: &str,
+) -> Result<Value> {
     let mut tl = load(draft)?;
     let material_id = {
         let track = tl["tracks"]
@@ -139,13 +142,23 @@ pub fn replace_text(draft: &Path, track_name: &str, seg_index: usize, new_text: 
             .iter_mut()
             .find(|t| t["type"] == "text")
             .ok_or_else(|| anyhow::anyhow!("no text track"))?;
-        let segs = track["segments"].as_array_mut().context("segments must be an array")?;
+        let segs = track["segments"]
+            .as_array_mut()
+            .context("segments must be an array")?;
         if seg_index >= segs.len() {
-            bail!("segment index {seg_index} out of range ({} segments)", segs.len());
+            bail!(
+                "segment index {seg_index} out of range ({} segments)",
+                segs.len()
+            );
         }
-        segs[seg_index]["material_id"].as_str().unwrap_or_default().to_string()
+        segs[seg_index]["material_id"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string()
     };
-    let texts = tl["materials"]["texts"].as_array_mut().context("no texts bucket")?;
+    let texts = tl["materials"]["texts"]
+        .as_array_mut()
+        .context("no texts bucket")?;
     let mat = texts
         .iter_mut()
         .find(|m| m["id"] == json!(material_id))
@@ -166,8 +179,10 @@ pub fn replace_text(draft: &Path, track_name: &str, seg_index: usize, new_text: 
     }
     mat["content"] = json!(content.to_string());
     save(draft, &tl)?;
-    Ok(json!({"status": "replaced", "track": track_name, "segment": seg_index,
-              "text": new_text, "utf16_len": utf16_len}))
+    Ok(
+        json!({"status": "replaced", "track": track_name, "segment": seg_index,
+              "text": new_text, "utf16_len": utf16_len}),
+    )
 }
 
 /// `replace_material_by_name` / `replace_material_by_seg` parity: swap a
@@ -236,7 +251,12 @@ pub fn replace_material(
               "source": new_source.to_string_lossy(), "duration_us": info.duration_us}))
 }
 
-fn apply_material_swap(m: &mut Value, bucket: &str, new_source: &Path, info: &probe::MediaInfo) -> Result<()> {
+fn apply_material_swap(
+    m: &mut Value,
+    bucket: &str,
+    new_source: &Path,
+    info: &probe::MediaInfo,
+) -> Result<()> {
     let name = new_source
         .file_name()
         .map(|n| n.to_string_lossy().into_owned())
@@ -267,7 +287,12 @@ pub fn import_track(target_draft: &Path, source_draft: &Path, track_name: &str) 
         .find(|t| t["name"] == json!(track_name) || t["type"] == json!(track_name))
         .ok_or_else(|| anyhow::anyhow!("track {track_name} not found in source"))?
         .clone();
-    if target["tracks"].as_array().unwrap().iter().any(|t| t["name"] == track["name"]) {
+    if target["tracks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|t| t["name"] == track["name"])
+    {
         bail!("target already has a track named {}", track["name"]);
     }
     let mut id_map: std::collections::BTreeMap<String, String> = Default::default();
@@ -283,7 +308,8 @@ pub fn import_track(target_draft: &Path, source_draft: &Path, track_name: &str) 
             for r in refs.iter_mut() {
                 let old = r.as_str().unwrap_or_default().to_string();
                 let mapped = id_map.get(&old).cloned().unwrap_or_else(|| {
-                    let new = copy_material(&source, &mut target, &old).unwrap_or_else(|_| old.clone());
+                    let new =
+                        copy_material(&source, &mut target, &old).unwrap_or_else(|_| old.clone());
                     id_map.insert(old.clone(), new.clone());
                     new
                 });
@@ -340,11 +366,7 @@ fn copy_material(source: &Value, target: &mut Value, material_id: &str) -> Resul
 
 /// `load_template` + add-segments parity: build the plan's tracks on top of a
 /// template timeline, keeping its tracks and materials.
-pub fn build_on_template(
-    template_dir: &Path,
-    base: &mut Value,
-    plan_name: &str,
-) -> Result<()> {
+pub fn build_on_template(template_dir: &Path, base: &mut Value, plan_name: &str) -> Result<()> {
     let template = load(template_dir)?;
     let now = now_us();
     base["id"] = template["id"].clone();
@@ -354,7 +376,10 @@ pub fn build_on_template(
     base["update_time"] = json!(now / 1_000_000);
     // keep template canvas/fps unless the plan changed them is decided by caller;
     // merge template materials buckets into base
-    if let (Some(tm), Some(bm)) = (template["materials"].as_object(), base["materials"].as_object_mut()) {
+    if let (Some(tm), Some(bm)) = (
+        template["materials"].as_object(),
+        base["materials"].as_object_mut(),
+    ) {
         for (bucket, items) in tm {
             if let Some(arr) = items.as_array() {
                 for m in arr {
@@ -396,24 +421,4 @@ pub fn build_on_template(
         .unwrap_or(0);
     base["duration"] = json!(duration);
     Ok(())
-}
-
-/// StyleRange re-export for parity tooling docs.
-#[allow(dead_code)]
-fn _style_range_type_check(_: StyleRange) {}
-#[allow(dead_code)]
-fn _deserialize_check<'de>(_: &'de str) -> Option<fn(&str) -> Result<[f64; 3]>> {
-    None
-}
-#[allow(dead_code)]
-fn _hex_check() -> Option<fn(&str) -> anyhow::Result<[f64; 3]>> {
-    Some(hex_rgb)
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(dead_code)]
-struct ParityCue {
-    start_us: i64,
-    end_us: i64,
-    text: String,
 }

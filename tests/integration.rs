@@ -72,9 +72,21 @@ fn write_plan(dir: &Path) -> PathBuf {
 
 #[test]
 fn catalogs_have_expected_populations_and_vip_guard() {
-    assert_eq!(jianying_cli::catalogs::transitions().as_array().unwrap().len(), 453);
-    assert_eq!(jianying_cli::catalogs::filters().as_array().unwrap().len(), 1052);
-    assert_eq!(jianying_cli::catalogs::fonts().as_array().unwrap().len(), 798);
+    assert_eq!(
+        jianying_cli::catalogs::transitions()
+            .as_array()
+            .unwrap()
+            .len(),
+        453
+    );
+    assert_eq!(
+        jianying_cli::catalogs::filters().as_array().unwrap().len(),
+        1052
+    );
+    assert_eq!(
+        jianying_cli::catalogs::fonts().as_array().unwrap().len(),
+        798
+    );
     assert_eq!(jianying_cli::catalogs::masks().as_array().unwrap().len(), 6);
     let plan: Plan = serde_json::from_value(json!({
         "schema": "jianying-cli-plan/v1", "name": "x",
@@ -82,8 +94,12 @@ fn catalogs_have_expected_populations_and_vip_guard() {
         "tracks": [{"type": "video", "segments": [
             {"start_us": 0, "duration_us": 1000000, "source": "a.mp4",
              "transition_out": {"name": "叠化扭曲"}}]}]
-    })).unwrap();
-    assert!(plan.validate().is_err(), "vip transition must be rejected without allow_vip");
+    }))
+    .unwrap();
+    assert!(
+        plan.validate().is_err(),
+        "vip transition must be rejected without allow_vip"
+    );
 }
 
 #[test]
@@ -105,10 +121,9 @@ fn build_full_capability_draft_and_self_verify() {
     let report = draft::build(&plan, &tmp, &out, None, &probe_stub).expect("build succeeds");
     assert_eq!(report.tracks, 5);
 
-    let d: Value = serde_json::from_str(
-        &std::fs::read_to_string(out.join("draft_content.json")).unwrap(),
-    )
-    .unwrap();
+    let d: Value =
+        serde_json::from_str(&std::fs::read_to_string(out.join("draft_content.json")).unwrap())
+            .unwrap();
     let info: Value =
         serde_json::from_str(&std::fs::read_to_string(out.join("draft_info.json")).unwrap())
             .unwrap();
@@ -116,38 +131,74 @@ fn build_full_capability_draft_and_self_verify() {
     let m = &d["materials"];
     assert_eq!(m["masks"].as_array().unwrap().len(), 1);
     assert_eq!(
-        m["effects"].as_array().unwrap().iter().filter(|e| e["type"] == "filter").count(),
+        m["effects"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|e| e["type"] == "filter")
+            .count(),
         2,
         "segment filter + global filter track"
     );
     assert_eq!(
-        m["video_effects"].as_array().unwrap().iter().filter(|e| e["apply_target_type"] == 2).count(),
+        m["video_effects"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|e| e["apply_target_type"] == 2)
+            .count(),
         1,
         "global effect track is apply_target_type=2"
     );
-    assert_eq!(m["audio_fades"].as_array().unwrap().len(), 2, "video fade + audio fade");
+    assert_eq!(
+        m["audio_fades"].as_array().unwrap().len(),
+        2,
+        "video fade + audio fade"
+    );
     let chroma = &m["chromas"][0];
     assert_eq!(chroma["type"], json!("chroma"));
     assert_eq!(chroma["intensity_value"], json!(0.3));
-    assert_eq!(chroma["id"].as_str().unwrap().len(), 36, "chroma id is an uppercase hyphenated uuid (pyJYD quirk)");
-    let bgf = m["canvases"].as_array().unwrap().iter()
-        .find(|c| c["type"] == "canvas_blur").expect("background filling entry");
+    assert_eq!(
+        chroma["id"].as_str().unwrap().len(),
+        36,
+        "chroma id is an uppercase hyphenated uuid (pyJYD quirk)"
+    );
+    let bgf = m["canvases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["type"] == "canvas_blur")
+        .expect("background filling entry");
     assert_eq!(bgf["blur"], json!(0.375));
-    let bubble = m["effects"].as_array().unwrap().iter()
-        .find(|e| e["type"] == "text_shape").expect("text bubble entry");
+    let bubble = m["effects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|e| e["type"] == "text_shape")
+        .expect("text bubble entry");
     assert_eq!(bubble["effect_id"], json!("123"));
     assert_eq!(m["audio_effects"].as_array().unwrap().len(), 1);
     let anim_items: Vec<&Value> = m["material_animations"]
-        .as_array().unwrap()
-        .iter().flat_map(|e| e["animations"].as_array().unwrap())
+        .as_array()
+        .unwrap()
+        .iter()
+        .flat_map(|e| e["animations"].as_array().unwrap())
         .collect();
     assert_eq!(anim_items.len(), 3, "video in + video out + text in");
-    assert_eq!(m["transitions"].as_array().unwrap()[0]["name"], json!("闪黑"));
-    let meta: Value = serde_json::from_str(
-        &std::fs::read_to_string(out.join("draft_meta_info.json")).unwrap(),
-    )
-    .unwrap();
-    assert_eq!(meta["draft_materials"][0]["value"].as_array().unwrap().len(), 3);
+    assert_eq!(
+        m["transitions"].as_array().unwrap()[0]["name"],
+        json!("闪黑")
+    );
+    let meta: Value =
+        serde_json::from_str(&std::fs::read_to_string(out.join("draft_meta_info.json")).unwrap())
+            .unwrap();
+    assert_eq!(
+        meta["draft_materials"][0]["value"]
+            .as_array()
+            .unwrap()
+            .len(),
+        3
+    );
 
     let verdict = draft::verify(&out).unwrap();
     assert_eq!(verdict["ok"], json!(true), "issues: {}", verdict["issues"]);
@@ -166,10 +217,12 @@ fn publish_registers_into_root_meta() {
     std::fs::create_dir_all(&root).unwrap();
     let result = store::publish(&out, &root, true).unwrap();
     assert_eq!(result["status"], json!("published"));
-    let root_meta: Value = serde_json::from_str(
-        &std::fs::read_to_string(root.join("root_meta_info.json")).unwrap(),
-    )
-    .unwrap();
+    let root_meta: Value =
+        serde_json::from_str(&std::fs::read_to_string(root.join("root_meta_info.json")).unwrap())
+            .unwrap();
     assert_eq!(root_meta["all_draft_store"].as_array().unwrap().len(), 1);
-    assert!(store::publish(&out, &root, true).is_err(), "name clash must refuse");
+    assert!(
+        store::publish(&out, &root, true).is_err(),
+        "name clash must refuse"
+    );
 }

@@ -186,7 +186,7 @@ pub fn publish(draft_dir: &Path, root: &Path, force: bool) -> Result<Value> {
     meta["draft_json_file"] = json!(dest.join("draft_content.json").to_string_lossy());
     meta["tm_draft_modified"] = json!(now);
     std::fs::write(
-        &meta_path.parent().unwrap().join("draft_meta_info.json"),
+        meta_path.parent().unwrap().join("draft_meta_info.json"),
         serde_json::to_string_pretty(&meta)?,
     )?;
 

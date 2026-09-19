@@ -48,14 +48,20 @@ pub fn parse(srt: &str) -> Result<Vec<Cue>> {
         }
         let text = lines
             .iter()
-            .filter(|l| !l.contains("-->") && !l.trim().parse::<u64>().map(|_| true).unwrap_or(false))
+            .filter(|l| {
+                !l.contains("-->") && !l.trim().parse::<u64>().map(|_| true).unwrap_or(false)
+            })
             .map(|l| l.trim().to_string())
             .collect::<Vec<_>>()
             .join("\n");
         if text.is_empty() {
             continue;
         }
-        cues.push(Cue { start_us: start, end_us: end, text });
+        cues.push(Cue {
+            start_us: start,
+            end_us: end,
+            text,
+        });
     }
     Ok(cues)
 }
