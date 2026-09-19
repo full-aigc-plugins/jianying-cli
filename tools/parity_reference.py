@@ -129,7 +129,7 @@ def main():
                 src = str((plan_dir / seg["source"]).resolve())
                 speed = seg.get("speed", 1.0)
                 material = draft.VideoMaterial(src)
-                mat_dur = material.duration
+                mat_dur = material.duration  # crop variant rewraps below
                 src_start = seg.get("source_start_us", 0)
                 src_dur = seg.get("source_duration_us") or int(seg["duration_us"] * speed)
                 from pyJianYingDraft import ClipSettings as _CS
@@ -142,12 +142,25 @@ def main():
                         scale_x=visual.get("scale", 1.0), scale_y=visual.get("scale", 1.0),
                         transform_x=visual.get("x", 0.0), transform_y=visual.get("y", 0.0),
                         rotation=visual.get("rotation", 0.0))
+                if seg.get("crop"):
+                    c = seg["crop"]
+                    cs_crop = draft.CropSettings(
+                        upper_left_x=c.get("upper_left_x", 0.0),
+                        upper_left_y=c.get("upper_left_y", 0.0),
+                        upper_right_x=c.get("upper_right_x", 1.0),
+                        upper_right_y=c.get("upper_right_y", 0.0),
+                        lower_left_x=c.get("lower_left_x", 0.0),
+                        lower_left_y=c.get("lower_left_y", 1.0),
+                        lower_right_x=c.get("lower_right_x", 1.0),
+                        lower_right_y=c.get("lower_right_y", 1.0))
+                    material = draft.VideoMaterial(src, crop_settings=cs_crop)
                 vs = VideoSegment(
                     material,
                     target_timerange=Timerange(seg["start_us"], seg["duration_us"]),
                     source_timerange=Timerange(src_start, src_dur),
                     speed=speed,
                     volume=seg.get("volume", 1.0),
+                    change_pitch=bool(seg.get("change_pitch", False)),
                     clip_settings=cs)
                 if seg.get("transition_out"):
                     to = seg["transition_out"]
@@ -208,7 +221,8 @@ def main():
                     target_timerange=Timerange(seg["start_us"], seg["duration_us"]),
                     source_timerange=Timerange(seg.get("source_start_us", 0), src_dur),
                     speed=speed,
-                    volume=seg.get("volume", 1.0))
+                    volume=seg.get("volume", 1.0),
+                    change_pitch=bool(seg.get("change_pitch", False)))
                 if seg.get("fade"):
                     aus.add_fade(seg["fade"]["in_us"], seg["fade"]["out_us"])
                 for e in seg.get("audio_effects", []):
@@ -282,6 +296,31 @@ def main():
                     txt.add_animation(member(draft.TextLoopAnim, seg["animation_group"]["name"]),
                                       duration=seg["animation_group"].get("duration_us"))
                 script.add_segment(txt, ref)
+    # SRT parity: when the harness drops subs.srt next to the plan, import it
+    # with the same options the CLI received (offset/style/position)
+    import os as _os
+    srt_path = plan_dir / "subs.srt"
+    if _os.path.exists(srt_path):
+        from pyJianYingDraft import ClipSettings as _CSC, TextStyle as _TSC
+        import json as _json
+        opts = {}
+        sidecar = plan_dir / "srt-opts.json"
+        if _os.path.exists(sidecar):
+            opts = _json.loads(sidecar.read_text())
+        st = _TSC(size=opts.get("size", 5), align=opts.get("align", 1),
+                  auto_wrapping=True)
+        kw = {}
+        if opts.get("color"):
+            st.color = tuple(draft_text_color(opts["color"]))
+        script.import_srt(
+            str(srt_path), "字幕",
+            time_offset=opts.get("offset_us", 0.0),
+            text_style=st,
+            clip_settings=_CSC(
+                transform_y=float(opts.get("y", -0.8)),
+                alpha=1.0,
+                scale_x=1.0, scale_y=1.0,
+                transform_x=0.0, rotation=0.0))
     script.dump(str(store / plan["name"] / "draft_content.json"))
     print("reference built:", plan["name"])
 

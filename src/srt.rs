@@ -66,18 +66,48 @@ pub fn parse(srt: &str) -> Result<Vec<Cue>> {
     Ok(cues)
 }
 
-/// Convert cues into a text track for the plan.
-pub fn cues_to_text_track(cues: Vec<Cue>) -> crate::plan::Track {
+/// Styled subtitle options (pyJYD import_srt parity: time_offset + text_style
+/// + clip_settings reduced to the fields an agent actually sets).
+#[derive(Debug, Clone, serde::Deserialize, Default)]
+pub struct SrtOptions {
+    /// shift all cues by this offset (accepts tim() strings at the CLI layer)
+    pub offset_us: i64,
+    pub size: Option<f64>,
+    /// 0 left / 1 center / 2 right
+    pub align: Option<u8>,
+    pub color: Option<String>,
+    pub border_width: Option<f64>,
+    /// default -0.8 (pyJYD)
+    pub y: Option<f64>,
+    pub bold: Option<bool>,
+}
+
+/// Convert cues into a styled text track for the plan.
+pub fn cues_to_text_track(cues: Vec<Cue>, opts: &SrtOptions) -> crate::plan::Track {
     crate::plan::Track {
         kind: "text".into(),
         name: Some("字幕".into()),
         segments: cues
             .into_iter()
-            .map(|c| crate::plan::Segment {
-                start_us: c.start_us,
-                duration_us: c.end_us - c.start_us,
-                text: Some(c.text),
-                ..Default::default()
+            .map(|c| {
+                let mut s = crate::plan::Segment {
+                    start_us: (c.start_us + opts.offset_us).max(0),
+                    duration_us: c.end_us - c.start_us,
+                    text: Some(c.text),
+                    // pyJYD import_srt defaults: size 5, centered, y=-0.8
+                    size: Some(opts.size.unwrap_or(5.0)),
+                    alignment: Some(opts.align.unwrap_or(1)),
+                    color: opts.color.clone(),
+                    border_width: opts.border_width,
+                    bold: opts.bold,
+                    y: Some(opts.y.unwrap_or(-0.8)),
+                    from_srt: true,
+                    ..Default::default()
+                };
+                if opts.color.is_none() {
+                    s.color = None;
+                }
+                s
             })
             .collect(),
     }

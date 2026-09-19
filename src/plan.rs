@@ -65,6 +65,15 @@ pub struct Segment {
     pub volume: Option<f64>,
     #[serde(default)]
     pub photo: bool,
+    /// 变速时是否同步变调 (pyJYD change_pitch → is_tone_modify)
+    #[serde(default)]
+    pub change_pitch: Option<bool>,
+    /// internal: segment injected via `build --srt` (import_srt wire type)
+    #[serde(skip)]
+    pub from_srt: bool,
+    /// 素材裁剪（0-1，原点左上，pyJYD CropSettings）
+    #[serde(default)]
+    pub crop: Option<CropSettings>,
     // visuals (video/sticker/text)
     #[serde(default)]
     pub scale: Option<f64>,
@@ -275,6 +284,28 @@ pub struct StyleRange {
 pub struct RawIds {
     pub effect_id: String,
     pub resource_id: String,
+}
+
+/// 素材裁剪：四角归一化坐标（0-1，原点左上，pyJYD CropSettings）。
+#[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct CropSettings {
+    #[serde(default)]
+    pub upper_left_x: f64,
+    #[serde(default)]
+    pub upper_left_y: f64,
+    #[serde(default)]
+    pub upper_right_x: f64,
+    #[serde(default)]
+    pub upper_right_y: f64,
+    #[serde(default)]
+    pub lower_left_x: f64,
+    #[serde(default)]
+    pub lower_left_y: f64,
+    #[serde(default)]
+    pub lower_right_x: f64,
+    #[serde(default)]
+    pub lower_right_y: f64,
 }
 
 /// 色度抠图 (chroma key); plan values are 0-100 like the 剪映 UI.
@@ -599,6 +630,23 @@ impl Plan {
             )?;
         }
 
+        if let Some(c) = &seg.crop {
+            if track.kind != "video" {
+                bail!("crop requires a video segment");
+            }
+            for (label, v) in [
+                ("upper_left_x", c.upper_left_x),
+                ("upper_left_y", c.upper_left_y),
+                ("upper_right_x", c.upper_right_x),
+                ("upper_right_y", c.upper_right_y),
+                ("lower_left_x", c.lower_left_x),
+                ("lower_left_y", c.lower_left_y),
+                ("lower_right_x", c.lower_right_x),
+                ("lower_right_y", c.lower_right_y),
+            ] {
+                check_range(v, 0.0, 1.0, &format!("crop {label}"))?;
+            }
+        }
         if let Some(m) = &seg.mask {
             if track.kind != "video" {
                 bail!("masks require a video segment");

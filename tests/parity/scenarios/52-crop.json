@@ -1,0 +1,53 @@
+{
+ "name": "p52",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p52",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 2000000,
+      "source": "a.mp4",
+      "crop": {
+       "upper_left_x": 0.1,
+       "upper_left_y": 0.2,
+       "upper_right_x": 0.9,
+       "upper_right_y": 0.2,
+       "lower_left_x": 0.1,
+       "lower_left_y": 0.8,
+       "lower_right_x": 0.9,
+       "lower_right_y": 0.8
+      }
+     },
+     {
+      "start_us": 2000000,
+      "duration_us": 2000000,
+      "source": "b.mp4"
+     }
+    ]
+   }
+  ]
+ }
+}

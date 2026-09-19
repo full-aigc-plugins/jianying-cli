@@ -191,6 +191,17 @@ def compare(ref_tl, cli_tl, superset=False):
     return issues
 
 
+def tim_value(v):
+    """CLI --srt-offset accepts tim() strings; mirror the conversion."""
+    import re as _re
+    s = str(v)
+    total = 0.0
+    for num, unit in _re.findall("([0-9.]+)(ms|us|h|m|s)", s):
+        total += float(num) * {"h": 3.6e9, "m": 6e7, "s": 1e6,
+                               "ms": 1e3, "us": 1}[unit]
+    return total if total else float(s if not s.isdigit() else int(s))
+
+
 def run(cmd):
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
@@ -240,10 +251,30 @@ def main():
             media = spec.get("media", [])
             for m in media:
                 run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", m["gen"], "-y", str(tmp / m["name"])])
+            srt_spec = spec.get("srt")
+            cli_extra = []
+            if srt_spec:
+                (tmp / "subs.srt").write_text(srt_spec["text"])
+                cli_extra = ["--srt", str(tmp / "subs.srt")]
+                for opt in ("offset", "size", "align", "color", "border", "y"):
+                    if opt in srt_spec:
+                        # equals-form so negative values stay attached
+                        cli_extra += [f"--srt-{opt}={srt_spec[opt]}"]
+            if srt_spec:
+                # sidecar (never inside the plan: deny_unknown_fields would
+                # reject the CLI parse)
+                (tmp / "srt-opts.json").write_text(json.dumps({
+                    "offset_us": tim_value(srt_spec.get("offset", "0")),
+                    "size": srt_spec.get("size", 5),
+                    "align": srt_spec.get("align", 1),
+                    "color": srt_spec.get("color"),
+                    "y": srt_spec.get("y", -0.8),
+                }))
             try:
                 run([sys.executable, str(ROOT / "tools" / "parity_reference.py"),
                      str(plan_path), str(tmp / "ref"), str(pyjyd_src)])
-                run([str(bin_path), "build", str(plan_path), "--out", str(tmp / "cli")])
+                run([str(bin_path), "build", str(plan_path), "--out", str(tmp / "cli")]
+                    + cli_extra)
                 ref_tl = json.loads(next((tmp / "ref" / "ref").glob("*/draft_content.json")).read_text())
                 cli_tl = json.loads((tmp / "cli" / "draft_content.json").read_text())
                 issues = compare(ref_tl, cli_tl, superset=bool(spec.get("expect_superset")))

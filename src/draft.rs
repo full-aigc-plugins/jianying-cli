@@ -147,6 +147,7 @@ fn base_segment(material_id: &str, seg: &Segment, render_index: i64) -> Value {
         "enable_lut": true,
         "enable_smart_color_adjust": false,
         "last_nonzero_volume": 1.0,
+        "is_tone_modify": seg.change_pitch.unwrap_or(false),
         "dur": seg.duration_us,
         "render_index": render_index,
         "track_render_index": 0,
@@ -303,6 +304,8 @@ fn copy_asset(out_dir: &Path, kind: &str, src: &Path) -> Result<String> {
 }
 
 fn build_text_content(seg: &Segment, font_entry: Option<&Value>) -> Result<String> {
+    // pyJYD import_srt cues never carry in-content strokes
+    let suppress_strokes = seg.from_srt;
     let text = seg.text.as_deref().unwrap_or_default();
     let utf16_len: i64 = text.encode_utf16().count() as i64;
     let base_color = hex_rgb(seg.color.as_deref().unwrap_or("#FFFFFF"))?;
@@ -350,7 +353,7 @@ fn build_text_content(seg: &Segment, font_entry: Option<&Value>) -> Result<Strin
         ));
     }
     let border = seg.border_width.unwrap_or(0.0);
-    if border > 0.0 {
+    if border > 0.0 && !suppress_strokes {
         let bc = hex_rgb(seg.border_color.as_deref().unwrap_or("#000000"))?;
         styles[0]["strokes"] = json!([{"content": {"solid": {"alpha": 1.0, "color": bc}},
                                        "width": border / 100.0 * 0.2}]);
@@ -488,13 +491,24 @@ pub fn build(
                         } else {
                             "video"
                         };
+                        let crop = match &seg.crop {
+                            Some(c) => json!({
+                                "upper_left_x": c.upper_left_x, "upper_left_y": c.upper_left_y,
+                                "upper_right_x": c.upper_right_x, "upper_right_y": c.upper_right_y,
+                                "lower_left_x": c.lower_left_x, "lower_left_y": c.lower_left_y,
+                                "lower_right_x": c.lower_right_x, "lower_right_y": c.lower_right_y,
+                            }),
+                            None => json!({
+                                "lower_left_x": 0.0, "lower_left_y": 1.0,
+                                "lower_right_x": 1.0, "lower_right_y": 1.0,
+                                "upper_left_x": 0.0, "upper_left_y": 0.0,
+                                "upper_right_x": 1.0, "upper_right_y": 0.0,
+                            }),
+                        };
                         materials["videos"].as_array_mut().unwrap().push(json!({
                             "audio_fade": null, "category_id": "", "category_name": "local",
                             "check_flag": 63487,
-                            "crop": {"lower_left_x": 0.0, "lower_left_y": 1.0,
-                                      "lower_right_x": 1.0, "lower_right_y": 1.0,
-                                      "upper_left_x": 0.0, "upper_left_y": 0.0,
-                                      "upper_right_x": 1.0, "upper_right_y": 0.0},
+                            "crop": crop,
                             "crop_ratio": "free", "crop_scale": 1.0,
                             "duration": if mtype == "photo" { 10_800_000_000 } else { info.duration_us },
                             "height": info.height, "width": info.width,
@@ -776,7 +790,9 @@ pub fn build(
                     let content_str = build_text_content(seg, font_entry)?;
                     let border = seg.border_width.unwrap_or(0.0);
                     let mut check_flag = 7;
-                    if border > 0.0 {
+                    // import_srt cues never flag the border bit even when the
+                    // material-level border fields are set (pyJYD authority)
+                    if border > 0.0 && !seg.from_srt {
                         check_flag |= 8;
                     }
                     if seg.background.is_some() {
@@ -785,8 +801,10 @@ pub fn build(
                     if seg.shadow.is_some() {
                         check_flag |= 32;
                     }
+                    // pyJYD: auto-wrapped subtitle material is type "subtitle"
+                    let text_type = if seg.from_srt { "subtitle" } else { "text" };
                     let mut text_material = json!({
-                        "id": material_id, "type": "text", "content": content_str,
+                        "id": material_id, "type": text_type, "content": content_str,
                         "alignment": seg.alignment.unwrap_or(1),
                         "font_size": seg.size.unwrap_or(8.0),
                         "text_color": seg.color.clone().unwrap_or_else(|| "#FFFFFF".into()).to_uppercase(),

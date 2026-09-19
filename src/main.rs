@@ -84,6 +84,9 @@ enum TemplateOp {
         source: PathBuf,
         /// Track name (or type) to import
         track: String,
+        /// Insert before this track name (pyJYD insert_track; default append)
+        #[arg(long)]
+        before: Option<String>,
     },
 }
 
@@ -131,6 +134,24 @@ enum Command {
         /// SRT file to append as a subtitle track
         #[arg(long)]
         srt: Option<PathBuf>,
+        /// SRT cue offset (tim() strings accepted) — pyJYD import_srt time_offset
+        #[arg(long)]
+        srt_offset: Option<String>,
+        /// SRT font size (pyJYD default 5)
+        #[arg(long)]
+        srt_size: Option<f64>,
+        /// SRT alignment 0/1/2 (pyJYD default 1)
+        #[arg(long)]
+        srt_align: Option<u8>,
+        /// SRT text color #RRGGBB
+        #[arg(long)]
+        srt_color: Option<String>,
+        /// SRT stroke width 0-100
+        #[arg(long)]
+        srt_border: Option<f64>,
+        /// SRT vertical position (pyJYD default -0.8)
+        #[arg(long)]
+        srt_y: Option<f64>,
         /// Seed schema markers from the newest app-written draft in this store
         #[arg(long)]
         seed: Option<PathBuf>,
@@ -209,13 +230,32 @@ fn run(cmd: Command) -> Result<()> {
             plan,
             out,
             srt,
+            srt_offset,
+            srt_size,
+            srt_align,
+            srt_color,
+            srt_border,
+            srt_y,
             seed,
             template,
         } => {
             let mut plan = plan::Plan::load(&plan)?;
             if let Some(srt_path) = srt {
                 let cues = srt::parse(&std::fs::read_to_string(&srt_path)?)?;
-                plan.tracks.push(srt::cues_to_text_track(cues));
+                let opts = srt::SrtOptions {
+                    offset_us: srt_offset
+                        .as_deref()
+                        .map(jianying_cli::tim::parse)
+                        .transpose()?
+                        .unwrap_or(0),
+                    size: srt_size,
+                    align: srt_align,
+                    color: srt_color,
+                    border_width: srt_border,
+                    y: srt_y,
+                    ..Default::default()
+                };
+                plan.tracks.push(srt::cues_to_text_track(cues, &opts));
                 plan.validate()?;
             }
             let plan_dir = plan.parent.clone().unwrap_or_else(|| PathBuf::from("."));
@@ -284,7 +324,13 @@ fn run(cmd: Command) -> Result<()> {
                 draft,
                 source,
                 track,
-            } => print_json(template::import_track(&draft, &source, &track)?),
+                before,
+            } => print_json(template::import_track_at(
+                &draft,
+                &source,
+                &track,
+                before.as_deref(),
+            )?),
         },
         Command::Catalog {
             domain,

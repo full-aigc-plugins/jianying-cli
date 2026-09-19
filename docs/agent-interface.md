@@ -29,7 +29,7 @@ ffprobe 实测：`{path, duration_us, width, height, has_video, has_audio, is_im
 ### `jianying build <plan.json> --out <dir> [--srt <s.srt>] [--seed <草稿根>] [--template <草稿>]`
 计划 → 草稿目录；产物 `draft_content.json` + `draft_info.json`（逐字节相同双镜像）
 + `draft_meta_info.json`（含 draft_materials 注册）+ `assets/`。构建后自动 `verify`，
-失败即整体报错不产出。`--srt` 追加字幕轨；`--seed` 从草稿根最新 app 亲写草稿拷贝
+失败即整体报错不产出。`--srt` 追加字幕轨（`--srt-offset/--srt-size/--srt-align/--srt-color/--srt-border/--srt-y` 全参数面，pyJYD import_srt 线型：type=subtitle/默认 size 5/y -0.8/content 无描边）；`--seed` 从草稿根最新 app 亲写草稿拷贝
 schema 标记（防新版 CapCut 拒开）；`--template` 在模板时间线上叠加计划轨道。
 
 ### `jianying verify <dir>` / `jianying inspect <dir>`
@@ -50,7 +50,7 @@ ffmpeg 代理预览：平铺主视频轨 + 混音全部音频轨（含淡入淡�
 ### `jianying template <op>`（6 操作）
 `inspect`（轨道+材料清单）/ `duplicate <src> <新名>` / `replace-text <dir> --track <t>
 --index <i> <文本>` / `replace-material <dir> <新素材> (--name <n> | --track <t> --index <i>)`
-/ `import-track <目标> <源> <轨名>`。对齐 pyJYD 模板模式；replace 后回写并保持
+/ `import-track <目标> <源> <轨名> [--before <锚轨>]`（--before=插到锚轨之前，pyJYD insert_track 语义）。对齐 pyJYD 模板模式；replace 后回写并保持
 段 source 范围钳制。
 
 ### `jianying store <op>`
@@ -65,6 +65,6 @@ speed 0.1-8、volume 0-4；关键帧线性、首点 at_us=0、≥2 点（关键�
 
 ## 4. 双源一致性（维护者）
 
-`tools/parity_run.py`：50 场景（20 个组合动作 + 逐域多样性）同一计划过 pyJYD 与 jianying-cli
+`tools/parity_run.py`：55 场景（20 个组合动作 + 逐域多样性）同一计划过 pyJYD 与 jianying-cli
 语义比对，30/30 必须保持全绿。`tools/gen_catalogs.py --check`：目录与 pyJYD
 metadata 一致性校验。两者都在 CI 强制执行。

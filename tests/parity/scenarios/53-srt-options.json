@@ -1,0 +1,52 @@
+{
+ "name": "p53",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p53",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 2000000,
+      "source": "a.mp4"
+     },
+     {
+      "start_us": 2000000,
+      "duration_us": 2000000,
+      "source": "b.mp4"
+     }
+    ]
+   }
+  ]
+ },
+ "srt": {
+  "text": "1\n00:00:00,200 --> 00:00:01,000\n第一句\n\n2\n00:00:01,500 --> 00:00:02,800\n第二句\n",
+  "offset": "300ms",
+  "size": 6,
+  "align": 1,
+  "color": "#FFEE00",
+  "border": 30,
+  "y": -0.7
+ }
+}

@@ -276,8 +276,14 @@ fn apply_material_swap(
 }
 
 /// `import_track` parity: copy a named track from another draft, remapping
-/// material ids and copying the referenced material entries.
-pub fn import_track(target_draft: &Path, source_draft: &Path, track_name: &str) -> Result<Value> {
+/// material ids and copying the referenced material entries. `before` gives
+/// pyJYD insert-track semantics (insert at a position instead of appending).
+pub fn import_track_at(
+    target_draft: &Path,
+    source_draft: &Path,
+    track_name: &str,
+    before: Option<&str>,
+) -> Result<Value> {
     let mut target = load(target_draft)?;
     let source = load(source_draft)?;
     let track = source["tracks"]
@@ -317,7 +323,17 @@ pub fn import_track(target_draft: &Path, source_draft: &Path, track_name: &str) 
             }
         }
     }
-    target["tracks"].as_array_mut().unwrap().push(new_track);
+    let tracks = target["tracks"].as_array_mut().unwrap();
+    match before {
+        Some(anchor) => {
+            let pos = tracks
+                .iter()
+                .position(|t| t["name"] == json!(anchor))
+                .ok_or_else(|| anyhow::anyhow!("track {anchor} not found in target"))?;
+            tracks.insert(pos, new_track);
+        }
+        None => tracks.push(new_track),
+    }
     let new_dur = target["tracks"]
         .as_array()
         .unwrap()
@@ -333,6 +349,7 @@ pub fn import_track(target_draft: &Path, source_draft: &Path, track_name: &str) 
     target["duration"] = json!(new_dur);
     save(target_draft, &target)?;
     Ok(json!({"status": "imported", "track": track_name,
+              "before": before,
               "source": source_draft.to_string_lossy(),
               "segments": track["segments"].as_array().map(|a| a.len()).unwrap_or(0)}))
 }

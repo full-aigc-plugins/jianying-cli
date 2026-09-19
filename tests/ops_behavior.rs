@@ -120,7 +120,7 @@ fn template_duplicate_replace_import() {
 
     // import_track: same-named track in the target is refused (name collision),
     // while a track type the target lacks imports cleanly with remapped ids
-    assert!(template::import_track(&d2, &built, "text").is_err());
+    assert!(template::import_track_at(&d2, &built, "text", None).is_err());
     let with_audio = dir.join("t3src");
     std::fs::create_dir_all(&with_audio).unwrap();
     let plan: Plan = serde_json::from_value(json!({
@@ -139,8 +139,28 @@ fn template_duplicate_replace_import() {
         &probe_stub,
     )
     .unwrap();
-    let r = template::import_track(&d2, &with_audio.join("t3src"), "audio").unwrap();
+    let r = template::import_track_at(&d2, &with_audio.join("t3src"), "audio", None).unwrap();
     assert_eq!(r["status"], json!("imported"));
+    // insert-track position semantics (pyJYD insert_track at_index parity)
+    let d4 = dir.join("t4");
+    template::duplicate(&built, "t4", None).unwrap();
+    let r2 = template::import_track_at(&d4, &d2, "audio", Some("video")).unwrap();
+    assert_eq!(r2["status"], json!("imported"));
+    let tl4: Value =
+        serde_json::from_str(&std::fs::read_to_string(d4.join("draft_content.json")).unwrap())
+            .unwrap();
+    let names: Vec<&str> = tl4["tracks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|t| t["type"].as_str().unwrap())
+        .collect();
+    assert_eq!(
+        names,
+        vec!["audio", "video", "text"],
+        "imported before video"
+    );
+    assert!(template::import_track_at(&d4, &d2, "text", Some("不存在")).is_err());
     let tl: Value =
         serde_json::from_str(&std::fs::read_to_string(d2.join("draft_content.json")).unwrap())
             .unwrap();
@@ -152,7 +172,7 @@ fn template_duplicate_replace_import() {
     // duration recomputed to the max segment end
     assert_eq!(tl["duration"], json!(2_000_000));
     // duplicate import of the same track name is refused
-    assert!(template::import_track(&d2, &with_audio.join("t3src"), "audio").is_err());
+    assert!(template::import_track_at(&d2, &with_audio.join("t3src"), "audio", None).is_err());
 }
 
 #[test]

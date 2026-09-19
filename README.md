@@ -53,7 +53,7 @@ jianying render d1 --burn-captions                    # ffmpeg 代理预览（�
 `tools/parity_run.py` 是差异测试闭环：每个场景的同一计划分别由
 pyJianYingDraft（参考实现，`tools/parity_reference.py`）与 jianying-cli
 构建，再语义化比对产物（忽略 id/时间戳/路径，数值归一，引用解析到桶，
-材料按 ref⊆cli 子集匹配）。50 个场景（20 个多能力组合动作 + 逐域多样性采样）覆盖全部能力域——转场（默认/自定义
+材料按 ref⊆cli 子集匹配）。55 个场景（pyJYD 作者域全覆盖：20 组合动作 + 逐域多样性 + change_pitch/crop/srt 参数面/插轨）覆盖全部能力域——转场（默认/自定义
 时长）、蒙版（圆形/矩形+圆角+反相）、滤镜强度、特效参数、混合模式、
 出入场动画、片段原声淡入淡出、音频淡入淡出、场景音、字体/描边/阴影/
 背景条、多范围样式（CLI 超集）、色度抠图、画布背景填充、关键帧、
@@ -62,7 +62,7 @@ pyJianYingDraft（参考实现，`tools/parity_reference.py`）与 jianying-cli
 ```bash
 cargo build --release
 cargo test                              # 31 unit/contract tests
-python3 tools/parity_run.py          # 50/50 PASS
+python3 tools/parity_run.py          # 55/55 PASS
 python3 tools/gen_catalogs.py <pyJYD检出> --check   # 目录与 pyJYD metadata 一致
 ```
 
