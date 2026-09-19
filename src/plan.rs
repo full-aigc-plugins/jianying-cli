@@ -82,6 +82,10 @@ pub struct Segment {
     #[serde(default)]
     pub mask: Option<Mask>,
     #[serde(default)]
+    pub chroma: Option<Chroma>,
+    #[serde(default)]
+    pub background_filling: Option<BackgroundFilling>,
+    #[serde(default)]
     pub filters: Vec<NamedIntensity>,
     #[serde(default)]
     pub effects: Vec<NamedParams>,
@@ -131,6 +135,9 @@ pub struct Segment {
     /// Raw 花字 passthrough (pyJianYingDraft ships no 花字 catalog).
     #[serde(default)]
     pub text_effect: Option<RawIds>,
+    /// 文本气泡 raw ids (bubble resources also ship no catalog).
+    #[serde(default)]
+    pub bubble: Option<RawIds>,
     // sticker-only
     #[serde(default)]
     pub sticker_id: Option<String>,
@@ -268,6 +275,34 @@ pub struct StyleRange {
 pub struct RawIds {
     pub effect_id: String,
     pub resource_id: String,
+}
+
+/// 色度抠图 (chroma key); plan values are 0-100 like the 剪映 UI.
+#[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Chroma {
+    /// key color, `#RRGGBBAA` (or `#RRGGBB`)
+    pub color: String,
+    #[serde(default)]
+    pub intensity: f64,
+    #[serde(default)]
+    pub shadow: f64,
+    #[serde(default)]
+    pub edge_smooth: f64,
+    #[serde(default)]
+    pub spill: f64,
+}
+
+/// 画布背景填充; `blur` in 0..1 (剪映四档 0.0625/0.375/0.75/1.0), color `#RRGGBBAA`.
+#[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct BackgroundFilling {
+    #[serde(rename = "type")]
+    pub fill_type: String,
+    #[serde(default)]
+    pub blur: f64,
+    #[serde(default)]
+    pub color: String,
 }
 
 fn check_range(v: f64, lo: f64, hi: f64, what: &str) -> Result<()> {
@@ -471,9 +506,33 @@ impl Plan {
                     check_range(*v, 0.0, 100.0, &format!("audio effect param {k}"))?;
                 }
             }
+        }
+        if matches!(track.kind.as_str(), "video" | "audio") {
             if let Some(f) = &seg.fade {
                 if f.in_us < 0 || f.out_us < 0 {
                     bail!("fade durations must be non-negative");
+                }
+            }
+            if let Some(c) = &seg.chroma {
+                if track.kind != "video" {
+                    bail!("chroma requires a video segment");
+                }
+                rgba_hex(&c.color)?;
+                for (label, v) in [("intensity", c.intensity), ("shadow", c.shadow),
+                                   ("edge_smooth", c.edge_smooth), ("spill", c.spill)] {
+                    check_range(v, 0.0, 100.0, &format!("chroma {label}"))?;
+                }
+            }
+            if let Some(bf) = &seg.background_filling {
+                if track.kind != "video" {
+                    bail!("background filling requires a video segment");
+                }
+                if !matches!(bf.fill_type.as_str(), "blur" | "color") {
+                    bail!("background filling type must be blur or color");
+                }
+                check_range(bf.blur, 0.0, 1.0, "background blur")?;
+                if !bf.color.is_empty() {
+                    rgba_hex(&bf.color)?;
                 }
             }
         }
@@ -579,6 +638,13 @@ impl Plan {
             }
             if let Some(w) = seg.border_width {
                 check_range(w, 0.0, 100.0, "border_width")?;
+            }
+            for raw in [&seg.text_effect, &seg.bubble] {
+                if let Some(r) = raw {
+                    if r.effect_id.is_empty() || r.resource_id.is_empty() {
+                        bail!("text effect/bubble ids must be non-empty");
+                    }
+                }
             }
             let text = seg.text.as_deref().unwrap_or_default();
             let utf16_len = text.encode_utf16().count();
@@ -711,6 +777,8 @@ impl Default for Segment {
             opacity: None,
             keyframes: None,
             mask: None,
+            chroma: None,
+            background_filling: None,
             filters: Vec::new(),
             effects: Vec::new(),
             mix_mode: None,
@@ -734,12 +802,22 @@ impl Default for Segment {
             shadow: None,
             styles: Vec::new(),
             text_effect: None,
+            bubble: None,
             sticker_id: None,
             resource_id: None,
             intensity: None,
             params: None,
         }
     }
+}
+
+/// Validate `#RRGGBB` or `#RRGGBBAA`.
+pub fn rgba_hex(hex: &str) -> Result<()> {
+    let h = hex.trim().trim_start_matches('#');
+    if (h.len() != 6 && h.len() != 8) || !h.chars().all(|c| c.is_ascii_hexdigit()) {
+        bail!("color must be #RRGGBB or #RRGGBBAA, got {hex:?}");
+    }
+    Ok(())
 }
 
 /// Parse `#RRGGBB` into 0..1 floats.

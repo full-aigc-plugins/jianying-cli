@@ -6,7 +6,7 @@
 //! jianying-headless) contributed contract facts only.
 
 use crate::catalogs;
-use crate::plan::{hex_rgb, KeyPoint, Plan, Segment, SCHEMA};
+use crate::plan::{hex_rgb, rgba_hex, KeyPoint, Plan, Segment, SCHEMA};
 use crate::probe::{self, MediaInfo};
 use anyhow::{bail, Context, Result};
 use serde::Serialize;
@@ -328,7 +328,7 @@ fn build_text_content(seg: &Segment, font_entry: Option<&Value>) -> Result<Strin
         let sc = hex_rgb(sh.color.as_deref().unwrap_or("#000000"))?;
         styles[0]["shadows"] = json!([{
             "content": {"solid": {"alpha": 1.0, "color": sc}},
-            "diffuse": sh.diffuse.unwrap_or(5.0),
+            "diffuse": sh.diffuse.unwrap_or(15.0),
             "alpha": sh.alpha.unwrap_or(1.0),
             "distance": sh.distance.unwrap_or(5.0),
             "angle": sh.angle.unwrap_or(-45.0),
@@ -373,6 +373,17 @@ fn mask_entry(materials: &mut Value, mask: &crate::plan::Mask, info: &MediaInfo)
         "type": "mask"
     }));
     Ok(id)
+}
+
+/// Normalize `#RRGGBB` to `#RRGGBBFF`-style 8-digit form (pyJianYingDraft
+/// `_normalize_rgba_color` accepts both and stores 8 digits).
+fn rgba_normalize(hex: &str) -> String {
+    let h = hex.trim().trim_start_matches('#');
+    if h.len() == 6 {
+        format!("#{}FF", h.to_uppercase())
+    } else {
+        format!("#{}", h.to_uppercase())
+    }
 }
 
 /// Build a full draft directory from a validated plan.
@@ -599,15 +610,6 @@ pub fn build(
                         }
                     }
                     if track.kind == "audio" {
-                        if let Some(f) = &seg.fade {
-                            let fid = hex_id();
-                            materials["audio_fades"].as_array_mut().unwrap().push(json!({
-                                "id": fid, "fade_in_duration": f.in_us,
-                                "fade_out_duration": f.out_us, "fade_type": 0,
-                                "type": "audio_fade"
-                            }));
-                            refs.push(fid);
-                        }
                         for e in &seg.audio_effects {
                             let entry = catalogs::resolve(
                                 catalogs::audio_scene_effects(), "audio effect", &e.name, vip_ok())
@@ -634,6 +636,41 @@ pub fn build(
                             }));
                             refs.push(aid);
                         }
+                    }
+                    if let Some(f) = &seg.fade {
+                        let fid = hex_id();
+                        materials["audio_fades"].as_array_mut().unwrap().push(json!({
+                            "id": fid, "fade_in_duration": f.in_us,
+                            "fade_out_duration": f.out_us, "fade_type": 0,
+                            "type": "audio_fade"
+                        }));
+                        refs.push(fid);
+                    }
+                    if let Some(c) = &seg.chroma {
+                        // Chroma.global_id is an UPPERCASE uuid in pyJianYingDraft — quirk kept
+                        let cid = uuid_upper();
+                        materials["chromas"].as_array_mut().unwrap().push(json!({
+                            "color": rgba_normalize(&c.color),
+                            "edge_smooth_value": c.edge_smooth / 100.0,
+                            "id": cid,
+                            "intensity_value": c.intensity / 100.0,
+                            "shadow_value": c.shadow / 100.0,
+                            "should_transfer_color": true,
+                            "spill_value": c.spill / 100.0,
+                            "type": "chroma",
+                            "version": "v2"
+                        }));
+                        refs.push(cid);
+                    }
+                    if let Some(bf) = &seg.background_filling {
+                        let bid = hex_id();
+                        let ftype = if bf.fill_type == "blur" { "canvas_blur" } else { "canvas_color" };
+                        materials["canvases"].as_array_mut().unwrap().push(json!({
+                            "id": bid, "type": ftype, "blur": bf.blur,
+                            "color": rgba_normalize(if bf.color.is_empty() { "#00000000" } else { &bf.color }),
+                            "source_platform": 0
+                        }));
+                        refs.push(bid);
                     }
                     apply_keyframes(&mut seg_v, seg);
                 }
@@ -688,17 +725,19 @@ pub fn build(
                     materials["texts"].as_array_mut().unwrap().push(text_material);
 
                     refs = Vec::new();
-                    if let Some(te) = &seg.text_effect {
-                        let tid = hex_id();
-                        materials["effects"].as_array_mut().unwrap().push(json!({
-                            "apply_target_type": 0, "effect_id": te.effect_id,
-                            "id": tid, "resource_id": te.resource_id,
-                            "type": "text_effect", "value": 1.0,
-                            "platform": "all", "source_platform": 0,
-                            "category_id": "", "category_name": "", "sub_type": "none",
-                            "time_range": null
-                        }));
-                        refs.push(tid);
+                    for (raw, kind) in [(&seg.text_effect, "text_shape"), (&seg.bubble, "text_shape")] {
+                        if let Some(r) = raw {
+                            let tid = hex_id();
+                            materials["effects"].as_array_mut().unwrap().push(json!({
+                                "apply_target_type": 0, "effect_id": r.effect_id,
+                                "id": tid, "resource_id": r.resource_id,
+                                "type": kind, "value": 1.0,
+                                "platform": "all", "source_platform": 0,
+                                "category_id": "", "category_name": "", "sub_type": "none",
+                                "time_range": null
+                            }));
+                            refs.push(tid);
+                        }
                     }
 
                     seg_v = base_segment(&material_id, seg, RENDER_INDEX_TEXT);
@@ -913,8 +952,8 @@ pub fn verify(draft_dir: &Path) -> Result<Value> {
         issues.push("the main video track must be the first track".into());
     }
     let ref_buckets = ["speeds", "placeholders", "sound_channel_mappings", "vocal_separations",
-        "canvases", "material_colors", "transitions", "masks", "effects", "video_effects",
-        "audio_fades", "audio_effects", "material_animations"];
+        "canvases", "material_colors", "transitions", "masks", "chromas", "effects",
+        "video_effects", "audio_fades", "audio_effects", "material_animations"];
     let mut max_end: i64 = 0;
     for (ti, t) in tracks.iter().enumerate() {
         let segs = t["segments"].as_array().context("segments must be an array")?;

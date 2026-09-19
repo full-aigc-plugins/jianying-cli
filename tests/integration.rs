@@ -17,6 +17,9 @@ const FULLCAP_PLAN: &str = r##"
        "mix_mode": "正片叠底",
        "animation_in": {"name": "渐显"},
        "animation_out": {"name": "渐隐"},
+       "fade": {"in_us": 250000, "out_us": 250000},
+       "chroma": {"color": "#00FF00", "intensity": 30, "edge_smooth": 10},
+       "background_filling": {"type": "blur", "blur": 0.375},
        "transition_out": {"name": "闪黑", "duration_us": 300000},
        "keyframes": {"scale": [{"at_us": 0, "value": 1.0}, {"at_us": 2000000, "value": 1.12}]}},
       {"start_us": 2000000, "duration_us": 2000000, "source": "shot-b.mp4"}
@@ -33,7 +36,8 @@ const FULLCAP_PLAN: &str = r##"
        "background": {"color": "#FF0000"},
        "shadow": {"angle": -45},
        "animation_in": {"name": "冲屏位移"},
-       "styles": [{"range": [0, 4], "color": "#FF0000"}]}
+       "styles": [{"range": [0, 4], "color": "#FF0000"}],
+       "bubble": {"effect_id": "123", "resource_id": "456"}}
     ]},
     {"type": "filter", "segments": [
       {"start_us": 0, "duration_us": 4000000, "filters": [{"name": "1980"}], "intensity": 40}
@@ -120,7 +124,17 @@ fn build_full_capability_draft_and_self_verify() {
         1,
         "global effect track is apply_target_type=2"
     );
-    assert_eq!(m["audio_fades"].as_array().unwrap().len(), 1);
+    assert_eq!(m["audio_fades"].as_array().unwrap().len(), 2, "video fade + audio fade");
+    let chroma = &m["chromas"][0];
+    assert_eq!(chroma["type"], json!("chroma"));
+    assert_eq!(chroma["intensity_value"], json!(0.3));
+    assert_eq!(chroma["id"].as_str().unwrap().len(), 36, "chroma id is an uppercase hyphenated uuid (pyJYD quirk)");
+    let bgf = m["canvases"].as_array().unwrap().iter()
+        .find(|c| c["type"] == "canvas_blur").expect("background filling entry");
+    assert_eq!(bgf["blur"], json!(0.375));
+    let bubble = m["effects"].as_array().unwrap().iter()
+        .find(|e| e["type"] == "text_shape").expect("text bubble entry");
+    assert_eq!(bubble["effect_id"], json!("123"));
     assert_eq!(m["audio_effects"].as_array().unwrap().len(), 1);
     let anim_items: Vec<&Value> = m["material_animations"]
         .as_array().unwrap()
