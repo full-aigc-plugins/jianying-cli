@@ -13,6 +13,9 @@ pub struct MediaInfo {
     pub height: u64,
     pub has_video: bool,
     pub has_audio: bool,
+    /// Single-image file (png/jpeg/webp...). pyJianYingDraft types these as
+    /// `photo` materials with a 3-hour nominal duration.
+    pub is_image: bool,
 }
 
 pub fn ffprobe_path() -> Option<String> {
@@ -63,11 +66,31 @@ pub fn probe(media: &Path) -> Result<MediaInfo> {
         );
     }
     let v: Value = serde_json::from_slice(&out.stdout)?;
-    let duration_us = v["format"]["duration"]
+    let format_name_early = v["format"]["format_name"].as_str().unwrap_or_default().to_string();
+    let is_image_early = format_name_early.contains("image")
+        || (format_name_early.ends_with("_pipe")
+            && !format_name_early.starts_with("mov")
+            && !["mp4", "mkv", "webm", "avi", "flv", "ts"]
+                .iter()
+                .any(|f| format_name_early.contains(f)));
+    let stream_duration = || {
+        v["streams"].as_array().and_then(|ss| {
+            ss.iter().find_map(|s| {
+                s["duration"].as_str().and_then(|d| d.parse::<f64>().ok())
+            })
+        })
+    };
+    let parsed = v["format"]["duration"]
         .as_str()
         .and_then(|s| s.parse::<f64>().ok())
-        .map(|s| (s * 1_000_000.0).round() as i64)
-        .ok_or_else(|| anyhow::anyhow!("no duration reported for {}", media.display()))?;
+        .or_else(stream_duration);
+    let duration_us = match parsed {
+        Some(s) => (s * 1_000_000.0).round() as i64,
+        // single images carry no duration; pyJYD assigns a 3h nominal value
+        None if is_image_early => 10_800_000_000,
+        None => bail!("no duration reported for {}", media.display()),
+    };
+    let is_image = is_image_early;
     let mut info = MediaInfo {
         path: media.to_string_lossy().into_owned(),
         duration_us,
@@ -75,6 +98,7 @@ pub fn probe(media: &Path) -> Result<MediaInfo> {
         height: 0,
         has_video: false,
         has_audio: false,
+        is_image,
     };
     if let Some(streams) = v["streams"].as_array() {
         for s in streams {
@@ -91,7 +115,7 @@ pub fn probe(media: &Path) -> Result<MediaInfo> {
             }
         }
     }
-    if !info.has_video && !info.has_audio {
+    if !info.has_video && !info.has_audio && !info.is_image {
         bail!("{} has no video or audio streams", media.display());
     }
     Ok(info)

@@ -1,0 +1,99 @@
+{
+ "name": "p22",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "c.mp4",
+   "gen": "color=c=green:s=640x360:d=6"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=6"
+  },
+  {
+   "name": "m.mp3",
+   "gen": "sine=frequency=880:duration=4"
+  },
+  {
+   "name": "pic.png",
+   "gen": "color=c=yellow:s=320x240:d=0.04"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p22",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 2000000,
+      "source": "a.mp4",
+      "transition_out": {
+       "name": "闪黑",
+       "duration_us": 300000
+      }
+     },
+     {
+      "start_us": 2000000,
+      "duration_us": 2000000,
+      "source": "b.mp4"
+     }
+    ]
+   },
+   {
+    "type": "audio",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 4000000,
+      "source": "n.mp3",
+      "volume": 0.9,
+      "fade": {
+       "in_us": 300000,
+       "out_us": 500000
+      },
+      "audio_effects": [
+       {
+        "name": "回音"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "text",
+    "segments": [
+     {
+      "start_us": 200000,
+      "duration_us": 1800000,
+      "text": "白模预演对比成片",
+      "size": 8,
+      "color": "#FFFFFF",
+      "border_width": 30,
+      "background": {
+       "color": "#000000",
+       "style": 1
+      },
+      "animation_in": {
+       "name": "冲屏位移"
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

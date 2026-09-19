@@ -87,12 +87,16 @@ def main():
     from pyJianYingDraft import (AudioSegment, TextSegment, Timerange, TrackSpec,
                                  TrackType, VideoSegment)
 
+    seen_types = {}
     for track in plan["tracks"]:
         kind = track["type"]
         tt = {"video": TrackType.video, "audio": TrackType.audio, "text": TrackType.text,
               "sticker": TrackType.sticker, "filter": TrackType.filter,
               "effect": TrackType.effect}[kind]
-        ref = script.append_track(TrackSpec(tt))
+        seen_types[kind] = seen_types.get(kind, 0) + 1
+        track_name = track.get("name") or (
+            kind if seen_types[kind] == 1 else f"{kind}{seen_types[kind]}")
+        ref = script.append_track(TrackSpec(tt, track_name))
         if kind == "filter":
             for seg in track["segments"]:
                 f = seg["filters"][0]
@@ -117,12 +121,23 @@ def main():
                 mat_dur = material.duration
                 src_start = seg.get("source_start_us", 0)
                 src_dur = seg.get("source_duration_us") or int(seg["duration_us"] * speed)
+                from pyJianYingDraft import ClipSettings as _CS
+                visual = {k: seg[k] for k in ("opacity", "scale", "x", "y", "rotation")
+                          if k in seg}
+                cs = None
+                if visual:
+                    cs = _CS(
+                        alpha=visual.get("opacity", 1.0),
+                        scale_x=visual.get("scale", 1.0), scale_y=visual.get("scale", 1.0),
+                        transform_x=visual.get("x", 0.0), transform_y=visual.get("y", 0.0),
+                        rotation=visual.get("rotation", 0.0))
                 vs = VideoSegment(
                     material,
                     target_timerange=Timerange(seg["start_us"], seg["duration_us"]),
                     source_timerange=Timerange(src_start, src_dur),
                     speed=speed,
-                    volume=seg.get("volume", 1.0))
+                    volume=seg.get("volume", 1.0),
+                    clip_settings=cs)
                 if seg.get("transition_out"):
                     to = seg["transition_out"]
                     vs.add_transition(member(draft.TransitionType, to["name"]),
@@ -195,6 +210,11 @@ def main():
                         except KeyError:
                             continue
                 script.add_segment(aus, ref)
+            elif kind == "sticker":
+                from pyJianYingDraft import StickerSegment
+                ss = StickerSegment(seg["resource_id"],
+                                    Timerange(seg["start_us"], seg["duration_us"]))
+                script.add_segment(ss, ref)
             elif kind == "text":
                 from pyJianYingDraft import ClipSettings, TextBackground, TextBorder, TextShadow, TextStyle
                 style = TextStyle(
@@ -227,6 +247,8 @@ def main():
                         height=bg.get("height", 0.14), width=bg.get("width", 0.14),
                         horizontal_offset=bg.get("horizontal_offset", 0.5),
                         vertical_offset=bg.get("vertical_offset", 0.5))
+                if seg.get("font"):
+                    kwargs["font"] = member(draft.FontType, seg["font"])
                 txt = TextSegment(
                     seg["text"], timerange=Timerange(seg["start_us"], seg["duration_us"]),
                     style=style, clip_settings=ClipSettings(transform_y=seg.get("y", -0.78)),
@@ -234,6 +256,12 @@ def main():
                 if seg.get("animation_in"):
                     txt.add_animation(member(draft.TextIntro, seg["animation_in"]["name"]),
                                       duration=seg["animation_in"].get("duration_us"))
+                if seg.get("animation_out"):
+                    txt.add_animation(member(draft.TextOutro, seg["animation_out"]["name"]),
+                                      duration=seg["animation_out"].get("duration_us"))
+                if seg.get("animation_group"):
+                    txt.add_animation(member(draft.TextLoopAnim, seg["animation_group"]["name"]),
+                                      duration=seg["animation_group"].get("duration_us"))
                 script.add_segment(txt, ref)
     script.dump(str(store / plan["name"] / "draft_content.json"))
     print("reference built:", plan["name"])

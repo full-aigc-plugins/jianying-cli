@@ -122,11 +122,41 @@ def convert(meta_dir: Path, out_dir: Path, source_ref: str):
     (out_dir / "index.json").write_text(json.dumps(index_meta, ensure_ascii=False, indent=1) + "\n")
 
 def main():
-    src = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("/tmp/pyjyd-study/pyJianYingDraft")
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("src", nargs="?", default="/tmp/pyjyd-study/pyJianYingDraft")
+    ap.add_argument("--out", default=None, help="output catalogs dir (default: repo catalogs/)")
+    ap.add_argument("--check", action="store_true",
+                    help="verify the committed catalogs match the source metadata; exit 1 on drift")
+    args = ap.parse_args()
+    src = Path(args.src)
     meta_dir = src / "metadata"
-    out_dir = Path(__file__).resolve().parents[1] / "catalogs"
-    out_dir.mkdir(exist_ok=True)
+    repo = Path(__file__).resolve().parents[1] / "catalogs"
     ref = subprocess_ref(src)
+    if args.check:
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            convert(meta_dir, tmp, ref)
+            drift = []
+            for f in sorted(tmp.rglob("*.json")):
+                committed = repo / f.name
+                if not committed.is_file():
+                    drift.append(f"+ {f.name} (missing in repo)")
+                elif committed.read_text() != f.read_text():
+                    drift.append(f"~ {f.name} (content differs)")
+            for f in sorted(repo.glob("*.json")):
+                if not (tmp / f.name).is_file():
+                    drift.append(f"- {f.name} (stale in repo)")
+            if drift:
+                print("catalog drift vs pyJianYingDraft metadata:")
+                for d in drift:
+                    print(" ", d)
+                sys.exit(1)
+            print("catalogs up to date with", ref)
+        return
+    out_dir = Path(args.out) if args.out else repo
+    out_dir.mkdir(exist_ok=True, parents=True)
     convert(meta_dir, out_dir, ref)
 
 def subprocess_ref(src: Path) -> str:

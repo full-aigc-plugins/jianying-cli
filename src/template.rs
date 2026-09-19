@@ -7,7 +7,7 @@ use crate::probe;
 use anyhow::{bail, Context, Result};
 use serde::Deserialize;
 use serde_json::{json, Value};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use uuid::Uuid;
 
 fn hex_id() -> String {

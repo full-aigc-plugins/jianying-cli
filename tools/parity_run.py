@@ -51,6 +51,32 @@ def canon(v, drop_ids=True):
     return v
 
 
+KEEP_KEYS = ["type", "name", "material_name", "resource_id", "effect_id",
+             "value", "duration_us", "fade_in_duration", "fade_out_duration",
+             "config", "color", "intensity_value", "shadow_value",
+             "edge_smooth_value", "spill_value", "should_transfer_color",
+             "content", "is_overlap", "apply_target_type", "version",
+             "sticker_id", "width", "height", "check_flag", "text_color",
+             "alignment", "font_size", "line_spacing", "background_color",
+             "background_style", "border_width", "border_color",
+             "audio_adjust_params"]
+
+
+def slim_entry(m):
+    slim = {}
+    for k in KEEP_KEYS:
+        if k not in m:
+            continue
+        if k == "content" and isinstance(m[k], str):
+            try:
+                slim[k] = canon(json.loads(m[k]))
+            except Exception:
+                slim[k] = m[k]
+        else:
+            slim[k] = canon(m[k], drop_ids=True)
+    return slim
+
+
 def segment_semantics(tl):
     """Extract per-track segment semantics, resolving refs to entries."""
     mats = tl.get("materials", {})
@@ -61,7 +87,7 @@ def segment_semantics(tl):
                 continue
             for m in items:
                 if m.get("id") == ref:
-                    return (bucket,) + tuple(sorted(canon(m, drop_ids=True).items()))
+                    return (bucket,) + tuple(sorted(slim_entry(m).items()))
         return None  # pyJYD leaves dangling refs (e.g. text border id) — ignorable
 
     out = []
@@ -101,37 +127,16 @@ def material_bucket(mats, material_id):
 
 
 def material_semantics(tl):
-    """Returns {bucket: [entry_dict, ...]} with ids dropped."""
-    """Semantic multiset of material entries that carry content."""
-    keep_keys = ["type", "name", "material_name", "resource_id", "effect_id",
-                 "value", "duration_us", "fade_in_duration", "fade_out_duration",
-                 "config", "color", "intensity_value", "shadow_value",
-                 "edge_smooth_value", "spill_value", "should_transfer_color",
-                 "content", "is_overlap", "apply_target_type", "version",
-                 "sticker_id", "width", "height", "check_flag", "text_color",
-                 "alignment", "font_size", "line_spacing", "background_color",
-                 "background_style", "border_width", "border_color"]
+    """Returns {bucket: [slim_entry, ...]} with ids dropped."""
     out = {}
     for bucket, items in tl.get("materials", {}).items():
         if not isinstance(items, list):
             continue
-        entries = []
-        for m in items:
-            slim = {}
-            for k in keep_keys:
-                if k not in m:
-                    continue
-                if k == "content" and isinstance(m[k], str):
-                    try:
-                        slim[k] = canon(json.loads(m[k]))
-                    except Exception:
-                        slim[k] = m[k]
-                else:
-                    slim[k] = canon(m[k], drop_ids=True)
-            if slim:
-                entries.append(slim)
+        entries = [slim_entry(m) for m in items]
+        entries = [e for e in entries if e]
         out[bucket] = entries
     return out
+
 
 
 def entry_subset(ref_entry, cli_entries):

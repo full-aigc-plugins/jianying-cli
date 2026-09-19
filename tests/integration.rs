@@ -57,6 +57,7 @@ fn probe_stub(_p: &Path) -> Result<MediaInfo> {
         height: 360,
         has_video: true,
         has_audio: true,
+        is_image: false,
     })
 }
 

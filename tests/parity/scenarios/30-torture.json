@@ -1,0 +1,213 @@
+{
+ "name": "p30",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "c.mp4",
+   "gen": "color=c=green:s=640x360:d=6"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=6"
+  },
+  {
+   "name": "m.mp3",
+   "gen": "sine=frequency=880:duration=4"
+  },
+  {
+   "name": "pic.png",
+   "gen": "color=c=yellow:s=320x240:d=0.04"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p30",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 2000000,
+      "source": "a.mp4",
+      "transition_out": {
+       "name": "叠化",
+       "duration_us": 500000
+      },
+      "mask": {
+       "name": "矩形",
+       "size": 0.7,
+       "rect_width": 0.8,
+       "round_corner": 10
+      },
+      "filters": [
+       {
+        "name": "Lofi II",
+        "intensity": 70
+       }
+      ],
+      "effects": [
+       {
+        "name": "1998"
+       }
+      ],
+      "mix_mode": "滤色",
+      "animation_in": {
+       "name": "渐显"
+      },
+      "animation_out": {
+       "name": "渐隐"
+      },
+      "fade": {
+       "in_us": 150000,
+       "out_us": 150000
+      },
+      "chroma": {
+       "color": "#0000FF",
+       "intensity": 15
+      },
+      "keyframes": {
+       "x": [
+        {
+         "at_us": 0,
+         "value": 0.0
+        },
+        {
+         "at_us": 2000000,
+         "value": 0.2
+        }
+       ],
+       "rotation": [
+        {
+         "at_us": 0,
+         "value": 0.0
+        },
+        {
+         "at_us": 2000000,
+         "value": 3.0
+        }
+       ]
+      }
+     },
+     {
+      "start_us": 2000000,
+      "duration_us": 1500000,
+      "source": "pic.png"
+     },
+     {
+      "start_us": 3500000,
+      "duration_us": 1000000,
+      "source": "b.mp4",
+      "volume": 0.6,
+      "speed": 1.5
+     }
+    ]
+   },
+   {
+    "type": "audio",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 4500000,
+      "source": "n.mp3",
+      "volume": 0.85,
+      "fade": {
+       "in_us": 250000,
+       "out_us": 400000
+      },
+      "audio_effects": [
+       {
+        "name": "低保真"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "text",
+    "segments": [
+     {
+      "start_us": 300000,
+      "duration_us": 2500000,
+      "text": "全能力对比验证",
+      "size": 9,
+      "color": "#FFFFFF",
+      "border_width": 35,
+      "background": {
+       "color": "#220000",
+       "style": 1
+      },
+      "shadow": {
+       "angle": -45
+      },
+      "animation_in": {
+       "name": "冲屏位移"
+      },
+      "styles": [
+       {
+        "range": [
+         0,
+         3
+        ],
+        "color": "#00FF88",
+        "bold": true
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "sticker",
+    "segments": [
+     {
+      "start_us": 1000000,
+      "duration_us": 1200000,
+      "resource_id": "7310000000000000002"
+     }
+    ]
+   },
+   {
+    "type": "filter",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 4500000,
+      "filters": [
+       {
+        "name": "ABG"
+       }
+      ],
+      "intensity": 35
+     }
+    ]
+   },
+   {
+    "type": "effect",
+    "segments": [
+     {
+      "start_us": 0,
+      "duration_us": 4500000,
+      "effects": [
+       {
+        "name": "70s"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "expect_superset": true
+}

@@ -457,8 +457,8 @@ impl Plan {
                 }
             }
             "sticker" => {
-                if seg.sticker_id.is_none() || seg.resource_id.is_none() {
-                    bail!("sticker segment at {} needs sticker_id and resource_id", seg.start_us);
+                if seg.resource_id.as_deref().map(str::is_empty).unwrap_or(true) {
+                    bail!("sticker segment at {} needs resource_id", seg.start_us);
                 }
             }
             "filter" => {

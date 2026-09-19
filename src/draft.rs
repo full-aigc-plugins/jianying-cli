@@ -6,8 +6,8 @@
 //! jianying-headless) contributed contract facts only.
 
 use crate::catalogs;
-use crate::plan::{hex_rgb, rgba_hex, KeyPoint, Plan, Segment};
-use crate::probe::{self, MediaInfo};
+use crate::plan::{hex_rgb, KeyPoint, Plan, Segment};
+use crate::probe::MediaInfo;
 use anyhow::{bail, Context, Result};
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -152,14 +152,14 @@ fn apply_visuals(seg_v: &mut Value, seg: &Segment, video: bool) {
         "transform": {"x": seg.x.unwrap_or(0.0), "y": seg.y.unwrap_or(0.0)},
         "flip": {"horizontal": false, "vertical": false}
     });
-    // visual segments (video and text) carry uniform_scale; non-uniform
+    // visual segments (video/sticker/text) carry uniform_scale; non-uniform
     // keyframes turn it off (pyJianYingDraft authority)
     let has_scale_kf = seg
         .keyframes
         .as_ref()
         .map(|k| k.contains_key("scale"))
         .unwrap_or(false);
-    if video || seg.text.is_some() {
+    if video || seg.text.is_some() || seg.sticker_id.is_some() || seg.resource_id.is_some() {
         seg_v["uniform_scale"] = json!({"on": !has_scale_kf, "value": 1.0});
     }
     if video {
@@ -450,7 +450,7 @@ pub fn build(
 
                     let (material_id, companions) = if track.kind == "video" {
                         let id = hex_id();
-                        let mtype = if seg.photo { "photo" } else { "video" };
+                        let mtype = if seg.photo || info.is_image { "photo" } else { "video" };
                         materials["videos"].as_array_mut().unwrap().push(json!({
                             "audio_fade": null, "category_id": "", "category_name": "local",
                             "check_flag": 63487,
@@ -459,21 +459,22 @@ pub fn build(
                                       "upper_left_x": 0.0, "upper_left_y": 0.0,
                                       "upper_right_x": 1.0, "upper_right_y": 0.0},
                             "crop_ratio": "free", "crop_scale": 1.0,
-                            "duration": info.duration_us, "height": info.height, "width": info.width,
+                            "duration": if mtype == "photo" { 10_800_000_000 } else { info.duration_us },
+                            "height": info.height, "width": info.width,
                             "id": id, "local_material_id": "", "material_id": id,
                             "material_name": src.file_name().map(|n| n.to_string_lossy()).unwrap_or_default(),
                             "media_path": "", "path": stored, "type": mtype,
-                            "has_audio": info.has_audio && !seg.photo
+                            "has_audio": info.has_audio && mtype == "video"
                         }));
                         draft_materials.push(json!({
                             "ai_group_type": "", "create_time": -1,
-                            "duration": if seg.photo { json!(5_000_000) } else { json!(info.duration_us) },
+                            "duration": if mtype == "photo" { json!(5_000_000) } else { json!(info.duration_us) },
                             "enter_from": 0,
                             "extra_info": src.file_name().map(|n| n.to_string_lossy()).unwrap_or_default(),
                             "file_Path": stored, "height": info.height, "id": hex_id(),
                             "import_time": -1, "import_time_ms": -1, "item_source": 1,
                             "material_color_tag": "", "md5": "",
-                            "metetype": if seg.photo { "photo" } else { "video" },
+                            "metetype": mtype,
                             "roughcut_time_range": {"duration": -1, "start": -1},
                             "sub_time_range": {"duration": -1, "start": -1},
                             "type": 0, "width": info.width
@@ -772,10 +773,12 @@ pub fn build(
                                 "out" => (seg.duration_us - dur).max(0),
                                 _ => 0,
                             };
+                            // pyJYD wire types: in/out/loop for text, in/out/group for video
+                            let wire_type = if kind == "group" { "loop" } else { kind };
                             anims.push(json!({
                                 "anim_adjust_params": null, "platform": "all", "panel": "",
                                 "material_type": "sticker", "name": entry["name"],
-                                "id": entry["effect_id"], "type": kind,
+                                "id": entry["effect_id"], "type": wire_type,
                                 "resource_id": entry["resource_id"],
                                 "start": start, "duration": dur
                             }));
@@ -796,7 +799,7 @@ pub fn build(
                     materials["stickers"].as_array_mut().unwrap().push(json!({
                         "id": material_id,
                         "resource_id": seg.resource_id,
-                        "sticker_id": seg.sticker_id,
+                        "sticker_id": seg.sticker_id.as_deref().unwrap_or(seg.resource_id.as_deref().unwrap_or_default()),
                         "source_platform": 1, "type": "sticker"
                     }));
                     seg_v = base_segment(&material_id, seg, ti as i64);

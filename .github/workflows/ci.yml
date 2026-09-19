@@ -3,6 +3,10 @@ on:
   pull_request:
   push:
     branches: [main]
+
+env:
+  PYJYD_REF: c3318066d964744e2bfc66f75c71745fe8cea52a
+
 jobs:
   test:
     runs-on: macos-latest
@@ -15,3 +19,31 @@ jobs:
         with:
           name: jianying-macos
           path: target/release/jianying
+
+  parity:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Clone the reference implementation (pinned)
+        run: |
+          git clone https://github.com/GuanYixuan/pyJianYingDraft.git /tmp/pyjyd
+          git -C /tmp/pyjyd checkout ${{ env.PYJYD_REF }}
+      - name: Install probe/runtime deps
+        run: |
+          brew install mediainfo
+          python3 -m pip install --quiet pymediainfo
+      - run: cargo build --release
+      - name: Dual-source parity suite (30 scenarios)
+        run: python3 tools/parity_run.py --pyjyd-src /tmp/pyjyd/pyJianYingDraft
+
+  catalog-freshness:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clone pyJianYingDraft at the pinned ref
+        run: |
+          git clone https://github.com/GuanYixuan/pyJianYingDraft.git /tmp/pyjyd
+          git -C /tmp/pyjyd checkout ${{ env.PYJYD_REF }}
+      - name: Catalogs must match the pinned metadata
+        run: python3 tools/gen_catalogs.py /tmp/pyjyd/pyJianYingDraft --check
