@@ -6,7 +6,7 @@
 //! jianying-headless) contributed contract facts only.
 
 use crate::catalogs;
-use crate::plan::{hex_rgb, rgba_hex, KeyPoint, Plan, Segment, SCHEMA};
+use crate::plan::{hex_rgb, rgba_hex, KeyPoint, Plan, Segment};
 use crate::probe::{self, MediaInfo};
 use anyhow::{bail, Context, Result};
 use serde::Serialize;
@@ -15,10 +15,6 @@ use std::path::{Path, PathBuf};
 
 pub const CONTENT_TEMPLATE: &str = include_str!("../assets/draft_content_template.json");
 pub const META_TEMPLATE: &str = include_str!("../assets/draft_meta_info.json");
-
-const RENDER_INDEX_VIDEO: i64 = 14000;
-const RENDER_INDEX_AUDIO: i64 = 11000;
-const RENDER_INDEX_TEXT: i64 = 15000;
 
 #[derive(Serialize)]
 pub struct BuildReport {
@@ -156,8 +152,17 @@ fn apply_visuals(seg_v: &mut Value, seg: &Segment, video: bool) {
         "transform": {"x": seg.x.unwrap_or(0.0), "y": seg.y.unwrap_or(0.0)},
         "flip": {"horizontal": false, "vertical": false}
     });
+    // visual segments (video and text) carry uniform_scale; non-uniform
+    // keyframes turn it off (pyJianYingDraft authority)
+    let has_scale_kf = seg
+        .keyframes
+        .as_ref()
+        .map(|k| k.contains_key("scale"))
+        .unwrap_or(false);
+    if video || seg.text.is_some() {
+        seg_v["uniform_scale"] = json!({"on": !has_scale_kf, "value": 1.0});
+    }
     if video {
-        seg_v["uniform_scale"] = json!({"on": true, "value": 1.0});
         seg_v["hdr_settings"] = json!({"intensity": 1.0, "mode": 1, "nits": 1000});
     }
 }
@@ -191,10 +196,7 @@ fn apply_keyframes(seg_v: &mut Value, seg: &Segment) {
     };
     for (channel, points) in kfs {
         match channel.as_str() {
-            "scale" => {
-                push("KFTypeScaleX", points);
-                push("KFTypeScaleY", points);
-            }
+            "scale" => push("KFTypeScaleX", points),
             "x" => push("KFTypePositionX", points),
             "y" => push("KFTypePositionY", points),
             "rotation" => push("KFTypeRotation", points),
@@ -322,13 +324,19 @@ fn build_text_content(seg: &Segment, font_entry: Option<&Value>) -> Result<Strin
     if border > 0.0 {
         let bc = hex_rgb(seg.border_color.as_deref().unwrap_or("#000000"))?;
         styles[0]["strokes"] = json!([{"content": {"solid": {"alpha": 1.0, "color": bc}},
-                                       "width": (border / 100.0).clamp(0.01, 1.0)}]);
+                                       "width": border / 100.0 * 0.2}]);
+    }
+    // pyJYD emits an empty strokes list on every style
+    for s in styles.iter_mut() {
+        if s.get("strokes").is_none() {
+            s["strokes"] = json!([]);
+        }
     }
     if let Some(sh) = &seg.shadow {
         let sc = hex_rgb(sh.color.as_deref().unwrap_or("#000000"))?;
         styles[0]["shadows"] = json!([{
-            "content": {"solid": {"alpha": 1.0, "color": sc}},
-            "diffuse": sh.diffuse.unwrap_or(15.0),
+            "content": {"solid": {"color": sc}},
+            "diffuse": (sh.diffuse.unwrap_or(15.0) / 100.0) / 6.0,
             "alpha": sh.alpha.unwrap_or(1.0),
             "distance": sh.distance.unwrap_or(5.0),
             "angle": sh.angle.unwrap_or(-45.0),
@@ -380,9 +388,9 @@ fn mask_entry(materials: &mut Value, mask: &crate::plan::Mask, info: &MediaInfo)
 fn rgba_normalize(hex: &str) -> String {
     let h = hex.trim().trim_start_matches('#');
     if h.len() == 6 {
-        format!("#{}FF", h.to_uppercase())
+        format!("#{}ff", h.to_lowercase())
     } else {
-        format!("#{}", h.to_uppercase())
+        format!("#{}", h.to_lowercase())
     }
 }
 
@@ -498,12 +506,7 @@ pub fn build(
                         (id, c)
                     };
 
-                    let render_index = if track.kind == "video" {
-                        RENDER_INDEX_VIDEO
-                    } else {
-                        RENDER_INDEX_AUDIO
-                    };
-                    seg_v = base_segment(&material_id, seg, render_index);
+                    seg_v = base_segment(&material_id, seg, ti as i64);
                     if track.kind == "video" {
                         apply_visuals(&mut seg_v, seg, true);
                     } else {
@@ -632,6 +635,7 @@ pub fn build(
                                 "resource_id": entry["resource_id"],
                                 "type": "audio_effect",
                                 "category_id": domain.0, "category_name": domain.1,
+                                "sub_type": 1, "time_range": {"duration": 0, "start": 0},
                                 "is_ugc": false, "production_path": "", "speaker_id": ""
                             }));
                             refs.push(aid);
@@ -701,6 +705,7 @@ pub fn build(
                         "typesetting": 0, "letter_spacing": 0, "line_spacing": 0.02, "line_feed": 1,
                         "line_max_width": 0.82, "force_apply_line_max_width": false,
                         "check_flag": check_flag,
+                        "global_alpha": 1.0,
                         "fixed_width": -1, "fixed_height": -1
                     });
                     if border > 0.0 {
@@ -740,9 +745,10 @@ pub fn build(
                         }
                     }
 
-                    seg_v = base_segment(&material_id, seg, RENDER_INDEX_TEXT);
+                    seg_v = base_segment(&material_id, seg, ti as i64);
                     seg_v["source_timerange"] = json!({"start": 0, "duration": seg.duration_us});
                     apply_visuals(&mut seg_v, seg, false);
+                    // pyJianYingDraft TextSegment defaults ClipSettings(transform_y=-0.78)
                     if seg.y.is_none() {
                         seg_v["clip"]["transform"]["y"] = json!(-0.78);
                     }
@@ -793,7 +799,7 @@ pub fn build(
                         "sticker_id": seg.sticker_id,
                         "source_platform": 1, "type": "sticker"
                     }));
-                    seg_v = base_segment(&material_id, seg, RENDER_INDEX_VIDEO);
+                    seg_v = base_segment(&material_id, seg, ti as i64);
                     apply_visuals(&mut seg_v, seg, false);
                     refs = Vec::new();
                     apply_keyframes(&mut seg_v, seg);
@@ -948,8 +954,10 @@ pub fn verify(draft_dir: &Path) -> Result<Value> {
         issues.push("no tracks".into());
     }
     let first_video = tracks.iter().position(|t| t["type"] == "video");
-    if first_video != Some(0) {
-        issues.push("the main video track must be the first track".into());
+    if let Some(fv) = first_video {
+        if fv != 0 {
+            issues.push("a video track exists but is not the first track".into());
+        }
     }
     let ref_buckets = ["speeds", "placeholders", "sound_channel_mappings", "vocal_separations",
         "canvases", "material_colors", "transitions", "masks", "chromas", "effects",
@@ -1039,7 +1047,3 @@ pub fn inspect(draft_dir: &Path) -> Result<Value> {
     }))
 }
 
-#[allow(dead_code)]
-fn schema_marker() -> &'static str {
-    SCHEMA
-}

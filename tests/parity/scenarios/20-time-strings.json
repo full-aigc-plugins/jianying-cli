@@ -1,0 +1,38 @@
+{
+ "name": "p20",
+ "media": [
+  {
+   "name": "a.mp4",
+   "gen": "color=c=blue:s=320x240:d=4"
+  },
+  {
+   "name": "b.mp4",
+   "gen": "color=c=red:s=320x240:d=4"
+  },
+  {
+   "name": "n.mp3",
+   "gen": "sine=frequency=440:duration=4"
+  }
+ ],
+ "plan": {
+  "schema": "jianying-cli-plan/v1",
+  "name": "p20",
+  "canvas": {
+   "width": 1280,
+   "height": 720,
+   "fps": 30
+  },
+  "tracks": [
+   {
+    "type": "video",
+    "segments": [
+     {
+      "start_us": "0s",
+      "duration_us": "2s",
+      "source": "a.mp4"
+     }
+    ]
+   }
+  ]
+ }
+}

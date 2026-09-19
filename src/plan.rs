@@ -331,7 +331,11 @@ impl Plan {
     pub fn load(path: &Path) -> Result<Plan> {
         let raw = std::fs::read_to_string(path)
             .map_err(|e| anyhow::anyhow!("cannot read plan {}: {e}", path.display()))?;
-        let mut plan: Plan = serde_json::from_str(&raw)
+        let mut raw_value: Value = serde_json::from_str(&raw)
+            .map_err(|e| anyhow::anyhow!("plan is not valid JSON: {e}"))?;
+        // pyJianYingDraft tim() parity: *_us fields accept "1h2m3s"-style strings
+        crate::tim::preprocess(&mut raw_value);
+        let mut plan: Plan = serde_json::from_value(raw_value)
             .map_err(|e| anyhow::anyhow!("plan is not a valid {SCHEMA}: {e}"))?;
         plan.parent = Some(path.parent().map(Path::to_path_buf).unwrap_or_default());
         plan.validate()?;
@@ -383,18 +387,16 @@ impl Plan {
             if track.segments.is_empty() {
                 bail!("track {} needs at least one segment", ti);
             }
+            let main_video = ti == 0 && track.kind == "video";
             let mut prior_end: i64 = 0;
             for (si, seg) in track.segments.iter().enumerate() {
-                let last = ti == 0 && si + 1 == track.segments.len();
+                let last = main_video && si + 1 == track.segments.len();
                 self.validate_segment(track, seg, prior_end, last)?;
                 prior_end = seg.start_us + seg.duration_us;
             }
             if track.kind == "video" && ti == 0 && track.segments[0].start_us != 0 {
                 bail!("main video must start at 0; place gaps on overlay tracks only");
             }
-        }
-        if !seen_main {
-            bail!("plan needs a video track (the main track)");
         }
         Ok(())
     }
@@ -544,7 +546,12 @@ impl Plan {
             if last_on_main {
                 bail!("a transition needs a following segment (cannot be on the last one)");
             }
-            let dur = t.duration_us.unwrap_or(0);
+            let entry = crate::catalogs::resolve(
+                crate::catalogs::transitions(), "transition", &t.name, self.allow_vip,
+            )?;
+            let dur = t.duration_us.unwrap_or_else(|| {
+                entry["duration_us"].as_i64().unwrap_or(500_000)
+            });
             if dur <= 0 || dur > 1_000_000 {
                 bail!("transition duration_us must be within 1..1000000");
             }

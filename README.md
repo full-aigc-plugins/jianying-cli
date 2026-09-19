@@ -42,6 +42,27 @@ jianying render d1 --burn-captions                    # ffmpeg 代理预览（�
 - 原生 MP4 导出、已有草稿编辑、ASR 记账在 NC fork 专业档（`partme-jianying-plugin` 的 `jianying-harness`），因许可不在本 CLI。
 - 曲线变速、新版剪映加密草稿读取：上游三项目同样不支持。
 
+## 双源验证测试集
+
+`tools/parity_run.py` 是差异测试闭环：每个场景的同一计划分别由
+pyJianYingDraft（参考实现，`tools/parity_reference.py`）与 jianying-cli
+构建，再语义化比对产物（忽略 id/时间戳/路径，数值归一，引用解析到桶，
+材料按 ref⊆cli 子集匹配）。20 个场景覆盖全部能力域——转场（默认/自定义
+时长）、蒙版（圆形/矩形+圆角+反相）、滤镜强度、特效参数、混合模式、
+出入场动画、片段原声淡入淡出、音频淡入淡出、场景音、字体/描边/阴影/
+背景条、多范围样式（CLI 超集）、色度抠图、画布背景填充、关键帧、
+全局滤镜/特效轨、时间字符串（tim() 语法）。
+
+```bash
+cargo build --release
+python3 tools/parity_run.py          # 20/20 PASS
+```
+
+历史上这套测试抓出并修正了：border/阴影的精确数值映射（×0.002、/600）、
+text_shape 类型名、scale 关键帧只写 ScaleX + 关 uniform_scale、文本段
+默认 transform_y=-0.78 与 global_alpha、音频特效 sub_type/time_range、
+transition 默认时长取目录值等 10+ 处偏差。
+
 ## 下游
 
 [`partme-ai/partme-jianying-plugin`](https://github.com/partme-ai/partme-jianying-plugin)

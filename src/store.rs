@@ -252,3 +252,48 @@ pub fn publish(draft_dir: &Path, root: &Path, force: bool) -> Result<Value> {
         "editor_running": running,
     }))
 }
+
+/// `DraftFolder::list_drafts` parity: draft names known to the store.
+pub fn list(root: &Path) -> Result<Value> {
+    let mut names: Vec<String> = Vec::new();
+    if let Ok(dirs) = std::fs::read_dir(root) {
+        for d in dirs.flatten() {
+            let p = d.path();
+            if p.is_dir() && p.join("draft_content.json").is_file()
+                || p.is_dir() && p.join("draft_info.json").is_file()
+            {
+                names.push(d.file_name().to_string_lossy().into_owned());
+            }
+        }
+    }
+    names.sort();
+    Ok(json!({"root": root.to_string_lossy(), "drafts": names}))
+}
+
+/// `DraftFolder::has_draft` parity.
+pub fn has(root: &Path, name: &str) -> Result<Value> {
+    Ok(json!({"name": name, "exists": root.join(name).is_dir()}))
+}
+
+/// `DraftFolder::remove` parity: delete the draft folder and unregister it.
+pub fn remove(root: &Path, name: &str) -> Result<Value> {
+    let dir = root.join(name);
+    if !dir.is_dir() {
+        bail!("draft {name} not found in {}", root.display());
+    }
+    std::fs::remove_dir_all(&dir)?;
+    let root_meta_path = root.join("root_meta_info.json");
+    if root_meta_path.is_file() {
+        let mut root_meta: Value =
+            serde_json::from_str(&std::fs::read_to_string(&root_meta_path)?)?;
+        if let Some(obj) = root_meta.as_object_mut() {
+            for (_k, v) in obj.iter_mut() {
+                if let Some(arr) = v.as_array_mut() {
+                    arr.retain(|e| e["draft_name"].as_str() != Some(name));
+                }
+            }
+        }
+        std::fs::write(&root_meta_path, serde_json::to_string_pretty(&root_meta)?)?;
+    }
+    Ok(json!({"status": "removed", "name": name}))
+}
