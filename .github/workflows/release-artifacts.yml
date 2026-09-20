@@ -74,8 +74,11 @@ jobs:
           git -C /tmp/pyjyd checkout "$PYJYD_REF"
           git clone https://github.com/renezander030/capcut-cli.git /tmp/capcut-cli
           git -C /tmp/capcut-cli checkout "$CAPCUT_REF"
-          npm --prefix /tmp/capcut-cli ci --ignore-scripts
-          npm --prefix /tmp/capcut-cli run build
+          (
+            cd /tmp/capcut-cli
+            npm ci --ignore-scripts
+            npm run build
+          )
       - name: Verify source policy, catalogs and all black-box differentials
         run: |
           python3 tools/check_provenance.py --self-test-negative-cases

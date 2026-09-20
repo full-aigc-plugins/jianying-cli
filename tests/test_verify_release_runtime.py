@@ -31,15 +31,15 @@ class VerifyReleaseRuntimeTests(unittest.TestCase):
         VERIFY.validate_capabilities(
             {
                 "schema": "jianying-capabilities/v1",
-                "cli_version": "1.6.3",
+                "cli_version": "1.6.4",
                 "contract_state": "released",
-                "release_ref": "v1.6.3",
+                "release_ref": "v1.6.4",
                 "source_commit": "a" * 40,
                 "capabilities": capabilities,
             },
-            "1.6.3",
+            "1.6.4",
             "released",
-            "v1.6.3",
+            "v1.6.4",
             "a" * 40,
         )
         capabilities[0]["status"] = "partial"
@@ -47,10 +47,10 @@ class VerifyReleaseRuntimeTests(unittest.TestCase):
             VERIFY.validate_capabilities(
                 {
                     "schema": "jianying-capabilities/v1",
-                    "cli_version": "1.6.3",
+                    "cli_version": "1.6.4",
                     "capabilities": capabilities,
                 },
-                "1.6.3",
+                "1.6.4",
                 None,
                 None,
                 None,
@@ -94,10 +94,10 @@ class VerifyReleaseRuntimeTests(unittest.TestCase):
                     VERIFY.validate_capabilities(
                         {
                             "schema": "jianying-capabilities/v1",
-                            "cli_version": "1.6.3",
+                            "cli_version": "1.6.4",
                             "capabilities": capabilities,
                         },
-                        "1.6.3",
+                        "1.6.4",
                         None,
                         None,
                         None,
