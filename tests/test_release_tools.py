@@ -614,6 +614,9 @@ class ReleaseIndexTests(unittest.TestCase):
 
     def test_packager_requires_complete_locked_sbom_identity_and_checksums(self) -> None:
         locked = tomllib.loads((ROOT / "Cargo.lock").read_text(encoding="utf-8"))["package"]
+        current_version = tomllib.loads(
+            (ROOT / "Cargo.toml").read_text(encoding="utf-8")
+        )["package"]["version"]
         packages = []
         for item in locked:
             package = {
@@ -638,13 +641,13 @@ class ReleaseIndexTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             sbom = Path(temporary) / "SBOM.spdx.json"
             sbom.write_text(json.dumps(document), encoding="utf-8")
-            PACKAGE.verify_sbom(sbom, "1.6.5")
+            PACKAGE.verify_sbom(sbom, current_version)
 
             truncated = dict(document)
             truncated["packages"] = packages[:-1]
             sbom.write_text(json.dumps(truncated), encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "Cargo.lock package coverage differs"):
-                PACKAGE.verify_sbom(sbom, "1.6.5")
+                PACKAGE.verify_sbom(sbom, current_version)
 
             tampered = json.loads(json.dumps(document))
             checksummed = next(
@@ -653,7 +656,7 @@ class ReleaseIndexTests(unittest.TestCase):
             checksummed["checksums"][0]["checksumValue"] = "0" * 64
             sbom.write_text(json.dumps(tampered), encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "checksum differs from Cargo.lock"):
-                PACKAGE.verify_sbom(sbom, "1.6.5")
+                PACKAGE.verify_sbom(sbom, current_version)
 
             wrong_source = json.loads(json.dumps(document))
             sourced = next(
@@ -663,7 +666,7 @@ class ReleaseIndexTests(unittest.TestCase):
             sourced["downloadLocation"] = "https://example.invalid/source"
             sbom.write_text(json.dumps(wrong_source), encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "source differs from Cargo.lock"):
-                PACKAGE.verify_sbom(sbom, "1.6.5")
+                PACKAGE.verify_sbom(sbom, current_version)
 
     def test_generated_sbom_passes_full_cargo_lock_verification(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
