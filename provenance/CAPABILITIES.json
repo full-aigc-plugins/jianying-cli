@@ -1,6 +1,6 @@
 {
   "schema": "jianying-capabilities/v1",
-  "cli_version": "1.6.2",
+  "cli_version": "1.6.3",
   "baseline_commit": "60eae921acd4fb8161eaa69c85b31d8c2267332c",
   "contract_state": "working_tree_unreleased",
   "release_ref": null,

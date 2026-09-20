@@ -181,7 +181,7 @@ Windows 摘要；后续 `windows-2025` 工作流必须从当前源码重新构�
 python3 tools/build_release_index.py \
   --input-dir dist \
   --repository full-aigc-plugins/jianying-cli \
-  --tag v1.6.2 \
+  --tag v1.6.3 \
   --output dist/jianying-cli-release-index.json
 ```
 

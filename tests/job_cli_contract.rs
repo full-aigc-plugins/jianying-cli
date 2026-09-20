@@ -38,7 +38,7 @@ fn temp_root(name: &str) -> PathBuf {
 fn v1_and_v2_job_create_have_equivalent_observable_draft_semantics() {
     let root = temp_root("job-equivalence");
     let media = root.join("a.mp4");
-    let ffmpeg = Command::new("ffmpeg")
+    let ffmpeg = match Command::new("ffmpeg")
         .args([
             "-v",
             "error",
@@ -50,7 +50,14 @@ fn v1_and_v2_job_create_have_equivalent_observable_draft_semantics() {
         ])
         .arg(&media)
         .output()
-        .unwrap();
+    {
+        Ok(output) => output,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("ffmpeg unavailable — skipping");
+            return;
+        }
+        Err(error) => panic!("failed to execute ffmpeg: {error}"),
+    };
     if !ffmpeg.status.success() {
         eprintln!("ffmpeg unavailable — skipping");
         return;
