@@ -331,6 +331,9 @@ impl From<RuntimePlatformArg> for jianying_runtime::RuntimePlatform {
 enum RuntimeOp {
     /// Discover installed editors and known draft roots without enabling native routing
     Discover {
+        /// Override the platform used for deterministic discovery and diagnostics
+        #[arg(long, value_enum)]
+        platform: Option<RuntimePlatformArg>,
         /// Additional application directory to scan; defaults to platform-known roots
         #[arg(long = "search-root")]
         search_roots: Vec<PathBuf>,
@@ -5060,11 +5063,14 @@ fn load_runtime_profile(path: &Path) -> Result<jianying_runtime::RuntimeProfile>
 fn run_runtime(op: RuntimeOp, json: bool) -> Result<()> {
     match op {
         RuntimeOp::Discover {
+            platform,
             mut search_roots,
             home,
             local_app_data,
         } => {
-            let platform = current_runtime_platform();
+            let platform = platform
+                .map(jianying_runtime::RuntimePlatform::from)
+                .unwrap_or_else(current_runtime_platform);
             let home = home
                 .or_else(|| std::env::var_os("HOME").map(PathBuf::from))
                 .unwrap_or_else(|| PathBuf::from("."));

@@ -56,6 +56,8 @@ fn runtime_discover_reports_unverified_installations_and_orphan_draft_roots() {
             "--json",
             "runtime",
             "discover",
+            "--platform",
+            "macos",
             "--home",
             home.to_str().unwrap(),
             "--search-root",
