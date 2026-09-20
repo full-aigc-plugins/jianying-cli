@@ -68,6 +68,10 @@ jobs:
           cargo clippy --workspace --all-targets --locked -- -D warnings
           cargo test --workspace --locked
           cargo build --release --locked
+      - name: Install media differential runtime
+        run: |
+          brew install ffmpeg
+          ffmpeg -version
       - name: Clone exact upstream parity sources
         run: |
           git clone https://github.com/GuanYixuan/pyJianYingDraft.git /tmp/pyjyd
