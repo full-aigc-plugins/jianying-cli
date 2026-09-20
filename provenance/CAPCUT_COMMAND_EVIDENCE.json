@@ -1,0 +1,609 @@
+{
+  "schema": "jianying-capcut-command-evidence/v1",
+  "baseline_commit": "49f70e3b07f1a236d45acb9b49a70c141dd1ee98",
+  "overall_claim": "incomplete",
+  "commands": [
+    {
+      "command": "info",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "version",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "lint",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "tracks",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "segments",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "texts",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "set-text",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "shift",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "shift-all",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "speed",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "volume",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "trim",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "opacity",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "export-srt",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "export-ass",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "export-timeline",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/interchange_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "import-timeline",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/interchange_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "materials",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/material_discovery_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json"
+    },
+    {
+      "command": "segment",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "material",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/material_discovery_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json"
+    },
+    {
+      "command": "add-audio",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_mutation_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json"
+    },
+    {
+      "command": "add-video",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_mutation_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json"
+    },
+    {
+      "command": "add-text",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "tts",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_mutation_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json"
+    },
+    {
+      "command": "crop",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "cut",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "duplicate",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "remove",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "keyframe",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "transition",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "mask",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "bg-blur",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "text-style",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "text-anim",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "image-anim",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "add-sticker",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "mix-mode",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "audio-fade",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "add-cover",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "add-filter",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "bubble-text",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "add-effect",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "save-template",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/template_cli_contract.rs",
+      "evidence_ref": "tests/template_cli_contract.rs"
+    },
+    {
+      "command": "apply-template",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/template_cli_contract.rs",
+      "evidence_ref": "tests/template_cli_contract.rs"
+    },
+    {
+      "command": "make-preset",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/template_cli_contract.rs",
+      "evidence_ref": "tests/template_cli_contract.rs"
+    },
+    {
+      "command": "templates",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/template_cli_contract.rs",
+      "evidence_ref": "tests/template_cli_contract.rs"
+    },
+    {
+      "command": "batch",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/job_cli_contract.rs",
+      "evidence_ref": "tests/job_cli_contract.rs"
+    },
+    {
+      "command": "import-srt",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "import-ass",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "text-ranges",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "caption",
+      "status": "external_dependency",
+      "claim": "external-gate",
+      "test_ref": "tests/provenance_guard.rs",
+      "evidence_ref": "crates/jianying-media/tests/asr_provider_contract.rs"
+    },
+    {
+      "command": "translate",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/captions_cli_contract.rs",
+      "evidence_ref": "tests/captions_cli_contract.rs"
+    },
+    {
+      "command": "migrate",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "add-sfx",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_mutation_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json"
+    },
+    {
+      "command": "chroma",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "matting",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "prune",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "register",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/store_cli_contract.rs",
+      "evidence_ref": "tests/store_cli_contract.rs"
+    },
+    {
+      "command": "rename",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/store_cli_contract.rs",
+      "evidence_ref": "tests/store_cli_contract.rs"
+    },
+    {
+      "command": "relink",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_mutation_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json"
+    },
+    {
+      "command": "replace-media",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_mutation_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json"
+    },
+    {
+      "command": "timeline",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/timeline_cli_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json"
+    },
+    {
+      "command": "projects",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/store_cli_contract.rs",
+      "evidence_ref": "tests/store_cli_contract.rs"
+    },
+    {
+      "command": "diff",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "concat",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "config",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/config_cli_contract.rs",
+      "evidence_ref": "tests/config_cli_contract.rs"
+    },
+    {
+      "command": "describe",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "completions",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_UTILITY_DIFFERENTIALS.json"
+    },
+    {
+      "command": "enums",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_UTILITY_DIFFERENTIALS.json"
+    },
+    {
+      "command": "catalogue",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/catalogs_guard.rs",
+      "evidence_ref": "tests/catalogs_guard.rs"
+    },
+    {
+      "command": "harvest-enums",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/harvest_enums_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_UTILITY_DIFFERENTIALS.json"
+    },
+    {
+      "command": "doctor",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "tests/agent_contract.rs"
+    },
+    {
+      "command": "diagnose",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/diagnose_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_UTILITY_DIFFERENTIALS.json"
+    },
+    {
+      "command": "fixture",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/fixture_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_UTILITY_DIFFERENTIALS.json"
+    },
+    {
+      "command": "sync-timelines",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/store_cli_contract.rs",
+      "evidence_ref": "tests/store_cli_contract.rs"
+    },
+    {
+      "command": "restore",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/store_cli_contract.rs",
+      "evidence_ref": "tests/store_cli_contract.rs"
+    },
+    {
+      "command": "serve",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/job_cli_contract.rs",
+      "evidence_ref": "tests/job_cli_contract.rs"
+    },
+    {
+      "command": "decrypt",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/store_cli_contract.rs",
+      "evidence_ref": "tests/store_cli_contract.rs"
+    },
+    {
+      "command": "export",
+      "status": "external_dependency",
+      "claim": "external-gate",
+      "test_ref": "tests/provenance_guard.rs",
+      "evidence_ref": "crates/jianying-jobs/tests/native_export_task.rs"
+    },
+    {
+      "command": "init",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "quickstart",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/agent_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "command": "compile",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/compile_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_UTILITY_DIFFERENTIALS.json"
+    },
+    {
+      "command": "render",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/render_batch_contract.rs",
+      "evidence_ref": "tests/render_batch_contract.rs"
+    },
+    {
+      "command": "detect-scenes",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_analysis_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json"
+    },
+    {
+      "command": "detect-silence",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_analysis_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json"
+    },
+    {
+      "command": "detect-retakes",
+      "status": "supported",
+      "claim": "verified",
+      "test_ref": "tests/media_analysis_contract.rs",
+      "evidence_ref": "provenance/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json"
+    }
+  ]
+}

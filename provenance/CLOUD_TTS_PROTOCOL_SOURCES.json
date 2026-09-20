@@ -1,0 +1,63 @@
+{
+  "schema_version": "jianying-cloud-tts-protocol-sources/v1",
+  "observed_at": "2026-09-20",
+  "policy": {
+    "source_copied": false,
+    "protocol_facts_only": true,
+    "network_call_performed": false,
+    "paid_canary_requires_separate_approval": true,
+    "credential_values_recorded": false
+  },
+  "sources": [
+    {
+      "id": "xiaomi-mimo",
+      "documentation": "https://platform.xiaomimimo.com/docs/en-US/news/previous-news/v2.5-tts-release",
+      "protocol": "OpenAI-compatible chat completions JSON with base64 audio",
+      "endpoint": "https://api.xiaomimimo.com/v1/chat/completions",
+      "status": "current"
+    },
+    {
+      "id": "volcengine",
+      "documentation": "https://www.volcengine.com/docs/6561/2228192?lang=zh",
+      "implementation_reference": "https://github.com/bytedance/agentkit-samples/blob/main/skills/byted-text-to-speech/scripts/text_to_speech.py",
+      "protocol": "V3 unidirectional SSE with X-Api-Key/X-Api-Resource-Id/X-Api-Request-Id and base64 audio frames",
+      "endpoint": "https://openspeech.bytedance.com/api/v3/tts/unidirectional/sse",
+      "status": "current-v3"
+    },
+    {
+      "id": "aliyun-bailian",
+      "documentation": "https://help.aliyun.com/zh/model-studio/non-realtime-tts-user-guide",
+      "protocol": "provider-family-specific HTTP JSON and expiring audio URL",
+      "endpoint": "workspace-or-dashscope-family-endpoint",
+      "status": "current"
+    },
+    {
+      "id": "baidu",
+      "documentation": "https://ai.baidu.com/ai-doc/SPEECH/mlbxh7xie",
+      "protocol": "application/x-www-form-urlencoded request and binary audio response",
+      "endpoint": "https://tsn.baidu.com/text2audio",
+      "status": "current"
+    },
+    {
+      "id": "tencent-cloud",
+      "documentation": "https://cloud.tencent.com/document/api/1073/37995",
+      "protocol": "Tencent Cloud API 3.0 signed JSON and base64 audio response",
+      "endpoint": "https://tts.tencentcloudapi.com",
+      "status": "current"
+    },
+    {
+      "id": "minimax",
+      "documentation": "https://platform.minimaxi.com/docs/api-reference/speech-t2a-http",
+      "protocol": "T2A V2 JSON and hex audio response",
+      "endpoint": "https://api.minimax.cn/v1/t2a_v2",
+      "status": "current"
+    },
+    {
+      "id": "zhipu-glm",
+      "documentation": "https://docs.bigmodel.cn/api-reference/%E6%A8%A1%E5%9E%8B-api/%E6%96%87%E6%9C%AC%E8%BD%AC%E8%AF%AD%E9%9F%B3",
+      "protocol": "GLM-TTS JSON request and binary audio response",
+      "endpoint": "https://open.bigmodel.cn/api/paas/v4/audio/speech",
+      "status": "current"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema": "jianying-capcut-media-mutation-differential/v1",
+  "upstream": {
+    "repository": "renezander030/capcut-cli",
+    "commit": "49f70e3b07f1a236d45acb9b49a70c141dd1ee98"
+  },
+  "runner": "tools/capcut_media_mutation_differential.py",
+  "cases": [
+    {
+      "command": "add-video",
+      "status": "semantic",
+      "reason": "Rust stages local assets into the draft transaction"
+    },
+    {
+      "command": "add-audio",
+      "status": "semantic",
+      "reason": "Rust stages local assets into the draft transaction"
+    },
+    {
+      "command": "replace-media",
+      "status": "semantic",
+      "reason": "IDs and staged paths are intentionally transaction-local"
+    },
+    {
+      "command": "relink",
+      "status": "semantic",
+      "reason": "Transaction directories and absolute paths differ"
+    },
+    {
+      "command": "add-sfx",
+      "status": "exact-fields"
+    },
+    {
+      "command": "tts",
+      "status": "semantic",
+      "reason": "Generated filenames and IDs are nondeterministic"
+    }
+  ],
+  "passed": 6,
+  "failed": 0
+}

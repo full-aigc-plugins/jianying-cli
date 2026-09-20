@@ -1,0 +1,59 @@
+[
+  {
+    "name": "empty-track",
+    "expect_reference_error": false,
+    "expect_edit_error": false,
+    "draft": {"tracks":[{"id":"track-empty","type":"video","segments":[]}],"materials":{}}
+  },
+  {
+    "name": "overlapping-existing-segments",
+    "expect_reference_error": false,
+    "expect_edit_error": false,
+    "draft": {
+      "materials":{"videos":[{"id":"video-1","type":"video","duration":2000000}]},
+      "tracks":[{"id":"track-1","type":"video","segments":[
+        {"id":"segment-1","material_id":"video-1","target_timerange":{"start":0,"duration":1000000}},
+        {"id":"segment-2","material_id":"video-1","target_timerange":{"start":500000,"duration":1000000}}
+      ]}]
+    }
+  },
+  {
+    "name": "negative-existing-offset",
+    "expect_reference_error": false,
+    "expect_edit_error": false,
+    "draft": {
+      "materials":{"texts":[{"id":"text-1","type":"text","content":"{\"text\":\"负偏移\",\"styles\":[{\"range\":[0,3],\"size\":8}]}"}]},
+      "tracks":[{"id":"track-1","type":"text","segments":[{"id":"segment-1","material_id":"text-1","target_timerange":{"start":-100000,"duration":500000}}]}]
+    }
+  },
+  {
+    "name": "speed-companion",
+    "expect_reference_error": false,
+    "expect_edit_error": false,
+    "draft": {
+      "materials":{"videos":[{"id":"video-1","type":"video","duration":2000000}],"speeds":[{"id":"speed-1","type":"speed","speed":2.0}]},
+      "tracks":[{"id":"track-1","type":"video","segments":[{"id":"segment-1","material_id":"video-1","speed":2.0,"volume":1.0,"extra_material_refs":["speed-1"]}]}]
+    }
+  },
+  {
+    "name": "missing-resource",
+    "expect_reference_error": true,
+    "expect_edit_error": false,
+    "draft": {"materials":{},"tracks":[{"id":"track-1","type":"audio","segments":[{"id":"segment-1","material_id":"missing-audio"}]}]}
+  },
+  {
+    "name": "unicode-utf16",
+    "expect_reference_error": false,
+    "expect_edit_error": false,
+    "draft": {
+      "materials":{"texts":[{"id":"text-1","type":"subtitle","content":"{\"text\":\"剪映🎬A\",\"styles\":[{\"range\":[0,5],\"size\":8}]}"}]},
+      "tracks":[{"id":"track-1","type":"text","segments":[{"id":"segment-1","material_id":"text-1"}]}]
+    }
+  },
+  {
+    "name": "unknown-fields",
+    "expect_reference_error": false,
+    "expect_edit_error": false,
+    "draft": {"future_root":{"enabled":true},"materials":{},"tracks":[{"id":"track-1","type":"future","future_track":7,"segments":[{"id":"segment-1","future_segment":{"x":1}}]}]}
+  }
+]

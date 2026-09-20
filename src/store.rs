@@ -8,6 +8,7 @@ use anyhow::{bail, Context, Result};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use uuid::Uuid;
 
 pub fn draft_root_candidates() -> Vec<(&'static str, PathBuf)> {
     let home = PathBuf::from(std::env::var("HOME").unwrap_or_default());
@@ -125,6 +126,263 @@ fn copy_dir_recursive(src: &Path, dest: &Path) -> Result<()> {
     Ok(())
 }
 
+/// 返回平台默认草稿目录候选及可用性，供智能体显式选择。
+pub fn directories() -> Value {
+    Value::Array(
+        draft_root_candidates()
+            .into_iter()
+            .map(|(namespace, path)| {
+                json!({"namespace":namespace,"path":path,"exists":path.is_dir()})
+            })
+            .collect(),
+    )
+}
+
+/// 在草稿库中安全重命名草稿目录，并同步时间线、元数据和根登记表。
+pub fn rename(root: &Path, name: &str, new_name: &str) -> Result<Value> {
+    validate_store_name(name)?;
+    validate_store_name(new_name)?;
+    let running = editors_running();
+    if !running.is_empty() {
+        bail!(
+            "editor is running ({}); close JianYing/CapCut before renaming drafts",
+            running.join(", ")
+        );
+    }
+    let source = root.join(name);
+    let target = root.join(new_name);
+    if !source.is_dir() {
+        bail!("draft {name} not found in {}", root.display());
+    }
+    if target.exists() {
+        bail!("draft {new_name} already exists in {}", root.display());
+    }
+    crate::draft::validate_bundle(&source)?;
+    let staging = root.join(format!(".jianying-rename-{}", Uuid::new_v4().simple()));
+    copy_dir_recursive(&source, &staging)?;
+    let mut timeline = crate::draft::load_timeline(&staging)?;
+    timeline["name"] = json!(new_name);
+    if let Err(error) = crate::template::save_timeline_as(&staging, &timeline, &target) {
+        let _ = std::fs::remove_dir_all(&staging);
+        return Err(error);
+    }
+    crate::draft::validate_bundle_as(&staging, &target)?;
+    std::fs::rename(&staging, &target)?;
+
+    let root_meta_path = root.join("root_meta_info.json");
+    if root_meta_path.is_file() {
+        let mut root_meta: Value =
+            serde_json::from_str(&std::fs::read_to_string(&root_meta_path)?)?;
+        for entry in root_meta
+            .as_object_mut()
+            .into_iter()
+            .flat_map(|object| object.values_mut())
+            .flat_map(|value| value.as_array_mut().into_iter().flatten())
+        {
+            if entry["draft_name"].as_str() == Some(name)
+                || entry["draft_fold_path"].as_str() == Some(source.to_string_lossy().as_ref())
+            {
+                entry["draft_name"] = json!(new_name);
+                entry["draft_fold_path"] = json!(target.to_string_lossy());
+                entry["draft_root_path"] = json!(root.to_string_lossy());
+                entry["draft_json_file"] =
+                    json!(target.join("draft_content.json").to_string_lossy());
+            }
+        }
+        if let Err(error) = write_atomic_json(&root_meta_path, &root_meta) {
+            let _ = std::fs::remove_dir_all(&target);
+            return Err(error);
+        }
+    }
+    std::fs::remove_dir_all(&source)?;
+    Ok(json!({"status":"renamed","from":name,"to":new_name,"draft":target}))
+}
+
+/// 规划或执行根时间线到镜像文件的单向同步。
+pub fn sync_timelines(draft: &Path, apply: bool, force_newer: bool) -> Result<Value> {
+    let canonical = draft.join("draft_content.json");
+    let canonical_raw = std::fs::read_to_string(&canonical)
+        .with_context(|| format!("reading canonical timeline {}", canonical.display()))?;
+    let canonical_json: Value = serde_json::from_str(&canonical_raw)
+        .context("canonical draft_content.json must be plaintext JSON")?;
+    let canonical_modified = std::fs::metadata(&canonical)?.modified()?;
+    let mut plans = Vec::new();
+    for name in ["draft_info.json", "template-2.tmp"] {
+        let path = draft.join(name);
+        if !path.is_file() {
+            continue;
+        }
+        let raw = std::fs::read_to_string(&path)?;
+        let parsed: Value = serde_json::from_str(&raw)
+            .with_context(|| format!("mirror {} must be plaintext JSON", path.display()))?;
+        let drifted = parsed != canonical_json;
+        let newer = drifted && std::fs::metadata(&path)?.modified()? > canonical_modified;
+        plans.push(json!({"path":path,"drifted":drifted,"newer_than_canonical":newer}));
+    }
+    let newer_mirrors: Vec<String> = plans
+        .iter()
+        .filter(|item| item["newer_than_canonical"].as_bool() == Some(true))
+        .filter_map(|item| item["path"].as_str().map(str::to_owned))
+        .collect();
+    if apply && !newer_mirrors.is_empty() && !force_newer {
+        bail!(
+            "refused [mirror-newer]: {} mirror(s) are newer than draft_content.json; inspect or pass --force-newer",
+            newer_mirrors.len()
+        );
+    }
+    let mut reconciled = Vec::new();
+    let mut backups = Vec::new();
+    if apply {
+        let running = editors_running();
+        if !running.is_empty() {
+            bail!(
+                "editor is running ({}); close JianYing/CapCut before syncing timelines",
+                running.join(", ")
+            );
+        }
+        for item in &plans {
+            if item["drifted"].as_bool() != Some(true) {
+                continue;
+            }
+            let path = PathBuf::from(item["path"].as_str().unwrap_or_default());
+            let backup = path.with_extension(format!(
+                "{}.bak",
+                path.extension()
+                    .and_then(|value| value.to_str())
+                    .unwrap_or("json")
+            ));
+            std::fs::copy(&path, &backup)?;
+            write_atomic(&path, canonical_raw.as_bytes())?;
+            reconciled.push(path);
+            backups.push(backup);
+        }
+        crate::draft::validate_bundle(draft)?;
+    }
+    Ok(json!({"canonical":canonical,"apply":apply,"targets":plans,
+        "newer_mirrors":newer_mirrors,"reconciled":reconciled,"backups":backups}))
+}
+
+/// 创建一个不覆盖既有目标的完整草稿备份。
+pub fn backup(draft: &Path, out: &Path) -> Result<Value> {
+    crate::draft::validate_bundle(draft)?;
+    if out.exists() {
+        bail!("backup target already exists: {}", out.display());
+    }
+    copy_dir_recursive(draft, out)?;
+    let timeline = crate::draft::load_timeline(out)?;
+    crate::template::save_timeline_as(out, &timeline, out)?;
+    crate::draft::validate_bundle(out)?;
+    Ok(json!({"status":"backed_up","source":draft,"backup":out}))
+}
+
+/// 通过 MutationPlan 将完整备份恢复到既有草稿。
+pub fn restore(snapshot: &Path, target: &Path) -> Result<Value> {
+    if !snapshot.is_dir() {
+        bail!(
+            "restore snapshot is not a directory: {}",
+            snapshot.display()
+        );
+    }
+    let running = editors_running();
+    if !running.is_empty() {
+        bail!(
+            "editor is running ({}); close JianYing/CapCut before restoring drafts",
+            running.join(", ")
+        );
+    }
+    let state_root = target
+        .parent()
+        .unwrap_or(target)
+        .join(".jianying-transactions");
+    let mut plan = jianying_store::MutationPlan::new(target.to_path_buf(), state_root)?;
+    plan.stage()?;
+    plan.replace_work_copy_from(snapshot)?;
+    let timeline = crate::draft::load_timeline(plan.work_copy())?;
+    crate::template::save_timeline_as(plan.work_copy(), &timeline, target)?;
+    let identity = plan.source().to_path_buf();
+    plan.validate(|work_copy| {
+        crate::draft::validate_bundle_as(work_copy, &identity)
+            .map_err(|error| jianying_store::StoreError::Validation(format!("{error:#}")))
+    })?;
+    plan.commit()?;
+    Ok(json!({"target":target,"restored_from":snapshot,
+        "safety_snapshot":plan.snapshot(),"audit_file":plan.audit_file()}))
+}
+
+/// 检测剪映加密、明文 JSON 或损坏 JSON；本项目明确不提供解密算法。
+pub fn detect_encryption(input: &Path) -> Result<Value> {
+    let path = if input.is_dir() {
+        input.join("draft_content.json")
+    } else {
+        input.to_path_buf()
+    };
+    let bytes = std::fs::read(&path)?;
+    let first_non_whitespace = bytes
+        .iter()
+        .copied()
+        .find(|byte| !byte.is_ascii_whitespace());
+    let parsed = serde_json::from_slice::<Value>(&bytes);
+    let (encrypted, classification, reason) = match parsed {
+        Ok(value) if value.is_object() => (
+            false,
+            "plaintext",
+            "timeline parses as a plaintext JSON object",
+        ),
+        Ok(_) => (false, "corrupted", "timeline JSON root is not an object"),
+        Err(_) if first_non_whitespace == Some(b'{') => (
+            false,
+            "corrupted",
+            "timeline begins like JSON but parsing failed; this is not classified as encryption",
+        ),
+        Err(_) => (
+            true,
+            "encrypted",
+            "timeline is non-JSON binary data consistent with JianYing 6.0+ encryption",
+        ),
+    };
+    let leading_bytes = bytes
+        .iter()
+        .take(8)
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<Vec<_>>()
+        .join("");
+    Ok(json!({
+        "path":path,"encrypted":encrypted,"classification":classification,"reason":reason,
+        "bytes":bytes.len(),"leading_bytes_hex":leading_bytes,"decrypt_supported":false,
+        "workarounds":["use a plaintext app-authored draft or generated copy",
+            "use CapCut International for plaintext round-trip editing",
+            "keep encrypted drafts behind the native Runtime Adapter boundary"]
+    }))
+}
+
+fn validate_store_name(name: &str) -> Result<()> {
+    let path = Path::new(name);
+    if name.trim().is_empty()
+        || path.is_absolute()
+        || path.components().count() != 1
+        || matches!(name, "." | "..")
+    {
+        bail!("draft name must be one safe path component");
+    }
+    Ok(())
+}
+
+fn write_atomic_json(path: &Path, value: &Value) -> Result<()> {
+    write_atomic(path, &serde_json::to_vec_pretty(value)?)
+}
+
+fn write_atomic(path: &Path, bytes: &[u8]) -> Result<()> {
+    let parent = path.parent().unwrap_or_else(|| Path::new("."));
+    let name = path
+        .file_name()
+        .and_then(|value| value.to_str())
+        .unwrap_or("store");
+    let temporary = parent.join(format!(".{name}.{}.tmp", Uuid::new_v4().simple()));
+    std::fs::write(&temporary, bytes)?;
+    std::fs::rename(&temporary, path)?;
+    Ok(())
+}
+
 fn find_store_key(root_meta: &Value) -> Option<String> {
     root_meta.as_object()?.iter().find_map(|(k, v)| {
         v.as_array().and_then(|a| {
@@ -156,6 +414,8 @@ pub fn publish(draft_dir: &Path, root: &Path, force: bool) -> Result<Value> {
             draft_dir.display()
         );
     }
+    crate::draft::validate_bundle(draft_dir)
+        .context("draft bundle failed integrity validation before publish")?;
     let mut meta: Value = serde_json::from_str(&std::fs::read_to_string(&meta_path)?)?;
     let name = meta["draft_name"]
         .as_str()
@@ -174,6 +434,11 @@ pub fn publish(draft_dir: &Path, root: &Path, force: bool) -> Result<Value> {
         );
     }
     copy_dir_recursive(draft_dir, &dest)?;
+    let mut published_timeline = crate::draft::load_timeline(&dest)?;
+    crate::draft::relocate_material_paths(&mut published_timeline, draft_dir, &dest);
+    crate::template::save_timeline(&dest, &published_timeline)
+        .context("synchronizing the published draft bundle")?;
+    meta = serde_json::from_str(&std::fs::read_to_string(dest.join("draft_meta_info.json"))?)?;
 
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -185,12 +450,8 @@ pub fn publish(draft_dir: &Path, root: &Path, force: bool) -> Result<Value> {
     meta["draft_root_path"] = json!(root_str);
     meta["draft_json_file"] = json!(dest.join("draft_content.json").to_string_lossy());
     meta["tm_draft_modified"] = json!(now);
-    std::fs::write(
-        meta_path.parent().unwrap().join("draft_meta_info.json"),
-        serde_json::to_string_pretty(&meta)?,
-    )?;
-
-    // Also restamp the copy's own meta sidecar.
+    // Restamp only the published copy; the source build remains a valid,
+    // independently addressable draft bundle.
     let dest_meta_path = dest.join("draft_meta_info.json");
     std::fs::write(&dest_meta_path, serde_json::to_string_pretty(&meta)?)?;
 

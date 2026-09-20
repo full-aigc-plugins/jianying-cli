@@ -39,6 +39,10 @@ const FULLCAP_PLAN: &str = r##"
        "styles": [{"range": [0, 4], "color": "#FF0000"}],
        "bubble": {"effect_id": "123", "resource_id": "456"}}
     ]},
+    {"type": "sticker", "segments": [
+      {"start_us": 500000, "duration_us": 1000000,
+       "resource_id": "7310000000000000002"}
+    ]},
     {"type": "filter", "segments": [
       {"start_us": 0, "duration_us": 4000000, "filters": [{"name": "1980"}], "intensity": 40}
     ]},
@@ -119,7 +123,7 @@ fn build_full_capability_draft_and_self_verify() {
     let out = tmp.join("integration-draft");
     let plan = Plan::load(&plan_path).unwrap();
     let report = draft::build(&plan, &tmp, &out, None, &probe_stub).expect("build succeeds");
-    assert_eq!(report.tracks, 5);
+    assert_eq!(report.tracks, 6);
 
     let d: Value =
         serde_json::from_str(&std::fs::read_to_string(out.join("draft_content.json")).unwrap())
@@ -128,6 +132,23 @@ fn build_full_capability_draft_and_self_verify() {
         serde_json::from_str(&std::fs::read_to_string(out.join("draft_info.json")).unwrap())
             .unwrap();
     assert_eq!(d, info, "timeline mirrors must be identical");
+    let wire = jianying_cli::lossless_draft::DraftTimelineWire::from_value(d.clone()).unwrap();
+    let resources = wire.resource_inventory().unwrap();
+    wire.validate_edit_semantics().unwrap();
+    for kind in [
+        jianying_cli::lossless_draft::DraftResourceKind::Video,
+        jianying_cli::lossless_draft::DraftResourceKind::Audio,
+        jianying_cli::lossless_draft::DraftResourceKind::Text,
+        jianying_cli::lossless_draft::DraftResourceKind::Sticker,
+        jianying_cli::lossless_draft::DraftResourceKind::Filter,
+        jianying_cli::lossless_draft::DraftResourceKind::Effect,
+        jianying_cli::lossless_draft::DraftResourceKind::Transition,
+        jianying_cli::lossless_draft::DraftResourceKind::Mask,
+        jianying_cli::lossless_draft::DraftResourceKind::Animation,
+        jianying_cli::lossless_draft::DraftResourceKind::Keyframe,
+    ] {
+        assert!(resources.count(kind) >= 1, "missing resource kind {kind:?}");
+    }
     let m = &d["materials"];
     assert_eq!(m["masks"].as_array().unwrap().len(), 1);
     assert_eq!(

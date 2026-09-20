@@ -1,0 +1,213 @@
+{
+  "schema": "jianying-source-manifest/v1",
+  "policy": {
+    "purpose": "commercially usable Rust CLI without importing non-commercial implementation material",
+    "decisions": ["pass", "conditional_pass", "needs_evidence", "blocked_as_implementation_source"],
+    "legal_note": "Engineering compliance triage only; not legal advice."
+  },
+  "sources": [
+    {
+      "id": "pyjianyingdraft",
+      "repository": "https://github.com/GuanYixuan/pyJianYingDraft",
+      "commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
+      "tree": "95f3b5549730eaee9f779afa845145f9ffcf1ec4",
+      "declared_license": "Apache-2.0",
+      "license_sha256": "308aaff89f5e69a7d715885bc8cc5f0001bfed9db7e5c056496be559c6e27455",
+      "usage_mode": ["copied_assets", "generated_metadata", "wire_differential_reference"],
+      "decision": "conditional_pass",
+      "obligations": ["preserve Apache-2.0 text", "preserve attribution", "mark modifications", "retain NOTICE when supplied"]
+    },
+    {
+      "id": "capcut-cli",
+      "repository": "https://github.com/renezander030/capcut-cli",
+      "commit": "49f70e3b07f1a236d45acb9b49a70c141dd1ee98",
+      "tree": "e63ca95af9a696e383c37bef62d0166daa9eba85",
+      "declared_license": "MIT",
+      "license_sha256": "21508e18e61118a79d3e3383254607fc1b5c1f4aa8b8f0dab46c368cd206a708",
+      "usage_mode": ["command_baseline", "behavioral_reference", "black_box_differential_reference"],
+      "decision": "pass",
+      "obligations": ["include MIT copyright and permission notice if substantial code is copied"]
+    },
+    {
+      "id": "jianying-headless-capability-target",
+      "repository": "https://github.com/partme-ai/jianying-headless",
+      "commit": "bb1e72cfc2bbed71ba7587548cebc85330b3e29a",
+      "tree": "89ec75afb57d466e23d6fa5af49418f320640828",
+      "declared_license": "LicenseRef-Personal-Learning-NonCommercial",
+      "license_sha256": "107d928e6cc3848b651c4e026d247693c03f7bed5372ce48788baa72f1cf54f8",
+      "usage_mode": ["capability_target_only", "independent_design", "authorized_black_box_validation_only"],
+      "decision": "blocked_as_implementation_source",
+      "obligations": ["do not copy or translate source", "do not copy tests, blueprints, resources, constants, or fixtures", "obtain written commercial authorization before any broader use"]
+    }
+  ],
+  "artifact_sets": [
+    {
+      "id": "pyjyd-assets",
+      "pattern": "assets/*.json",
+      "file_count": 3,
+      "tree_sha256": "ddf8d13c753389c5cf913d8c1107e0bf7dff79235c6617f80bb199ab0b829136",
+      "source": "pyjianyingdraft",
+      "usage_mode": "copied_and_restamped_at_runtime"
+    },
+    {
+      "id": "pyjyd-catalogs",
+      "pattern": "catalogs/*.json",
+      "file_count": 17,
+      "tree_sha256": "d35a6f283ac8004b266819aa8e01102812e00edab919a52e70cf78fb1e3f38d4",
+      "source": "pyjianyingdraft",
+      "usage_mode": "generated_metadata"
+    },
+    {
+      "id": "project-authored-parity-fixtures",
+      "pattern": "tests/parity/scenarios/*.json",
+      "file_count": 55,
+      "tree_sha256": "12965d77500782106cbfde272234ff6084364e5f49354ad34ab00dd6a6b1fb51",
+      "source": "pyjianyingdraft",
+      "usage_mode": "project_authored_inputs_executed_against_reference"
+    },
+    {
+      "id": "pyjyd-frozen-wire-reference",
+      "pattern": "tests/fixtures/pyjyd_wire/*.json",
+      "file_count": 2,
+      "tree_sha256": "1424a0b166c815cbd935e03777dde4c5fbc84ea806774f2d0b8bdc3712a1e9a7",
+      "source": "pyjianyingdraft",
+      "usage_mode": "normalized_wire_differential_reference"
+    },
+    {
+      "id": "capcut-audio-effect-catalog",
+      "pattern": "catalogs/capcut/audio_effects.json",
+      "file_count": 1,
+      "tree_sha256": "57db77276165bdf6546abee52e8dc1298aca7c7f8cd37ec4f341c81db0b3f262",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata subset for offline SFX resolution"
+    },
+    {
+      "id": "capcut-mask-catalog",
+      "pattern": "catalogs/capcut/masks.json",
+      "file_count": 1,
+      "tree_sha256": "2c482437f019d3839451c1121292f467ab04570891ab8ec141fd8131f14649a2",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata subset for offline mask resolution"
+    },
+    {
+      "id": "capcut-filter-catalog",
+      "pattern": "catalogs/capcut/filters.json",
+      "file_count": 1,
+      "tree_sha256": "bee8eeafea12dc573d9c799942d3a8da5210e5bd190274c00d723d5c7f388220",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata subset for offline filter resolution"
+    },
+    {
+      "id": "capcut-bubble-catalog",
+      "pattern": "catalogs/capcut/bubbles.json",
+      "file_count": 1,
+      "tree_sha256": "5be0c0e2884860aef5734af1140e1fb78a3511d5b5bd3cb7ed47dc58f6341fdd",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata subset for offline text bubble resolution"
+    },
+    {
+      "id": "capcut-effect-catalog",
+      "pattern": "catalogs/capcut/effects.json",
+      "file_count": 1,
+      "tree_sha256": "59250d30f13f4945b19fa1a62ca7f5b41e39294f673f0b7c817e6df552c4bdf2",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata subset for offline video effect resolution"
+    },
+    {
+      "id": "capcut-transition-catalog",
+      "pattern": "catalogs/capcut/transitions.json",
+      "file_count": 1,
+      "tree_sha256": "31efb1ff886502f9b0df125e439435d2dcb35b5d87c911fd58bc32f6ba0f19b5",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata subset for offline transition resolution"
+    },
+    {
+      "id": "capcut-text-animation-catalogs",
+      "pattern": "catalogs/capcut/*text_animations.json",
+      "file_count": 2,
+      "tree_sha256": "a6892d896983702cf476477c4c0a625a8c6898abac8dfb256128ab8fc08ef796",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata subsets for CapCut and JianYing text animation resolution"
+    },
+    {
+      "id": "capcut-image-animation-catalog",
+      "pattern": "catalogs/capcut/image_animations.json",
+      "file_count": 1,
+      "tree_sha256": "6eae40902582a39bdcdbc00696979960c84e283744dd3460ec6ab4c67215232a",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata subset for CapCut and JianYing image animation resolution"
+    },
+    {
+      "id": "capcut-enum-catalog",
+      "pattern": "catalogs/capcut/enums.json",
+      "file_count": 1,
+      "tree_sha256": "d830b3aeef8b1e52e753eaa342d480fe88775f3e87b32911706f0a06d40bf4fa",
+      "source": "capcut-cli",
+      "usage_mode": "MIT fixed-commit metadata for exact offline CapCut and JianYing enum listing"
+    }
+  ],
+  "fixture_sets": [
+    {
+      "id": "pyjyd-differential-scenarios",
+      "origin": "project-authored synthetic plans and media recipes",
+      "reference_source": "pyjianyingdraft",
+      "files": [
+        "tests/parity/scenarios/01-basic.json",
+        "tests/parity/scenarios/02-trim-speed.json",
+        "tests/parity/scenarios/03-transition.json",
+        "tests/parity/scenarios/04-transition-default.json",
+        "tests/parity/scenarios/05-mask-circle.json",
+        "tests/parity/scenarios/06-mask-rect.json",
+        "tests/parity/scenarios/07-filter.json",
+        "tests/parity/scenarios/08-effect-params.json",
+        "tests/parity/scenarios/09-mix-mode.json",
+        "tests/parity/scenarios/10-animations.json",
+        "tests/parity/scenarios/11-video-fade.json",
+        "tests/parity/scenarios/12-chroma.json",
+        "tests/parity/scenarios/13-background-filling.json",
+        "tests/parity/scenarios/14-keyframes.json",
+        "tests/parity/scenarios/15-audio-fade.json",
+        "tests/parity/scenarios/16-audio-effect.json",
+        "tests/parity/scenarios/17-text-styles.json",
+        "tests/parity/scenarios/18-text-multirange.json",
+        "tests/parity/scenarios/19-global-tracks.json",
+        "tests/parity/scenarios/20-time-strings.json",
+        "tests/parity/scenarios/21-cinematic-stack.json",
+        "tests/parity/scenarios/22-narration-package.json",
+        "tests/parity/scenarios/23-speed-chain.json",
+        "tests/parity/scenarios/24-global-and-segment.json",
+        "tests/parity/scenarios/25-photo-sticker.json",
+        "tests/parity/scenarios/26-text-kitchen-sink.json",
+        "tests/parity/scenarios/27-audio-suite.json",
+        "tests/parity/scenarios/28-tim-compound.json",
+        "tests/parity/scenarios/29-compositing.json",
+        "tests/parity/scenarios/30-torture.json",
+        "tests/parity/scenarios/31-transition-variety.json",
+        "tests/parity/scenarios/32-mask-all-shapes.json",
+        "tests/parity/scenarios/33-mask-more-shapes.json",
+        "tests/parity/scenarios/34-mask-last-shapes.json",
+        "tests/parity/scenarios/35-filter-variety.json",
+        "tests/parity/scenarios/36-effect-variety.json",
+        "tests/parity/scenarios/37-mix-mode-variety.json",
+        "tests/parity/scenarios/38-animation-variety.json",
+        "tests/parity/scenarios/39-font-variety.json",
+        "tests/parity/scenarios/40-audio-effect-variety.json",
+        "tests/parity/scenarios/41-extremes.json",
+        "tests/parity/scenarios/42-pip-stack.json",
+        "tests/parity/scenarios/43-text-variants.json",
+        "tests/parity/scenarios/44-tim-full.json",
+        "tests/parity/scenarios/45-keying-suite.json",
+        "tests/parity/scenarios/46-audio-keyframes.json",
+        "tests/parity/scenarios/47-dual-text-tracks.json",
+        "tests/parity/scenarios/48-sticker-motion.json",
+        "tests/parity/scenarios/49-long-chain.json",
+        "tests/parity/scenarios/50-photo-timing.json",
+        "tests/parity/scenarios/51-change-pitch.json",
+        "tests/parity/scenarios/52-crop.json",
+        "tests/parity/scenarios/53-srt-options.json",
+        "tests/parity/scenarios/54-srt-defaults.json",
+        "tests/parity/scenarios/55-pitch-crop-combo.json"
+      ]
+    }
+  ]
+}

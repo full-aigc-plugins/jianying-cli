@@ -1,0 +1,35 @@
+{
+  "schema": "jianying-job/v2",
+  "operation": "create",
+  "project": {
+    "type": "new",
+    "project": {
+      "name": "example",
+      "width": 1920,
+      "height": 1080,
+      "frame_rate": { "numerator": 30, "denominator": 1 },
+      "timeline": {
+        "tracks": [
+          {
+            "id": "video-main",
+            "kind": "video",
+            "segments": [
+              {
+                "type": "video",
+                "id": "segment-1",
+                "range": { "start_us": 0, "duration_us": 1000000 },
+                "material_id": "material-1",
+                "source_range": { "start_us": 0, "duration_us": 1000000 },
+                "speed": 1.0,
+                "volume": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      "materials": [
+        { "type": "video", "id": "material-1", "path": "input.mp4" }
+      ]
+    }
+  }
+}

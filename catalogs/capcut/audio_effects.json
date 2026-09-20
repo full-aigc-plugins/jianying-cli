@@ -1,0 +1,17 @@
+[
+  {"member":"Big_House","slug":"big-house","effect_id":"8954C5C2-A0BB-4915-8CB2-B422445DCB71","is_vip":false,"md5":"3b1d62bbe927104e393b0fc5043dc0a6","name":"Big House","resource_id":"7350559836590838274"},
+  {"member":"Low","slug":"low","effect_id":"4D23A0EA-5E4B-4B6A-8CE7-E3B0ADAFBCE1","is_vip":false,"md5":"e2e27786b25e4cf9b4e74558d6f6c832","name":"Low","resource_id":"7021052731091587586"},
+  {"member":"Energetic","slug":"energetic","effect_id":"FA559CAA-D9AA-443B-9D39-392B43D2DB02","is_vip":false,"md5":"99fee98d58dd023a9f54a772dffe1ac1","name":"Energetic","resource_id":"7320193885114733057"},
+  {"member":"High","slug":"high","effect_id":"E663A5D0-A024-4DED-8F0D-DA6D70A9F50C","is_vip":false,"md5":"a83c56bd3fb17e93a1437d06498ab7ec","name":"High","resource_id":"7021052551755731457"},
+  {"member":"Low_Battery","slug":"low-battery","effect_id":"3FB0AA17-B7E8-4820-86A2-0A34E3F2F881","is_vip":false,"md5":"a96ff559c9f1afec0603ae8bb107d98c","name":"Low Battery","resource_id":"7021052694370456065"},
+  {"member":"Tremble","slug":"tremble","effect_id":"4AEE9A06-71E0-4188-A87E-A161DDB80F4A","is_vip":false,"md5":"337b1ba48ea61c95ac84ba238598ca0c","name":"Tremble","resource_id":"7021052770924892674"},
+  {"member":"Electronic","slug":"electronic","effect_id":"0285BDC4-794F-48D0-A8BD-78B248FDE822","is_vip":false,"md5":"a6f883d8294fd5f49952cbf08544a0c5","name":"Electronic","resource_id":"7021052717204247042"},
+  {"member":"Sweet","slug":"sweet","effect_id":"2CD71FC4-7B4E-4E53-B337-32173184F480","is_vip":false,"md5":"ac2110d039d35ad01ca8452a6eadc921","name":"Sweet","resource_id":"7320193577613529602"},
+  {"member":"Vinyl","slug":"vinyl","effect_id":"6D42DEB5-D9DE-479F-955C-9F63C3B88F06","is_vip":false,"md5":"fe8fdb1bcec05647749e076a15443f08","name":"Vinyl","resource_id":"7025484451710767618"},
+  {"member":"Mic_Hog","slug":"mic-hog","effect_id":"9A48AB2D-B527-4DF0-8512-058819047877","is_vip":false,"md5":"f2bab335416833134ab4bb780c128cd2","name":"Mic Hog","resource_id":"7021052785101640194"},
+  {"member":"LoFi","slug":"lo-fi","effect_id":"1C8426BF-AC3B-4F90-B145-CA712BD486D3","is_vip":false,"md5":"44a00f0e2b85e0006f49ef345a305ec1","name":"Lo-Fi","resource_id":"7025484400313766402"},
+  {"member":"Megaphone","slug":"megaphone","effect_id":"8A5CF5B8-0959-4E8A-8CC5-AD17BA176D89","is_vip":false,"md5":"b2ca5803b90f44ee0c833f34ef684d40","name":"Megaphone","resource_id":"7021052620592648705"},
+  {"member":"Echo","slug":"echo","effect_id":"83B7B5D7-B539-4FAA-8CF3-3318394C9278","is_vip":false,"md5":"c37d02ae5853211ad84c13e6dca31b81","name":"Echo","resource_id":"7021052523762946561"},
+  {"member":"Synth","slug":"synth","effect_id":"450DE367-AD03-4D06-B635-C947161AAA8E","is_vip":false,"md5":"0247a95158fda7a9e44ccd4f832a9a14","name":"Synth","resource_id":"7021052503919694337"},
+  {"member":"Deep","slug":"deep","effect_id":"188C5140-E4AC-41A5-B42A-901ACAEF1B62","is_vip":false,"md5":"583e3ccf9d2daad3860aa70ad61b64ca","name":"Deep","resource_id":"7021052537344102913"}
+]

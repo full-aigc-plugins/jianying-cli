@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://partme.ai/schemas/jianying-config-v1.schema.json",
+  "title": "JianYing CLI profile configuration",
+  "type": "object",
+  "required": ["schema", "profile", "values"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "jianying-config/v1"},
+    "profile": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+    "values": {"type": "object"}
+  }
+}

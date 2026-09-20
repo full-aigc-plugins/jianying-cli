@@ -1,0 +1,163 @@
+{
+  "schema": "jianying-capcut-timeline-differential/v1",
+  "upstream": {
+    "repository": "renezander030/capcut-cli",
+    "commit": "49f70e3b07f1a236d45acb9b49a70c141dd1ee98"
+  },
+  "runner": "tools/capcut_timeline_differential.py",
+  "cases": [
+    {
+      "command": "tracks",
+      "status": "exact"
+    },
+    {
+      "command": "segments",
+      "status": "exact"
+    },
+    {
+      "command": "segment",
+      "status": "exact"
+    },
+    {
+      "command": "timeline",
+      "status": "exact"
+    },
+    {
+      "command": "shift",
+      "status": "exact"
+    },
+    {
+      "command": "shift-all",
+      "status": "exact"
+    },
+    {
+      "command": "speed",
+      "status": "exact"
+    },
+    {
+      "command": "volume",
+      "status": "exact"
+    },
+    {
+      "command": "trim",
+      "status": "exact"
+    },
+    {
+      "command": "add-track",
+      "status": "rust-extension",
+      "evidence": "timeline_cli_contract"
+    },
+    {
+      "command": "add-segment",
+      "status": "rust-extension",
+      "evidence": "timeline_cli_contract"
+    },
+    {
+      "command": "set",
+      "status": "rust-extension",
+      "evidence": "timeline_cli_contract"
+    },
+    {
+      "command": "split",
+      "status": "rust-extension",
+      "evidence": "timeline_cli_contract"
+    },
+    {
+      "command": "duplicate",
+      "status": "semantic",
+      "evidence": "fixed-upstream deep material clone and existing-track placement"
+    },
+    {
+      "command": "remove",
+      "status": "semantic",
+      "evidence": "fixed-upstream orphan sweep, duration, and track removal"
+    },
+    {
+      "command": "matting",
+      "status": "exact",
+      "evidence": "fixed-upstream enable, disable, shared segment, and cache preservation"
+    },
+    {
+      "command": "chroma",
+      "status": "semantic",
+      "evidence": "fixed-upstream clamp, wire material, reference attachment, and targeted removal"
+    },
+    {
+      "command": "mask",
+      "status": "semantic",
+      "evidence": "fixed-upstream CapCut resource, geometry, field selection, and cross-field removal"
+    },
+    {
+      "command": "bg-blur",
+      "status": "semantic",
+      "evidence": "fixed-upstream level mapping, canvas wire material, reference replacement, and off"
+    },
+    {
+      "command": "audio-fade",
+      "status": "semantic",
+      "evidence": "fixed-upstream prefix lookup, seconds conversion, wire material, and replacement"
+    },
+    {
+      "command": "add-filter",
+      "status": "semantic",
+      "evidence": "fixed-upstream catalogue/raw ids, intensity, shared filter track, and full range"
+    },
+    {
+      "command": "bubble-text",
+      "status": "semantic",
+      "evidence": "fixed-upstream prefix, catalogue/raw ids, dual write, and active-ref replacement"
+    },
+    {
+      "command": "add-effect",
+      "status": "semantic",
+      "evidence": "fixed-upstream catalogue/raw ids, params, intensity, binding, shared track, and full range"
+    },
+    {
+      "command": "crop",
+      "status": "exact",
+      "evidence": "fixed-upstream read, prefix, ratio, rect precedence, reset, and dry-run"
+    },
+    {
+      "command": "keyframe",
+      "status": "semantic",
+      "evidence": "fixed-upstream alias, value normalization, JSONL batch, easing handles, hold helper, and prefix lookup"
+    },
+    {
+      "command": "transition",
+      "status": "semantic",
+      "evidence": "fixed-upstream CapCut/JianYing catalogues, default/explicit duration, wire, refs, and prefix lookup"
+    },
+    {
+      "command": "text-anim",
+      "status": "semantic",
+      "evidence": "fixed-upstream full dual catalogues, default/explicit duration, outro anchor, container wire, and prefix lookup"
+    },
+    {
+      "command": "image-anim",
+      "status": "semantic",
+      "evidence": "fixed-upstream starter and full dual catalogues, intro/outro/combo anchors, container wire, and prefix lookup"
+    },
+    {
+      "command": "add-sticker",
+      "status": "semantic",
+      "evidence": "fixed-upstream default track reuse, transform wire, sticker material, and six companion material references"
+    },
+    {
+      "command": "text-ranges",
+      "status": "exact",
+      "evidence": "fixed-upstream UTF-16 ranges, stable sorting, inherited gap styles, prefix lookup, and content wire"
+    },
+    {
+      "command": "opacity",
+      "status": "semantic",
+      "evidence": "timeline_cli_contract"
+    },
+    {
+      "command": "composite",
+      "status": "semantic",
+      "evidence": "timeline_cli_contract"
+    }
+  ],
+  "passed": 32,
+  "failed": 0
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": "jianying-audio-java-research/v1",
+  "observed_at": "2026-09-20",
+  "research_repository": "https://github.com/partme-ai/spring-ai-examples.git",
+  "research_revision": "b7740bb945bc08257be29bbdbf510924f27e76b4",
+  "research_repository_license": "NOASSERTION",
+  "policy": {
+    "copy_source": false,
+    "extract_protocol_facts_only": true,
+    "runtime_support_requires_independent_adapter_and_handshake": true
+  },
+  "sources": [
+    {
+      "id": "chattts",
+      "module": "spring-ai-ollama-audio-chattts",
+      "classification": "local-http-wrapper",
+      "capability": "tts",
+      "protocol_facts": [
+        "POST application/x-www-form-urlencoded /tts",
+        "text voice speed temperature top_p top_k refine_max_new_token infer_max_new_token text_seed skip_refine is_stream custom_voice",
+        "JSON response contains code msg filename url audio_files"
+      ],
+      "migration_decision": "reimplement-fixture-codec-only-commercial-use-denied-by-model-license",
+      "research_repository_license": "NOASSERTION",
+      "source_copied": false
+    },
+    {
+      "id": "edgetts",
+      "module": "spring-ai-ollama-audio-edgetts",
+      "classification": "local-client-remote-service",
+      "capability": "tts",
+      "protocol_facts": [
+        "structured edge-tts argv",
+        "text voice rate volume pitch words-in-cue write-subtitles proxy write-media",
+        "requires outbound Microsoft Edge speech service"
+      ],
+      "upstream": {
+        "repository": "https://github.com/rany2/edge-tts",
+        "revision": "4bdb8e4c6ea62f151a45a3fceb4cf6ff696bb89f",
+        "code_license": "LGPL-3.0-except-srt-composer-MIT"
+      },
+      "migration_decision": "future-explicit-network-provider-not-offline-runtime",
+      "research_repository_license": "NOASSERTION",
+      "source_copied": false
+    },
+    {
+      "id": "emotivoice",
+      "module": "spring-ai-ollama-audio-emoti",
+      "classification": "local-http-runtime",
+      "capability": "tts",
+      "protocol_facts": [
+        "loopback base URL http://localhost:8000",
+        "OpenAI-style POST /v1/audio/speech",
+        "model input voice response_format speed"
+      ],
+      "upstream": {
+        "repository": "https://github.com/netease-youdao/EmotiVoice",
+        "revision": "59f0f36de4db12825f4705dd4e0780d79dd6bb01",
+        "code_license": "Apache-2.0"
+      },
+      "migration_decision": "named-runtime-profile-then-independent-offline-codec",
+      "research_repository_license": "NOASSERTION",
+      "source_copied": false
+    },
+    {
+      "id": "mars5tts",
+      "module": "spring-ai-ollama-audio-mars5tts",
+      "classification": "protocol-mismatch-reference-only",
+      "capability": "tts",
+      "protocol_facts": [
+        "module currently duplicates ChatTTS-ui /tts form schema",
+        "does not prove a native MARS5 HTTP contract",
+        "MARS5 must use an independently implemented process adapter"
+      ],
+      "upstream": {
+        "repository": "https://github.com/Camb-ai/MARS5-TTS",
+        "revision": "84697c8673d6277d329381acfd796114b02d531f",
+        "code_license": "AGPL-3.0-only"
+      },
+      "migration_decision": "reject-java-protocol-use-external-process-and-copyleft-gate",
+      "research_repository_license": "NOASSERTION",
+      "source_copied": false
+    },
+    {
+      "id": "unifiedtts",
+      "module": "spring-ai-ollama-audio-unifiedtts",
+      "classification": "paid-remote-aggregator",
+      "capability": "tts",
+      "protocol_facts": [
+        "authenticated remote base URL https://unifiedtts.com",
+        "GET /tools/models and /tools/voices/{model}",
+        "POST /v1/common/tts-sync returns request_id audio_url file_size"
+      ],
+      "migration_decision": "future-cloud-adapter-with-credential-budget-ledger-and-ssrf-safe-download",
+      "research_repository_license": "NOASSERTION",
+      "source_copied": false
+    },
+    {
+      "id": "whisper",
+      "module": "spring-ai-ollama-audio-whisper",
+      "classification": "local-asr-runtime",
+      "capability": "asr",
+      "protocol_facts": [
+        "multipart POST /v1/audio/transcriptions",
+        "file model language prompt response_format temperature timestamp_granularities[]",
+        "json text srt verbose_json and vtt response formats"
+      ],
+      "upstream": {
+        "repository": "https://github.com/openai/whisper",
+        "revision": "86098128c0b4f24f0e2aa2994de830614b474227",
+        "code_and_model_license": "MIT"
+      },
+      "migration_decision": "route-to-asr-provider-task-not-tts",
+      "research_repository_license": "NOASSERTION",
+      "source_copied": false
+    }
+  ]
+}

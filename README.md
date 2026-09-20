@@ -26,10 +26,13 @@
 cargo build --release          # 产物 target/release/jianying
 
 jianying doctor                                       # 环境/草稿根/编辑器预检
-jianying build plan.json --out d1 [--srt subs.srt]    # 构建（自带 verify 门禁）
-jianying verify d1 && jianying inspect d1             # 结构 lint / 摘要
-jianying publish d1 [--root DIR] [--force]            # 发布进草稿库并注册
-jianying render d1 --burn-captions                    # ffmpeg 代理预览（非成片）
+jianying status --json                                # 环境、能力与持久任务健康摘要
+jianying audit [TASK_ID] --json                       # 全局或单任务追加式审计视图
+jianying completion zsh > _jianying                   # 生成补全脚本，不修改 shell 配置
+jianying project build plan.json --out d1 [--srt subs.srt] # 构建（自带 verify 门禁）
+jianying project verify d1 && jianying project inspect d1  # 结构 lint / 摘要
+jianying store publish d1 [--root DIR] [--force]           # 发布进草稿库并注册
+jianying render proxy d1 --burn-captions                   # ffmpeg 代理预览（非成片）
 ```
 
 计划契约、全部字段与校验规则见 [`docs/plan-format.md`](docs/plan-format.md)。
@@ -40,12 +43,16 @@ jianying render d1 --burn-captions                    # ffmpeg 代理预览（�
 
 命令面、退出码、JSON 输出契约与全部约束见
 [`docs/agent-interface.md`](docs/agent-interface.md)（事实源）；`jianying --help`
-同步内置。能力名检索：`jianying catalog [--domain <d>] [--search <名>]`。
+同步内置。能力名检索：`jianying media catalog [--domain <d>] [--search <名>]`。
+`build/verify/inspect/probe/catalog/publish` 与旧式 `render <dir>` 暂作兼容别名，
+调用共享 handler 并在 stderr 输出迁移提示；`jianying commands --json` 提供机器可读替代关系。
 
 ## 边界（如实）
 
 - 代理渲染不渲染转场/特效/蒙版——权威出口是剪映内导出。
-- 原生 MP4 导出、已有草稿编辑、ASR 记账在 NC fork 专业档（`partme-jianying-plugin` 的 `jianying-harness`），因许可不在本 CLI。
+- 已有草稿的媒体/时间线编辑已进入 Rust CLI；ASR 已具备官方 whisper.cpp CLI 的本地结构化
+  adapter 与幂等账本，但真实模型 canary、字幕写回和云端 ASR 尚未验收；原生 MP4 导出仍受
+  真实剪映宿主门禁约束。不导入非商业 headless 项目的实现代码或资产。
 - 曲线变速、新版剪映加密草稿读取：上游三项目同样不支持。
 
 ## 双源验证测试集

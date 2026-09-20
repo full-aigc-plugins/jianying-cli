@@ -6,7 +6,7 @@
 //! (generated from pyJianYingDraft's Apache-2.0 metadata).
 
 use anyhow::{bail, Result};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 pub const SCHEMA: &str = "jianying-cli-plan/v1";
 pub const FPS_VALUES: [u64; 5] = [24, 25, 30, 50, 60];
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Plan {
     pub schema: String,
@@ -30,7 +30,7 @@ pub struct Plan {
     pub parent: Option<PathBuf>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Canvas {
     pub width: u64,
@@ -38,7 +38,7 @@ pub struct Canvas {
     pub fps: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Track {
     #[serde(rename = "type")]
@@ -48,7 +48,7 @@ pub struct Track {
     pub segments: Vec<Segment>,
 }
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(deny_unknown_fields)]
 pub struct Segment {
     pub start_us: i64,
@@ -159,14 +159,14 @@ pub struct Segment {
     pub params: Option<BTreeMap<String, f64>>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct KeyPoint {
     pub at_us: i64,
     pub value: f64,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct TransitionOut {
     pub name: String,
@@ -174,7 +174,7 @@ pub struct TransitionOut {
     pub duration_us: Option<i64>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Mask {
     pub name: String,
@@ -196,7 +196,7 @@ pub struct Mask {
     pub round_corner: Option<f64>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct NamedIntensity {
     pub name: String,
@@ -204,7 +204,7 @@ pub struct NamedIntensity {
     pub intensity: Option<f64>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct NamedParams {
     pub name: String,
@@ -212,7 +212,7 @@ pub struct NamedParams {
     pub params: BTreeMap<String, f64>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Animation {
     pub name: String,
@@ -220,14 +220,14 @@ pub struct Animation {
     pub duration_us: Option<i64>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Fade {
     pub in_us: i64,
     pub out_us: i64,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct TextBackground {
     pub color: String,
@@ -247,7 +247,7 @@ pub struct TextBackground {
     pub vertical_offset: Option<f64>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct TextShadow {
     #[serde(default)]
@@ -262,7 +262,7 @@ pub struct TextShadow {
     pub diffuse: Option<f64>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct StyleRange {
     /// [start, end] in UTF-16 code units
@@ -279,7 +279,7 @@ pub struct StyleRange {
     pub color: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct RawIds {
     pub effect_id: String,
@@ -287,7 +287,7 @@ pub struct RawIds {
 }
 
 /// 素材裁剪：四角归一化坐标（0-1，原点左上，pyJYD CropSettings）。
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct CropSettings {
     #[serde(default)]
@@ -309,7 +309,7 @@ pub struct CropSettings {
 }
 
 /// 色度抠图 (chroma key); plan values are 0-100 like the 剪映 UI.
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Chroma {
     /// key color, `#RRGGBBAA` (or `#RRGGBB`)
@@ -325,7 +325,7 @@ pub struct Chroma {
 }
 
 /// 画布背景填充; `blur` in 0..1 (剪映四档 0.0625/0.375/0.75/1.0), color `#RRGGBBAA`.
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct BackgroundFilling {
     #[serde(rename = "type")]

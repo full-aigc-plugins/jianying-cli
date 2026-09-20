@@ -1,0 +1,9 @@
+[
+  {"slug":"rectangle","name":"Rectangle","effect_id":"7137268628230638087","resource_id":"7137268628230638087"},
+  {"slug":"rounded","name":"Rounded Rectangle","effect_id":"7137268898998568967","resource_id":"7137268898998568967"},
+  {"slug":"cloud","name":"Cloud","effect_id":"7137269184932778510","resource_id":"7137269184932778510"},
+  {"slug":"oval","name":"Oval","effect_id":"7137269466232116231","resource_id":"7137269466232116231"},
+  {"slug":"star","name":"Star","effect_id":"7137269743886750214","resource_id":"7137269743886750214"},
+  {"slug":"heart","name":"Heart","effect_id":"7137270031716044302","resource_id":"7137270031716044302"},
+  {"slug":"burst","name":"Burst","effect_id":"7137270320304885262","resource_id":"7137270320304885262"}
+]

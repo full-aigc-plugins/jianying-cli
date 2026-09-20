@@ -9,6 +9,7 @@ use crate::catalogs;
 use crate::plan::{hex_rgb, KeyPoint, Plan, Segment};
 use crate::probe::MediaInfo;
 use anyhow::{bail, Context, Result};
+use jianying_draft::{DraftBundleIntegrity, DraftMetadataWire, DraftTimelineWire};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
@@ -274,7 +275,7 @@ fn make_companions(materials: &mut Value, speed: f64, video: bool) -> Vec<String
     refs
 }
 
-fn copy_asset(out_dir: &Path, kind: &str, src: &Path) -> Result<String> {
+pub(crate) fn copy_asset(out_dir: &Path, kind: &str, src: &Path) -> Result<String> {
     let dir = out_dir.join("assets").join(kind);
     std::fs::create_dir_all(&dir)?;
     let name = src
@@ -301,6 +302,114 @@ fn copy_asset(out_dir: &Path, kind: &str, src: &Path) -> Result<String> {
             .with_context(|| format!("copying {} into the draft", src.display()))?;
     }
     Ok(dest.to_string_lossy().into_owned())
+}
+
+/// 已探测媒体追加参数。
+pub(crate) struct MediaAppend<'a> {
+    pub source: &'a Path,
+    pub info: &'a MediaInfo,
+    pub kind: &'a str,
+    pub start_us: i64,
+    pub duration_us: i64,
+    pub track_name: Option<&'a str>,
+    pub volume: f64,
+}
+
+/// 向已有草稿追加一个经探测的本地视频、图片或音频素材。
+pub(crate) fn append_media(
+    timeline: &mut Value,
+    draft_dir: &Path,
+    identity_dir: &Path,
+    request: MediaAppend<'_>,
+) -> Result<Value> {
+    let MediaAppend {
+        source,
+        info,
+        kind,
+        start_us,
+        duration_us,
+        track_name,
+        volume,
+    } = request;
+    if !source.is_file() || start_us < 0 || duration_us <= 0 || volume < 0.0 {
+        bail!("invalid media append arguments");
+    }
+    let staged = PathBuf::from(copy_asset(draft_dir, kind, source)?);
+    let stored = identity_dir
+        .join(staged.strip_prefix(draft_dir).unwrap_or(&staged))
+        .to_string_lossy()
+        .into_owned();
+    let material_id = hex_id();
+    let materials = &mut timeline["materials"];
+    if kind == "video" {
+        let material_type = if info.is_image { "photo" } else { "video" };
+        materials["videos"].as_array_mut().context("materials.videos must be an array")?.push(json!({
+            "audio_fade":null,"category_id":"","category_name":"local","check_flag":63487,
+            "crop":{"lower_left_x":0.0,"lower_left_y":1.0,"lower_right_x":1.0,"lower_right_y":1.0,
+                "upper_left_x":0.0,"upper_left_y":0.0,"upper_right_x":1.0,"upper_right_y":0.0},
+            "crop_ratio":"free","crop_scale":1.0,
+            "duration":if info.is_image{10_800_000_000}else{info.duration_us},
+            "height":info.height,"width":info.width,"id":material_id,"local_material_id":"",
+            "material_id":material_id,"material_name":source.file_name().unwrap_or_default().to_string_lossy(),
+            "media_path":"","path":stored,"type":material_type,
+            "has_audio":info.has_audio && !info.is_image
+        }));
+    } else {
+        materials["audios"].as_array_mut().context("materials.audios must be an array")?.push(json!({
+            "app_id":0,"category_id":"","category_name":"local","check_flag":3,
+            "copyright_limit_type":"none","duration":info.duration_us,"effect_id":"","formula_id":"",
+            "id":material_id,"local_material_id":material_id,"music_id":material_id,
+            "name":source.file_name().unwrap_or_default().to_string_lossy(),"path":stored,
+            "source_platform":0,"type":"extract_music","wave_points":[]
+        }));
+    }
+    let refs = make_companions(materials, 1.0, kind == "video");
+    let segment_spec: Segment = serde_json::from_value(json!({
+        "start_us":start_us,"duration_us":duration_us,"source":source,
+        "volume":volume
+    }))?;
+    let mut segment = base_segment(&material_id, &segment_spec, 0);
+    segment["extra_material_refs"] = json!(refs);
+    if kind == "video" {
+        apply_visuals(&mut segment, &segment_spec, true);
+    } else {
+        segment["clip"] = Value::Null;
+        segment["hdr_settings"] = Value::Null;
+    }
+    let segment_id = segment["id"].as_str().unwrap_or_default().to_owned();
+    let default_name = if kind == "video" { "video" } else { "audio" };
+    let wanted_name = track_name.unwrap_or(default_name);
+    let tracks = timeline["tracks"]
+        .as_array_mut()
+        .context("tracks must be an array")?;
+    let index = tracks.iter().position(|track| {
+        track["type"].as_str() == Some(kind) && track["name"].as_str() == Some(wanted_name)
+    });
+    let track_id;
+    if let Some(index) = index {
+        track_id = tracks[index]["id"].as_str().unwrap_or_default().to_owned();
+        tracks[index]["segments"]
+            .as_array_mut()
+            .context("segments must be an array")?
+            .push(segment);
+        tracks[index]["segments"]
+            .as_array_mut()
+            .unwrap()
+            .sort_by_key(|item| item["target_timerange"]["start"].as_i64().unwrap_or(0));
+    } else {
+        track_id = hex_id();
+        let track = json!({"attribute":0,"flag":0,"id":track_id,"is_default_name":track_name.is_none(),
+            "name":wanted_name,"segments":[segment],"type":kind});
+        if kind == "video" {
+            tracks.insert(0, track);
+        } else {
+            tracks.push(track);
+        }
+    }
+    Ok(
+        json!({"ok":true,"segment_id":segment_id,"material_id":material_id,
+        "track_id":track_id,"path":stored,"start_us":start_us,"duration_us":duration_us}),
+    )
 }
 
 fn build_text_content(seg: &Segment, font_entry: Option<&Value>) -> Result<String> {
@@ -1054,6 +1163,19 @@ pub fn build(
     meta["tm_draft_removed"] = json!(0);
     meta["tm_duration"] = json!(plan.total_duration());
 
+    let timeline_wire = DraftTimelineWire::from_value(content.clone())
+        .context("generated draft_content.json violates the Rust wire model")?;
+    timeline_wire
+        .resource_inventory()
+        .context("generated draft resources violate the Rust wire semantics")?;
+    timeline_wire
+        .validate_references()
+        .context("generated draft contains invalid material references")?;
+    let metadata_wire = DraftMetadataWire::from_value(meta.clone())
+        .context("generated draft_meta_info.json violates the Rust wire model")?;
+    DraftBundleIntegrity::validate(&timeline_wire, &timeline_wire, &metadata_wire, None)
+        .context("generated draft bundle contains inconsistent mirror or registration data")?;
+
     let content_str = serde_json::to_string_pretty(&content)?;
     std::fs::write(out_dir.join("draft_content.json"), &content_str)?;
     std::fs::write(out_dir.join("draft_info.json"), &content_str)?;
@@ -1089,10 +1211,77 @@ pub fn load_timeline(draft_dir: &Path) -> Result<Value> {
     );
 }
 
+/// 将复制草稿中的本地音视频路径从源目录重定位到目标目录。
+pub fn relocate_material_paths(timeline: &mut Value, source_dir: &Path, target_dir: &Path) {
+    let source_dir = source_dir
+        .canonicalize()
+        .unwrap_or_else(|_| source_dir.to_path_buf());
+    for bucket in ["videos", "audios"] {
+        for material in timeline["materials"][bucket]
+            .as_array_mut()
+            .into_iter()
+            .flatten()
+        {
+            for field in ["path", "media_path"] {
+                let Some(raw) = material[field].as_str().filter(|path| !path.is_empty()) else {
+                    continue;
+                };
+                let raw_path = Path::new(raw);
+                let absolute = if raw_path.is_absolute() {
+                    raw_path.to_path_buf()
+                } else {
+                    source_dir.join(raw_path)
+                };
+                let normalized = absolute.canonicalize().unwrap_or(absolute);
+                if let Ok(relative) = normalized.strip_prefix(&source_dir) {
+                    material[field] = json!(target_dir.join(relative).to_string_lossy());
+                }
+            }
+        }
+    }
+}
+
+/// 校验草稿目录中的双时间线镜像、元数据路径、素材注册和引用闭包。
+pub fn validate_bundle(draft_dir: &Path) -> Result<()> {
+    validate_bundle_as(draft_dir, draft_dir)
+}
+
+/// 校验隔离工作副本，但按原子提交后的最终草稿路径校验元数据身份。
+pub fn validate_bundle_as(draft_dir: &Path, identity_dir: &Path) -> Result<()> {
+    let content_path = draft_dir.join("draft_content.json");
+    let info_path = draft_dir.join("draft_info.json");
+    let metadata_path = draft_dir.join("draft_meta_info.json");
+    let content_raw = std::fs::read_to_string(&content_path)
+        .with_context(|| format!("reading {}", content_path.display()))?;
+    let info_raw = std::fs::read_to_string(&info_path)
+        .with_context(|| format!("reading {}", info_path.display()))?;
+    if content_raw != info_raw {
+        bail!("draft_content.json and draft_info.json must be byte-identical mirrors");
+    }
+    let content = DraftTimelineWire::from_value(serde_json::from_str(&content_raw)?)?;
+    let info = DraftTimelineWire::from_value(serde_json::from_str(&info_raw)?)?;
+    let metadata = DraftMetadataWire::from_value(serde_json::from_str(
+        &std::fs::read_to_string(&metadata_path)
+            .with_context(|| format!("reading {}", metadata_path.display()))?,
+    )?)?;
+    DraftBundleIntegrity::validate_with_roots(
+        &content,
+        &info,
+        &metadata,
+        Some(identity_dir),
+        Some(draft_dir),
+    )?;
+    Ok(())
+}
+
 /// Structural lint over a built/published draft.
 pub fn verify(draft_dir: &Path) -> Result<Value> {
     let tl = load_timeline(draft_dir)?;
     let mut issues: Vec<String> = Vec::new();
+
+    if let Err(error) = validate_bundle(draft_dir) {
+        issues.push(format!("bundle integrity: {error:#}"));
+    }
 
     let tracks = tl["tracks"].as_array().context("tracks must be an array")?;
     if tracks.is_empty() {
@@ -1116,6 +1305,7 @@ pub fn verify(draft_dir: &Path) -> Result<Value> {
         "chromas",
         "effects",
         "video_effects",
+        "filters",
         "audio_fades",
         "audio_effects",
         "material_animations",
@@ -1145,10 +1335,22 @@ pub fn verify(draft_dir: &Path) -> Result<Value> {
                 _ => None,
             };
             if let Some(bucket) = bucket {
-                let found = tl["materials"][bucket]
+                let mut found = tl["materials"][bucket]
                     .as_array()
                     .map(|a| a.iter().any(|m| m["id"] == json!(mid)))
                     .unwrap_or(false);
+                if !found && t["type"] == "audio" {
+                    found = tl["materials"]["audio_effects"]
+                        .as_array()
+                        .map(|items| items.iter().any(|material| material["id"] == json!(mid)))
+                        .unwrap_or(false);
+                }
+                if !found && t["type"] == "filter" {
+                    found = tl["materials"]["video_effects"]
+                        .as_array()
+                        .map(|items| items.iter().any(|material| material["id"] == json!(mid)))
+                        .unwrap_or(false);
+                }
                 if !found {
                     issues.push(format!("track {ti}: material {mid} missing from {bucket}"));
                 }

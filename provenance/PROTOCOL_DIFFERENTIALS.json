@@ -1,0 +1,32 @@
+{
+  "schema": "jianying-protocol-differentials/v1",
+  "python_source_commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
+  "run_report": "provenance/PARITY_RUN.json",
+  "comparison_modes": {
+    "exact": "volatile fields included and byte/value equal",
+    "normalized_equivalent": "ids, timestamps and absolute paths removed; stable semantics equal",
+    "approved_difference": "documented Rust extension is removed before normalized comparison"
+  },
+  "objects": [
+    {"object":"timeline","mode":"normalized_equivalent","scenarios":["24-global-and-segment.json"]},
+    {"object":"track","mode":"normalized_equivalent","scenarios":["24-global-and-segment.json"]},
+    {"object":"segment","mode":"normalized_equivalent","scenarios":["21-cinematic-stack.json"]},
+    {"object":"video","mode":"normalized_equivalent","scenarios":["01-basic.json","55-pitch-crop-combo.json"]},
+    {"object":"audio","mode":"normalized_equivalent","scenarios":["01-basic.json","40-audio-effect-variety.json"]},
+    {"object":"text","mode":"normalized_equivalent","scenarios":["17-text-styles.json","43-text-variants.json"]},
+    {"object":"sticker","mode":"normalized_equivalent","scenarios":["25-photo-sticker.json","48-sticker-motion.json"]},
+    {"object":"filter","mode":"normalized_equivalent","scenarios":["07-filter.json","35-filter-variety.json"]},
+    {"object":"effect","mode":"normalized_equivalent","scenarios":["08-effect-params.json","36-effect-variety.json"]},
+    {"object":"transition","mode":"normalized_equivalent","scenarios":["03-transition.json","31-transition-variety.json"]},
+    {"object":"mask","mode":"normalized_equivalent","scenarios":["05-mask-circle.json","32-mask-all-shapes.json"]},
+    {"object":"animation","mode":"normalized_equivalent","scenarios":["10-animations.json","38-animation-variety.json"]},
+    {"object":"keyframe","mode":"normalized_equivalent","scenarios":["14-keyframes.json","46-audio-keyframes.json"]},
+    {"object":"subtitle","mode":"normalized_equivalent","scenarios":["53-srt-options.json","54-srt-defaults.json"]},
+    {"object":"text_style","mode":"approved_difference","scenarios":["18-text-multirange.json","26-text-kitchen-sink.json","30-torture.json"],"rationale":"Rust preserves additional UTF-16 style ranges; the shared base style must remain normalized-equivalent."},
+    {"object":"speed","mode":"normalized_equivalent","scenarios":["02-trim-speed.json","23-speed-chain.json"]},
+    {"object":"volume","mode":"normalized_equivalent","scenarios":["01-basic.json","27-audio-suite.json"]},
+    {"object":"crop","mode":"normalized_equivalent","scenarios":["52-crop.json","55-pitch-crop-combo.json"]},
+    {"object":"transform","mode":"normalized_equivalent","scenarios":["41-extremes.json","42-pip-stack.json"]},
+    {"object":"compositing","mode":"normalized_equivalent","scenarios":["09-mix-mode.json","29-compositing.json","37-mix-mode-variety.json"]}
+  ]
+}

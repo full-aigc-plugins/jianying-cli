@@ -1,0 +1,9 @@
+{
+  "source": "https://github.com/GuanYixuan/pyJianYingDraft",
+  "commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
+  "license": "Apache-2.0",
+  "input": "tests/parity/scenarios/17-text-styles.json#plan",
+  "generator": "tools/parity_reference.py",
+  "normalization": "drop volatile identifiers, timestamps, paths, material references and text source_timerange; retain canvas, timeline duration/fps, track identity and segment placement/transform fields",
+  "generated_at": "2026-09-19"
+}

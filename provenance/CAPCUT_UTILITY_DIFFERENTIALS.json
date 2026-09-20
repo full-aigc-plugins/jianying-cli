@@ -1,0 +1,292 @@
+{
+  "schema": "jianying-capcut-utility-differential/v1",
+  "upstream": {
+    "repository": "renezander030/capcut-cli",
+    "commit": "49f70e3b07f1a236d45acb9b49a70c141dd1ee98"
+  },
+  "runner": "tools/capcut_utility_differential.py",
+  "cases": [
+    {
+      "command": "completions",
+      "shell": "bash",
+      "status": "semantic-command-map",
+      "evidence": "deterministic non-empty shell-native script using the mapped executable name"
+    },
+    {
+      "command": "completions",
+      "shell": "zsh",
+      "status": "semantic-command-map",
+      "evidence": "deterministic non-empty shell-native script using the mapped executable name"
+    },
+    {
+      "command": "completions",
+      "shell": "fish",
+      "status": "semantic-command-map",
+      "evidence": "deterministic non-empty shell-native script using the mapped executable name"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "transitions",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "masks",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "image_intros",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "image_outros",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "image_combos",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "text_intros",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "text_outros",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "text_loop_anims",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "scene_effects",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "character_effects",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "audio_effects",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "fonts",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "filters",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "capcut",
+      "category": "bubbles",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "transitions",
+      "status": "approved-upstream-stdout-truncation",
+      "evidence": "upstream exits zero after truncating piped JSON at 65536 bytes; Rust entries and order equal the same pinned src/enums.json"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "masks",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "image_intros",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "image_outros",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "image_combos",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "text_intros",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "text_outros",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "text_loop_anims",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "scene_effects",
+      "status": "approved-upstream-stdout-truncation",
+      "evidence": "upstream exits zero after truncating piped JSON at 65536 bytes; Rust entries and order equal the same pinned src/enums.json"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "character_effects",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "audio_effects",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "fonts",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "filters",
+      "status": "approved-upstream-stdout-truncation",
+      "evidence": "upstream exits zero after truncating piped JSON at 65536 bytes; Rust entries and order equal the same pinned src/enums.json"
+    },
+    {
+      "command": "enums",
+      "namespace": "jianying",
+      "category": "bubbles",
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
+    },
+    {
+      "command": "harvest-enums",
+      "mode": "scan",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream plan/apply, known-id, candidate, slug, id-only and persisted-entry semantics"
+    },
+    {
+      "command": "harvest-enums",
+      "mode": "add",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream manual validation plus plan/apply entry semantics"
+    },
+    {
+      "command": "harvest-enums",
+      "mode": "sync",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream plan/apply sorted library sweep, cross-draft dedupe and broken-draft skip semantics"
+    },
+    {
+      "command": "diagnose",
+      "mode": "canonical",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream canonical/layout/version, per-candidate byte hashes and timeline-equivalence relation"
+    },
+    {
+      "command": "diagnose",
+      "mode": "divergence-bundle",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream sibling divergence plus redacted bundle semantics"
+    },
+    {
+      "command": "fixture",
+      "mode": "sanitize-check",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream timeline-only copy, path/email/device redaction, reports, media exclusion and clean mechanical check"
+    },
+    {
+      "command": "fixture",
+      "mode": "verify-only-failure",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream nonzero exit, file/line/kind-only leak finding and no sensitive stderr echo"
+    },
+    {
+      "command": "compile",
+      "mode": "preflight",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream full media/operation preflight, canvas, item, operation and ref summary"
+    },
+    {
+      "command": "compile",
+      "mode": "nine-operations-build",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream refs, counts, duration and observable transition/keyframe/fade/style/ranges/filter/effect/template/captions semantics"
+    },
+    {
+      "command": "compile",
+      "mode": "jsonl-batch",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream placeholder substitution, row ordering, distinct draft naming and two-draft build"
+    },
+    {
+      "command": "compile",
+      "mode": "batch-fail-fast",
+      "status": "semantic-command-map",
+      "evidence": "fixed-upstream 1-based failing row, nonzero exit and all-row preflight with zero draft writes"
+    }
+  ],
+  "passed": 42,
+  "failed": 0
+}

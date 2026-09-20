@@ -1,0 +1,30 @@
+{
+  "schema_version": "jianying-asr-protocol-sources/v1",
+  "observed_at": "2026-09-20",
+  "policy": {
+    "source_copied": false,
+    "protocol_facts_only": true,
+    "network_call_performed": false,
+    "model_download_performed": false,
+    "model_weights_bundled": false,
+    "runtime_binary_bundled": false
+  },
+  "sources": [
+    {
+      "id": "whisper-cpp-cli",
+      "project": "ggml-org/whisper.cpp",
+      "documentation": "https://github.com/ggml-org/whisper.cpp/blob/master/examples/cli/README.md",
+      "implementation_reference": "https://github.com/ggml-org/whisper.cpp/blob/master/examples/cli/cli.cpp",
+      "license": "MIT",
+      "protocol": "structured local process argv using --model, --file, --output-file, one output-format flag, --no-prints, optional --language and optional --translate",
+      "supported_output_flags": [
+        "--output-json",
+        "--output-json-full",
+        "--output-srt",
+        "--output-txt",
+        "--output-vtt"
+      ],
+      "status": "current-cli-contract"
+    }
+  ]
+}

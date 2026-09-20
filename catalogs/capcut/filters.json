@@ -1,0 +1,12 @@
+[
+  {"slug":"vintage","name":"Vintage","effect_id":"7028463716732079117","resource_id":"7028463716732079117"},
+  {"slug":"warm","name":"Warm","effect_id":"7028463716732079118","resource_id":"7028463716732079118"},
+  {"slug":"cool","name":"Cool","effect_id":"7028463716732079119","resource_id":"7028463716732079119"},
+  {"slug":"bw","name":"B&W","effect_id":"7028463716732079120","resource_id":"7028463716732079120"},
+  {"slug":"sepia","name":"Sepia","effect_id":"7028463716732079121","resource_id":"7028463716732079121"},
+  {"slug":"vivid","name":"Vivid","effect_id":"7028463716732079122","resource_id":"7028463716732079122"},
+  {"slug":"contrast","name":"Contrast","effect_id":"7028463716732079123","resource_id":"7028463716732079123"},
+  {"slug":"faded","name":"Faded","effect_id":"7028463716732079124","resource_id":"7028463716732079124"},
+  {"slug":"dramatic","name":"Dramatic","effect_id":"7028463716732079125","resource_id":"7028463716732079125"},
+  {"slug":"soft","name":"Soft","effect_id":"7028463716732079126","resource_id":"7028463716732079126"}
+]

@@ -1,0 +1,37 @@
+{
+  "schema": "jianying-capcut-interchange-differential/v1",
+  "upstream": {
+    "repository": "renezander030/capcut-cli",
+    "commit": "49f70e3b07f1a236d45acb9b49a70c141dd1ee98"
+  },
+  "runner": "tools/capcut_interchange_differential.py",
+  "rust_cli": "provided-by-runner",
+  "cases": [
+    {
+      "command": "export-timeline",
+      "status": "exact",
+      "variants": [
+        "stdout-document",
+        "file-and-summary",
+        "caption-markers"
+      ]
+    },
+    {
+      "command": "import-timeline",
+      "status": "normalized-equivalent",
+      "variants": [
+        "new-draft",
+        "caption-markers",
+        "placeholders",
+        "dry-run"
+      ],
+      "approved": [
+        "generated-ids",
+        "template-metadata",
+        "missing-path-normalized-empty"
+      ]
+    }
+  ],
+  "passed": 2,
+  "failed": 0
+}

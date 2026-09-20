@@ -1,0 +1,401 @@
+{
+  "schema": "jianying-python-rust-parity-run/v1",
+  "python_source": {
+    "project": "GuanYixuan/pyJianYingDraft",
+    "commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
+    "media_probe": "tools/pymediainfo.py ffprobe compatibility adapter"
+  },
+  "rust_binary": "target/release/jianying",
+  "summary": {
+    "passed": 55,
+    "failed": 0,
+    "total": 55
+  },
+  "scenarios": [
+    {
+      "scenario": "01-basic.json",
+      "name": "p01",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "02-trim-speed.json",
+      "name": "p02",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "03-transition.json",
+      "name": "p03",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "04-transition-default.json",
+      "name": "p04",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "05-mask-circle.json",
+      "name": "p05",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "06-mask-rect.json",
+      "name": "p06",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "07-filter.json",
+      "name": "p07",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "08-effect-params.json",
+      "name": "p08",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "09-mix-mode.json",
+      "name": "p09",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "10-animations.json",
+      "name": "p10",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "11-video-fade.json",
+      "name": "p11",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "12-chroma.json",
+      "name": "p12",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "13-background-filling.json",
+      "name": "p13",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "14-keyframes.json",
+      "name": "p14",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "15-audio-fade.json",
+      "name": "p15",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "16-audio-effect.json",
+      "name": "p16",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "17-text-styles.json",
+      "name": "p17",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "18-text-multirange.json",
+      "name": "p18",
+      "comparison": "approved_difference",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "19-global-tracks.json",
+      "name": "p19",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "20-time-strings.json",
+      "name": "p20",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "21-cinematic-stack.json",
+      "name": "p21",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "22-narration-package.json",
+      "name": "p22",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "23-speed-chain.json",
+      "name": "p23",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "24-global-and-segment.json",
+      "name": "p24",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "25-photo-sticker.json",
+      "name": "p25",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "26-text-kitchen-sink.json",
+      "name": "p26",
+      "comparison": "approved_difference",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "27-audio-suite.json",
+      "name": "p27",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "28-tim-compound.json",
+      "name": "p28",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "29-compositing.json",
+      "name": "p29",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "30-torture.json",
+      "name": "p30",
+      "comparison": "approved_difference",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "31-transition-variety.json",
+      "name": "p31",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "32-mask-all-shapes.json",
+      "name": "p32",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "33-mask-more-shapes.json",
+      "name": "p33",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "34-mask-last-shapes.json",
+      "name": "p34",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "35-filter-variety.json",
+      "name": "p35",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "36-effect-variety.json",
+      "name": "p36",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "37-mix-mode-variety.json",
+      "name": "p37",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "38-animation-variety.json",
+      "name": "p38",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "39-font-variety.json",
+      "name": "p39",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "40-audio-effect-variety.json",
+      "name": "p40",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "41-extremes.json",
+      "name": "p41",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "42-pip-stack.json",
+      "name": "p42",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "43-text-variants.json",
+      "name": "p43",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "44-tim-full.json",
+      "name": "p44",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "45-keying-suite.json",
+      "name": "p45",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "46-audio-keyframes.json",
+      "name": "p46",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "47-dual-text-tracks.json",
+      "name": "p47",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "48-sticker-motion.json",
+      "name": "p48",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "49-long-chain.json",
+      "name": "p49",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "50-photo-timing.json",
+      "name": "p50",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "51-change-pitch.json",
+      "name": "p51",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "52-crop.json",
+      "name": "p52",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "53-srt-options.json",
+      "name": "p53",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "54-srt-defaults.json",
+      "name": "p54",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    },
+    {
+      "scenario": "55-pitch-crop-combo.json",
+      "name": "p55",
+      "comparison": "normalized_equivalent",
+      "status": "passed",
+      "issues": []
+    }
+  ]
+}

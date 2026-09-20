@@ -1,0 +1,1446 @@
+{
+  "intros": [
+    {
+      "member": "Throw_Out",
+      "slug": "throw-out",
+      "duration": 500000,
+      "effect_id": "7233110260204966402",
+      "is_vip": false,
+      "md5": "97162e8faa56cf163b8f2c1bfd5ad6e0",
+      "resource_id": "7233110260204966402",
+      "title": "Throw Out"
+    },
+    {
+      "member": "Typewriter",
+      "slug": "typewriter",
+      "duration": 500000,
+      "effect_id": "7210980292243231233",
+      "is_vip": false,
+      "md5": "6828d67634e66ace1e76c4eb7cc2f8e6",
+      "resource_id": "7210980292243231233",
+      "title": "Typewriter"
+    },
+    {
+      "member": "Concentrate",
+      "slug": "concentrate",
+      "duration": 500000,
+      "effect_id": "7044433622119485954",
+      "is_vip": false,
+      "md5": "49ca01f4c5f0b75d8c10e8023362cffa",
+      "resource_id": "7044433622119485954",
+      "title": "Concentrate"
+    },
+    {
+      "member": "Fade_In",
+      "slug": "fade-in",
+      "duration": 500000,
+      "effect_id": "6724916044072227332",
+      "is_vip": false,
+      "md5": "3ed092e2c06abae5644f5f12014e3020",
+      "resource_id": "6724916044072227332",
+      "title": "Fade In"
+    },
+    {
+      "member": "Glitch",
+      "slug": "glitch",
+      "duration": 500000,
+      "effect_id": "7077812383946641921",
+      "is_vip": false,
+      "md5": "de64c5a073e2517b8d5a07244034fc62",
+      "resource_id": "7077812383946641921",
+      "title": "Glitch"
+    },
+    {
+      "member": "Spin_In_2",
+      "slug": "spin-in-2",
+      "duration": 500000,
+      "effect_id": "6775803763652301326",
+      "is_vip": false,
+      "md5": "c1e619166960120b52986dd94ce15417",
+      "resource_id": "6775803763652301326",
+      "title": "Spin In 2"
+    },
+    {
+      "member": "Spin_In_1",
+      "slug": "spin-in-1",
+      "duration": 500000,
+      "effect_id": "6763873859402732039",
+      "is_vip": false,
+      "md5": "87d5263bcd792156b91109cca5fc5aae",
+      "resource_id": "6763873859402732039",
+      "title": "Spin In 1"
+    },
+    {
+      "member": "Zoom_Out_2",
+      "slug": "zoom-out-2",
+      "duration": 500000,
+      "effect_id": "7054480742507614722",
+      "is_vip": false,
+      "md5": "d57145a34871f239c1512d7c748e3131",
+      "resource_id": "7054480742507614722",
+      "title": "Zoom Out 2"
+    },
+    {
+      "member": "Wave_in",
+      "slug": "wave-in",
+      "duration": 500000,
+      "effect_id": "6918927741362377218",
+      "is_vip": false,
+      "md5": "28bad8ddc1ee27d91a2f48deacbba9f7",
+      "resource_id": "6918927741362377218",
+      "title": "Wave in"
+    },
+    {
+      "member": "Faulty_text",
+      "slug": "faulty-text",
+      "duration": 500000,
+      "effect_id": "6870325507511030274",
+      "is_vip": false,
+      "md5": "c1c83996ee60af2be54d81a8f58f84ea",
+      "resource_id": "6870325507511030274",
+      "title": "Faulty text"
+    },
+    {
+      "member": "Dissolve",
+      "slug": "dissolve",
+      "duration": 500000,
+      "effect_id": "6873386253367120386",
+      "is_vip": false,
+      "md5": "3bac40f9a5d0b2a6b569ac8e4ca3c670",
+      "resource_id": "6873386253367120386",
+      "title": "Dissolve"
+    },
+    {
+      "member": "Pop_Up",
+      "slug": "pop-up",
+      "duration": 500000,
+      "effect_id": "7145435451946439170",
+      "is_vip": false,
+      "md5": "28d9145ead32c23742082a37e511370e",
+      "resource_id": "7145435451946439170",
+      "title": "Pop Up"
+    },
+    {
+      "member": "Random_Typewriter",
+      "slug": "random-typewriter",
+      "duration": 500000,
+      "effect_id": "7145435525799744002",
+      "is_vip": false,
+      "md5": "49221bfc90329890d81c3612e6222a51",
+      "resource_id": "7145435525799744002",
+      "title": "Random Typewriter"
+    },
+    {
+      "member": "Fly_In",
+      "slug": "fly-in",
+      "duration": 500000,
+      "effect_id": "7037028196277031425",
+      "is_vip": false,
+      "md5": "33d2b2dfaf2e62325e4027463ce5bfbe",
+      "resource_id": "7037028196277031425",
+      "title": "Fly In"
+    },
+    {
+      "member": "Chroma_Type",
+      "slug": "chroma-type",
+      "duration": 500000,
+      "effect_id": "7402175560819937809",
+      "is_vip": false,
+      "md5": "e3283c9eb0db927fa7cdb6d138030814",
+      "resource_id": "7402175560819937809",
+      "title": "Chroma Type"
+    },
+    {
+      "member": "Spiral",
+      "slug": "spiral",
+      "duration": 500000,
+      "effect_id": "6799873891352187406",
+      "is_vip": false,
+      "md5": "9f8838b63890f4522ccce6b344fe4509",
+      "resource_id": "6799873891352187406",
+      "title": "Spiral"
+    },
+    {
+      "member": "Blur",
+      "slug": "blur",
+      "duration": 500000,
+      "effect_id": "6923135604519604737",
+      "is_vip": false,
+      "md5": "a5f4d3998c0648ec65c03251506bd0a0",
+      "resource_id": "6923135604519604737",
+      "title": "Blur"
+    },
+    {
+      "member": "Type_2",
+      "slug": "type-2",
+      "duration": 500000,
+      "effect_id": "6724920636403094028",
+      "is_vip": false,
+      "md5": "8bd0b8cec591907fc2a56682d8e14274",
+      "resource_id": "6724920636403094028",
+      "title": "Type 2"
+    },
+    {
+      "member": "Type_1",
+      "slug": "type-1",
+      "duration": 500000,
+      "effect_id": "6724920249654710791",
+      "is_vip": false,
+      "md5": "c539514fc398e05a6cf4d7c196f78305",
+      "resource_id": "6724920249654710791",
+      "title": "Type 1"
+    },
+    {
+      "member": "Float_Down",
+      "slug": "float-down",
+      "duration": 500000,
+      "effect_id": "7094880375222047233",
+      "is_vip": false,
+      "md5": "b312472b5a680f49d2d1229cfe07f49d",
+      "resource_id": "7094880375222047233",
+      "title": "Float Down"
+    },
+    {
+      "member": "Zoom_In",
+      "slug": "zoom-in",
+      "duration": 500000,
+      "effect_id": "6724919499042066958",
+      "is_vip": false,
+      "md5": "43a8026720374e330daf7b70a91ac7ce",
+      "resource_id": "6724919499042066958",
+      "title": "Zoom In"
+    },
+    {
+      "member": "Open",
+      "slug": "open",
+      "duration": 500000,
+      "effect_id": "6943606694240850434",
+      "is_vip": false,
+      "md5": "229acba913af69794139dfd359fedb92",
+      "resource_id": "6943606694240850434",
+      "title": "Open"
+    },
+    {
+      "member": "Blur_to_the_Left",
+      "slug": "blur-to-the-left",
+      "duration": 500000,
+      "effect_id": "7131932467698602497",
+      "is_vip": false,
+      "md5": "ee5716b5bf9ef16fd99dd7d2d89dbefc",
+      "resource_id": "7131932467698602497",
+      "title": "Blur to the Left"
+    },
+    {
+      "member": "Karaoke",
+      "slug": "karaoke",
+      "duration": 500000,
+      "effect_id": "6771294855785091588",
+      "is_vip": false,
+      "md5": "1cb64a1965c8199c61442d25989078d9",
+      "resource_id": "6771294855785091588",
+      "title": "Karaoke"
+    },
+    {
+      "member": "Flicker",
+      "slug": "flicker",
+      "duration": 500000,
+      "effect_id": "7040020396136993282",
+      "is_vip": false,
+      "md5": "1c34ef7d819c78f05977685370e320ec",
+      "resource_id": "7040020396136993282",
+      "title": "Flicker"
+    },
+    {
+      "member": "Flip_and_jump",
+      "slug": "flip-and-jump",
+      "duration": 500000,
+      "effect_id": "6865175746420150792",
+      "is_vip": false,
+      "md5": "4d9af68136aafd135073befdbfca7e39",
+      "resource_id": "6865175746420150792",
+      "title": "Flip and jump"
+    },
+    {
+      "member": "Flutter",
+      "slug": "flutter",
+      "duration": 500000,
+      "effect_id": "7094880213590348290",
+      "is_vip": false,
+      "md5": "ab2dbbce0edfafdaad328707d6864bae",
+      "resource_id": "7094880213590348290",
+      "title": "Flutter"
+    },
+    {
+      "member": "Dissolve_Down",
+      "slug": "dissolve-down",
+      "duration": 500000,
+      "effect_id": "7037028613287318018",
+      "is_vip": false,
+      "md5": "766af9230fe82c84e551c1f1100aac58",
+      "resource_id": "7037028613287318018",
+      "title": "Dissolve Down"
+    },
+    {
+      "member": "Wipe_Right",
+      "slug": "wipe-right",
+      "duration": 500000,
+      "effect_id": "6771288500240126478",
+      "is_vip": false,
+      "md5": "137e4f6e581377e6c98b18e3d29694a2",
+      "resource_id": "6771288500240126478",
+      "title": "Wipe Right"
+    },
+    {
+      "member": "Blur_Wipe_Right",
+      "slug": "blur-wipe-right",
+      "duration": 500000,
+      "effect_id": "6909714649797628417",
+      "is_vip": false,
+      "md5": "b11884681d795aaf41a34f28b7b8d51f",
+      "resource_id": "6909714649797628417",
+      "title": "Blur Wipe Right"
+    },
+    {
+      "member": "Slingshot",
+      "slug": "slingshot",
+      "duration": 500000,
+      "effect_id": "6862897343176380942",
+      "is_vip": false,
+      "md5": "f4127b21d8ec8cca132953398388eec2",
+      "resource_id": "6862897343176380942",
+      "title": "Slingshot"
+    },
+    {
+      "member": "Blur_to_the_right",
+      "slug": "blur-to-the-right",
+      "duration": 500000,
+      "effect_id": "7203606035557257730",
+      "is_vip": false,
+      "md5": "0eff42d557a9d5c8c9974daef189b570",
+      "resource_id": "7203606035557257730",
+      "title": "Blur to the right"
+    },
+    {
+      "member": "Jolt_Forward",
+      "slug": "jolt-forward",
+      "duration": 500000,
+      "effect_id": "7086778010807833090",
+      "is_vip": false,
+      "md5": "53dadd15e28f30461bea6ab0244f1082",
+      "resource_id": "7086778010807833090",
+      "title": "Jolt Forward"
+    },
+    {
+      "member": "Rotation_Verbatim",
+      "slug": "rotation-verbatim",
+      "duration": 500000,
+      "effect_id": "7131932250437849602",
+      "is_vip": false,
+      "md5": "17a78b3b5c193a3e30431946a8cbd696",
+      "resource_id": "7131932250437849602",
+      "title": "Rotation Verbatim"
+    },
+    {
+      "member": "Elastic_Telescopic_II",
+      "slug": "elastic-telescopic-ii",
+      "duration": 500000,
+      "effect_id": "7161336180561154562",
+      "is_vip": false,
+      "md5": "9b0bdc149bbc541e93cddaf94b1dcaa0",
+      "resource_id": "7161336180561154562",
+      "title": "Elastic Telescopic II"
+    },
+    {
+      "member": "Flip_Verbatim",
+      "slug": "flip-verbatim",
+      "duration": 500000,
+      "effect_id": "7131932337893282306",
+      "is_vip": false,
+      "md5": "cdf2df541dea807f4bcb29ede73dd766",
+      "resource_id": "7131932337893282306",
+      "title": "Flip Verbatim"
+    },
+    {
+      "member": "Zoom_Out",
+      "slug": "zoom-out",
+      "duration": 500000,
+      "effect_id": "6724921217721045515",
+      "is_vip": false,
+      "md5": "0b58ad7d0d7cc93080e7bedfd0caa222",
+      "resource_id": "6724921217721045515",
+      "title": "Zoom Out"
+    },
+    {
+      "member": "Trail",
+      "slug": "trail",
+      "duration": 500000,
+      "effect_id": "7231492571321602562",
+      "is_vip": false,
+      "md5": "40884dac1fc802d207c69b05e2987d4d",
+      "resource_id": "7231492571321602562",
+      "title": "Trail"
+    },
+    {
+      "member": "Slide_Right",
+      "slug": "slide-right",
+      "duration": 500000,
+      "effect_id": "6724920136056181256",
+      "is_vip": false,
+      "md5": "c49f75ef6e0f886e570f68a00f7c1312",
+      "resource_id": "6724920136056181256",
+      "title": "Slide Right"
+    },
+    {
+      "member": "Clock_wipe",
+      "slug": "clock-wipe",
+      "duration": 500000,
+      "effect_id": "6840689010034086407",
+      "is_vip": false,
+      "md5": "5df8f0147561089a7e98c2e15b31c15c",
+      "resource_id": "6840689010034086407",
+      "title": "Clock wipe"
+    },
+    {
+      "member": "Flipping",
+      "slug": "flipping",
+      "duration": 500000,
+      "effect_id": "7221379732166676993",
+      "is_vip": false,
+      "md5": "c863f3afe0d73cccc19188d6313b1dae",
+      "resource_id": "7221379732166676993",
+      "title": "Flipping"
+    },
+    {
+      "member": "Squeeze",
+      "slug": "squeeze",
+      "duration": 500000,
+      "effect_id": "6779879712261935619",
+      "is_vip": false,
+      "md5": "87deb51be366cd3e83fb4a04c6ea2240",
+      "resource_id": "6779879712261935619",
+      "title": "Squeeze"
+    },
+    {
+      "member": "Fold",
+      "slug": "fold",
+      "duration": 500000,
+      "effect_id": "7131933414189437441",
+      "is_vip": false,
+      "md5": "9f65c45595fa8c0002f7f49a61637ff2",
+      "resource_id": "7131933414189437441",
+      "title": "Fold"
+    },
+    {
+      "member": "Roll_In",
+      "slug": "roll-in",
+      "duration": 500000,
+      "effect_id": "7037027812351414786",
+      "is_vip": false,
+      "md5": "c877f5d0bb23720b302244e7e9b9f0bc",
+      "resource_id": "7037027812351414786",
+      "title": "Roll In"
+    },
+    {
+      "member": "Judder_Up",
+      "slug": "judder-up",
+      "duration": 500000,
+      "effect_id": "7086778112611979777",
+      "is_vip": false,
+      "md5": "b3ea1be4937b7cd032f1775d98b1f06e",
+      "resource_id": "7086778112611979777",
+      "title": "Judder Up"
+    },
+    {
+      "member": "Type_3",
+      "slug": "type-3",
+      "duration": 500000,
+      "effect_id": "6724920521462387207",
+      "is_vip": false,
+      "md5": "5916ce3ef5af2ecc787b16353dd32074",
+      "resource_id": "6724920521462387207",
+      "title": "Type 3"
+    },
+    {
+      "member": "Bounce_In",
+      "slug": "bounce-in",
+      "duration": 500000,
+      "effect_id": "6887766069587481090",
+      "is_vip": false,
+      "md5": "83cd5b21c6a1cea2d11aac09bf328d1b",
+      "resource_id": "6887766069587481090",
+      "title": "Bounce In"
+    },
+    {
+      "member": "Slide_Up",
+      "slug": "slide-up",
+      "duration": 500000,
+      "effect_id": "6763470111253729803",
+      "is_vip": false,
+      "md5": "7369b47c2bd5267948b0422f69f686c0",
+      "resource_id": "6763470111253729803",
+      "title": "Slide Up"
+    },
+    {
+      "member": "Blow_In",
+      "slug": "blow-in",
+      "duration": 500000,
+      "effect_id": "6873386357952090626",
+      "is_vip": false,
+      "md5": "39fb9e67642a084fc3a22944d28bbbba",
+      "resource_id": "6873386357952090626",
+      "title": "Blow In"
+    },
+    {
+      "member": "Wobble",
+      "slug": "wobble",
+      "duration": 500000,
+      "effect_id": "7095603439912096258",
+      "is_vip": false,
+      "md5": "d9099a94194f6a60366a2115ecca7646",
+      "resource_id": "7095603439912096258",
+      "title": "Wobble"
+    },
+    {
+      "member": "Bounce_from_TR",
+      "slug": "bounce-from-tr",
+      "duration": 500000,
+      "effect_id": "7080126619364364801",
+      "is_vip": false,
+      "md5": "ccff88fa7a5e6a545e8ff343593ae255",
+      "resource_id": "7080126619364364801",
+      "title": "Bounce from TR"
+    },
+    {
+      "member": "Showing_Right",
+      "slug": "showing-right",
+      "duration": 500000,
+      "effect_id": "7149113362096329217",
+      "is_vip": false,
+      "md5": "6f8e0a5cd98c44b79f9ec09b0b913059",
+      "resource_id": "7149113362096329217",
+      "title": "Showing Right"
+    },
+    {
+      "member": "Showing_Up",
+      "slug": "showing-up",
+      "duration": 500000,
+      "effect_id": "7149113228788765186",
+      "is_vip": false,
+      "md5": "8c4b711fc99437b6b4aebf575ca3e552",
+      "resource_id": "7149113228788765186",
+      "title": "Showing Up"
+    },
+    {
+      "member": "Mini_Zoom",
+      "slug": "mini-zoom",
+      "duration": 500000,
+      "effect_id": "6763469998330483213",
+      "is_vip": false,
+      "md5": "6f5ec0bb82bfd24a72706e2006c0e806",
+      "resource_id": "6763469998330483213",
+      "title": "Mini Zoom"
+    },
+    {
+      "member": "Set_to_the_Right",
+      "slug": "set-to-the-right",
+      "duration": 500000,
+      "effect_id": "7145435431297880577",
+      "is_vip": false,
+      "md5": "5a78f1024ecdc9a6b69220eac58a0963",
+      "resource_id": "7145435431297880577",
+      "title": "Set to the Right"
+    },
+    {
+      "member": "Slide_Left",
+      "slug": "slide-left",
+      "duration": 500000,
+      "effect_id": "7403255792146584081",
+      "is_vip": false,
+      "md5": "6623efc403e59006d52ef89ca8cab5fe",
+      "resource_id": "7403255792146584081",
+      "title": "Slide Left"
+    },
+    {
+      "member": "Bounce_In_TL",
+      "slug": "bounce-in-tl",
+      "duration": 500000,
+      "effect_id": "7080126868136923650",
+      "is_vip": false,
+      "md5": "7cfe7399370f640c938a4226b688e0a3",
+      "resource_id": "7080126868136923650",
+      "title": "Bounce In TL"
+    },
+    {
+      "member": "Wipe_Up",
+      "slug": "wipe-up",
+      "duration": 500000,
+      "effect_id": "6774625910067827212",
+      "is_vip": false,
+      "md5": "b18e5a9811cc39acd1342b404f67235b",
+      "resource_id": "6774625910067827212",
+      "title": "Wipe Up"
+    },
+    {
+      "member": "Random_Bounce",
+      "slug": "random-bounce",
+      "duration": 500000,
+      "effect_id": "7046650374005985793",
+      "is_vip": false,
+      "md5": "08211765b28b4f74406367e8998ef907",
+      "resource_id": "7046650374005985793",
+      "title": "Random Bounce"
+    },
+    {
+      "member": "Blur_Wipe_Left",
+      "slug": "blur-wipe-left",
+      "duration": 500000,
+      "effect_id": "6909714445518246401",
+      "is_vip": false,
+      "md5": "c6b81d117c36f8028015e1ba72afeabd",
+      "resource_id": "6909714445518246401",
+      "title": "Blur Wipe Left"
+    },
+    {
+      "member": "Sunrise",
+      "slug": "sunrise",
+      "duration": 500000,
+      "effect_id": "6779084126457696776",
+      "is_vip": false,
+      "md5": "5135096b047fe38ea94febe82b97ffde",
+      "resource_id": "6779084126457696776",
+      "title": "Sunrise"
+    },
+    {
+      "member": "Wipe_Down",
+      "slug": "wipe-down",
+      "duration": 500000,
+      "effect_id": "6774626192990409224",
+      "is_vip": false,
+      "md5": "da43ba0acb3e0f247373c40e51ec0952",
+      "resource_id": "6774626192990409224",
+      "title": "Wipe Down"
+    },
+    {
+      "member": "Wipe_In_LR",
+      "slug": "wipe-in-lr",
+      "duration": 500000,
+      "effect_id": "7095603601355051521",
+      "is_vip": false,
+      "md5": "f83eb09e4eebd66587abf023688739a5",
+      "resource_id": "7095603601355051521",
+      "title": "Wipe In LR"
+    },
+    {
+      "member": "Wipe_Left",
+      "slug": "wipe-left",
+      "duration": 500000,
+      "effect_id": "6774626830038077960",
+      "is_vip": false,
+      "md5": "c3b5c38587edc82914b1bbb9c8b1b070",
+      "resource_id": "6774626830038077960",
+      "title": "Wipe Left"
+    },
+    {
+      "member": "Slide_Left_1",
+      "slug": "slide-left-1",
+      "duration": 500000,
+      "effect_id": "6763470195894784525",
+      "is_vip": false,
+      "md5": "7715ee0fb10ee4db78e3e84ca6076c1d",
+      "resource_id": "6763470195894784525",
+      "title": "Slide Left"
+    },
+    {
+      "member": "Slide_Down",
+      "slug": "slide-down",
+      "duration": 500000,
+      "effect_id": "7403256520537805329",
+      "is_vip": false,
+      "md5": "cf042bc2dd475dc6166e33f43b116641",
+      "resource_id": "7403256520537805329",
+      "title": "Slide Down"
+    },
+    {
+      "member": "Slide_Up_1",
+      "slug": "slide-up-1",
+      "duration": 500000,
+      "effect_id": "7275682326678344193",
+      "is_vip": false,
+      "md5": "9ab223e5e9a0b9611b04062048173de9",
+      "resource_id": "7275682326678344193",
+      "title": "Slide Up"
+    },
+    {
+      "member": "Showing_Left",
+      "slug": "showing-left",
+      "duration": 500000,
+      "effect_id": "7149113444279521793",
+      "is_vip": false,
+      "md5": "b4119cf3405c71bc556e1c5562e22d01",
+      "resource_id": "7149113444279521793",
+      "title": "Showing Left"
+    },
+    {
+      "member": "Slide_Down_1",
+      "slug": "slide-down-1",
+      "duration": 500000,
+      "effect_id": "6724921985282871816",
+      "is_vip": false,
+      "md5": "4ef6c5a0fc93b203e40cb38c8bbdd7bb",
+      "resource_id": "6724921985282871816",
+      "title": "Slide Down"
+    },
+    {
+      "member": "Boing",
+      "slug": "boing",
+      "duration": 500000,
+      "effect_id": "6873386210002211330",
+      "is_vip": false,
+      "md5": "cbc371fed78af934a95433cef2923b96",
+      "resource_id": "6873386210002211330",
+      "title": "Boing"
+    },
+    {
+      "member": "Spring",
+      "slug": "spring",
+      "duration": 500000,
+      "effect_id": "6887766363436225025",
+      "is_vip": false,
+      "md5": "feb1261746ba3792d367c214383fdaf0",
+      "resource_id": "6887766363436225025",
+      "title": "Spring"
+    },
+    {
+      "member": "Ease_In_Right",
+      "slug": "ease-in-right",
+      "duration": 500000,
+      "effect_id": "7054065145990877698",
+      "is_vip": false,
+      "md5": "09369ebe9ac7df7d95981647795b726d",
+      "resource_id": "7054065145990877698",
+      "title": "Ease In Right"
+    },
+    {
+      "member": "Turn_Horizontal",
+      "slug": "turn-horizontal",
+      "duration": 500000,
+      "effect_id": "7063344665025581570",
+      "is_vip": false,
+      "md5": "e7b57129e1b9b24b14e5c6257e03ad94",
+      "resource_id": "7063344665025581570",
+      "title": "Turn Horizontal"
+    },
+    {
+      "member": "Grow",
+      "slug": "grow",
+      "duration": 500000,
+      "effect_id": "6873386301182185986",
+      "is_vip": false,
+      "md5": "6a574fce0c4041c452997d059ebe018c",
+      "resource_id": "6873386301182185986",
+      "title": "Grow"
+    },
+    {
+      "member": "Showing_Down",
+      "slug": "showing-down",
+      "duration": 500000,
+      "effect_id": "7149113292747706881",
+      "is_vip": false,
+      "md5": "a7b05a11c6bdc7010cc4dc7f1d276407",
+      "resource_id": "7149113292747706881",
+      "title": "Showing Down"
+    },
+    {
+      "member": "Flip_up",
+      "slug": "flip-up",
+      "duration": 500000,
+      "effect_id": "7195849719673786882",
+      "is_vip": false,
+      "md5": "0cf2050093a2bbe736ab4b2ee9002dcf",
+      "resource_id": "7195849719673786882",
+      "title": "Flip up"
+    }
+  ],
+  "outros": [
+    {
+      "member": "Fade_Out",
+      "slug": "fade-out",
+      "duration": 500000,
+      "effect_id": "6724919382104871427",
+      "is_vip": false,
+      "md5": "6ecc8fa1d956c3e14c84cdc0679982a9",
+      "resource_id": "6724919382104871427",
+      "title": "Fade Out"
+    },
+    {
+      "member": "Blur",
+      "slug": "blur",
+      "duration": 500000,
+      "effect_id": "6923134492760609282",
+      "is_vip": false,
+      "md5": "a455f364ad8079365e4d9c880ee58902",
+      "resource_id": "6923134492760609282",
+      "title": "Blur"
+    },
+    {
+      "member": "Zoom_In",
+      "slug": "zoom-in",
+      "duration": 500000,
+      "effect_id": "6724919767200698884",
+      "is_vip": false,
+      "md5": "31f07f6c0980eef948904395c7ba4bd4",
+      "resource_id": "6724919767200698884",
+      "title": "Zoom In"
+    },
+    {
+      "member": "Typewriter",
+      "slug": "typewriter",
+      "duration": 500000,
+      "effect_id": "7210980400984756738",
+      "is_vip": false,
+      "md5": "3f2d4916f48390652f4abaff69742c0b",
+      "resource_id": "7210980400984756738",
+      "title": "Typewriter"
+    },
+    {
+      "member": "Zoom_In_2",
+      "slug": "zoom-in-2",
+      "duration": 500000,
+      "effect_id": "7054480833201050114",
+      "is_vip": false,
+      "md5": "826379869afa4037da8bbcafc1e8a6c7",
+      "resource_id": "7054480833201050114",
+      "title": "Zoom In 2"
+    },
+    {
+      "member": "Dissolve_Up",
+      "slug": "dissolve-up",
+      "duration": 500000,
+      "effect_id": "7037028782544261634",
+      "is_vip": false,
+      "md5": "11ea5c712b93ca8d0df41c2378073d29",
+      "resource_id": "7037028782544261634",
+      "title": "Dissolve Up"
+    },
+    {
+      "member": "Slide_Down",
+      "slug": "slide-down",
+      "duration": 500000,
+      "effect_id": "7403256664498901520",
+      "is_vip": false,
+      "md5": "30080fd3aae7a739d431c59387afdd4f",
+      "resource_id": "7403256664498901520",
+      "title": "Slide Down"
+    },
+    {
+      "member": "Dissolve",
+      "slug": "dissolve",
+      "duration": 500000,
+      "effect_id": "6873386286082691586",
+      "is_vip": false,
+      "md5": "46389f9f5f72e1b58020a0b8293a23b9",
+      "resource_id": "6873386286082691586",
+      "title": "Dissolve"
+    },
+    {
+      "member": "Slide_Up",
+      "slug": "slide-up",
+      "duration": 500000,
+      "effect_id": "6763873533115240968",
+      "is_vip": false,
+      "md5": "bbec5aa1ddf8df26276b99cfd9996d76",
+      "resource_id": "6763873533115240968",
+      "title": "Slide Up"
+    },
+    {
+      "member": "Flicker",
+      "slug": "flicker",
+      "duration": 500000,
+      "effect_id": "7040020559656129025",
+      "is_vip": false,
+      "md5": "91be98f44180d877cbcb2b515315eb01",
+      "resource_id": "7040020559656129025",
+      "title": "Flicker"
+    },
+    {
+      "member": "Blur_to_the_Left",
+      "slug": "blur-to-the-left",
+      "duration": 500000,
+      "effect_id": "7131932497641738753",
+      "is_vip": false,
+      "md5": "02ee1da62468714f7b17a671ee61acf0",
+      "resource_id": "7131932497641738753",
+      "title": "Blur to the Left"
+    },
+    {
+      "member": "Zoom_Out",
+      "slug": "zoom-out",
+      "duration": 500000,
+      "effect_id": "7428455252141100293",
+      "is_vip": false,
+      "md5": "4caa7ab406013ea4c9febad3ab95cabf",
+      "resource_id": "7428455252141100293",
+      "title": "Zoom Out"
+    },
+    {
+      "member": "Slide_Down_1",
+      "slug": "slide-down-1",
+      "duration": 500000,
+      "effect_id": "6724919284893487619",
+      "is_vip": false,
+      "md5": "4b1190ca81551d872f1d6b0e2ce5db2b",
+      "resource_id": "6724919284893487619",
+      "title": "Slide Down"
+    },
+    {
+      "member": "Mini_Zoom",
+      "slug": "mini-zoom",
+      "duration": 500000,
+      "effect_id": "6763469915518145032",
+      "is_vip": false,
+      "md5": "1e293df954586a261a11576481dd8454",
+      "resource_id": "6763469915518145032",
+      "title": "Mini Zoom"
+    },
+    {
+      "member": "Bounce_Out",
+      "slug": "bounce-out",
+      "duration": 500000,
+      "effect_id": "6887765964515971585",
+      "is_vip": false,
+      "md5": "465f833066158d62db9e54df6cd77354",
+      "resource_id": "6887765964515971585",
+      "title": "Bounce Out"
+    },
+    {
+      "member": "Wipe_Left",
+      "slug": "wipe-left",
+      "duration": 500000,
+      "effect_id": "6774626748177846791",
+      "is_vip": false,
+      "md5": "1160d9bcc8a158a65441bcfc9603bd00",
+      "resource_id": "6774626748177846791",
+      "title": "Wipe Left"
+    },
+    {
+      "member": "Expand",
+      "slug": "expand",
+      "duration": 500000,
+      "effect_id": "6779879836916650509",
+      "is_vip": false,
+      "md5": "9691c2574e653e0263365df7446a8af9",
+      "resource_id": "6779879836916650509",
+      "title": "Expand"
+    },
+    {
+      "member": "Throw_Back",
+      "slug": "throw-back",
+      "duration": 500000,
+      "effect_id": "7233110388701663745",
+      "is_vip": false,
+      "md5": "0203e194e3bcf10f7f96fde73dc350f3",
+      "resource_id": "7233110388701663745",
+      "title": "Throw Back"
+    },
+    {
+      "member": "Slide_Left",
+      "slug": "slide-left",
+      "duration": 500000,
+      "effect_id": "6763873602476446221",
+      "is_vip": false,
+      "md5": "a193ecedf73b2b27616ee7da4f599b9b",
+      "resource_id": "6763873602476446221",
+      "title": "Slide Left"
+    },
+    {
+      "member": "Slide_Up_1",
+      "slug": "slide-up-1",
+      "duration": 500000,
+      "effect_id": "7403256763803243024",
+      "is_vip": false,
+      "md5": "126062701f0797dedd8019fdf82969d5",
+      "resource_id": "7403256763803243024",
+      "title": "Slide Up"
+    },
+    {
+      "member": "Type_1",
+      "slug": "type-1",
+      "duration": 500000,
+      "effect_id": "6763469696260903435",
+      "is_vip": false,
+      "md5": "628234381485fb1dd576eeb48c85a091",
+      "resource_id": "6763469696260903435",
+      "title": "Type 1"
+    },
+    {
+      "member": "Dilute",
+      "slug": "dilute",
+      "duration": 500000,
+      "effect_id": "7044433705141539329",
+      "is_vip": false,
+      "md5": "fe2cfbc08c330517caa8b602187ced07",
+      "resource_id": "7044433705141539329",
+      "title": "Dilute"
+    },
+    {
+      "member": "Type_2",
+      "slug": "type-2",
+      "duration": 500000,
+      "effect_id": "6763469767555682823",
+      "is_vip": false,
+      "md5": "83076ce7cda24efdaca9731b112fb097",
+      "resource_id": "6763469767555682823",
+      "title": "Type 2"
+    },
+    {
+      "member": "Horizontal_Close",
+      "slug": "horizontal-close",
+      "duration": 500000,
+      "effect_id": "6943606672514355714",
+      "is_vip": false,
+      "md5": "e7048d848c90a6e15fbc9349dad6f95c",
+      "resource_id": "6943606672514355714",
+      "title": "Horizontal Close"
+    },
+    {
+      "member": "Slide_Right",
+      "slug": "slide-right",
+      "duration": 500000,
+      "effect_id": "6724920744431587853",
+      "is_vip": false,
+      "md5": "4026a211f18b0fc6ab9e10d09c8922ba",
+      "resource_id": "6724920744431587853",
+      "title": "Slide Right"
+    },
+    {
+      "member": "Disband_to_the_Left",
+      "slug": "disband-to-the-left",
+      "duration": 500000,
+      "effect_id": "7145435368777585153",
+      "is_vip": false,
+      "md5": "46b117e1d9fc552e574958fcde072a53",
+      "resource_id": "7145435368777585153",
+      "title": "Disband to the Left"
+    },
+    {
+      "member": "Random_Typewriter",
+      "slug": "random-typewriter",
+      "duration": 500000,
+      "effect_id": "7145435491129627137",
+      "is_vip": false,
+      "md5": "e667d209a1c3ab8dfdfb00f2f014ec9d",
+      "resource_id": "7145435491129627137",
+      "title": "Random Typewriter"
+    },
+    {
+      "member": "Flutter",
+      "slug": "flutter",
+      "duration": 500000,
+      "effect_id": "7094881109661454849",
+      "is_vip": false,
+      "md5": "2e58579b330dbccc4491c5f0a8cf4a8a",
+      "resource_id": "7094881109661454849",
+      "title": "Flutter"
+    },
+    {
+      "member": "Fold",
+      "slug": "fold",
+      "duration": 500000,
+      "effect_id": "7131933395650613762",
+      "is_vip": false,
+      "md5": "ccce629bcf7f98a8de4d4e1a2228d11a",
+      "resource_id": "7131933395650613762",
+      "title": "Fold"
+    },
+    {
+      "member": "Trail",
+      "slug": "trail",
+      "duration": 500000,
+      "effect_id": "7231863704063578626",
+      "is_vip": false,
+      "md5": "20d1992e9f7b67bedf1811c0811b1e5c",
+      "resource_id": "7231863704063578626",
+      "title": "Trail"
+    },
+    {
+      "member": "Chromatic_Aberration_Tailing",
+      "slug": "chromatic-aberration-tailing",
+      "duration": 500000,
+      "effect_id": "7161314207609131522",
+      "is_vip": false,
+      "md5": "998e6b4aee4a58c7810ae427f4ef2a6e",
+      "resource_id": "7161314207609131522",
+      "title": "Chromatic Aberration Tailing"
+    },
+    {
+      "member": "Roll_Out",
+      "slug": "roll-out",
+      "duration": 500000,
+      "effect_id": "7037027990873575938",
+      "is_vip": false,
+      "md5": "f25af0cdef9584d588584b3765350f64",
+      "resource_id": "7037027990873575938",
+      "title": "Roll Out"
+    },
+    {
+      "member": "Pop_Down",
+      "slug": "pop-down",
+      "duration": 500000,
+      "effect_id": "7145435533580177921",
+      "is_vip": false,
+      "md5": "751b7e005e3ec297f5d3d2c40664f585",
+      "resource_id": "7145435533580177921",
+      "title": "Pop Down"
+    },
+    {
+      "member": "Slingshot",
+      "slug": "slingshot",
+      "duration": 500000,
+      "effect_id": "6862897350478664200",
+      "is_vip": false,
+      "md5": "45f66e1fa1a3b79968b3749275bab10c",
+      "resource_id": "6862897350478664200",
+      "title": "Slingshot"
+    },
+    {
+      "member": "Faulty_text",
+      "slug": "faulty-text",
+      "duration": 500000,
+      "effect_id": "6870325383217025538",
+      "is_vip": false,
+      "md5": "71a23656184bc8438f4fa22425192185",
+      "resource_id": "6870325383217025538",
+      "title": "Faulty text"
+    },
+    {
+      "member": "Sunset",
+      "slug": "sunset",
+      "duration": 500000,
+      "effect_id": "6779084194392838670",
+      "is_vip": false,
+      "md5": "662eea25ba7d450d9a91febf43f22f7f",
+      "resource_id": "6779084194392838670",
+      "title": "Sunset"
+    },
+    {
+      "member": "Ink_Print",
+      "slug": "ink-print",
+      "duration": 500000,
+      "effect_id": "7131933235000381953",
+      "is_vip": false,
+      "md5": "ffde7ad26438a2a7e38c55cbfc2a06e6",
+      "resource_id": "7131933235000381953",
+      "title": "Ink Print"
+    },
+    {
+      "member": "Wipe_Right",
+      "slug": "wipe-right",
+      "duration": 500000,
+      "effect_id": "6783908820176343566",
+      "is_vip": false,
+      "md5": "a48325fce55a7a419b351c8a9826c7a0",
+      "resource_id": "6783908820176343566",
+      "title": "Wipe Right"
+    },
+    {
+      "member": "Bounce_Out_TR",
+      "slug": "bounce-out-tr",
+      "duration": 500000,
+      "effect_id": "7080126748129497601",
+      "is_vip": false,
+      "md5": "c686d80fd584cd755a3a9a8168b90c91",
+      "resource_id": "7080126748129497601",
+      "title": "Bounce Out TR"
+    },
+    {
+      "member": "Glitch",
+      "slug": "glitch",
+      "duration": 500000,
+      "effect_id": "7077812264559972865",
+      "is_vip": false,
+      "md5": "ef29a8a0678cfc09c6888cf3cd0cd1fe",
+      "resource_id": "7077812264559972865",
+      "title": "Glitch"
+    },
+    {
+      "member": "Stroke_Fill",
+      "slug": "stroke-fill",
+      "duration": 500000,
+      "effect_id": "7239696026389451266",
+      "is_vip": false,
+      "md5": "88e26415caea51e4cd4453f113e4ce82",
+      "resource_id": "7239696026389451266",
+      "title": "Stroke Fill"
+    },
+    {
+      "member": "Wipe_Down",
+      "slug": "wipe-down",
+      "duration": 500000,
+      "effect_id": "6774626081791021576",
+      "is_vip": false,
+      "md5": "4dafd6a7cbde862044fcbc543ecd818a",
+      "resource_id": "6774626081791021576",
+      "title": "Wipe Down"
+    },
+    {
+      "member": "Flip_Down",
+      "slug": "flip-down",
+      "duration": 500000,
+      "effect_id": "7198418239955669506",
+      "is_vip": false,
+      "md5": "fb59d5300e87e87718c3fd2f956df6f1",
+      "resource_id": "7198418239955669506",
+      "title": "Flip Down"
+    },
+    {
+      "member": "Blur_Erase_Right",
+      "slug": "blur-erase-right",
+      "duration": 500000,
+      "effect_id": "6909715076459008514",
+      "is_vip": false,
+      "md5": "b55ab5e5eb7c4b540f3065e25c5b2862",
+      "resource_id": "6909715076459008514",
+      "title": "Blur Erase Right"
+    },
+    {
+      "member": "Turn_Horizontal",
+      "slug": "turn-horizontal",
+      "duration": 500000,
+      "effect_id": "7063344803768963585",
+      "is_vip": false,
+      "md5": "d7e4694ce021064f57fb9d56ea9ca955",
+      "resource_id": "7063344803768963585",
+      "title": "Turn Horizontal"
+    },
+    {
+      "member": "Flipping",
+      "slug": "flipping",
+      "duration": 500000,
+      "effect_id": "7221823093847626241",
+      "is_vip": false,
+      "md5": "07d60e408004cba91944a6fbe3ec570d",
+      "resource_id": "7221823093847626241",
+      "title": "Flipping"
+    },
+    {
+      "member": "Grow",
+      "slug": "grow",
+      "duration": 500000,
+      "effect_id": "6873386318026510850",
+      "is_vip": false,
+      "md5": "e6ae4e1fc5ade7bd8765ef6d918f5f6f",
+      "resource_id": "6873386318026510850",
+      "title": "Grow"
+    },
+    {
+      "member": "Ease_Out_Right",
+      "slug": "ease-out-right",
+      "duration": 500000,
+      "effect_id": "7054065225024147969",
+      "is_vip": false,
+      "md5": "4efcd0a37ec562695391e6e24ff805aa",
+      "resource_id": "7054065225024147969",
+      "title": "Ease Out Right"
+    },
+    {
+      "member": "Spring",
+      "slug": "spring",
+      "duration": 500000,
+      "effect_id": "6887766592759796225",
+      "is_vip": false,
+      "md5": "0bed65b365b11c525396282d2d6070c0",
+      "resource_id": "6887766592759796225",
+      "title": "Spring"
+    },
+    {
+      "member": "Blur_Erase_Left",
+      "slug": "blur-erase-left",
+      "duration": 500000,
+      "effect_id": "6909714891058188801",
+      "is_vip": false,
+      "md5": "e491ca3b41a5dba9af4db1ca6b72500f",
+      "resource_id": "6909714891058188801",
+      "title": "Blur Erase Left"
+    },
+    {
+      "member": "Wipe_Up",
+      "slug": "wipe-up",
+      "duration": 500000,
+      "effect_id": "6774625752794010115",
+      "is_vip": false,
+      "md5": "d9b04e37f86d6b5cf456f396648e11d4",
+      "resource_id": "6774625752794010115",
+      "title": "Wipe Up"
+    },
+    {
+      "member": "Bounce_Out_TL",
+      "slug": "bounce-out-tl",
+      "duration": 500000,
+      "effect_id": "7080126963121132033",
+      "is_vip": false,
+      "md5": "2901b7202d9ac40d48bd5f242ad2edac",
+      "resource_id": "7080126963121132033",
+      "title": "Bounce Out TL"
+    },
+    {
+      "member": "Vrille",
+      "slug": "vrille",
+      "duration": 500000,
+      "effect_id": "6799874105710481927",
+      "is_vip": false,
+      "md5": "e6e1a2239d894b408e41341a6ca578ca",
+      "resource_id": "6799874105710481927",
+      "title": "Vrille"
+    },
+    {
+      "member": "Blow_Away",
+      "slug": "blow-away",
+      "duration": 500000,
+      "effect_id": "6873386371508081154",
+      "is_vip": false,
+      "md5": "d1292de2cfc57d0ca12fdbafb4e0bca2",
+      "resource_id": "6873386371508081154",
+      "title": "Blow Away"
+    },
+    {
+      "member": "Type_3",
+      "slug": "type-3",
+      "duration": 500000,
+      "effect_id": "6763469838368117256",
+      "is_vip": false,
+      "md5": "3f77a87e46ee1b50cd0ac207809c4c24",
+      "resource_id": "6763469838368117256",
+      "title": "Type 3"
+    },
+    {
+      "member": "Rotation_Verbatim",
+      "slug": "rotation-verbatim",
+      "duration": 500000,
+      "effect_id": "7131932325171958273",
+      "is_vip": false,
+      "md5": "ee29d8b9e06a471972f36734c53dbea8",
+      "resource_id": "7131932325171958273",
+      "title": "Rotation Verbatim"
+    },
+    {
+      "member": "Fly_Out",
+      "slug": "fly-out",
+      "duration": 500000,
+      "effect_id": "7037028379068994050",
+      "is_vip": false,
+      "md5": "324c695abdd43e1ec3506364fce0a087",
+      "resource_id": "7037028379068994050",
+      "title": "Fly Out"
+    },
+    {
+      "member": "Float_Up",
+      "slug": "float-up",
+      "duration": 500000,
+      "effect_id": "7094881236941804033",
+      "is_vip": false,
+      "md5": "3513093fd914fcccfa87cb98a410062e",
+      "resource_id": "7094881236941804033",
+      "title": "Float Up"
+    },
+    {
+      "member": "Spin_Out_1",
+      "slug": "spin-out-1",
+      "duration": 500000,
+      "effect_id": "6763873732143354376",
+      "is_vip": false,
+      "md5": "ffc35db86b29aee7a0a4342ea5ed059f",
+      "resource_id": "6763873732143354376",
+      "title": "Spin Out 1"
+    },
+    {
+      "member": "Spin_Out_2",
+      "slug": "spin-out-2",
+      "duration": 500000,
+      "effect_id": "6775804032318444045",
+      "is_vip": false,
+      "md5": "dc208cb851dff052cac198a5989f27b2",
+      "resource_id": "6775804032318444045",
+      "title": "Spin Out 2"
+    },
+    {
+      "member": "Slide_Down_2",
+      "slug": "slide-down-2",
+      "duration": 500000,
+      "effect_id": "7275978484902531585",
+      "is_vip": false,
+      "md5": "fa4aaf84b182425eed4e330ac03ecdbd",
+      "resource_id": "7275978484902531585",
+      "title": "Slide Down"
+    },
+    {
+      "member": "Flip_Verbatim",
+      "slug": "flip-verbatim",
+      "duration": 500000,
+      "effect_id": "7131932349456978433",
+      "is_vip": false,
+      "md5": "ffc81a4b0c44427fbfd60984f7ddcdc2",
+      "resource_id": "7131932349456978433",
+      "title": "Flip Verbatim"
+    },
+    {
+      "member": "Boing",
+      "slug": "boing",
+      "duration": 500000,
+      "effect_id": "6873386227546984961",
+      "is_vip": false,
+      "md5": "f2882bcfc0abc3b0c53b39649a2c4224",
+      "resource_id": "6873386227546984961",
+      "title": "Boing"
+    },
+    {
+      "member": "Random_Bounce",
+      "slug": "random-bounce",
+      "duration": 500000,
+      "effect_id": "7047418513429893633",
+      "is_vip": false,
+      "md5": "c260caa85b16e7d471ddeb2015cdf3f3",
+      "resource_id": "7047418513429893633",
+      "title": "Random Bounce"
+    },
+    {
+      "member": "Wave_out",
+      "slug": "wave-out",
+      "duration": 500000,
+      "effect_id": "6918927254676312578",
+      "is_vip": false,
+      "md5": "66ea8431aa7bc02f3b4d3219a127b313",
+      "resource_id": "6918927254676312578",
+      "title": "Wave out"
+    },
+    {
+      "member": "Elastic_Telescopic_II",
+      "slug": "elastic-telescopic-ii",
+      "duration": 500000,
+      "effect_id": "7163958556784333313",
+      "is_vip": false,
+      "md5": "9b225f4fafa2341876eec98ba91c89ee",
+      "resource_id": "7163958556784333313",
+      "title": "Elastic Telescopic II"
+    },
+    {
+      "member": "Clock_wipe",
+      "slug": "clock-wipe",
+      "duration": 500000,
+      "effect_id": "6840698265277567496",
+      "is_vip": false,
+      "md5": "e2faf1635350ccf31739618a257d87ad",
+      "resource_id": "6840698265277567496",
+      "title": "Clock wipe"
+    },
+    {
+      "member": "Jump_and_flip",
+      "slug": "jump-and-flip",
+      "duration": 500000,
+      "effect_id": "6865176065514410503",
+      "is_vip": false,
+      "md5": "f578720479df7746fa067199a1e4ea8b",
+      "resource_id": "6865176065514410503",
+      "title": "Jump and flip"
+    }
+  ]
+}

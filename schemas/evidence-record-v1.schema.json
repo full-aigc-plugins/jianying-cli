@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://partme.ai/schemas/jianying-evidence-record-v1.schema.json",
+  "title": "JianYing Evidence Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "level", "subject", "result", "observed_at", "artifacts"],
+  "properties": {
+    "schema": {"const": "jianying-evidence-record/v1"},
+    "id": {"type": "string", "minLength": 1},
+    "level": {
+      "enum": ["unit", "differential", "structural", "app-open", "cold-reopen", "playback", "native-export"]
+    },
+    "subject": {"type": "string", "minLength": 1},
+    "result": {"enum": ["passed", "failed", "blocked"]},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "platform": {"type": "string"},
+    "product": {"type": "string"},
+    "version": {"type": "string"},
+    "runtime_identity": {"type": "string"},
+    "artifacts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "string"},
+          {"type": "number"},
+          {"type": "boolean"},
+          {"type": "array", "items": {"type": "string"}}
+        ]
+      }
+    }
+  }
+}

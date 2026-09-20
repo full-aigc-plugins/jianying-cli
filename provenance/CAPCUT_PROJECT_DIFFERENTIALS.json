@@ -1,0 +1,71 @@
+{
+  "schema": "jianying-capcut-project-differential/v1",
+  "upstream": {
+    "repository": "renezander030/capcut-cli",
+    "commit": "49f70e3b07f1a236d45acb9b49a70c141dd1ee98"
+  },
+  "runner": "tools/capcut_project_differential.py",
+  "rust_cli": "provided-by-runner",
+  "cases": [
+    {
+      "command": "info",
+      "status": "exact"
+    },
+    {
+      "command": "diff",
+      "status": "exact"
+    },
+    {
+      "command": "migrate",
+      "status": "exact"
+    },
+    {
+      "command": "concat",
+      "status": "exact-timeline"
+    },
+    {
+      "command": "cut",
+      "status": "exact-timeline",
+      "evidence": "fixed-upstream clipping, rebasing, source range, orphan cleanup, and source isolation"
+    },
+    {
+      "command": "prune",
+      "status": "exact"
+    },
+    {
+      "command": "add-cover",
+      "status": "semantic",
+      "approved": [
+        "generated-id"
+      ]
+    },
+    {
+      "command": "init",
+      "status": "semantic",
+      "approved": [
+        "template",
+        "registration"
+      ]
+    },
+    {
+      "command": "quickstart",
+      "status": "semantic",
+      "approved": [
+        "template",
+        "registration",
+        "diagnostics"
+      ]
+    },
+    {
+      "command": "version",
+      "status": "approved-difference",
+      "reason": "Runtime Profile gate remains fail-closed"
+    },
+    {
+      "command": "describe",
+      "status": "semantic-command-map"
+    }
+  ],
+  "passed": 11,
+  "failed": 0
+}

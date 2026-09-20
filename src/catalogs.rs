@@ -34,6 +34,19 @@ catalog!("text_animations_out.json", text_animations_out);
 catalog!("text_animations_loop.json", text_animations_loop);
 catalog!("masks.json", masks);
 catalog!("mix_modes.json", mix_modes);
+catalog!("capcut/audio_effects.json", capcut_audio_effects);
+catalog!("capcut/masks.json", capcut_masks);
+catalog!("capcut/filters.json", capcut_filters);
+catalog!("capcut/bubbles.json", capcut_bubbles);
+catalog!("capcut/effects.json", capcut_effects);
+catalog!("capcut/transitions.json", capcut_transitions);
+catalog!("capcut/text_animations.json", capcut_text_animations);
+catalog!("capcut/image_animations.json", capcut_image_animations);
+catalog!("capcut/enums.json", capcut_enums);
+catalog!(
+    "capcut/jianying_text_animations.json",
+    capcut_jianying_text_animations
+);
 
 /// Look a display name up in a catalog array.
 pub fn find<'a>(catalog: &'a Value, name: &str) -> Option<&'a Value> {

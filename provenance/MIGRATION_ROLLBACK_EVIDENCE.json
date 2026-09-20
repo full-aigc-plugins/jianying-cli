@@ -1,0 +1,46 @@
+{
+  "schema": "jianying-migration-rollback-evidence/v1",
+  "executed_at": "2026-09-20T00:00:00+08:00",
+  "status": "passed",
+  "scope": "local structural rehearsal; no plugin switch, release artifact or real editor claim",
+  "v1_parser": {
+    "status": "retained",
+    "implementation_refs": [
+      "src/plan.rs",
+      "src/domain_compat.rs"
+    ],
+    "test_ref": "tests/job_v2_contract.rs",
+    "fixture_count": 55,
+    "command": [
+      "cargo",
+      "test",
+      "--test",
+      "job_v2_contract",
+      "all_frozen_v1_fixtures_survive_the_v2_compatibility_envelope",
+      "--",
+      "--exact",
+      "--nocapture"
+    ]
+  },
+  "draft_rollback": {
+    "status": "passed",
+    "test_ref": "tests/agent_contract.rs",
+    "command": [
+      "cargo",
+      "test",
+      "--test",
+      "agent_contract",
+      "project_init_quickstart_migrate_and_concat_are_black_box_operational",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "observed_steps": [
+      "create native draft",
+      "migrate known 5.9 to 9.6 mask bucket boundary",
+      "persist immutable source snapshot and audit recovery command",
+      "restore snapshot through MutationPlan",
+      "verify restored bundle and original mask semantics"
+    ]
+  }
+}

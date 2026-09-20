@@ -1,0 +1,369 @@
+name: release-artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYJYD_REF: c3318066d964744e2bfc66f75c71745fe8cea52a
+  CAPCUT_REF: 49f70e3b07f1a236d45acb9b49a70c141dd1ee98
+
+jobs:
+  source-parity-gate:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - name: Capture remote immutable release prerequisites
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_RULESET_READ_TOKEN || github.token }}
+        run: |
+          set +e
+          python3 tools/release_preflight.py --output release-preflight.json
+          preflight_status=$?
+          set -e
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            exit "$preflight_status"
+          fi
+      - name: Preserve remote preflight evidence even when blocked
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: jianying-cli-remote-preflight
+          path: release-preflight.json
+          if-no-files-found: error
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable action snapshot 2026-09-20
+      - name: Validate release tag and immutable repository setting
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cargo_version="$(python3 -c 'import tomllib; print(tomllib.load(open("Cargo.toml", "rb"))["package"]["version"])')"
+          if [ "$GITHUB_REF_NAME" != "v${cargo_version}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match Cargo version v${cargo_version}" >&2
+            exit 1
+          fi
+          enabled="$(gh api "repos/${GITHUB_REPOSITORY}/immutable-releases" --jq .enabled)"
+          if [ "$enabled" != "true" ]; then
+            echo "::error::enable GitHub immutable releases before running release builds" >&2
+            exit 1
+          fi
+      - name: Format, lint, test and build the complete workspace
+        run: |
+          cargo fmt --all --check
+          cargo clippy --workspace --all-targets --locked -- -D warnings
+          cargo test --workspace --locked
+          cargo build --release --locked
+      - name: Clone exact upstream parity sources
+        run: |
+          git clone https://github.com/GuanYixuan/pyJianYingDraft.git /tmp/pyjyd
+          git -C /tmp/pyjyd checkout "$PYJYD_REF"
+          git clone https://github.com/renezander030/capcut-cli.git /tmp/capcut-cli
+          git -C /tmp/capcut-cli checkout "$CAPCUT_REF"
+          npm --prefix /tmp/capcut-cli ci --ignore-scripts
+          npm --prefix /tmp/capcut-cli run build
+      - name: Verify source policy, catalogs and all black-box differentials
+        run: |
+          python3 tools/check_provenance.py --self-test-negative-cases
+          python3 tools/gen_catalogs.py /tmp/pyjyd/pyJianYingDraft --check
+          python3 tools/parity_run.py \
+            --pyjyd-src /tmp/pyjyd/pyJianYingDraft \
+            --report /tmp/PARITY_RUN.json
+          cmp provenance/PARITY_RUN.json /tmp/PARITY_RUN.json
+          python3 tools/capcut_project_differential.py \
+            --upstream /tmp/capcut-cli --rust-bin target/release/jianying \
+            --output /tmp/CAPCUT_PROJECT_DIFFERENTIALS.json
+          cmp provenance/CAPCUT_PROJECT_DIFFERENTIALS.json \
+            /tmp/CAPCUT_PROJECT_DIFFERENTIALS.json
+          python3 tools/capcut_timeline_differential.py \
+            --upstream /tmp/capcut-cli --rust-bin target/release/jianying \
+            --output /tmp/CAPCUT_TIMELINE_DIFFERENTIALS.json
+          cmp provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json \
+            /tmp/CAPCUT_TIMELINE_DIFFERENTIALS.json
+          python3 tools/capcut_media_analysis_differential.py \
+            --upstream /tmp/capcut-cli --rust-bin target/release/jianying \
+            --output /tmp/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json
+          cmp provenance/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json \
+            /tmp/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json
+          python3 tools/capcut_media_mutation_differential.py \
+            --upstream /tmp/capcut-cli --rust-bin target/release/jianying \
+            --output /tmp/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json
+          cmp provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json \
+            /tmp/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json
+          python3 tools/capcut_material_discovery_differential.py \
+            --upstream /tmp/capcut-cli --rust-bin target/release/jianying \
+            --output /tmp/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json
+          cmp provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json \
+            /tmp/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json
+          python3 tools/capcut_interchange_differential.py \
+            --upstream /tmp/capcut-cli --rust-bin target/release/jianying \
+            --output /tmp/CAPCUT_INTERCHANGE_DIFFERENTIALS.json
+          cmp provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json \
+            /tmp/CAPCUT_INTERCHANGE_DIFFERENTIALS.json
+          python3 tools/capcut_utility_differential.py \
+            --upstream /tmp/capcut-cli --rust-bin target/release/jianying \
+            --output /tmp/CAPCUT_UTILITY_DIFFERENTIALS.json
+          cmp provenance/CAPCUT_UTILITY_DIFFERENTIALS.json \
+            /tmp/CAPCUT_UTILITY_DIFFERENTIALS.json
+          python3 -m unittest \
+            tests/test_release_tools.py \
+            tests/test_verify_release_runtime.py
+
+  build:
+    needs: source-parity-gate
+    env:
+      JIANYING_BUILD_CONTRACT_STATE: ${{ startsWith(github.ref, 'refs/tags/v') && 'released' || 'committed_unreleased' }}
+      JIANYING_BUILD_RELEASE_REF: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
+      JIANYING_BUILD_SOURCE_COMMIT: ${{ github.sha }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            platform: darwin-arm64
+            binary: target/release/jianying
+          - runner: macos-15-intel
+            platform: darwin-x64
+            binary: target/release/jianying
+          - runner: windows-2025
+            platform: win32-x64
+            binary: target/release/jianying.exe
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable action snapshot 2026-09-20
+      - name: Test workspace
+        run: cargo test --workspace --locked
+      - name: Build release binary
+        run: cargo build --release --locked
+      - name: Verify release runtime and cloud TTS command surface
+        run: >-
+          python tools/verify_release_runtime.py
+          --binary ${{ matrix.binary }}
+      - name: Generate SPDX SBOM
+        run: python tools/generate_sbom.py --output target/release/SBOM.spdx.json
+      - name: Package binary, schemas, capabilities, licenses and checksums
+        run: >-
+          python tools/package_release.py
+          --binary ${{ matrix.binary }}
+          --platform ${{ matrix.platform }}
+          --sbom target/release/SBOM.spdx.json
+          --output-dir dist
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: jianying-cli-${{ matrix.platform }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [source-parity-gate, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: jianying-cli-darwin-arm64
+          path: dist/darwin-arm64
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: jianying-cli-darwin-x64
+          path: dist/darwin-x64
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: jianying-cli-win32-x64
+          path: dist/win32-x64
+      - name: Build three-platform release index
+        run: >-
+          python3 tools/build_release_index.py
+          --input-dir dist
+          --repository full-aigc-plugins/jianying-cli
+          --tag "${GITHUB_REF_NAME}"
+          --output dist/jianying-cli-release-index.json
+      - name: Require GitHub immutable releases before publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          enabled="$(gh api "repos/${GITHUB_REPOSITORY}/immutable-releases" --jq .enabled)"
+          if [ "$enabled" != "true" ]; then
+            echo "::error::enable GitHub immutable releases before publishing" >&2
+            exit 1
+          fi
+      - name: Publish immutable release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          find dist -type f \( \
+            -name '*.tar.gz' -o \
+            -name '*.zip' -o \
+            -name '*.sha256' -o \
+            -name '*.release-entry.json' -o \
+            -name 'jianying-cli-release-index.json' \
+          \) -print0 > "$RUNNER_TEMP/expected-assets.list"
+          release_plan="$RUNNER_TEMP/release-publication-plan.json"
+          missing_assets="$RUNNER_TEMP/missing-assets.list"
+          python3 tools/release_publication_plan.py \
+            --repository "$GITHUB_REPOSITORY" \
+            --expected-paths0 "$RUNNER_TEMP/expected-assets.list" \
+            --release-ref "$GITHUB_REF_NAME" \
+            --remote origin \
+            --expected-commit "$(git rev-parse HEAD)" \
+            --output "$release_plan" \
+            --missing-paths0 "$missing_assets"
+          publication_action="$(jq -r .action "$release_plan")"
+          case "$publication_action" in
+            create_draft)
+              gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --draft
+              ;;
+            resume_draft)
+              echo "resuming a byte-identical partial draft release"
+              ;;
+            publish_draft)
+              echo "draft release already contains the complete byte-identical asset set"
+              ;;
+            verify_existing)
+              echo "existing immutable release matches this build identity; verifying assets"
+              ;;
+            *)
+              echo "::error::unsupported publication action: $publication_action" >&2
+              exit 1
+              ;;
+          esac
+          if [ "$publication_action" = "create_draft" ] \
+            || [ "$publication_action" = "resume_draft" ]; then
+            xargs -0 gh release upload "$GITHUB_REF_NAME" < "$missing_assets"
+          fi
+          if [ "$publication_action" != "verify_existing" ]; then
+            python3 tools/release_publication_plan.py \
+              --repository "$GITHUB_REPOSITORY" \
+              --expected-paths0 "$RUNNER_TEMP/expected-assets.list" \
+              --release-ref "$GITHUB_REF_NAME" \
+              --remote origin \
+              --expected-commit "$(git rev-parse HEAD)" \
+              --output "$release_plan" \
+              --missing-paths0 "$missing_assets"
+            publication_action="$(jq -r .action "$release_plan")"
+            test "$publication_action" = "publish_draft"
+            gh release edit "$GITHUB_REF_NAME" --draft=false
+          fi
+          python3 tools/release_publication_plan.py \
+            --repository "$GITHUB_REPOSITORY" \
+            --expected-paths0 "$RUNNER_TEMP/expected-assets.list" \
+            --release-ref "$GITHUB_REF_NAME" \
+            --remote origin \
+            --expected-commit "$(git rev-parse HEAD)" \
+            --output "$release_plan" \
+            --missing-paths0 "$missing_assets"
+          test "$(jq -r .action "$release_plan")" = "verify_existing"
+          rm -rf "$RUNNER_TEMP/published-release"
+          mkdir -p "$RUNNER_TEMP/published-release"
+          gh release download "$GITHUB_REF_NAME" \
+            --dir "$RUNNER_TEMP/published-release"
+          python3 - dist "$RUNNER_TEMP/published-release" <<'PY'
+          import hashlib
+          import sys
+          from pathlib import Path
+
+          source = Path(sys.argv[1])
+          published = Path(sys.argv[2])
+          suffixes = (".tar.gz", ".zip", ".sha256", ".release-entry.json")
+          expected_files = [
+              path for path in source.rglob("*")
+              if path.is_file()
+              and (path.name.endswith(suffixes)
+                   or path.name == "jianying-cli-release-index.json")
+          ]
+
+          def inventory(paths):
+              result = {}
+              for path in paths:
+                  if path.name in result:
+                      raise SystemExit(
+                          f"published release asset set or digest differs: duplicate {path.name}"
+                      )
+                  result[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+              return result
+
+          expected = inventory(expected_files)
+          observed = inventory(path for path in published.iterdir() if path.is_file())
+          if observed != expected:
+              raise SystemExit("published release asset set or digest differs")
+          PY
+          verified=false
+          release_attestation="$RUNNER_TEMP/release-attestation.json"
+          expected_tag_object="$(git ls-remote --tags origin \
+            "refs/tags/${GITHUB_REF_NAME}" | cut -f1)"
+          for attempt in $(seq 1 30); do
+            if ! gh release verify "$GITHUB_REF_NAME" --format json \
+              > "$release_attestation"; then
+              echo "release attestation not visible yet (attempt ${attempt}/30)"
+              sleep 10
+              continue
+            fi
+            if ! python3 tools/verify_release_attestation.py \
+              --input "$release_attestation" \
+              --repository "$GITHUB_REPOSITORY" \
+              --release-ref "$GITHUB_REF_NAME" \
+              --expected-tag-object "$expected_tag_object" \
+              --expected-paths0 "$RUNNER_TEMP/expected-assets.list"; then
+              echo "release attestation identity is incomplete (attempt ${attempt}/30)"
+              sleep 10
+              continue
+            fi
+            all_verified=true
+            while IFS= read -r -d '' asset; do
+              if ! gh release verify-asset "$GITHUB_REF_NAME" "$asset"; then
+                all_verified=false
+                break
+              fi
+            done < "$RUNNER_TEMP/expected-assets.list"
+            if [ "$all_verified" = "true" ]; then
+              verified=true
+              break
+            fi
+            echo "asset attestation not visible yet (attempt ${attempt}/30)"
+            sleep 10
+          done
+          test "$verified" = "true"
+      - name: Notify the plugin lock synchronization workflow
+        env:
+          GH_TOKEN: ${{ secrets.CLI_SYNC_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "CLI_SYNC_TOKEN not configured; plugin schedule will discover the release"
+            exit 0
+          fi
+          index_sha256="$(sha256sum dist/jianying-cli-release-index.json | cut -d ' ' -f 1)"
+          gh api repos/full-aigc-plugins/jianying-edit-plugin/dispatches \
+            -f event_type=cli-released \
+            -F "client_payload[release_ref]=${GITHUB_REF_NAME}" \
+            -F "client_payload[source_commit]=${GITHUB_SHA}" \
+            -F "client_payload[index_sha256]=${index_sha256}"

@@ -1,0 +1,12 @@
+{
+  "schema": "jianying-v1-baseline/v1",
+  "captured_from_commit": "60eae921acd4fb8161eaa69c85b31d8c2267332c",
+  "plan_schema": "jianying-cli-plan/v1",
+  "top_level_commands": ["doctor", "probe", "build", "template", "catalog", "store", "verify", "inspect", "publish", "render"],
+  "template_commands": ["inspect", "duplicate", "replace-text", "replace-material", "import-track"],
+  "store_commands": ["list", "has", "remove"],
+  "parity_fixture_count": 55,
+  "parity_fixture_tree_sha256": "12965d77500782106cbfde272234ff6084364e5f49354ad34ab00dd6a6b1fb51",
+  "contract_tests": ["tests/agent_contract.rs", "tests/plan_validation.rs", "tests/parity/scenarios/*.json"],
+  "compatibility_rule": "Existing v1 inputs and commands remain supported until a separately announced removal cycle."
+}

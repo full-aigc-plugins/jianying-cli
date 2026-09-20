@@ -1,0 +1,56 @@
+{
+  "schema": "jianying-evidence-model/v1",
+  "record_schema": "schemas/evidence-record-v1.schema.json",
+  "levels": [
+    {
+      "id": "unit",
+      "rank": 1,
+      "proves": "one isolated contract or invariant",
+      "required_artifacts": ["test_command", "test_result"]
+    },
+    {
+      "id": "differential",
+      "rank": 2,
+      "proves": "observable equivalence against a pinned lawful reference",
+      "required_artifacts": ["source_commit", "input_fixture", "comparison_mode", "diff_result", "reproduce_argv"]
+    },
+    {
+      "id": "structural",
+      "rank": 3,
+      "proves": "generated draft structure and references satisfy checked invariants",
+      "required_artifacts": ["draft_digest", "validator_command", "validator_result"]
+    },
+    {
+      "id": "app-open",
+      "rank": 4,
+      "proves": "a named editor version opened the draft without immediate rejection",
+      "required_artifacts": ["platform", "product", "version", "runtime_identity", "draft_digest", "observation"]
+    },
+    {
+      "id": "cold-reopen",
+      "rank": 5,
+      "proves": "the editor reopened the persisted draft after a clean close and restart",
+      "required_artifacts": ["platform", "product", "version", "runtime_identity", "draft_digest", "close_observation", "reopen_observation"]
+    },
+    {
+      "id": "playback",
+      "rank": 6,
+      "proves": "the named editor played the target timeline and observed media/audio semantics",
+      "required_artifacts": ["platform", "product", "version", "runtime_identity", "draft_digest", "playback_observation"]
+    },
+    {
+      "id": "native-export",
+      "rank": 7,
+      "proves": "the named editor produced and verified a native export artifact",
+      "required_artifacts": ["platform", "product", "version", "runtime_identity", "draft_digest", "approval_id", "output_sha256", "export_observation"]
+    }
+  ],
+  "rules": {
+    "no_implicit_promotion": true,
+    "highest_claim_equals_observed_level": true,
+    "synthetic_process_max_level": "structural",
+    "proxy_render_max_level": "structural",
+    "native_export_requires_explicit_approval": true,
+    "external_levels_require_named_runtime": ["app-open", "cold-reopen", "playback", "native-export"]
+  }
+}

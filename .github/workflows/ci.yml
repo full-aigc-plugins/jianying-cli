@@ -7,20 +7,34 @@ name: ci
 
 env:
   PYJYD_REF: c3318066d964744e2bfc66f75c71745fe8cea52a
+  CAPCUT_REF: 49f70e3b07f1a236d45acb9b49a70c141dd1ee98
 
 jobs:
   test:
     runs-on: macos-latest
+    env:
+      JIANYING_BUILD_CONTRACT_STATE: committed_unreleased
+      JIANYING_BUILD_RELEASE_REF: ""
+      JIANYING_BUILD_SOURCE_COMMIT: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable action snapshot 2026-09-20
         with:
           components: clippy, rustfmt
       - run: cargo fmt --check
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test
       - run: cargo build --release
-      - uses: actions/upload-artifact@v4
+      - name: Verify release tooling and current-platform runtime surface
+        run: |
+          python3 -m unittest \
+            tests/test_release_tools.py \
+            tests/test_verify_release_runtime.py
+          python3 tools/verify_release_runtime.py --binary target/release/jianying
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: jianying-macos
           path: target/release/jianying
@@ -28,24 +42,54 @@ jobs:
   parity:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable action snapshot 2026-09-20
       - name: Clone the pinned reference implementation
         run: |
           git clone https://github.com/GuanYixuan/pyJianYingDraft.git /tmp/pyjyd
           git -C /tmp/pyjyd checkout "$PYJYD_REF"
-      - name: Install probe/runtime deps
+      - run: cargo build --release --locked
+      - name: Dual-source parity suite (55 scenarios)
+        run: python3 tools/parity_run.py --pyjyd-src /tmp/pyjyd/pyJianYingDraft --report /tmp/PARITY_RUN.json
+      - name: Parity report and protocol matrix must match the release claim
+        run: cmp provenance/PARITY_RUN.json /tmp/PARITY_RUN.json
+      - name: Clone and build pinned capcut-cli
         run: |
-          brew install mediainfo
-          python3 -m pip install --quiet pymediainfo
-      - run: cargo build --release
-      - name: Dual-source parity suite (50 scenarios)
-        run: python3 tools/parity_run.py --pyjyd-src /tmp/pyjyd/pyJianYingDraft
+          git clone https://github.com/renezander030/capcut-cli.git /tmp/capcut-cli
+          git -C /tmp/capcut-cli checkout "$CAPCUT_REF"
+          npm --prefix /tmp/capcut-cli ci --ignore-scripts
+          npm --prefix /tmp/capcut-cli run build
+      - name: Project command black-box differentials
+        run: python3 tools/capcut_project_differential.py --upstream /tmp/capcut-cli --rust-bin target/release/jianying --output /tmp/CAPCUT_PROJECT_DIFFERENTIALS.json
+      - name: Project differential report must match the checked-in evidence
+        run: cmp provenance/CAPCUT_PROJECT_DIFFERENTIALS.json /tmp/CAPCUT_PROJECT_DIFFERENTIALS.json
+      - name: Timeline command black-box differentials
+        run: python3 tools/capcut_timeline_differential.py --upstream /tmp/capcut-cli --rust-bin target/release/jianying --output /tmp/CAPCUT_TIMELINE_DIFFERENTIALS.json
+      - name: Timeline differential report must match the checked-in evidence
+        run: cmp provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json /tmp/CAPCUT_TIMELINE_DIFFERENTIALS.json
+      - name: Media analysis black-box differentials
+        run: python3 tools/capcut_media_analysis_differential.py --upstream /tmp/capcut-cli --rust-bin target/release/jianying --output /tmp/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json
+      - name: Media analysis differential report must match the checked-in evidence
+        run: cmp provenance/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json /tmp/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json
+      - name: Media mutation black-box differentials
+        run: python3 tools/capcut_media_mutation_differential.py --upstream /tmp/capcut-cli --rust-bin target/release/jianying --output /tmp/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json
+      - name: Media mutation differential report must match the checked-in evidence
+        run: cmp provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json /tmp/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json
+      - run: python3 tools/check_provenance.py --self-test-negative-cases
 
   catalog-freshness:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
       - name: Clone pyJianYingDraft at the pinned ref
         run: |
           git clone https://github.com/GuanYixuan/pyJianYingDraft.git /tmp/pyjyd

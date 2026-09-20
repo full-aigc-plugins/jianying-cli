@@ -1,9 +1,24 @@
 [package]
 name = "jianying-cli"
-version = "1.4.0"
+version = "1.6.0"
 edition = "2021"
 description = "Local JianYing/CapCut draft CLI in Rust — full-capability draft building from jianying-cli-plan/v1, verified and publishable, no account, no upload."
 license = "Apache-2.0"
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/jianying-domain",
+    "crates/jianying-schema",
+    "crates/jianying-draft",
+    "crates/jianying-store",
+    "crates/jianying-media",
+    "crates/jianying-runtime",
+    "crates/jianying-jobs",
+    "crates/jianying-mcp",
+    "crates/jianying-cli",
+    "crates/jianying-config",
+]
 
 [[bin]]
 name = "jianying"
@@ -12,9 +27,28 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
+clap_complete = "4"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 uuid = { version = "1", features = ["v4"] }
+thiserror = "2"
+sha2 = "0.10"
+time = { version = "0.3", features = ["formatting"] }
+regex = "1"
+jianying-domain = { path = "crates/jianying-domain" }
+jianying-schema = { path = "crates/jianying-schema" }
+jianying-draft = { path = "crates/jianying-draft" }
+jianying-store = { path = "crates/jianying-store" }
+jianying-media = { path = "crates/jianying-media" }
+jianying-runtime = { path = "crates/jianying-runtime" }
+jianying-jobs = { path = "crates/jianying-jobs" }
+jianying-mcp = { path = "crates/jianying-mcp" }
+jianying-cli-contract = { path = "crates/jianying-cli" }
+jianying-config = { path = "crates/jianying-config" }
+rmcp = { version = "3.4.0", default-features = false, features = ["server", "transport-io", "transport-streamable-http-server"] }
+axum = "0.8.9"
+tokio = { version = "1", features = ["rt", "net", "signal"] }
+tokio-util = "0.7"
 
 [profile.release]
 strip = true

@@ -28,6 +28,12 @@ pub fn render(
     burn_captions: bool,
     crf: i32,
 ) -> Result<Value> {
+    if !scale.is_finite() || scale <= 0.0 || scale > 4.0 {
+        bail!("render scale must be finite and within (0, 4]");
+    }
+    if !(0..=51).contains(&crf) {
+        bail!("render crf must be between 0 and 51");
+    }
     let tl = load_timeline(draft_dir)?;
     let ff =
         crate::probe::ffmpeg_path().ok_or_else(|| anyhow::anyhow!("ffmpeg not found on PATH"))?;
@@ -248,4 +254,92 @@ pub fn render(
         "audio_segments_mixed": if has_audio { aidx - input_idx } else { 0 },
         "captions_burned": if burn_captions { drawtext.len() } else { 0 },
     }))
+}
+
+/// 执行 `jianying-render-batch/v1` 清单中的多个代理渲染任务。
+#[allow(clippy::too_many_arguments)]
+pub fn render_batch(
+    manifest_path: &Path,
+    out_dir: &Path,
+    scale: f64,
+    burn_captions: bool,
+    crf: i32,
+    continue_on_error: bool,
+    overwrite: bool,
+) -> Result<Value> {
+    let manifest: Value = serde_json::from_str(&std::fs::read_to_string(manifest_path)?)?;
+    if manifest["schema"].as_str() != Some("jianying-render-batch/v1") {
+        bail!("unsupported render batch schema");
+    }
+    let jobs = manifest["jobs"]
+        .as_array()
+        .context("render batch jobs must be an array")?;
+    if jobs.is_empty() {
+        bail!("render batch requires at least one job");
+    }
+    let base = manifest_path.parent().unwrap_or_else(|| Path::new("."));
+    std::fs::create_dir_all(out_dir)?;
+    let mut prepared = Vec::new();
+    let mut outputs = std::collections::BTreeSet::new();
+    for (index, job) in jobs.iter().enumerate() {
+        let draft = job["draft"]
+            .as_str()
+            .with_context(|| format!("render batch job {index} requires draft"))?;
+        let output = job["output"]
+            .as_str()
+            .with_context(|| format!("render batch job {index} requires output"))?;
+        let output_path = Path::new(output);
+        if output_path.is_absolute()
+            || output_path
+                .components()
+                .any(|component| matches!(component, std::path::Component::ParentDir))
+        {
+            bail!("render batch output must stay inside --out-dir: {output}");
+        }
+        let draft_path = Path::new(draft);
+        let draft_path = if draft_path.is_absolute() {
+            draft_path.to_path_buf()
+        } else {
+            base.join(draft_path)
+        };
+        crate::draft::validate_bundle(&draft_path)
+            .with_context(|| format!("render batch job {index} has invalid draft"))?;
+        let target = out_dir.join(output_path);
+        if !outputs.insert(target.clone()) {
+            bail!("duplicate render batch output: {}", target.display());
+        }
+        if target.exists() && !overwrite {
+            bail!(
+                "render batch output {} exists; pass --overwrite to replace it",
+                target.display()
+            );
+        }
+        if let Some(parent) = target.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        prepared.push((draft_path, target));
+    }
+
+    let mut results = Vec::new();
+    let mut failures = 0usize;
+    for (index, (draft, output)) in prepared.iter().enumerate() {
+        match render(draft, output, scale, burn_captions, crf) {
+            Ok(result) => {
+                results.push(serde_json::json!({"index":index,"ok":true,"result":result}))
+            }
+            Err(error) if continue_on_error => {
+                failures += 1;
+                results.push(
+                    serde_json::json!({"index":index,"ok":false,"error":format!("{error:#}"),
+                    "draft":draft,"output":output}),
+                );
+            }
+            Err(error) => bail!("render batch job {index} failed: {error:#}"),
+        }
+    }
+    Ok(
+        serde_json::json!({"schema":"jianying-render-batch-result/v1","jobs":results.len(),
+        "succeeded":results.len()-failures,"failed":failures,"results":results,
+        "preview":true}),
+    )
 }

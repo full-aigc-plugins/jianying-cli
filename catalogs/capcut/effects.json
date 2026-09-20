@@ -1,0 +1,9 @@
+[
+  {"slug":"shake","name":"Shake","effect_id":"7061205058364788270","resource_id":"7061205058364788270","effect_type":"video_effect"},
+  {"slug":"vhs","name":"VHS","effect_id":"6706773500257242119","resource_id":"6706773500257242119","effect_type":"video_effect"},
+  {"slug":"cinematic","name":"Cinematic","effect_id":"7102283971168211981","resource_id":"7102283971168211981","effect_type":"video_effect"},
+  {"slug":"light-leak","name":"Light Leak","effect_id":"7039726019823718926","resource_id":"7039726019823718926","effect_type":"video_effect"},
+  {"slug":"film-grain","name":"Film Grain","effect_id":"6921123676029981197","resource_id":"6921123676029981197","effect_type":"video_effect"},
+  {"slug":"chromatic","name":"Chromatic","effect_id":"7069620856462184973","resource_id":"7069620856462184973","effect_type":"video_effect"},
+  {"slug":"vignette","name":"Vignette","effect_id":"6710812571147752967","resource_id":"6710812571147752967","effect_type":"video_effect"}
+]

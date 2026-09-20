@@ -1,0 +1,111 @@
+{
+  "schema_version": "jianying-local-tts-sources/v1",
+  "observed_at": "2026-09-20",
+  "distribution_policy": {
+    "source_copied": false,
+    "model_weights_bundled": false,
+    "selected_artifact_review_required": true
+  },
+  "sources": [
+    {
+      "id": "qwen3-tts",
+      "repository": "https://github.com/QwenLM/Qwen3-TTS",
+      "revision": "022e286b98fbec7e1e916cb940cdf532cd9f488e",
+      "code_license": "Apache-2.0",
+      "model_license": "selected-artifact-review-required",
+      "commercial_policy": "allowed_after_artifact_review",
+      "integration": "local-process",
+      "evidence": ["LICENSE", "README.md#vllm-usage"]
+    },
+    {
+      "id": "cosyvoice",
+      "repository": "https://github.com/FunAudioLLM/CosyVoice",
+      "revision": "074ca6dc9e80a2f424f1f74b48bdd7d3fea531cc",
+      "code_license": "Apache-2.0",
+      "model_license": "selected-artifact-review-required",
+      "commercial_policy": "allowed_after_artifact_review",
+      "integration": "cosyvoice-fastapi",
+      "evidence": ["LICENSE", "runtime/python/fastapi/server.py"]
+    },
+    {
+      "id": "gpt-sovits",
+      "repository": "https://github.com/RVC-Boss/GPT-SoVITS",
+      "revision": "48b1a0169a28582a8984402f82cf438d3bfa6aca",
+      "code_license": "MIT",
+      "model_license": "selected-artifact-review-required",
+      "commercial_policy": "allowed_after_artifact_review",
+      "integration": "generic-http",
+      "evidence": ["LICENSE"]
+    },
+    {
+      "id": "melotts",
+      "repository": "https://github.com/myshell-ai/MeloTTS",
+      "revision": "209145371cff8fc3bd60d7be902ea69cbdb7965a",
+      "code_license": "MIT",
+      "model_license": "selected-artifact-review-required",
+      "commercial_policy": "allowed_after_artifact_review",
+      "integration": "local-process",
+      "evidence": ["LICENSE"]
+    },
+    {
+      "id": "chattts",
+      "repository": "https://github.com/2noise/ChatTTS",
+      "revision": "77b89ee281cd479f5b1a787ada330dc975ca1f2a",
+      "code_license": "AGPL-3.0-or-later",
+      "model_license": "CC-BY-NC-4.0",
+      "commercial_policy": "non_commercial",
+      "integration": "generic-http",
+      "evidence": ["LICENSE", "README.md#licenses"]
+    },
+    {
+      "id": "emotivoice",
+      "repository": "https://github.com/netease-youdao/EmotiVoice",
+      "revision": "59f0f36de4db12825f4705dd4e0780d79dd6bb01",
+      "code_license": "Apache-2.0",
+      "model_license": "selected-artifact-review-required",
+      "commercial_policy": "allowed_after_artifact_review",
+      "integration": "openai-audio-loopback",
+      "evidence": ["LICENSE", "README.zh.md"]
+    },
+    {
+      "id": "mars5-tts",
+      "repository": "https://github.com/Camb-ai/MARS5-TTS",
+      "revision": "84697c8673d6277d329381acfd796114b02d531f",
+      "code_license": "AGPL-3.0-only",
+      "model_license": "selected-artifact-review-required",
+      "commercial_policy": "copyleft_compliance_required",
+      "integration": "external-local-process",
+      "evidence": ["LICENSE", "README.md#license"]
+    },
+    {
+      "id": "f5-tts",
+      "repository": "https://github.com/SWivid/F5-TTS",
+      "revision": "9c614e9657089213efc6a7421b30630be138a3f5",
+      "code_license": "MIT",
+      "model_license": "CC-BY-NC-4.0-public-base-weights",
+      "commercial_policy": "non_commercial",
+      "integration": "local-process",
+      "evidence": ["LICENSE", "README.md#license"]
+    },
+    {
+      "id": "fish-speech",
+      "repository": "https://github.com/fishaudio/fish-speech",
+      "revision": "214da3cd841bda85da2496b96cd3c4d7edb1337e",
+      "code_license": "Fish-Audio-Research-License",
+      "model_license": "Fish-Audio-Research-License",
+      "commercial_policy": "permission_required",
+      "integration": "generic-http",
+      "evidence": ["LICENSE#commercial-use"]
+    },
+    {
+      "id": "indextts",
+      "repository": "https://github.com/index-tts/index-tts",
+      "revision": "ee40fa7d6c6b8a2c7f06105f9f1e65775b74868c",
+      "code_license": "bilibili-model-use-license-agreement",
+      "model_license": "bilibili-model-use-license-agreement",
+      "commercial_policy": "permission_required",
+      "integration": "generic-http",
+      "evidence": ["LICENSE", "README.md#license"]
+    }
+  ]
+}

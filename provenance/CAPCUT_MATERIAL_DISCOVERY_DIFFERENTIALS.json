@@ -1,0 +1,29 @@
+{
+  "schema": "jianying-capcut-material-discovery-differential/v1",
+  "upstream": {
+    "repository": "renezander030/capcut-cli",
+    "commit": "49f70e3b07f1a236d45acb9b49a70c141dd1ee98"
+  },
+  "runner": "tools/capcut_material_discovery_differential.py",
+  "rust_cli": "provided-by-runner",
+  "cases": [
+    {
+      "command": "materials",
+      "status": "exact",
+      "variants": [
+        "type-counts",
+        "type-filter-summaries"
+      ]
+    },
+    {
+      "command": "material",
+      "status": "exact",
+      "variants": [
+        "case-insensitive-id-prefix",
+        "lossless-detail"
+      ]
+    }
+  ],
+  "passed": 2,
+  "failed": 0
+}

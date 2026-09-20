@@ -6,6 +6,8 @@ semantically. pyJianYingDraft output is the authority for wire shapes.
 Usage:
     python3 tools/parity_run.py [--bin target/release/jianying] [--pyjyd-src DIR]
                                 [--scenario tests/parity/scenarios/xx.json]
+                                [--report provenance/PARITY_RUN.json]
+                                [--self-test-diagnostics]
 
 Each scenario file: {name, pyjyd_allowed_extra?: bool, plan: {...}}.
 Volatile fields (ids, timestamps, absolute paths) are excluded; entries are
@@ -153,21 +155,29 @@ def compare(ref_tl, cli_tl, superset=False):
     ref_tracks = segment_semantics(ref_tl)
     cli_tracks = segment_semantics(cli_tl)
     if len(ref_tracks) != len(cli_tracks):
-        issues.append(f"track count {len(cli_tracks)} != reference {len(ref_tracks)}")
+        issues.append({"path": "/tracks", "expected": len(ref_tracks),
+                       "actual": len(cli_tracks), "message": "track count differs"})
     for i, (r, c) in enumerate(zip(ref_tracks, cli_tracks)):
         if r["type"] != c["type"]:
-            issues.append(f"track {i} type {c['type']} != reference {r['type']}")
+            issues.append({"path": f"/tracks/{i}/type", "expected": r["type"],
+                           "actual": c["type"], "message": "track type differs"})
         for j, (rs, cs) in enumerate(zip(r["segments"], c["segments"])):
             for k in rs:
                 if k == "material_bucket" or k == "refs":
                     continue
                 if cs.get(k) != rs[k]:
-                    issues.append(f"track {i} seg {j} field {k}: "
-                                  f"{json.dumps(cs.get(k), ensure_ascii=False)} != "
-                                  f"reference {json.dumps(rs[k], ensure_ascii=False)}")
+                    issues.append({
+                        "path": f"/tracks/{i}/segments/{j}/{pointer_escape(k)}",
+                        "expected": rs[k], "actual": cs.get(k),
+                        "message": "segment field differs",
+                    })
             for k in rs.get("refs", ()):
                 if k not in cs.get("refs", ()):
-                    issues.append(f"track {i} seg {j}: missing ref entry {json.dumps(k, ensure_ascii=False)[:200]}")
+                    issues.append({
+                        "path": f"/tracks/{i}/segments/{j}/extra_material_refs",
+                        "expected": k, "actual": None,
+                        "message": "referenced material entry is missing",
+                    })
     if superset:
         # CLI extensions (e.g. multi-range styled text) are supersets of the
         # reference: compare only the base style
@@ -186,9 +196,49 @@ def compare(ref_tl, cli_tl, superset=False):
         cli_entries = cli_mats.get(bucket, [])
         for re_ in ref_entries:
             if not entry_subset(re_, cli_entries):
-                issues.append(
-                    f"missing {bucket} entry: {json.dumps(re_, ensure_ascii=False)[:400]}")
+                issues.append({
+                    "path": f"/materials/{pointer_escape(bucket)}",
+                    "expected": re_, "actual": cli_entries,
+                    "message": "material entry is missing",
+                })
     return issues
+
+
+def pointer_escape(value):
+    """Escape one RFC 6901 JSON Pointer segment."""
+    return str(value).replace("~", "~0").replace("/", "~1")
+
+
+def failure_record(scenario_path, name, comparison, issues):
+    """Build a failure carrying its fixture and shell-free reproduction argv."""
+    return {
+        "scenario": scenario_path.name,
+        "name": name,
+        "comparison": comparison,
+        "status": "failed",
+        "issues": issues,
+        "fixture": scenario_path.relative_to(ROOT).as_posix(),
+        "reproduce": [
+            "python3", "tools/parity_run.py", "--scenario", scenario_path.name,
+            "--pyjyd-src", "<PINNED_PYJYD_PATH>",
+            "--bin", "target/release/jianying",
+        ],
+    }
+
+
+def self_test_diagnostics():
+    reference = {"tracks": [{"type": "video", "segments": []}], "materials": {}}
+    actual = {"tracks": [{"type": "audio", "segments": []}], "materials": {}}
+    issues = compare(reference, actual)
+    assert issues == [{"path": "/tracks/0/type", "expected": "video",
+                       "actual": "audio", "message": "track type differs"}]
+    fixture = ROOT / "tests" / "parity" / "scenarios" / "01-basic.json"
+    record = failure_record(fixture, "diagnostic-self-test", "normalized_equivalent", issues)
+    assert record["fixture"] == "tests/parity/scenarios/01-basic.json"
+    assert record["reproduce"][0:2] == ["python3", "tools/parity_run.py"]
+    assert record["reproduce"][3] == "01-basic.json"
+    print(json.dumps({"ok": True, "path": issues[0]["path"],
+                      "fixture": record["fixture"], "reproduce": record["reproduce"]}))
 
 
 def tim_value(v):
@@ -222,9 +272,13 @@ parity_reference.build({json.dumps(str(plan_path))}, {json.dumps(str(out_dir))})
 
 def main():
     args = sys.argv[1:]
+    if "--self-test-diagnostics" in args:
+        self_test_diagnostics()
+        return
     bin_path = ROOT / "target" / "release" / "jianying"
     pyjyd_src = Path("/tmp/pyjyd-study/pyJianYingDraft")
     scenario_filter = None
+    report_path = None
     i = 0
     while i < len(args):
         if args[i] == "--bin":
@@ -233,6 +287,8 @@ def main():
             pyjyd_src = Path(args[i + 1]); i += 2
         elif args[i] == "--scenario":
             scenario_filter = args[i + 1]; i += 2
+        elif args[i] == "--report":
+            report_path = Path(args[i + 1]); i += 2
         else:
             i += 1
 
@@ -240,7 +296,7 @@ def main():
     if scenario_filter:
         scenarios = [s for s in scenarios if scenario_filter in s.name]
 
-    passed, failed = 0, []
+    passed, failed, records = 0, [], []
     for sc in scenarios:
         spec = json.loads(sc.read_text())
         name = spec["name"]
@@ -279,16 +335,40 @@ def main():
                 cli_tl = json.loads((tmp / "cli" / "draft_content.json").read_text())
                 issues = compare(ref_tl, cli_tl, superset=bool(spec.get("expect_superset")))
             except RuntimeError as exc:
-                issues = [f"harness error: {exc}"]
+                issues = [{"path": "/", "expected": "successful differential execution",
+                           "actual": type(exc).__name__, "message": f"harness error: {exc}"}]
         if issues:
             failed.append((name, issues))
-            print(f"FAIL {name}")
-            for msg in issues[:6]:
-                print(f"     - {msg}")
+            comparison = "approved_difference" if spec.get("expect_superset") else "normalized_equivalent"
+            records.append(failure_record(sc, name, comparison, issues))
+            print(f"FAIL {name} ({sc.relative_to(ROOT)})")
+            for issue in issues[:6]:
+                print(f"     - {issue['path']}: {issue['message']}")
+            print("     reproduce:", " ".join(records[-1]["reproduce"]))
         else:
             passed += 1
+            records.append({
+                "scenario": sc.name,
+                "name": name,
+                "comparison": "approved_difference" if spec.get("expect_superset") else "normalized_equivalent",
+                "status": "passed",
+                "issues": [],
+            })
             print(f"PASS {name}")
     print(f"\nparity: {passed} passed, {len(failed)} failed")
+    if report_path:
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(json.dumps({
+            "schema": "jianying-python-rust-parity-run/v1",
+            "python_source": {
+                "project": "GuanYixuan/pyJianYingDraft",
+                "commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
+                "media_probe": "tools/pymediainfo.py ffprobe compatibility adapter",
+            },
+            "rust_binary": str(bin_path.relative_to(ROOT) if bin_path.is_relative_to(ROOT) else bin_path),
+            "summary": {"passed": passed, "failed": len(failed), "total": len(records)},
+            "scenarios": records,
+        }, ensure_ascii=False, indent=2) + "\n")
     if failed:
         sys.exit(1)
 

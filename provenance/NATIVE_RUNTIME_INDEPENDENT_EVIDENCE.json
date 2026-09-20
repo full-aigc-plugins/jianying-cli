@@ -1,0 +1,58 @@
+{
+  "schema": "jianying-native-runtime-independent-evidence/v1",
+  "restricted_source": {
+    "id": "jianying-headless-capability-target",
+    "commit": "bb1e72cfc2bbed71ba7587548cebc85330b3e29a",
+    "decision": "blocked_as_implementation_source",
+    "review_result": "no_source_tests_blueprints_resources_fixtures_or_constants_used"
+  },
+  "policy": {
+    "material_origin": "project_generated_at_test_runtime",
+    "network": "disabled",
+    "real_editor": "not_used",
+    "claim_limit": "synthetic_contract_evidence_only"
+  },
+  "implementation_roots": [
+    "crates/jianying-runtime/src",
+    "crates/jianying-media/src",
+    "crates/jianying-jobs/src"
+  ],
+  "cases": [
+    {
+      "id": "runtime-profile-probe",
+      "test_path": "crates/jianying-runtime/tests/runtime_profile_probe.rs",
+      "material_origin": "project_generated_at_test_runtime",
+      "evidence_level": "unit",
+      "covers": ["product", "version", "platform", "file_identity", "permissions", "draft_root", "materials", "capability", "editor_write_guard"]
+    },
+    {
+      "id": "isolated-draft-copy",
+      "test_path": "crates/jianying-runtime/tests/isolated_draft_copy.rs",
+      "material_origin": "project_generated_at_test_runtime",
+      "evidence_level": "structural",
+      "covers": ["independent_copy", "source_unchanged", "full_tree_sha256_diff"]
+    },
+    {
+      "id": "owned-process-control",
+      "test_path": "crates/jianying-runtime/tests/local_runtime_adapter.rs",
+      "material_origin": "project_generated_at_test_runtime",
+      "evidence_level": "unit",
+      "covers": ["start", "status", "stop", "owned_process_only", "structured_argv"]
+    },
+    {
+      "id": "asr-provider-ledger",
+      "test_path": "crates/jianying-jobs/tests/asr_ledger.rs",
+      "material_origin": "project_generated_at_test_runtime",
+      "evidence_level": "unit",
+      "covers": ["content_hash", "executor_identity", "single_submit", "artifact_reuse", "paid_approval", "ambiguous_reconciliation"]
+    },
+    {
+      "id": "native-export-task",
+      "test_path": "crates/jianying-jobs/tests/native_export_task.rs",
+      "material_origin": "project_generated_at_test_runtime",
+      "evidence_level": "structural",
+      "covers": ["explicit_approval", "monotonic_progress", "interruption_checkpoint", "result_sha256", "proxy_native_separation"]
+    }
+  ],
+  "ci_command": "cargo test --workspace --all-targets"
+}

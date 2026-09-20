@@ -1,0 +1,48 @@
+{
+  "duration": 3000000,
+  "fps": 30.0,
+  "canvas_config": {
+    "width": 1280,
+    "height": 720,
+    "ratio": "original"
+  },
+  "tracks": [
+    {
+      "attribute": 0,
+      "flag": 0,
+      "is_default_name": false,
+      "name": "text",
+      "type": "text",
+      "segments": [
+        {
+          "target_timerange": {
+            "start": 0,
+            "duration": 3000000
+          },
+          "speed": 1.0,
+          "volume": 1.0,
+          "clip": {
+            "alpha": 1.0,
+            "flip": {
+              "horizontal": false,
+              "vertical": false
+            },
+            "rotation": 0.0,
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "transform": {
+              "x": 0.0,
+              "y": -0.78
+            }
+          },
+          "uniform_scale": {
+            "on": true,
+            "value": 1.0
+          }
+        }
+      ]
+    }
+  ]
+}

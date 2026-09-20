@@ -70,6 +70,29 @@ fn store_list_has_remove_roundtrip() {
     std::fs::create_dir_all(&root).unwrap();
     store::publish(&built, &root, true).unwrap();
 
+    draft::validate_bundle(&root.join("s1")).unwrap();
+    let published_meta: Value = serde_json::from_str(
+        &std::fs::read_to_string(root.join("s1/draft_meta_info.json")).unwrap(),
+    )
+    .unwrap();
+    let root_meta: Value =
+        serde_json::from_str(&std::fs::read_to_string(root.join("root_meta_info.json")).unwrap())
+            .unwrap();
+    let registered = &root_meta["all_draft_store"][0];
+    for field in [
+        "draft_id",
+        "draft_name",
+        "draft_fold_path",
+        "draft_root_path",
+        "draft_json_file",
+        "tm_duration",
+    ] {
+        assert_eq!(
+            registered[field], published_meta[field],
+            "store mirror {field}"
+        );
+    }
+
     let listed = store::list(&root).unwrap();
     assert_eq!(listed["drafts"], json!(["s1"]));
     assert_eq!(store::has(&root, "s1").unwrap()["exists"], json!(true));
@@ -141,11 +164,20 @@ fn template_duplicate_replace_import() {
     .unwrap();
     let r = template::import_track_at(&d2, &with_audio.join("t3src"), "audio", None).unwrap();
     assert_eq!(r["status"], json!("imported"));
+    draft::validate_bundle(&d2).unwrap();
+    let imported: Value =
+        serde_json::from_str(&std::fs::read_to_string(d2.join("draft_content.json")).unwrap())
+            .unwrap();
+    let imported_audio_path =
+        Path::new(imported["materials"]["audios"][0]["path"].as_str().unwrap());
+    assert!(imported_audio_path.starts_with(&d2));
+    assert!(imported_audio_path.is_file());
     // insert-track position semantics (pyJYD insert_track at_index parity)
     let d4 = dir.join("t4");
     template::duplicate(&built, "t4", None).unwrap();
     let r2 = template::import_track_at(&d4, &d2, "audio", Some("video")).unwrap();
     assert_eq!(r2["status"], json!("imported"));
+    draft::validate_bundle(&d4).unwrap();
     let tl4: Value =
         serde_json::from_str(&std::fs::read_to_string(d4.join("draft_content.json")).unwrap())
             .unwrap();
@@ -173,6 +205,22 @@ fn template_duplicate_replace_import() {
     assert_eq!(tl["duration"], json!(2_000_000));
     // duplicate import of the same track name is refused
     assert!(template::import_track_at(&d2, &with_audio.join("t3src"), "audio", None).is_err());
+
+    // build-on-template copies local assets instead of retaining a dependency
+    // on the source draft directory.
+    let overlay = build_simple(&dir, "overlay");
+    let mut overlay_timeline: Value =
+        serde_json::from_str(&std::fs::read_to_string(overlay.join("draft_content.json")).unwrap())
+            .unwrap();
+    template::build_on_template(&built, &overlay, &mut overlay_timeline, "overlay").unwrap();
+    template::save_timeline(&overlay, &overlay_timeline).unwrap();
+    draft::validate_bundle(&overlay).unwrap();
+    assert_eq!(overlay_timeline["tracks"].as_array().unwrap().len(), 4);
+    for video in overlay_timeline["materials"]["videos"].as_array().unwrap() {
+        let path = Path::new(video["path"].as_str().unwrap());
+        assert!(path.starts_with(&overlay));
+        assert!(path.is_file());
+    }
 }
 
 #[test]
@@ -207,6 +255,29 @@ fn verify_catches_injected_corruption() {
 
     std::fs::write(&tl_path, &original).unwrap();
     assert_eq!(draft::verify(&built).unwrap()["ok"], json!(true));
+
+    // 4) the second timeline file is an exact mirror, not a fallback copy
+    let info_path = built.join("draft_info.json");
+    let mut info: Value = serde_json::from_str(&original).unwrap();
+    info["name"] = json!("broken-mirror");
+    std::fs::write(&info_path, serde_json::to_string_pretty(&info).unwrap()).unwrap();
+    let mirrored = draft::verify(&built).unwrap();
+    assert_eq!(mirrored["ok"], json!(false));
+    assert!(mirrored["issues"].to_string().contains("mirror"));
+    std::fs::write(&info_path, &original).unwrap();
+
+    // 5) local video/audio paths must remain registered in draft_meta_info
+    let meta_path = built.join("draft_meta_info.json");
+    let original_meta = std::fs::read_to_string(&meta_path).unwrap();
+    let mut meta: Value = serde_json::from_str(&original_meta).unwrap();
+    meta["draft_materials"] = json!([]);
+    std::fs::write(&meta_path, serde_json::to_string_pretty(&meta).unwrap()).unwrap();
+    let unregistered = draft::verify(&built).unwrap();
+    assert_eq!(unregistered["ok"], json!(false));
+    assert!(unregistered["issues"]
+        .to_string()
+        .contains("not registered"));
+    std::fs::write(&meta_path, original_meta).unwrap();
 }
 
 #[test]
