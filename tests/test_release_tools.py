@@ -50,22 +50,22 @@ class ReleaseIndexTests(unittest.TestCase):
             evidence = {"verificationResult": {"statement": {
                 "predicate": {
                     "repository": "full-aigc-plugins/jianying-cli",
-                    "tag": "v1.6.0",
+                    "tag": "v1.6.1",
                 },
                 "subject": [
-                    {"uri": "pkg:github/full-aigc-plugins/jianying-cli@v1.6.0",
+                    {"uri": "pkg:github/full-aigc-plugins/jianying-cli@v1.6.1",
                      "digest": {"sha1": commit}},
                     {"name": asset.name,
                      "digest": {"sha256": hashlib.sha256(b"release").hexdigest()}},
                 ],
             }}}
             ATTESTATION.verify(
-                evidence, "full-aigc-plugins/jianying-cli", "v1.6.0",
+                evidence, "full-aigc-plugins/jianying-cli", "v1.6.1",
                 commit, [asset],
             )
             with self.assertRaisesRegex(ValueError, "tag object differs"):
                 ATTESTATION.verify(
-                    evidence, "full-aigc-plugins/jianying-cli", "v1.6.0",
+                    evidence, "full-aigc-plugins/jianying-cli", "v1.6.1",
                     "b" * 40, [asset],
                 )
 
@@ -77,7 +77,7 @@ class ReleaseIndexTests(unittest.TestCase):
             )
 
         self.assertIsNone(PUBLICATION.query_release_metadata(
-            "full-aigc-plugins/jianying-cli", "v1.6.0", missing,
+            "full-aigc-plugins/jianying-cli", "v1.6.1", missing,
         ))
 
         def forbidden(*_args, **_kwargs):
@@ -88,11 +88,11 @@ class ReleaseIndexTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "cannot query GitHub release"):
             PUBLICATION.query_release_metadata(
-                "full-aigc-plugins/jianying-cli", "v1.6.0", forbidden,
+                "full-aigc-plugins/jianying-cli", "v1.6.1", forbidden,
             )
 
     def test_release_publication_binds_lightweight_and_annotated_remote_tags(self) -> None:
-        release_ref = "v1.6.0"
+        release_ref = "v1.6.1"
         commit = "a" * 40
         tag_object = "b" * 40
         lightweight = f"{commit}\trefs/tags/{release_ref}\n"
@@ -120,20 +120,20 @@ class ReleaseIndexTests(unittest.TestCase):
             second.write_bytes(b"second")
             expected = [first, second]
 
-            created = PUBLICATION.plan_publication(None, expected, "v1.6.0")
+            created = PUBLICATION.plan_publication(None, expected, "v1.6.1")
             self.assertEqual(created["action"], "create_draft")
             self.assertEqual(created["missing"], [str(first), str(second)])
 
             partial = PUBLICATION.plan_publication(
                 {
-                    "tagName": "v1.6.0",
+                    "tagName": "v1.6.1",
                     "isDraft": True,
                     "isPrerelease": False,
                     "isImmutable": False,
                     "assets": [PUBLICATION.describe_expected(first)],
                 },
                 expected,
-                "v1.6.0",
+                "v1.6.1",
             )
             self.assertEqual(partial["action"], "resume_draft")
             self.assertEqual(partial["missing"], [str(second)])
@@ -144,28 +144,28 @@ class ReleaseIndexTests(unittest.TestCase):
             ]
             complete = PUBLICATION.plan_publication(
                 {
-                    "tagName": "v1.6.0",
+                    "tagName": "v1.6.1",
                     "isDraft": True,
                     "isPrerelease": False,
                     "isImmutable": False,
                     "assets": complete_assets,
                 },
                 expected,
-                "v1.6.0",
+                "v1.6.1",
             )
             self.assertEqual(complete["action"], "publish_draft")
             self.assertEqual(complete["missing"], [])
 
             immutable = PUBLICATION.plan_publication(
                 {
-                    "tagName": "v1.6.0",
+                    "tagName": "v1.6.1",
                     "isDraft": False,
                     "isPrerelease": False,
                     "isImmutable": True,
                     "assets": complete_assets,
                 },
                 expected,
-                "v1.6.0",
+                "v1.6.1",
             )
             self.assertEqual(immutable["action"], "verify_existing")
             self.assertEqual(immutable["missing"], [])
@@ -177,7 +177,7 @@ class ReleaseIndexTests(unittest.TestCase):
             asset.write_bytes(b"expected")
             expected_asset = PUBLICATION.describe_expected(asset)
             base = {
-                "tagName": "v1.6.0",
+                "tagName": "v1.6.1",
                 "isDraft": True,
                 "isPrerelease": False,
                 "isImmutable": False,
@@ -200,7 +200,7 @@ class ReleaseIndexTests(unittest.TestCase):
                 with self.subTest(message=message):
                     with self.assertRaisesRegex(ValueError, message):
                         PUBLICATION.plan_publication(
-                            metadata, [asset], "v1.6.0"
+                            metadata, [asset], "v1.6.1"
                         )
 
     def test_github_actions_and_rust_toolchain_are_immutable(self) -> None:
@@ -299,7 +299,7 @@ class ReleaseIndexTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / "Cargo.toml").write_text(
-                '[package]\nname = "jianying-cli"\nversion = "1.6.0"\n',
+                '[package]\nname = "jianying-cli"\nversion = "1.6.1"\n',
                 encoding="utf-8",
             )
 
@@ -315,13 +315,13 @@ class ReleaseIndexTests(unittest.TestCase):
             self.assertFalse(report["releaseComplete"])
             self.assertEqual(report["blockedPrerequisites"], [])
             self.assertEqual(report["blocked"], ["release.expected"])
-            self.assertEqual(report["expected"]["ref"], "v1.6.0")
+            self.assertEqual(report["expected"]["ref"], "v1.6.1")
 
     def test_release_preflight_blocks_disabled_immutable_releases(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / "Cargo.toml").write_text(
-                '[package]\nname = "jianying-cli"\nversion = "1.6.0"\n',
+                '[package]\nname = "jianying-cli"\nversion = "1.6.1"\n',
                 encoding="utf-8",
             )
 
@@ -331,7 +331,7 @@ class ReleaseIndexTests(unittest.TestCase):
                 if arguments[0] == "api" and "rulesets" in arguments[1]:
                     return PREFLIGHT.release_tag_ruleset_fixture()
                 return {
-                    "tagName": "v1.6.0",
+                    "tagName": "v1.6.1",
                     "isDraft": False,
                     "isPrerelease": False,
                     "isImmutable": True,
@@ -350,7 +350,7 @@ class ReleaseIndexTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / "Cargo.toml").write_text(
-                '[package]\nname = "jianying-cli"\nversion = "1.6.0"\n',
+                '[package]\nname = "jianying-cli"\nversion = "1.6.1"\n',
                 encoding="utf-8",
             )
 
@@ -436,7 +436,7 @@ class ReleaseIndexTests(unittest.TestCase):
             directory = root / platform
             directory.mkdir()
             extension = ".zip" if platform.startswith("win32") else ".tar.gz"
-            archive = directory / f"jianying-cli-1.6.0-{platform}{extension}"
+            archive = directory / f"jianying-cli-1.6.1-{platform}{extension}"
             archive.write_bytes(f"archive:{platform}".encode())
             digest = hashlib.sha256(archive.read_bytes()).hexdigest()
             archive.with_suffix(archive.suffix + ".sha256").write_text(
@@ -444,7 +444,7 @@ class ReleaseIndexTests(unittest.TestCase):
             )
             entry = {
                 "schema": "jianying-cli-release-entry/v1",
-                "version": "1.6.0",
+                "version": "1.6.1",
                 "platform": platform,
                 "archiveName": archive.name,
                 "archiveSha256": digest,
@@ -453,7 +453,7 @@ class ReleaseIndexTests(unittest.TestCase):
                 "sbomSha256": "3" * 64,
                 "capabilitySchema": "jianying-capabilities/v1",
                 "contentState": "released",
-                "releaseRef": "v1.6.0",
+                "releaseRef": "v1.6.1",
                 "sourceCommit": "a" * 40,
             }
             (directory / f"{platform}.release-entry.json").write_text(
@@ -464,9 +464,9 @@ class ReleaseIndexTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self.fixture(root, ("darwin-arm64", "darwin-x64", "win32-x64"))
-            index = INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.0")
+            index = INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.1")
             self.assertEqual(index["schema"], "jianying-cli-release-index/v1")
-            self.assertEqual(index["releaseRef"], "v1.6.0")
+            self.assertEqual(index["releaseRef"], "v1.6.1")
             self.assertEqual(index["repository"], "full-aigc-plugins/jianying-cli")
             self.assertEqual(set(index["artifacts"]), INDEX.PLATFORMS)
             self.assertEqual(index["sourceCommit"], "a" * 40)
@@ -477,7 +477,7 @@ class ReleaseIndexTests(unittest.TestCase):
             root = Path(temporary)
             self.fixture(root, ("darwin-arm64", "darwin-x64", "win32-x64"))
             with self.assertRaisesRegex(ValueError, "canonical repository"):
-                INDEX.build_index(root, "mirror/jianying-cli", "v1.6.0")
+                INDEX.build_index(root, "mirror/jianying-cli", "v1.6.1")
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -488,7 +488,7 @@ class ReleaseIndexTests(unittest.TestCase):
             entry_path.write_text(json.dumps(entry))
             with self.assertRaisesRegex(ValueError, "exact archive name"):
                 INDEX.build_index(
-                    root, "full-aigc-plugins/jianying-cli", "v1.6.0"
+                    root, "full-aigc-plugins/jianying-cli", "v1.6.1"
                 )
 
     def test_missing_platform_and_tampered_archive_are_rejected(self) -> None:
@@ -496,14 +496,14 @@ class ReleaseIndexTests(unittest.TestCase):
             root = Path(temporary)
             self.fixture(root, ("darwin-arm64",))
             with self.assertRaisesRegex(ValueError, "exactly one entry"):
-                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.0")
+                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.1")
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self.fixture(root, ("darwin-arm64", "darwin-x64", "win32-x64"))
             next(root.rglob("*.zip")).write_bytes(b"tampered")
             with self.assertRaisesRegex(ValueError, "checksum differs"):
-                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.0")
+                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.1")
 
     def test_missing_or_tampered_archive_checksum_sidecar_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -513,7 +513,7 @@ class ReleaseIndexTests(unittest.TestCase):
             sidecar.unlink()
             with self.assertRaisesRegex(ValueError, "checksum sidecar"):
                 INDEX.build_index(
-                    root, "full-aigc-plugins/jianying-cli", "v1.6.0"
+                    root, "full-aigc-plugins/jianying-cli", "v1.6.1"
                 )
 
         with tempfile.TemporaryDirectory() as temporary:
@@ -523,7 +523,7 @@ class ReleaseIndexTests(unittest.TestCase):
             sidecar.write_text(f"{'0' * 64}  wrong-name.zip\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "checksum sidecar"):
                 INDEX.build_index(
-                    root, "full-aigc-plugins/jianying-cli", "v1.6.0"
+                    root, "full-aigc-plugins/jianying-cli", "v1.6.1"
                 )
 
     def test_unreleased_platform_entry_is_rejected(self) -> None:
@@ -536,7 +536,7 @@ class ReleaseIndexTests(unittest.TestCase):
             entry["releaseRef"] = None
             entry_path.write_text(json.dumps(entry))
             with self.assertRaisesRegex(ValueError, "not bound to the release tag"):
-                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.0")
+                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.1")
 
     def test_packager_rejects_stale_binary_contract_and_split_identity(self) -> None:
         embedded = json.loads(
@@ -552,7 +552,7 @@ class ReleaseIndexTests(unittest.TestCase):
 
         identity = {
             "contract_state": "released",
-            "release_ref": "v1.6.0",
+            "release_ref": "v1.6.1",
             "source_commit": "a" * 40,
         }
         split = dict(embedded)
@@ -572,26 +572,26 @@ class ReleaseIndexTests(unittest.TestCase):
             sbom = Path(temporary) / "SBOM.spdx.json"
             sbom.write_text("{}", encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "SPDX-2.3"):
-                PACKAGE.verify_sbom(sbom, "1.6.0")
+                PACKAGE.verify_sbom(sbom, "1.6.1")
 
             sbom.write_text(json.dumps({
                 "spdxVersion": "SPDX-2.3",
                 "dataLicense": "CC0-1.0",
                 "packages": [{
                     "name": "jianying-cli",
-                    "versionInfo": "1.6.0",
+                    "versionInfo": "1.6.1",
                     "licenseDeclared": "NOASSERTION",
                 }],
             }), encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "lack declared licenses"):
-                PACKAGE.verify_sbom(sbom, "1.6.0")
+                PACKAGE.verify_sbom(sbom, "1.6.1")
 
             document = json.loads(sbom.read_text(encoding="utf-8"))
             document["packages"][0]["licenseDeclared"] = "Apache-2.0"
-            document["packages"][0]["SPDXID"] = "SPDXRef-Package-jianying-cli-1.6.0"
+            document["packages"][0]["SPDXID"] = "SPDXRef-Package-jianying-cli-1.6.1"
             sbom.write_text(json.dumps(document), encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "Cargo.lock package coverage differs"):
-                PACKAGE.verify_sbom(sbom, "1.6.0")
+                PACKAGE.verify_sbom(sbom, "1.6.1")
 
     def test_packager_requires_complete_locked_sbom_identity_and_checksums(self) -> None:
         locked = tomllib.loads((ROOT / "Cargo.lock").read_text(encoding="utf-8"))["package"]
@@ -619,13 +619,13 @@ class ReleaseIndexTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             sbom = Path(temporary) / "SBOM.spdx.json"
             sbom.write_text(json.dumps(document), encoding="utf-8")
-            PACKAGE.verify_sbom(sbom, "1.6.0")
+            PACKAGE.verify_sbom(sbom, "1.6.1")
 
             truncated = dict(document)
             truncated["packages"] = packages[:-1]
             sbom.write_text(json.dumps(truncated), encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "Cargo.lock package coverage differs"):
-                PACKAGE.verify_sbom(sbom, "1.6.0")
+                PACKAGE.verify_sbom(sbom, "1.6.1")
 
             tampered = json.loads(json.dumps(document))
             checksummed = next(
@@ -634,7 +634,7 @@ class ReleaseIndexTests(unittest.TestCase):
             checksummed["checksums"][0]["checksumValue"] = "0" * 64
             sbom.write_text(json.dumps(tampered), encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "checksum differs from Cargo.lock"):
-                PACKAGE.verify_sbom(sbom, "1.6.0")
+                PACKAGE.verify_sbom(sbom, "1.6.1")
 
             wrong_source = json.loads(json.dumps(document))
             sourced = next(
@@ -644,7 +644,7 @@ class ReleaseIndexTests(unittest.TestCase):
             sourced["downloadLocation"] = "https://example.invalid/source"
             sbom.write_text(json.dumps(wrong_source), encoding="utf-8")
             with self.assertRaisesRegex(SystemExit, "source differs from Cargo.lock"):
-                PACKAGE.verify_sbom(sbom, "1.6.0")
+                PACKAGE.verify_sbom(sbom, "1.6.1")
 
     def test_generated_sbom_passes_full_cargo_lock_verification(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -686,7 +686,7 @@ class ReleaseIndexTests(unittest.TestCase):
         for platform in ("darwin-arm64", "win32-x64"):
             with self.subTest(platform=platform), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                bundle = root / f"jianying-cli-1.6.0-{platform}"
+                bundle = root / f"jianying-cli-1.6.1-{platform}"
                 (bundle / "nested").mkdir(parents=True)
                 binary = bundle / ("jianying.exe" if platform == "win32-x64" else "jianying")
                 binary.write_bytes(b"binary fixture")
