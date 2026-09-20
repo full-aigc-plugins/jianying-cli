@@ -215,7 +215,7 @@ jobs:
           --output dist/jianying-cli-release-index.json
       - name: Require GitHub immutable releases before publishing
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_RULESET_READ_TOKEN || github.token }}
         run: |
           enabled="$(gh api "repos/${GITHUB_REPOSITORY}/immutable-releases" --jq .enabled)"
           if [ "$enabled" != "true" ]; then

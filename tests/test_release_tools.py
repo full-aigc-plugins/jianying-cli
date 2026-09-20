@@ -324,9 +324,11 @@ class ReleaseIndexTests(unittest.TestCase):
         self.assertIn("Validate release tag and immutable repository setting", release_workflow)
         self.assertIn("tag ${GITHUB_REF_NAME} does not match Cargo version", release_workflow)
         self.assertIn("tools/release_preflight.py", release_workflow)
-        self.assertIn(
-            "secrets.RELEASE_RULESET_READ_TOKEN || github.token",
-            release_workflow,
+        self.assertGreaterEqual(
+            release_workflow.count(
+                "secrets.RELEASE_RULESET_READ_TOKEN || github.token"
+            ),
+            3,
         )
         self.assertIn("--output release-preflight.json", release_workflow)
         self.assertIn("name: jianying-cli-remote-preflight", release_workflow)
