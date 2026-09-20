@@ -5493,7 +5493,7 @@ fn print_output(value: serde_json::Value, json: bool) {
     );
 }
 
-fn main() {
+fn run_main() {
     let cli = Cli::parse();
     if cli.no_color {
         std::env::set_var("NO_COLOR", "1");
@@ -5511,6 +5511,24 @@ fn main() {
         }
         std::process::exit(1);
     }
+}
+
+fn main() {
+    #[cfg(windows)]
+    {
+        // Windows 可执行文件的默认主线程栈较小；完整 Clap 命令树需要显式栈预算。
+        let outcome = std::thread::Builder::new()
+            .name("jianying-main".to_owned())
+            .stack_size(16 * 1024 * 1024)
+            .spawn(run_main)
+            .expect("failed to start jianying main thread")
+            .join();
+        if let Err(panic) = outcome {
+            std::panic::resume_unwind(panic);
+        }
+    }
+    #[cfg(not(windows))]
+    run_main();
 }
 
 #[cfg(test)]
