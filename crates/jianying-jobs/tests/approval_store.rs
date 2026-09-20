@@ -1,16 +1,17 @@
 use jianying_jobs::{ApprovalBinding, ApprovalError, ApprovalRecord, ApprovalStore};
-use std::path::PathBuf;
 
 #[test]
 fn approval_is_exactly_bound_expires_and_is_single_use() {
     let root = std::env::temp_dir().join(format!("jianying-approval-store-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&root);
     let store = ApprovalStore::new(&root);
+    let workspace = root.join("workspace");
+    let draft = workspace.join("draft");
     let binding = ApprovalBinding::new(
         "project.publish".to_owned(),
         vec!["--force".to_owned(), "false".to_owned()],
-        PathBuf::from("/workspace"),
-        PathBuf::from("/workspace/draft"),
+        workspace.clone(),
+        draft.clone(),
         "jy-task-1".to_owned(),
     )
     .unwrap();
@@ -21,40 +22,40 @@ fn approval_is_exactly_bound_expires_and_is_single_use() {
         ApprovalBinding::new(
             "project.delete".to_owned(),
             vec!["--force".to_owned(), "false".to_owned()],
-            PathBuf::from("/workspace"),
-            PathBuf::from("/workspace/draft"),
+            workspace.clone(),
+            draft.clone(),
             "jy-task-1".to_owned(),
         )
         .unwrap(),
         ApprovalBinding::new(
             "project.publish".to_owned(),
             vec!["--force".to_owned(), "true".to_owned()],
-            PathBuf::from("/workspace"),
-            PathBuf::from("/workspace/draft"),
+            workspace.clone(),
+            draft.clone(),
             "jy-task-1".to_owned(),
         )
         .unwrap(),
         ApprovalBinding::new(
             "project.publish".to_owned(),
             vec!["--force".to_owned(), "false".to_owned()],
-            PathBuf::from("/other-workspace"),
-            PathBuf::from("/workspace/draft"),
+            root.join("other-workspace"),
+            draft.clone(),
             "jy-task-1".to_owned(),
         )
         .unwrap(),
         ApprovalBinding::new(
             "project.publish".to_owned(),
             vec!["--force".to_owned(), "false".to_owned()],
-            PathBuf::from("/workspace"),
-            PathBuf::from("/workspace/other-draft"),
+            workspace.clone(),
+            workspace.join("other-draft"),
             "jy-task-1".to_owned(),
         )
         .unwrap(),
         ApprovalBinding::new(
             "project.publish".to_owned(),
             vec!["--force".to_owned(), "false".to_owned()],
-            PathBuf::from("/workspace"),
-            PathBuf::from("/workspace/draft"),
+            workspace,
+            draft,
             "jy-task-2".to_owned(),
         )
         .unwrap(),
