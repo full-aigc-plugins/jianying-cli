@@ -222,3 +222,17 @@ index SHA-256 通过 `cli-released` 事件通知 `jianying-edit-plugin`。未配
 
 生成工作流不等于发布完成。插件只有在取得实际 workflow artifact、核对 archive
 checksum 并写入自身 CLI lock 后，才能进入 fresh-install 门禁。
+
+## v1.6.13 正式不可变发布
+
+2026-09-21，tag `v1.6.13` 对应 source commit
+`c9ba52ad8a359b6938275438c1e41a11b31f1765`。GitHub Actions run `35534748729` 的来源/parity
+门禁以及 macOS arm64、macOS x64、Windows x64 三个平台构建全部成功；各平台均执行原生测试、
+release binary、运行时命令面验证、SPDX SBOM、打包与 artifact 上传。公开 Release 为稳定、
+非草稿、非预发布且 `isImmutable=true`，共 10 个资产。
+
+`jianying-cli-release-index.json` 大小为 1,861 bytes，SHA-256 为
+`92681d802e1362945d95ab9643d92d44d7060a136718a0f686f204b869e7a497`。独立下载后，
+`gh release verify v1.6.13` 与 `gh release verify-asset` 均通过；index 同时绑定三个 archive、
+binary、capability manifest 和 SBOM 摘要。该证据完成 OpenSpec `9.5`，但不替代真实剪映
+冷重开、播放、原生导出或 Windows Runtime Profile canary。
