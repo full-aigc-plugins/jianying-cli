@@ -117,7 +117,7 @@
       "id": "capcut-transition-catalog",
       "pattern": "catalogs/capcut/transitions.json",
       "file_count": 1,
-      "tree_sha256": "31efb1ff886502f9b0df125e439435d2dcb35b5d87c911fd58bc32f6ba0f19b5",
+      "tree_sha256": "a27df59bb98bc803e76e7f421dcde73f8c2114e9ac6e5ef78e05af0a22ec89ca",
       "source": "capcut-cli",
       "usage_mode": "MIT fixed-commit metadata subset for offline transition resolution"
     },
@@ -125,7 +125,7 @@
       "id": "capcut-text-animation-catalogs",
       "pattern": "catalogs/capcut/*text_animations.json",
       "file_count": 2,
-      "tree_sha256": "a6892d896983702cf476477c4c0a625a8c6898abac8dfb256128ab8fc08ef796",
+      "tree_sha256": "c47000a361a18534adc31c44931550cd86bbbbd6ca3421dfc763130c28ea33b4",
       "source": "capcut-cli",
       "usage_mode": "MIT fixed-commit metadata subsets for CapCut and JianYing text animation resolution"
     },

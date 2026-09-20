@@ -841,7 +841,7 @@ fn build_with_tim_strings_produces_verifiable_draft() {
     std::fs::create_dir_all(&tmp).unwrap();
     // ffmpeg-synthesized media keeps this self-contained
     let media = tmp.join("a.mp4");
-    let ok = Command::new("ffmpeg")
+    let ok = match Command::new("ffmpeg")
         .args([
             "-v",
             "error",
@@ -853,7 +853,14 @@ fn build_with_tim_strings_produces_verifiable_draft() {
         ])
         .arg(&media)
         .output()
-        .unwrap();
+    {
+        Ok(output) => output,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("ffmpeg unavailable — skipping");
+            return;
+        }
+        Err(error) => panic!("failed to execute ffmpeg: {error}"),
+    };
     if !ok.status.success() {
         eprintln!("ffmpeg unavailable — skipping");
         return;
