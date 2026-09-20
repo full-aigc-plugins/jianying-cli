@@ -4746,11 +4746,20 @@ fn redact_path_text(text: &str) -> String {
             return text.replacen(&home, "$HOME", 1);
         }
     }
-    let path = Path::new(text);
-    if path.is_absolute() {
-        let name = path
-            .file_name()
-            .map(|name| name.to_string_lossy())
+    // 诊断可能包含另一平台生成的路径，不能只依赖当前宿主的 Path 语义。
+    let has_windows_drive = text.as_bytes().get(1) == Some(&b':')
+        && text
+            .as_bytes()
+            .get(2)
+            .is_some_and(|separator| matches!(separator, b'/' | b'\\'));
+    let is_cross_platform_absolute = text.starts_with('/')
+        || text.starts_with('\\')
+        || text.starts_with("//")
+        || has_windows_drive;
+    if is_cross_platform_absolute {
+        let name = text
+            .rsplit(['/', '\\'])
+            .find(|component| !component.is_empty())
             .unwrap_or_default();
         return format!("<redacted-path>/{name}");
     }
@@ -5514,11 +5523,15 @@ mod tests {
         let redacted = redact_diagnostics(json!({
             "token": "top-secret",
             "nested": {"api_key": "also-secret"},
-            "database": "/private/customer/jobs.sqlite3"
+            "database": "/private/customer/jobs.sqlite3",
+            "windows_path": "C:\\Users\\customer\\jobs.sqlite3",
+            "unc_root": "\\\\server\\share\\draft.json"
         }));
         assert_eq!(redacted["token"], "[REDACTED]");
         assert_eq!(redacted["nested"]["api_key"], "[REDACTED]");
         assert_eq!(redacted["database"], "<redacted-path>/jobs.sqlite3");
+        assert_eq!(redacted["windows_path"], "<redacted-path>/jobs.sqlite3");
+        assert_eq!(redacted["unc_root"], "<redacted-path>/draft.json");
         assert!(!redacted.to_string().contains("secret"));
         assert!(!redacted.to_string().contains("/private/customer"));
     }
