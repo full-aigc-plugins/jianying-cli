@@ -38,9 +38,42 @@ def query_release_metadata(
             and str(payload.get("status")) == "404"
             and payload.get("message") == "Not Found"
         ):
-            return None
-        detail = result.stderr.strip() or result.stdout.strip() or "unknown error"
-        raise ValueError(f"cannot query GitHub release: {detail}")
+            # GitHub 的按 tag 端点不会返回 Draft；继续扫描鉴权用户可见的
+            # Release 列表，避免创建 Draft 后被误判为仍不存在。
+            listed = runner(
+                [
+                    "gh", "api", "--paginate", "--slurp",
+                    f"repos/{repository}/releases?per_page=100",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if listed.returncode != 0:
+                detail = listed.stderr.strip() or listed.stdout.strip() or "unknown error"
+                raise ValueError(f"cannot list GitHub releases: {detail}")
+            try:
+                pages = json.loads(listed.stdout)
+            except json.JSONDecodeError as error:
+                raise ValueError("GitHub release list returned invalid JSON") from error
+            if not isinstance(pages, list) or any(
+                not isinstance(page, list) for page in pages
+            ):
+                raise ValueError("GitHub release list returned malformed pages")
+            matches = [
+                item
+                for page in pages
+                for item in page
+                if isinstance(item, dict) and item.get("tag_name") == release_ref
+            ]
+            if not matches:
+                return None
+            if len(matches) != 1:
+                raise ValueError("GitHub release list returned duplicate tags")
+            payload = matches[0]
+        else:
+            detail = result.stderr.strip() or result.stdout.strip() or "unknown error"
+            raise ValueError(f"cannot query GitHub release: {detail}")
     if not isinstance(payload, dict):
         raise ValueError("GitHub release query returned no object")
     assets = payload.get("assets")

@@ -70,7 +70,9 @@ class ReleaseIndexTests(unittest.TestCase):
                 )
 
     def test_release_query_treats_only_explicit_http_404_as_absent(self) -> None:
-        def missing(*_args, **_kwargs):
+        def missing(arguments, **_kwargs):
+            if "--slurp" in arguments:
+                return subprocess.CompletedProcess([], 0, "[]\n", "")
             return subprocess.CompletedProcess(
                 [], 1, '{"message":"Not Found","status":"404"}\n',
                 "gh: Not Found (HTTP 404)\n",
@@ -90,6 +92,23 @@ class ReleaseIndexTests(unittest.TestCase):
             PUBLICATION.query_release_metadata(
                 "full-aigc-plugins/jianying-cli", "v1.6.1", forbidden,
             )
+
+    def test_release_query_recovers_tagged_draft_from_release_list(self) -> None:
+        def draft(arguments, **_kwargs):
+            if "--slurp" in arguments:
+                return subprocess.CompletedProcess([], 0, '''[[{
+                  "tag_name":"v1.6.1","draft":true,"prerelease":false,
+                  "immutable":false,"assets":[]
+                }]]''', "")
+            return subprocess.CompletedProcess(
+                [], 1, '{"message":"Not Found","status":"404"}\n', "",
+            )
+
+        metadata = PUBLICATION.query_release_metadata(
+            "full-aigc-plugins/jianying-cli", "v1.6.1", draft,
+        )
+        self.assertTrue(metadata["isDraft"])
+        self.assertEqual(metadata["assets"], [])
 
     def test_release_publication_binds_lightweight_and_annotated_remote_tags(self) -> None:
         release_ref = "v1.6.1"
