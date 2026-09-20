@@ -77,7 +77,10 @@ def verify_windows_runtime_profile(capabilities: list[dict]) -> None:
 
 def verify_binary(binary: Path) -> dict:
     version_result = subprocess.run(
-        [str(binary), "--version"], check=True, capture_output=True, text=True
+        [str(binary), "--version"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
     )
     if version() not in version_result.stdout:
         raise SystemExit("binary version does not match Cargo.toml")
@@ -85,7 +88,7 @@ def verify_binary(binary: Path) -> dict:
         [str(binary), "capabilities", "--json"],
         check=True,
         capture_output=True,
-        text=True,
+        encoding="utf-8",
     )
     envelope = json.loads(capability_result.stdout)
     capability_entries = envelope["data"]["capabilities"]

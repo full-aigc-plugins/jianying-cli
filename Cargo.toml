@@ -1,6 +1,6 @@
 [package]
 name = "jianying-cli"
-version = "1.6.11"
+version = "1.6.12"
 edition = "2021"
 description = "Local JianYing/CapCut draft CLI in Rust — full-capability draft building from jianying-cli-plan/v1, verified and publishable, no account, no upload."
 license = "Apache-2.0"

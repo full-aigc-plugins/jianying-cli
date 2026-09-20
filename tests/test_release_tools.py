@@ -10,6 +10,7 @@ import sys
 import tempfile
 import tomllib
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -42,6 +43,33 @@ ATTESTATION_SPEC.loader.exec_module(ATTESTATION)
 
 
 class ReleaseIndexTests(unittest.TestCase):
+    def test_release_packager_decodes_binary_output_as_utf8(self) -> None:
+        capability_entries = [
+            {"id": capability, "status": "supported"}
+            for capability in PACKAGE.REQUIRED_RELEASE_CAPABILITIES
+        ]
+        capability_entries.append({
+            "id": "runtime.profile.windows",
+            "platform": "windows",
+            "status": "external_dependency",
+            "availability": "unsupported",
+            "label": "剪映 Windows 运行时",
+        })
+        envelope = {"data": {"capabilities": capability_entries}}
+        results = [
+            subprocess.CompletedProcess([], 0, "jianying 1.6.12\n", ""),
+            subprocess.CompletedProcess([], 0, json.dumps(envelope, ensure_ascii=False), ""),
+        ]
+        with patch.object(PACKAGE, "version", return_value="1.6.12"), patch.object(
+            PACKAGE.subprocess, "run", side_effect=results
+        ) as run:
+            PACKAGE.verify_binary(Path("jianying.exe"))
+
+        self.assertEqual(run.call_count, 2)
+        for invocation in run.call_args_list:
+            self.assertEqual(invocation.kwargs.get("encoding"), "utf-8")
+            self.assertNotIn("text", invocation.kwargs)
+
     def test_release_attestation_binds_commit_and_exact_assets(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             asset = Path(temporary) / "release.zip"
