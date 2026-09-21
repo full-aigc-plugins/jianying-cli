@@ -67,17 +67,43 @@ pub fn resolve_root(explicit: Option<&Path>) -> Result<PathBuf> {
     );
 }
 
+#[cfg(unix)]
+fn editors_from_process_listing(text: &str) -> Vec<String> {
+    ["JianyingPro", "CapCut", "VideoFusion-macOS"]
+        .into_iter()
+        .filter(|name| {
+            text.lines().any(|line| {
+                Path::new(line.trim())
+                    .file_name()
+                    .and_then(|name| name.to_str())
+                    == Some(*name)
+            })
+        })
+        .map(str::to_owned)
+        .collect()
+}
+
+#[cfg(all(test, unix))]
+mod editor_process_tests {
+    #[test]
+    fn identifies_actual_editor_executables_without_matching_helpers_or_parent_paths() {
+        let listing = "/Applications/VideoFusion-macOS.app/Contents/MacOS/VideoFusion-macOS\n/Applications/CapCut.app/Contents/MacOS/CapCut\nJianyingPro\n";
+        let found = super::editors_from_process_listing(listing);
+        assert_eq!(found.len(), 3);
+        assert!(found.iter().any(|name| name == "VideoFusion-macOS"));
+        assert!(super::editors_from_process_listing(
+            "/Applications/CapCut.app/Contents/MacOS/helper\nVideoFusion-macOSTray\nnot-JianyingPro\n"
+        ).is_empty());
+    }
+}
+
 pub fn editors_running() -> Vec<String> {
     let mut found = vec![];
     #[cfg(unix)]
     {
         if let Ok(out) = Command::new("ps").args(["-axo", "comm="]).output() {
             let text = String::from_utf8_lossy(&out.stdout);
-            for needle in ["JianyingPro", "CapCut"] {
-                if text.lines().any(|l| l.contains(needle)) {
-                    found.push(needle.to_string());
-                }
-            }
+            found.extend(editors_from_process_listing(&text));
         }
     }
     #[cfg(windows)]

@@ -16,6 +16,10 @@
 - **WHEN** 已知应用包包含匹配 executable
 - **THEN** 返回产品、平台、安装根、版本（若可得）、executable SHA-256/长度及关联草稿根，但 support status 仍为 unverified，下一步要求精确 Runtime Profile canary
 
+#### Scenario: 新版 macOS 剪映使用 VideoFusion 安装布局
+- **WHEN** 显式搜索根下存在 `VideoFusion-macOS.app` 或 `剪映专业版.app`，且其 executable 为 `Contents/MacOS/VideoFusion-macOS`
+- **THEN** 发现记录使用 `com.lemon.lvpro` 和 `VideoFusion-macOS` 进程名，固定版本与文件哈希；重复搜索根不得重复报告，且不得仅凭系统应用登记或废纸篓条目宣称运行时受支持
+
 #### Scenario: Windows Runtime Profile 尚无真实 canary
 - **WHEN** 发布制品声明 `runtime.profile.windows` 缺失、平台不是 Windows、状态不是 `external_dependency`，或 availability 不是 `unsupported`
 - **THEN** 发布运行时验证器和独立打包器都必须 fail closed；即使绕过 CI 步骤顺序也不能生成制品，只有真实 Windows 主机完成版本化 Runtime Profile canary 后，才允许通过后续规格变更提升支持状态
@@ -47,6 +51,10 @@
 #### Scenario: 编辑器仍在运行
 - **WHEN** 写入草稿库时检测到剪映仍在运行
 - **THEN** 系统拒绝写入并返回关闭编辑器后的恢复命令
+
+#### Scenario: 新版剪映进程使用 VideoFusion 名称
+- **WHEN** 进程列表的 executable basename 为 `VideoFusion-macOS`
+- **THEN** 草稿库写入门禁必须将其识别为运行中的编辑器；名称前缀、父目录包含产品名或独立 tray helper 不得冒充编辑器主进程
 
 ### Requirement: 自主实现来源隔离
 系统 MUST NOT 包含或派生自非商业 headless 仓库的源码、测试、蓝图、资源目录或实现常量；能力只能依据本项目自主设计、Apache/MIT 来源和合法黑盒验证实现。

@@ -112,6 +112,23 @@ pub fn discover_runtime_draft_roots(
 
 fn candidates(platform: RuntimePlatform) -> &'static [RuntimeCandidate] {
     const MACOS: &[RuntimeCandidate] = &[
+        // 新版剪映的应用包和进程使用 VideoFusion 名称，显示名称仍为剪映专业版。
+        (
+            "VideoFusion-macOS.app",
+            "Contents/MacOS/VideoFusion-macOS",
+            "jianying",
+            "JianYing Pro",
+            Some("com.lemon.lvpro"),
+            "VideoFusion-macOS",
+        ),
+        (
+            "剪映专业版.app",
+            "Contents/MacOS/VideoFusion-macOS",
+            "jianying",
+            "JianYing Pro",
+            Some("com.lemon.lvpro"),
+            "VideoFusion-macOS",
+        ),
         (
             "剪映专业版.app",
             "Contents/MacOS/JianyingPro",

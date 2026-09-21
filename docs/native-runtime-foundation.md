@@ -23,6 +23,18 @@ SHA-256/长度，并读取可得的 macOS bundle 版本；草稿根存在而应�
 `drafts_without_editor`。发现结果固定为 `support_status=unverified`、
 `automatic_routing=false`，不能替代精确 Runtime Profile 或真实宿主 canary。
 
+macOS 发现同时支持旧 `JianyingPro` 和新版 `VideoFusion-macOS` executable。
+新版应用包允许 `VideoFusion-macOS.app` 或中文显示名对应的 `剪映专业版.app`，
+使用 bundle ID `com.lemon.lvpro`。系统应用清单可能保留已移入废纸篓的条目，
+不能单凭应用清单判断安装可用；默认发现仍只扫描正常安装根。
+草稿写入的进程门禁按 executable 的完整 basename 匹配这两种剪映进程及 `CapCut`，
+不会把同名目录内的 helper 或 `VideoFusion-macOSTray` 当作编辑器主进程。
+
+2026-09-21 本机只读验证：恢复应用后，CLI 成功发现 `VideoFusion-macOS.app`，
+`CFBundleShortVersionString=11.5.13239`，executable 为 447632 字节，SHA-256 为
+`20cdaeb576fed9cdf85fc1858336a90291173d0ab03ccd0c225abe580ceae428`。
+这仅证明安装发现和文件身份；未作为冷重开、播放或原生导出证据。
+
 当前探测层是可复用的判定内核；支持 profile 仍需 8.9 与 9.3 的合法宿主 canary，因此
 capability manifest 不把真实剪映 runtime 控制宣称为 supported。
 
