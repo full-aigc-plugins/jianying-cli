@@ -343,7 +343,7 @@ fn last_metric(text: &str, label: &str) -> Option<f64> {
             let (_, rest) = line.rsplit_once(label)?;
             rest.split_whitespace().next()?.parse::<f64>().ok()
         })
-        .last()
+        .next_back()
 }
 
 /// 从 SRT 中识别窗口内重复的口播尝试，默认保留后一次。
