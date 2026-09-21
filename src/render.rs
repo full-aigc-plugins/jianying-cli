@@ -86,7 +86,9 @@ pub fn render(
             chain.push_str(&format!(
                 ",scale={out_w}:{out_h}:force_original_aspect_ratio=decrease,pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p"
             ));
-            vparts.push(format!("[v{input_idx}]{chain}"));
+            // ffmpeg 输入标签必须绑定真实输入流；`[vN]` 只作为本段滤镜输出。
+            // 若把 `[vN]` 同时当输入，代理渲染会绕过 trim 并输出完整源文件。
+            vparts.push(format!("[{input_idx}:v]{chain}[v{input_idx}]"));
             input_idx += 1;
         }
     }

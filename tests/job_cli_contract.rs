@@ -198,6 +198,108 @@ fn v1_and_v2_job_create_have_equivalent_observable_draft_semantics() {
 }
 
 #[test]
+fn job_source_range_controls_proxy_duration() {
+    let root = temp_root("job-source-range-proxy");
+    let media = root.join("source.mp4");
+    let generated = match Command::new("ffmpeg")
+        .args([
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=blue:s=320x240:d=4",
+            "-y",
+        ])
+        .arg(&media)
+        .output()
+    {
+        Ok(output) => output,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("ffmpeg unavailable — skipping");
+            return;
+        }
+        Err(error) => panic!("failed to execute ffmpeg: {error}"),
+    };
+    if !generated.status.success() {
+        eprintln!("ffmpeg unavailable — skipping");
+        return;
+    }
+    let job_path = root.join("job.json");
+    write_json(
+        &job_path,
+        &json!({
+            "schema":"jianying-job/v2","operation":"create",
+            "project":{"type":"new","project":{
+                "name":"trimmed-proxy","width":320,"height":240,
+                "frame_rate":{"numerator":30,"denominator":1},
+                "materials":[{"type":"video","id":"m1","path":media}],
+                "timeline":{"tracks":[{"id":"v1","kind":"video","segments":[{
+                    "type":"video","id":"s1","range":{"start_us":0,"duration_us":2_000_000},
+                    "material_id":"m1","source_range":{"start_us":1_000_000,"duration_us":2_000_000},
+                    "speed":1,"volume":1
+                }]}]}
+            }}
+        }),
+    );
+    let draft = root.join("draft");
+    let create = run(&[
+        "job",
+        "run",
+        job_path.to_str().unwrap(),
+        "--out",
+        draft.to_str().unwrap(),
+        "--json",
+    ]);
+    assert!(
+        create.status.success(),
+        "{}",
+        String::from_utf8_lossy(&create.stderr)
+    );
+    let preview = root.join("preview.mp4");
+    let render = run(&[
+        "render",
+        "proxy",
+        draft.to_str().unwrap(),
+        "--out",
+        preview.to_str().unwrap(),
+        "--json",
+    ]);
+    assert!(
+        render.status.success(),
+        "{}",
+        String::from_utf8_lossy(&render.stderr)
+    );
+    let probe = Command::new("ffprobe")
+        .args([
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=nw=1:nk=1",
+        ])
+        .arg(&preview)
+        .output()
+        .expect("ffprobe must accompany ffmpeg in this integration test");
+    assert!(
+        probe.status.success(),
+        "{}",
+        String::from_utf8_lossy(&probe.stderr)
+    );
+    let duration: f64 = String::from_utf8(probe.stdout)
+        .unwrap()
+        .trim()
+        .parse()
+        .unwrap();
+    assert!(
+        (1.9..=2.1).contains(&duration),
+        "proxy duration {duration} ignored the Job source range"
+    );
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
 fn json_mode_rejects_unknown_schema_with_a_structured_failure() {
     let root = temp_root("unknown-schema");
     let job_path = root.join("job.json");
