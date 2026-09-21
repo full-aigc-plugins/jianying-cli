@@ -7,6 +7,7 @@ fn run(args: &[&str]) -> Output {
         .unwrap()
 }
 
+#[cfg(unix)]
 fn executable(path: &std::path::Path) {
     use std::os::unix::fs::PermissionsExt;
     let mut permissions = std::fs::metadata(path).unwrap().permissions();
