@@ -4,6 +4,7 @@ pub mod capabilities;
 pub mod caption_ops;
 pub mod catalogs;
 pub mod compile_ops;
+pub mod control_catalog;
 pub mod domain_compat;
 pub mod draft;
 pub mod error_contract;

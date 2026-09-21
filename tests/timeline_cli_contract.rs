@@ -1,13 +1,37 @@
 use anyhow::Result;
 use jianying_cli::{draft, plan::Plan, probe::MediaInfo};
+use std::fs;
 use std::path::Path;
 use std::process::{Command, Output};
+#[cfg(unix)]
+use std::sync::OnceLock;
 
 fn run(args: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_jianying"))
-        .args(args)
-        .output()
-        .unwrap()
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.args(args);
+    // 时间线合同必须只观察合成草稿，不能被开发机上正在运行的剪映污染。
+    // 用无输出的 `ps` 测试替身隔离宿主进程；生产二进制仍保持运行中拒写门禁。
+    #[cfg(unix)]
+    command.env("PATH", isolated_process_path());
+    command.output().unwrap()
+}
+
+#[cfg(unix)]
+fn isolated_process_path() -> &'static str {
+    static PATH: OnceLock<String> = OnceLock::new();
+    PATH.get_or_init(|| {
+        use std::os::unix::fs::PermissionsExt;
+
+        let root = std::env::temp_dir().join(format!(
+            "jianying-timeline-contract-bin-{}",
+            std::process::id()
+        ));
+        fs::create_dir_all(&root).unwrap();
+        let ps = root.join("ps");
+        fs::write(&ps, "#!/bin/sh\nexit 0\n").unwrap();
+        fs::set_permissions(&ps, fs::Permissions::from_mode(0o700)).unwrap();
+        root.to_string_lossy().into_owned()
+    })
 }
 
 fn json(output: &Output) -> serde_json::Value {

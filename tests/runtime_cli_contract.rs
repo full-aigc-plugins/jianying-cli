@@ -17,6 +17,8 @@ fn runtime_help_exposes_probe_and_owned_process_controls() {
     let help = String::from_utf8(output.stdout).unwrap();
     for operation in [
         "discover",
+        "controls",
+        "entitlement",
         "status",
         "probe",
         "start",
@@ -25,6 +27,296 @@ fn runtime_help_exposes_probe_and_owned_process_controls() {
     ] {
         assert!(help.contains(operation), "missing {operation} in {help}");
     }
+}
+
+#[test]
+fn semantic_control_catalog_prefers_direct_draft_routes_and_contains_no_coordinates() {
+    let output = run(&["--json", "runtime", "controls", "list"]);
+    assert!(
+        output.status.success(),
+        "stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let envelope: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let controls = envelope["data"]["controls"].as_array().unwrap();
+    assert!(controls.len() >= 25);
+    let split = controls
+        .iter()
+        .find(|control| control["semantic_id"] == "timeline.segment.split")
+        .unwrap();
+    assert_eq!(split["route"], "draft_protocol");
+    assert_eq!(split["status"], "supported");
+    assert_eq!(split["capability"], "timeline.edit");
+    let undo = controls
+        .iter()
+        .find(|control| control["semantic_id"] == "timeline.session.undo")
+        .unwrap();
+    assert_eq!(undo["route"], "runtime_native");
+    assert_eq!(undo["status"], "partial");
+    assert!(!serde_json::to_string(&envelope)
+        .unwrap()
+        .contains("screen_coordinate"));
+
+    let direct = run(&[
+        "--json",
+        "runtime",
+        "controls",
+        "list",
+        "--route",
+        "draft_protocol",
+        "--status",
+        "supported",
+    ]);
+    assert!(direct.status.success());
+    let direct: Value = serde_json::from_slice(&direct.stdout).unwrap();
+    assert!(direct["data"]["controls"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|control| control["route"] == "draft_protocol" && control["status"] == "supported"));
+
+    let get = run(&[
+        "--json",
+        "runtime",
+        "controls",
+        "get",
+        "timeline.segment.delete",
+    ]);
+    assert!(get.status.success());
+    let get: Value = serde_json::from_slice(&get.stdout).unwrap();
+    assert_eq!(get["data"]["capability"], "timeline.remove");
+}
+
+#[test]
+fn screenshot_surface_inventory_accounts_for_every_visible_entry_without_coordinates() {
+    let output = run(&["--json", "runtime", "controls", "surfaces"]);
+    assert!(
+        output.status.success(),
+        "stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let envelope: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(envelope["data"]["coverage"]["expected_surfaces"], 50);
+    let surfaces = envelope["data"]["surfaces"].as_array().unwrap();
+    assert_eq!(surfaces.len(), 50);
+    for (region, expected) in [
+        ("timeline_tabs", 4),
+        ("edit_toolbar", 12),
+        ("view_toolbar", 12),
+        ("view_settings_popover", 4),
+        ("track_headers", 9),
+        ("timeline_canvas", 9),
+    ] {
+        assert_eq!(
+            surfaces
+                .iter()
+                .filter(|surface| surface["region"] == region)
+                .count(),
+            expected,
+            "region {region}"
+        );
+    }
+    let serialized = serde_json::to_string(&envelope).unwrap();
+    assert!(!serialized.contains("coordinates"));
+    assert!(!serialized.contains("screen_coordinate"));
+    assert!(surfaces.iter().any(|surface| {
+        surface["surface_id"] == "settings.track_height"
+            && surface["semantic_id"] == "timeline.view.track_height"
+    }));
+    assert!(surfaces.iter().any(|surface| {
+        surface["surface_id"] == "track.video.cover" && surface["semantic_id"] == "track.cover.edit"
+    }));
+
+    let unresolved = run(&[
+        "--json",
+        "runtime",
+        "controls",
+        "surfaces",
+        "--status",
+        "unresolved",
+    ]);
+    assert!(unresolved.status.success());
+    let unresolved: Value = serde_json::from_slice(&unresolved.stdout).unwrap();
+    assert_eq!(unresolved["data"]["surfaces"].as_array().unwrap().len(), 5);
+}
+
+#[test]
+fn semantic_control_catalog_binds_existing_atomic_edit_commands_without_gui_coordinates() {
+    let output = run(&[
+        "--json",
+        "runtime",
+        "controls",
+        "list",
+        "--route",
+        "draft_protocol",
+        "--status",
+        "supported",
+    ]);
+    assert!(output.status.success());
+    let output: Value = serde_json::from_slice(&output.stdout).expect("JSON envelope");
+    let controls = output["data"]["controls"]
+        .as_array()
+        .expect("controls array");
+    let expected = [
+        ("timeline.segment.split", "timeline.edit", "timeline split"),
+        (
+            "timeline.segment.trim_left",
+            "timeline.edit",
+            "timeline trim",
+        ),
+        ("timeline.segment.move", "timeline.edit", "timeline move"),
+        (
+            "timeline.segment.delete",
+            "timeline.remove",
+            "timeline remove",
+        ),
+        (
+            "timeline.segment.duplicate",
+            "timeline.duplicate",
+            "timeline duplicate",
+        ),
+        ("timeline.track.add", "timeline.edit", "timeline add-track"),
+        (
+            "timeline.keyframe.add",
+            "timeline.keyframe",
+            "timeline keyframe",
+        ),
+        (
+            "timeline.filter.add",
+            "timeline.filter",
+            "timeline add-filter",
+        ),
+        (
+            "timeline.effect.add",
+            "timeline.effect",
+            "timeline add-effect",
+        ),
+        (
+            "timeline.transition.set",
+            "timeline.transition",
+            "timeline transition",
+        ),
+    ];
+
+    for (semantic_id, capability, command_fragment) in expected {
+        let control = controls
+            .iter()
+            .find(|control| control["semantic_id"] == semantic_id)
+            .unwrap_or_else(|| panic!("missing supported direct control {semantic_id}"));
+        assert_eq!(control["capability"], capability);
+        assert!(control["command"]
+            .as_str()
+            .expect("command")
+            .contains(command_fragment));
+        assert!(control["parameters"].is_array());
+        assert!(control.get("coordinates").is_none());
+        assert!(control.get("screen_coordinate").is_none());
+    }
+}
+
+#[test]
+fn session_controls_require_state_readback_and_remain_partial() {
+    let expected = [
+        ("timeline.session.undo", "invoke"),
+        ("timeline.session.redo", "invoke"),
+        ("timeline.audio.record", "invoke"),
+        ("timeline.session.main_track_magnet", "set"),
+        ("timeline.session.snap", "set"),
+        ("timeline.session.linkage", "set"),
+        ("timeline.view.fit", "invoke"),
+        ("timeline.view.zoom_out", "invoke"),
+        ("timeline.view.zoom", "set"),
+        ("timeline.view.zoom_in", "invoke"),
+    ];
+
+    for (semantic_id, operation) in expected {
+        let output = run(&["--json", "runtime", "controls", "get", semantic_id]);
+        assert!(output.status.success(), "failed to get {semantic_id}");
+        let envelope: Value = serde_json::from_slice(&output.stdout).unwrap();
+        let control = &envelope["data"];
+        assert_eq!(control["status"], "partial");
+        assert_eq!(control["state_contract"]["operation"], operation);
+        assert_eq!(control["state_contract"]["readback_required"], true);
+        assert!(control["state_contract"]["readback"].is_string());
+    }
+}
+
+#[test]
+fn runtime_control_mutations_fail_closed_with_version_bound_structured_errors() {
+    let help = run(&["runtime", "controls", "--help"]);
+    assert!(help.status.success());
+    let help = String::from_utf8(help.stdout).unwrap();
+    for operation in ["list", "get", "set", "invoke"] {
+        assert!(help.contains(operation), "missing {operation} in {help}");
+    }
+
+    let mismatch = run(&[
+        "--json",
+        "runtime",
+        "controls",
+        "set",
+        "timeline.session.snap",
+        "--value",
+        "true",
+        "--bundle-id",
+        "com.lemon.lvpro",
+        "--version",
+        "0.0.0",
+        "--build",
+        "11.6.0-beta2",
+    ]);
+    assert_eq!(mismatch.status.code(), Some(1));
+    let mismatch: Value = serde_json::from_slice(&mismatch.stdout).unwrap();
+    assert_eq!(mismatch["error"]["type"], "control_profile_mismatch");
+    assert_eq!(mismatch["error"]["details"]["field"], "version");
+    assert_eq!(mismatch["error"]["details"]["expected"], "11.5.13243");
+
+    let unavailable = run(&[
+        "--json",
+        "runtime",
+        "controls",
+        "invoke",
+        "timeline.session.undo",
+        "--bundle-id",
+        "com.lemon.lvpro",
+        "--version",
+        "11.5.13243",
+        "--build",
+        "11.6.0-beta2",
+    ]);
+    assert_eq!(unavailable.status.code(), Some(1));
+    let unavailable: Value = serde_json::from_slice(&unavailable.stdout).unwrap();
+    assert_eq!(unavailable["error"]["type"], "control_unavailable");
+    assert_eq!(
+        unavailable["error"]["details"]["control"],
+        "timeline.session.undo"
+    );
+    assert!(unavailable["error"]["message"]
+        .as_str()
+        .unwrap()
+        .contains("undo_depth readback is not implemented"));
+
+    let wrong_operation = run(&[
+        "--json",
+        "runtime",
+        "controls",
+        "invoke",
+        "timeline.view.zoom",
+        "--bundle-id",
+        "com.lemon.lvpro",
+        "--version",
+        "11.5.13243",
+        "--build",
+        "11.6.0-beta2",
+    ]);
+    assert_eq!(wrong_operation.status.code(), Some(1));
+    let wrong_operation: Value = serde_json::from_slice(&wrong_operation.stdout).unwrap();
+    assert_eq!(
+        wrong_operation["error"]["type"],
+        "control_operation_mismatch"
+    );
 }
 
 #[test]

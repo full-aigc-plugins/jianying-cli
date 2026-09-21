@@ -61,6 +61,31 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
     }
     if let Some(runtime_error) = effective.downcast_ref::<jianying_runtime::RuntimeError>() {
         let error_type = match runtime_error {
+            jianying_runtime::RuntimeError::EntitlementExpired(_) => "entitlement_expired",
+            jianying_runtime::RuntimeError::InsufficientEdition { .. }
+            | jianying_runtime::RuntimeError::EntitlementNotActive(_)
+            | jianying_runtime::RuntimeError::EntitlementCapabilityMissing(_) => {
+                "entitlement_denied"
+            }
+            jianying_runtime::RuntimeError::AssetIdentityMismatch(_) => "asset_identity_mismatch",
+            jianying_runtime::RuntimeError::DraftResourceUnavailable(_) => {
+                "asset_resource_unavailable"
+            }
+            jianying_runtime::RuntimeError::ResourceIdentityKindMismatch => {
+                "asset_identity_kind_mismatch"
+            }
+            jianying_runtime::RuntimeError::PreviewOnlyAsset
+            | jianying_runtime::RuntimeError::AssetUsageNotAllowed(_) => "asset_use_denied",
+            jianying_runtime::RuntimeError::UnknownControl(_) => "unknown_control",
+            jianying_runtime::RuntimeError::ControlProfileMismatch { .. } => {
+                "control_profile_mismatch"
+            }
+            jianying_runtime::RuntimeError::ControlOperationMismatch { .. } => {
+                "control_operation_mismatch"
+            }
+            jianying_runtime::RuntimeError::ControlUnavailable { .. } => "control_unavailable",
+            jianying_runtime::RuntimeError::InvalidEntitlement(_) => "invalid_entitlement",
+            jianying_runtime::RuntimeError::InvalidAssetReceipt(_) => "invalid_asset_receipt",
             jianying_runtime::RuntimeError::UnsupportedProduct { .. }
             | jianying_runtime::RuntimeError::UnsupportedVersion { .. }
             | jianying_runtime::RuntimeError::UnsupportedPlatform
@@ -70,11 +95,66 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
             jianying_runtime::RuntimeError::OwnershipMismatch(_) => "runtime_ownership_mismatch",
             _ => "runtime_error",
         };
+        let recovery = if error_type.starts_with("entitlement")
+            || error_type.starts_with("asset_")
+            || error_type == "invalid_entitlement"
+            || error_type == "invalid_asset_receipt"
+        {
+            vec![
+                "refresh entitlement evidence or select a resource with matching rights".to_owned(),
+            ]
+        } else {
+            vec!["run `jianying runtime probe` with the exact profile and executable".to_owned()]
+        };
+        let mut details = json!({
+            "runtime_profile_contract":"jianying-runtime-profile/v1",
+            "entitlement_contract":"jianying-entitlement/v1",
+            "official_resource_contract":"jianying-official-resource-receipt/v1"
+        });
+        if let Some(object) = details.as_object_mut() {
+            match runtime_error {
+                jianying_runtime::RuntimeError::EntitlementExpired(expires_at) => {
+                    object.insert("expires_at_epoch_seconds".to_owned(), json!(expires_at));
+                }
+                jianying_runtime::RuntimeError::InsufficientEdition { required, observed } => {
+                    object.insert("required_edition".to_owned(), json!(required));
+                    object.insert("observed_edition".to_owned(), json!(observed));
+                }
+                jianying_runtime::RuntimeError::EntitlementCapabilityMissing(capability)
+                | jianying_runtime::RuntimeError::UnsupportedCapability(capability) => {
+                    object.insert("capability".to_owned(), json!(capability));
+                }
+                jianying_runtime::RuntimeError::AssetIdentityMismatch(path) => {
+                    object.insert("resource".to_owned(), json!(path));
+                }
+                jianying_runtime::RuntimeError::DraftResourceUnavailable(resource) => {
+                    object.insert("resource".to_owned(), json!(resource));
+                }
+                jianying_runtime::RuntimeError::AssetUsageNotAllowed(usage) => {
+                    object.insert("usage".to_owned(), json!(usage));
+                }
+                jianying_runtime::RuntimeError::UnknownControl(control)
+                | jianying_runtime::RuntimeError::ControlUnavailable { control, .. }
+                | jianying_runtime::RuntimeError::ControlOperationMismatch { control, .. } => {
+                    object.insert("control".to_owned(), json!(control));
+                }
+                jianying_runtime::RuntimeError::ControlProfileMismatch {
+                    field,
+                    expected,
+                    observed,
+                } => {
+                    object.insert("field".to_owned(), json!(field));
+                    object.insert("expected".to_owned(), json!(expected));
+                    object.insert("observed".to_owned(), json!(observed));
+                }
+                _ => {}
+            }
+        }
         return ErrorEnvelope::with_details(
             error_type,
             runtime_error.to_string(),
-            json!({"runtime_profile_contract":"jianying-runtime-profile/v1"}),
-            vec!["run `jianying runtime probe` with the exact profile and executable".to_owned()],
+            details,
+            recovery,
         );
     }
     if let Some(native_error) = effective.downcast_ref::<jianying_jobs::NativeExportError>() {

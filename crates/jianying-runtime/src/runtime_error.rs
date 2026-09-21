@@ -52,8 +52,48 @@ pub enum RuntimeError {
     InvalidProfileId(String),
     #[error("runtime ownership record is invalid: {0}")]
     InvalidOwnershipRecord(String),
+    #[error("invalid entitlement evidence: {0}")]
+    InvalidEntitlement(String),
+    #[error("runtime entitlement is not active: {0}")]
+    EntitlementNotActive(String),
+    #[error("runtime entitlement expired at {0}")]
+    EntitlementExpired(u64),
+    #[error("runtime edition {observed} does not satisfy required edition {required}")]
+    InsufficientEdition { required: String, observed: String },
+    #[error("runtime entitlement does not provide capability: {0}")]
+    EntitlementCapabilityMissing(String),
+    #[error("official asset identity mismatch: {0}")]
+    AssetIdentityMismatch(PathBuf),
+    #[error("official draft resource is missing or ambiguous: {0}")]
+    DraftResourceUnavailable(String),
+    #[error("official resource identity kind does not match the verification input")]
+    ResourceIdentityKindMismatch,
+    #[error("official asset is preview-only and cannot be delivered")]
+    PreviewOnlyAsset,
+    #[error("official asset usage is not allowed: {0}")]
+    AssetUsageNotAllowed(String),
+    #[error("invalid official asset receipt: {0}")]
+    InvalidAssetReceipt(String),
     #[error(
         "runtime ownership check failed for pid {0}; refusing to control an unverified process"
     )]
     OwnershipMismatch(u32),
+    #[error("unknown runtime control: {0}")]
+    UnknownControl(String),
+    #[error(
+        "runtime control profile mismatch for {field}: expected {expected}, observed {observed}"
+    )]
+    ControlProfileMismatch {
+        field: String,
+        expected: String,
+        observed: String,
+    },
+    #[error("runtime control {control} requires {expected}, not {requested}")]
+    ControlOperationMismatch {
+        control: String,
+        expected: String,
+        requested: String,
+    },
+    #[error("runtime control {control} is unavailable: {reason}")]
+    ControlUnavailable { control: String, reason: String },
 }

@@ -2,6 +2,8 @@
 //! exit codes, single-JSON stdout, error chains on stderr, --help surface.
 
 use std::process::{Command, Output};
+#[cfg(unix)]
+use std::sync::OnceLock;
 
 fn bin() -> Command {
     Command::new(env!("CARGO_BIN_EXE_jianying"))
@@ -9,6 +11,33 @@ fn bin() -> Command {
 
 fn run(args: &[&str]) -> Output {
     bin().args(args).output().unwrap()
+}
+
+fn run_without_host_editor(args: &[&str]) -> Output {
+    let mut command = bin();
+    command.args(args);
+    // 草稿迁移合同只测试临时 fixture；开发机上真实剪映进程不应污染该黑盒用例。
+    #[cfg(unix)]
+    command.env("PATH", isolated_process_path());
+    command.output().unwrap()
+}
+
+#[cfg(unix)]
+fn isolated_process_path() -> &'static str {
+    static PATH: OnceLock<String> = OnceLock::new();
+    PATH.get_or_init(|| {
+        use std::os::unix::fs::PermissionsExt;
+
+        let root = std::env::temp_dir().join(format!(
+            "jianying-agent-contract-bin-{}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&root).unwrap();
+        let ps = root.join("ps");
+        std::fs::write(&ps, "#!/bin/sh\nexit 0\n").unwrap();
+        std::fs::set_permissions(&ps, std::fs::Permissions::from_mode(0o700)).unwrap();
+        root.to_string_lossy().into_owned()
+    })
 }
 
 fn stdout_json(o: &Output) -> serde_json::Value {
@@ -731,7 +760,7 @@ fn project_init_quickstart_migrate_and_concat_are_black_box_operational() {
     let encoded = serde_json::to_string_pretty(&migratable).unwrap();
     std::fs::write(draft_a.join("draft_content.json"), &encoded).unwrap();
     std::fs::write(draft_a.join("draft_info.json"), &encoded).unwrap();
-    let migrated = run(&[
+    let migrated = run_without_host_editor(&[
         "project",
         "migrate",
         &draft_a.to_string_lossy(),
@@ -770,7 +799,7 @@ fn project_init_quickstart_migrate_and_concat_are_black_box_operational() {
     assert!(audit.contains("atomic-commit"));
     assert!(audit.contains("jianying store restore-snapshot"));
     let snapshot = transaction.join("snapshot");
-    let restored = run(&[
+    let restored = run_without_host_editor(&[
         "store",
         "restore-snapshot",
         "--snapshot",
@@ -804,7 +833,7 @@ fn project_init_quickstart_migrate_and_concat_are_black_box_operational() {
     assert_eq!(stdout_json(&restored_verify)["data"]["ok"], true);
 
     let combined = root.join("combined");
-    let concat = run(&[
+    let concat = run_without_host_editor(&[
         "project",
         "concat",
         &draft_a.to_string_lossy(),

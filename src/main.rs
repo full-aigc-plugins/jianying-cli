@@ -2,11 +2,11 @@
 //! drafts from a jianying-cli-plan/v1 JSON file. No account, no upload.
 
 use anyhow::{bail, Context, Result};
-use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
+use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
-    capabilities, caption_ops, draft, interchange, job_runner, media_analysis, media_ops, plan,
-    probe, project_ops, render, srt, store, template, tim, timeline_ops,
+    capabilities, caption_ops, control_catalog, draft, interchange, job_runner, media_analysis,
+    media_ops, plan, probe, project_ops, render, srt, store, template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -317,6 +317,101 @@ enum RuntimePlatformArg {
     Linux,
 }
 
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum JianyingEditionArg {
+    Unknown,
+    Basic,
+    Professional,
+}
+
+impl From<JianyingEditionArg> for jianying_runtime::JianyingEdition {
+    fn from(value: JianyingEditionArg) -> Self {
+        match value {
+            JianyingEditionArg::Unknown => Self::Unknown,
+            JianyingEditionArg::Basic => Self::Basic,
+            JianyingEditionArg::Professional => Self::Professional,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum OfficialAssetUsageArg {
+    Personal,
+    Commercial,
+    Editorial,
+}
+
+impl From<OfficialAssetUsageArg> for jianying_runtime::OfficialAssetUsage {
+    fn from(value: OfficialAssetUsageArg) -> Self {
+        match value {
+            OfficialAssetUsageArg::Personal => Self::Personal,
+            OfficialAssetUsageArg::Commercial => Self::Commercial,
+            OfficialAssetUsageArg::Editorial => Self::Editorial,
+        }
+    }
+}
+
+#[derive(Subcommand)]
+enum EntitlementOp {
+    /// Verify minimized entitlement evidence against edition, capability and time
+    Verify {
+        evidence: PathBuf,
+        #[arg(long, value_enum, default_value_t = JianyingEditionArg::Basic)]
+        required_edition: JianyingEditionArg,
+        #[arg(long = "capability")]
+        capabilities: Vec<String>,
+        /// Deterministic epoch-seconds validation time; defaults to now
+        #[arg(long = "at")]
+        at_epoch_seconds: Option<u64>,
+    },
+}
+
+#[derive(Subcommand)]
+enum RuntimeControlsOp {
+    /// List semantic controls, optionally filtering by route or support status
+    List {
+        #[arg(long)]
+        route: Option<String>,
+        #[arg(long)]
+        status: Option<String>,
+    },
+    /// Read one control by exact semantic id
+    Get { semantic_id: String },
+    /// List every observed clickable surface from the version-bound UI inventory
+    Surfaces {
+        #[arg(long)]
+        region: Option<String>,
+        #[arg(long)]
+        status: Option<String>,
+    },
+    /// Set a stateful control after exact editor-version matching
+    Set {
+        semantic_id: String,
+        #[arg(long)]
+        value: String,
+        #[command(flatten)]
+        target: RuntimeControlTargetArgs,
+    },
+    /// Invoke an action control after exact editor-version matching
+    Invoke {
+        semantic_id: String,
+        #[arg(long, default_value = "{}")]
+        arguments: String,
+        #[command(flatten)]
+        target: RuntimeControlTargetArgs,
+    },
+}
+
+#[derive(Args)]
+struct RuntimeControlTargetArgs {
+    #[arg(long)]
+    bundle_id: String,
+    #[arg(long)]
+    version: String,
+    #[arg(long)]
+    build: String,
+}
+
 impl From<RuntimePlatformArg> for jianying_runtime::RuntimePlatform {
     fn from(value: RuntimePlatformArg) -> Self {
         match value {
@@ -329,6 +424,16 @@ impl From<RuntimePlatformArg> for jianying_runtime::RuntimePlatform {
 
 #[derive(Subcommand)]
 enum RuntimeOp {
+    /// Validate account edition and expiring entitlement evidence without reading secrets
+    Entitlement {
+        #[command(subcommand)]
+        op: EntitlementOp,
+    },
+    /// Inspect the version-bound semantic editor control catalogue
+    Controls {
+        #[command(subcommand)]
+        op: RuntimeControlsOp,
+    },
     /// Discover installed editors and known draft roots without enabling native routing
     Discover {
         /// Override the platform used for deterministic discovery and diagnostics
@@ -1660,6 +1765,11 @@ struct MediaTranscribeArgs {
 
 #[derive(Subcommand)]
 enum MediaOp {
+    /// Verify and register typed JianYing official-resource receipts
+    Official {
+        #[command(subcommand)]
+        op: OfficialMediaOp,
+    },
     /// Probe one local media file
     Probe(ProbeArgs),
     /// Search the embedded resource catalogue
@@ -1808,6 +1918,82 @@ enum MediaOp {
     },
     /// Report media capability state
     Status,
+}
+
+#[derive(Subcommand)]
+enum OfficialMediaOp {
+    /// Verify one receipt, local resource identity, entitlement and intended usage
+    Verify {
+        receipt: PathBuf,
+        #[arg(required_unless_present = "draft", conflicts_with = "draft")]
+        resource: Option<PathBuf>,
+        /// Draft containing the embedded resource identity from the receipt
+        #[arg(long, conflicts_with = "resource")]
+        draft: Option<PathBuf>,
+        #[arg(long)]
+        entitlement: PathBuf,
+        #[arg(long, value_enum)]
+        usage: OfficialAssetUsageArg,
+        /// Deterministic epoch-seconds validation time; defaults to now
+        #[arg(long = "at")]
+        at_epoch_seconds: Option<u64>,
+    },
+    /// Verify and atomically register one immutable resource receipt
+    Register {
+        receipt: PathBuf,
+        #[arg(required_unless_present = "draft", conflicts_with = "draft")]
+        resource: Option<PathBuf>,
+        /// Draft containing the embedded resource identity from the receipt
+        #[arg(long, conflicts_with = "resource")]
+        draft: Option<PathBuf>,
+        #[arg(long)]
+        entitlement: PathBuf,
+        #[arg(long, value_enum)]
+        usage: OfficialAssetUsageArg,
+        /// Deterministic epoch-seconds validation time; defaults to now
+        #[arg(long = "at")]
+        at_epoch_seconds: Option<u64>,
+        #[arg(long)]
+        store_root: Option<PathBuf>,
+    },
+    /// List every valid receipt in stable resource-id order
+    List {
+        #[arg(long)]
+        store_root: Option<PathBuf>,
+    },
+    /// Read one receipt by exact resource id
+    Show {
+        asset_id: String,
+        #[arg(long)]
+        store_root: Option<PathBuf>,
+    },
+    /// Preflight every official resource required by a Job without mutating drafts
+    Preflight {
+        requirements: PathBuf,
+        #[arg(long)]
+        entitlement: PathBuf,
+        /// Deterministic epoch-seconds validation time; defaults to now
+        #[arg(long = "at")]
+        at_epoch_seconds: Option<u64>,
+        #[arg(long)]
+        store_root: Option<PathBuf>,
+    },
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct OfficialResourcePreflightDocument {
+    schema_version: String,
+    requirements: Vec<OfficialResourceRequirement>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct OfficialResourceRequirement {
+    asset_id: String,
+    usage: jianying_runtime::OfficialAssetUsage,
+    resource: Option<PathBuf>,
+    draft: Option<PathBuf>,
 }
 
 #[derive(Subcommand)]
@@ -2590,6 +2776,7 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             TimelineOp::Status => print_domain_status("timeline", json)?,
         },
         Command::Media { op } => match op {
+            MediaOp::Official { op } => run_official_media(op, json)?,
             MediaOp::Probe(args) => run_probe(args, json)?,
             MediaOp::Catalog(args) => run_catalog(args, json)?,
             MediaOp::Enums(args) => run_enums(args, json)?,
@@ -3883,6 +4070,236 @@ fn run_probe(args: ProbeArgs, json: bool) -> Result<()> {
     Ok(())
 }
 
+fn load_entitlement(path: &Path) -> Result<jianying_runtime::RuntimeEntitlementSnapshot> {
+    let bytes = std::fs::read(path).map_err(|error| jianying_runtime::RuntimeError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })?;
+    let snapshot: jianying_runtime::RuntimeEntitlementSnapshot = serde_json::from_slice(&bytes)
+        .map_err(|error| jianying_runtime::RuntimeError::InvalidEntitlement(error.to_string()))?;
+    snapshot.validate_document()?;
+    Ok(snapshot)
+}
+
+fn load_official_receipt(path: &Path) -> Result<jianying_runtime::OfficialAssetReceipt> {
+    let bytes = std::fs::read(path).map_err(|error| jianying_runtime::RuntimeError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })?;
+    let receipt: jianying_runtime::OfficialAssetReceipt = serde_json::from_slice(&bytes)
+        .map_err(|error| jianying_runtime::RuntimeError::InvalidAssetReceipt(error.to_string()))?;
+    receipt.validate_document()?;
+    Ok(receipt)
+}
+
+fn run_entitlement(op: EntitlementOp, json: bool) -> Result<()> {
+    match op {
+        EntitlementOp::Verify {
+            evidence,
+            required_edition,
+            capabilities,
+            at_epoch_seconds,
+        } => {
+            let snapshot = load_entitlement(&evidence)?;
+            let validation_time = at_epoch_seconds.unwrap_or_else(epoch_seconds);
+            snapshot.authorize(required_edition.into(), &capabilities, validation_time)?;
+            print_output(
+                serde_json::json!({
+                    "authorized":true,
+                    "edition":snapshot.edition(),
+                    "required_edition":jianying_runtime::JianyingEdition::from(required_edition),
+                    "capabilities":capabilities,
+                    "validated_at_epoch_seconds":validation_time,
+                    "evidence":evidence
+                }),
+                json,
+            );
+            Ok(())
+        }
+    }
+}
+
+fn resolve_official_receipt_root(requested: Option<PathBuf>) -> PathBuf {
+    requested
+        .or_else(|| std::env::var_os("JIANYING_OFFICIAL_RECEIPT_ROOT").map(PathBuf::from))
+        .unwrap_or_else(|| PathBuf::from(".jianying-official-resources"))
+}
+
+fn verify_official_resource(
+    receipt_path: &Path,
+    resource: Option<&Path>,
+    draft: Option<&Path>,
+    entitlement_path: &Path,
+    usage: OfficialAssetUsageArg,
+    at_epoch_seconds: Option<u64>,
+) -> Result<(jianying_runtime::OfficialAssetReceipt, u64)> {
+    let receipt = load_official_receipt(receipt_path)?;
+    let entitlement = load_entitlement(entitlement_path)?;
+    let validation_time = at_epoch_seconds.unwrap_or_else(epoch_seconds);
+    match (resource, draft) {
+        (Some(resource), None) => {
+            receipt.verify(resource, &entitlement, usage.into(), validation_time)?
+        }
+        (None, Some(draft)) => {
+            receipt.verify_draft(draft, &entitlement, usage.into(), validation_time)?
+        }
+        _ => bail!("pass one downloaded resource path or --draft <draft>"),
+    }
+    Ok((receipt, validation_time))
+}
+
+fn run_official_media(op: OfficialMediaOp, json: bool) -> Result<()> {
+    match op {
+        OfficialMediaOp::Verify {
+            receipt,
+            resource,
+            draft,
+            entitlement,
+            usage,
+            at_epoch_seconds,
+        } => {
+            let (receipt, validation_time) = verify_official_resource(
+                &receipt,
+                resource.as_deref(),
+                draft.as_deref(),
+                &entitlement,
+                usage,
+                at_epoch_seconds,
+            )?;
+            print_output(
+                serde_json::json!({
+                    "status":"verified",
+                    "asset_id":receipt.asset_id(),
+                    "resource_kind":receipt.resource_kind(),
+                    "resource":resource,
+                    "draft":draft,
+                    "usage":jianying_runtime::OfficialAssetUsage::from(usage),
+                    "validated_at_epoch_seconds":validation_time
+                }),
+                json,
+            );
+            Ok(())
+        }
+        OfficialMediaOp::Register {
+            receipt,
+            resource,
+            draft,
+            entitlement,
+            usage,
+            at_epoch_seconds,
+            store_root,
+        } => {
+            let (receipt, validation_time) = verify_official_resource(
+                &receipt,
+                resource.as_deref(),
+                draft.as_deref(),
+                &entitlement,
+                usage,
+                at_epoch_seconds,
+            )?;
+            let store = jianying_runtime::OfficialResourceReceiptStore::new(
+                resolve_official_receipt_root(store_root),
+            );
+            let stored_at = store.register(&receipt)?;
+            print_output(
+                serde_json::json!({
+                    "status":"registered",
+                    "asset_id":receipt.asset_id(),
+                    "resource_kind":receipt.resource_kind(),
+                    "resource":resource,
+                    "draft":draft,
+                    "usage":jianying_runtime::OfficialAssetUsage::from(usage),
+                    "validated_at_epoch_seconds":validation_time,
+                    "receipt_path":stored_at
+                }),
+                json,
+            );
+            Ok(())
+        }
+        OfficialMediaOp::List { store_root } => {
+            let root = resolve_official_receipt_root(store_root);
+            let receipts = jianying_runtime::OfficialResourceReceiptStore::new(&root).list()?;
+            print_output(serde_json::json!({"root":root,"receipts":receipts}), json);
+            Ok(())
+        }
+        OfficialMediaOp::Show {
+            asset_id,
+            store_root,
+        } => {
+            let receipt = jianying_runtime::OfficialResourceReceiptStore::new(
+                resolve_official_receipt_root(store_root),
+            )
+            .show(&asset_id)?;
+            print_output(serde_json::to_value(receipt)?, json);
+            Ok(())
+        }
+        OfficialMediaOp::Preflight {
+            requirements,
+            entitlement,
+            at_epoch_seconds,
+            store_root,
+        } => {
+            let document: OfficialResourcePreflightDocument =
+                serde_json::from_slice(&std::fs::read(&requirements)?)?;
+            if document.schema_version != "jianying-official-resource-preflight/v1" {
+                bail!(
+                    "unsupported official resource preflight schema: {}",
+                    document.schema_version
+                );
+            }
+            if document.requirements.is_empty() {
+                bail!("official resource preflight requires at least one resource");
+            }
+            let entitlement = load_entitlement(&entitlement)?;
+            let validation_time = at_epoch_seconds.unwrap_or_else(epoch_seconds);
+            let store = jianying_runtime::OfficialResourceReceiptStore::new(
+                resolve_official_receipt_root(store_root),
+            );
+            let mut verified = Vec::with_capacity(document.requirements.len());
+            for requirement in document.requirements {
+                if requirement.asset_id.trim().is_empty() {
+                    bail!("official resource preflight asset_id must not be empty");
+                }
+                let receipt = store.show(&requirement.asset_id)?;
+                match (&requirement.resource, &requirement.draft) {
+                    (Some(resource), None) => receipt.verify(
+                        resource,
+                        &entitlement,
+                        requirement.usage,
+                        validation_time,
+                    )?,
+                    (None, Some(draft)) => receipt.verify_draft(
+                        draft,
+                        &entitlement,
+                        requirement.usage,
+                        validation_time,
+                    )?,
+                    _ => bail!(
+                        "resource {} must provide exactly one of resource or draft",
+                        requirement.asset_id
+                    ),
+                }
+                verified.push(serde_json::json!({
+                    "asset_id":requirement.asset_id,
+                    "resource_kind":receipt.resource_kind(),
+                    "usage":requirement.usage,
+                    "identity":"verified"
+                }));
+            }
+            print_output(
+                serde_json::json!({
+                    "schema_version":"jianying-official-resource-preflight-result/v1",
+                    "status":"ready",
+                    "validated_at_epoch_seconds":validation_time,
+                    "requirements":verified
+                }),
+                json,
+            );
+            Ok(())
+        }
+    }
+}
+
 fn run_catalog(args: CatalogArgs, json: bool) -> Result<()> {
     catalog_query(
         args.domain.as_deref(),
@@ -5094,6 +5511,44 @@ fn load_runtime_profile(path: &Path) -> Result<jianying_runtime::RuntimeProfile>
 
 fn run_runtime(op: RuntimeOp, json: bool) -> Result<()> {
     match op {
+        RuntimeOp::Entitlement { op } => run_entitlement(op, json),
+        RuntimeOp::Controls { op } => {
+            let value = match op {
+                RuntimeControlsOp::List { route, status } => {
+                    control_catalog::list(route.as_deref(), status.as_deref())?
+                }
+                RuntimeControlsOp::Get { semantic_id } => control_catalog::get(&semantic_id)?,
+                RuntimeControlsOp::Surfaces { region, status } => {
+                    control_catalog::surfaces(region.as_deref(), status.as_deref())?
+                }
+                RuntimeControlsOp::Set {
+                    semantic_id,
+                    value,
+                    target,
+                } => control_catalog::request(
+                    &semantic_id,
+                    "set",
+                    &serde_json::from_str(&value)?,
+                    &target.bundle_id,
+                    &target.version,
+                    &target.build,
+                )?,
+                RuntimeControlsOp::Invoke {
+                    semantic_id,
+                    arguments,
+                    target,
+                } => control_catalog::request(
+                    &semantic_id,
+                    "invoke",
+                    &serde_json::from_str(&arguments)?,
+                    &target.bundle_id,
+                    &target.version,
+                    &target.build,
+                )?,
+            };
+            print_output(value, json);
+            Ok(())
+        }
         RuntimeOp::Discover {
             platform,
             mut search_roots,
