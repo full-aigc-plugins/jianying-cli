@@ -139,6 +139,12 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
     }
     if let Some(job_error) = effective.downcast_ref::<job_runner::JobRunError>() {
         return match job_error {
+            job_runner::JobRunError::UnsupportedDraftEncoding => ErrorEnvelope::with_details(
+                "unsupported_draft_encoding",
+                job_error.to_string(),
+                task_details(json!({"file":"draft_meta_info.json", "required_encoding":"json_object", "source_unchanged":true}), task_id),
+                vec!["use an independently verified readable draft copy; do not replace opaque metadata or retry unchanged input".to_owned()],
+            ),
             job_runner::JobRunError::IncompatibleCapability { capability } => {
                 ErrorEnvelope::with_details(
                     "incompatible_capability",

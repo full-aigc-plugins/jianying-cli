@@ -21,6 +21,8 @@ pub enum JobRunError {
     IncompatibleCapability { capability: &'static str },
     #[error("job project shape does not match operation")]
     InvalidProjectShape,
+    #[error("draft metadata is not a readable JSON object; lossless editing is unavailable")]
+    UnsupportedDraftEncoding,
 }
 
 /// 持久任务执行失败；保留 task ID 供调用方恢复。
@@ -219,6 +221,11 @@ fn run_edit(job: &JobV2, base_dir: &Path) -> Result<Value> {
     let output = resolve_job_path(base_dir, output);
     if output.exists() {
         return Err(anyhow!("edit output {} already exists", output.display()));
+    }
+    // 应用可能将元数据保存为不透明编码。复制前拒绝，不能以新元数据覆盖未知字段。
+    let metadata = std::fs::read(source.join("draft_meta_info.json"))?;
+    if !serde_json::from_slice::<Value>(&metadata).is_ok_and(|value| value.is_object()) {
+        return Err(JobRunError::UnsupportedDraftEncoding.into());
     }
     let staging = output.with_extension(format!("jianying-edit-{}.tmp", Uuid::new_v4().simple()));
     let result = (|| -> Result<Value> {

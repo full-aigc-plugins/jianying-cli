@@ -35,6 +35,10 @@
 ### Requirement: Job v2 隔离编辑执行
 系统 SHALL 仅在 `edit` Job 携带至少一个强类型 `EditOperation` 时执行已有草稿编辑，并 MUST 将全部操作应用到全新输出副本；源草稿在成功、失败和不支持的操作路径上均保持逐文件不变。
 
+#### Scenario: 应用保存后的元数据不是可读 JSON 对象
+- **WHEN** `draft_meta_info.json` 为不透明编码、损坏 JSON 或非对象 JSON
+- **THEN** `job run edit` 在创建工作副本前返回 `unsupported_draft_encoding`，保留 task ID 和文件名，不回显文件内容、不建议无条件重试、不覆盖源草稿未知元数据
+
 #### Scenario: 在隔离副本中组合编辑
 - **WHEN** `jianying-job/v2` 对已有草稿提交 `replace_text`、`move_segment` 或 `remove_segment` 操作
 - **THEN** `job run --json` 原子产生可验证的新草稿，返回逐操作结果和源目录不变证据，且输出草稿使用最终输出路径作为身份

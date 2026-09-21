@@ -247,6 +247,43 @@ fn json_mode_rejects_edit_without_operations_before_copying() {
 }
 
 #[test]
+fn job_edit_rejects_opaque_metadata_before_copying_without_leaking_content() {
+    let root = temp_root("opaque-metadata");
+    let source = root.join("source");
+    std::fs::create_dir(&source).unwrap();
+    let opaque = b"independent-synthetic-opaque-metadata";
+    std::fs::write(source.join("draft_meta_info.json"), opaque).unwrap();
+    write_json(&source.join("draft_content.json"), &json!({"tracks":[]}));
+    let before = jianying_runtime::DraftTreeSnapshot::capture(&source).unwrap();
+    let job = root.join("edit.json");
+    write_json(
+        &job,
+        &json!({
+            "schema":"jianying-job/v2", "operation":"edit",
+            "project":{"type":"existing","source":"source","output":"copy"},
+            "operations":[{"operation":"replace_text","segment_id":"caption","text":"edited"}]
+        }),
+    );
+    let result = run(&["--json", "job", "run", job.to_str().unwrap()]);
+    assert!(!result.status.success());
+    let envelope = stdout_json(&result);
+    assert_eq!(envelope["error"]["type"], "unsupported_draft_encoding");
+    assert_eq!(envelope["error"]["details"]["file"], "draft_meta_info.json");
+    assert!(envelope["error"]["details"]["task_id"].is_string());
+    assert!(!String::from_utf8_lossy(&result.stdout).contains("independent-synthetic"));
+    assert!(!root.join("copy").exists());
+    assert_eq!(
+        before,
+        jianying_runtime::DraftTreeSnapshot::capture(&source).unwrap()
+    );
+    assert!(!std::fs::read_dir(&root).unwrap().any(|entry| entry
+        .unwrap()
+        .file_name()
+        .to_string_lossy()
+        .contains("jianying-edit")));
+}
+
+#[test]
 fn job_edit_applies_typed_operations_to_an_isolated_copy() {
     let root = temp_root("isolated-edit");
     let plan_path = root.join("plan.json");
