@@ -12,6 +12,8 @@ fn probe_stub(path: &Path) -> Result<MediaInfo> {
         height: 720,
         has_video: false,
         has_audio: false,
+        frame_rate: None,
+        streams: Vec::new(),
         is_image: false,
     })
 }

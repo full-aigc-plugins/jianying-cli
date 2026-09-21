@@ -40,7 +40,9 @@
 脚本文本放在标准成功信封的 `data.script` 中。
 
 ### `jianying media probe <media>`
-ffprobe 实测：`{path, duration_us, width, height, has_video, has_audio, is_image}`。
+ffprobe 实测：`{path, duration_us, width, height, has_video, has_audio, frame_rate, streams, is_image}`。
+`frame_rate` 保留有理数分子/分母，`streams` 明确列出 `video` / `audio`，供发布二进制调用方
+在不读取 Rust 源码时验证可解码性、帧率和音视频流。
 图片（is_image）按 pyJYD 口径计 3 小时名义时长并落 `type:"photo"`。
 **规则：计划里所有 duration 必须来自 probe 实测，不许用设计值。**
 

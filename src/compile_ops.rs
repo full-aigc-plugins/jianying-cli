@@ -914,6 +914,8 @@ fn build_probe_map(
                     }),
                     has_video: track.kind == "video",
                     has_audio: track.kind == "audio",
+                    frame_rate: None,
+                    streams: Vec::new(),
                     is_image: item.media_type.as_deref() == Some("photo"),
                 },
             );

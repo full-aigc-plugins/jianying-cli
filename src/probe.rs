@@ -6,6 +6,17 @@ use std::path::Path;
 use std::process::Command;
 
 #[derive(Debug, Clone, serde::Serialize)]
+pub struct ProbeFrameRate {
+    pub numerator: u64,
+    pub denominator: u64,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ProbeStream {
+    pub r#type: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct MediaInfo {
     pub path: String,
     pub duration_us: i64,
@@ -13,6 +24,8 @@ pub struct MediaInfo {
     pub height: u64,
     pub has_video: bool,
     pub has_audio: bool,
+    pub frame_rate: Option<ProbeFrameRate>,
+    pub streams: Vec<ProbeStream>,
     /// Single-image file (png/jpeg/webp...). pyJianYingDraft types these as
     /// `photo` materials with a 3-hour nominal duration.
     pub is_image: bool,
@@ -100,6 +113,8 @@ pub fn probe(media: &Path) -> Result<MediaInfo> {
         height: 0,
         has_video: false,
         has_audio: false,
+        frame_rate: None,
+        streams: Vec::new(),
         is_image,
     };
     if let Some(streams) = v["streams"].as_array() {
@@ -111,8 +126,22 @@ pub fn probe(media: &Path) -> Result<MediaInfo> {
                         info.height = s["height"].as_u64().unwrap_or(0);
                     }
                     info.has_video = true;
+                    info.streams.push(ProbeStream {
+                        r#type: "video".to_string(),
+                    });
+                    if info.frame_rate.is_none() {
+                        info.frame_rate = s["avg_frame_rate"]
+                            .as_str()
+                            .or_else(|| s["r_frame_rate"].as_str())
+                            .and_then(parse_frame_rate);
+                    }
                 }
-                Some("audio") => info.has_audio = true,
+                Some("audio") => {
+                    info.has_audio = true;
+                    info.streams.push(ProbeStream {
+                        r#type: "audio".to_string(),
+                    });
+                }
                 _ => {}
             }
         }
@@ -121,4 +150,28 @@ pub fn probe(media: &Path) -> Result<MediaInfo> {
         bail!("{} has no video or audio streams", media.display());
     }
     Ok(info)
+}
+
+fn parse_frame_rate(value: &str) -> Option<ProbeFrameRate> {
+    let (numerator, denominator) = value.split_once('/')?;
+    let numerator = numerator.parse().ok()?;
+    let denominator = denominator.parse().ok()?;
+    (numerator > 0 && denominator > 0).then_some(ProbeFrameRate {
+        numerator,
+        denominator,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_frame_rate;
+
+    #[test]
+    fn parses_positive_rational_frame_rate() {
+        let rate = parse_frame_rate("30000/1001").expect("valid frame rate");
+        assert_eq!(rate.numerator, 30_000);
+        assert_eq!(rate.denominator, 1_001);
+        assert!(parse_frame_rate("0/0").is_none());
+        assert!(parse_frame_rate("unknown").is_none());
+    }
 }
