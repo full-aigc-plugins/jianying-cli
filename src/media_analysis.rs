@@ -2,11 +2,15 @@
 
 use anyhow::{bail, Context, Result};
 use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
 use std::cmp::Ordering;
+use std::fs::File;
+use std::io::Read;
 use std::path::Path;
 use std::process::Command;
 
 const US: f64 = 1_000_000.0;
+const EVIDENCE_ALGORITHM: &str = "jianying-media-evidence/1.0.0";
 
 #[derive(Clone, Copy, Debug)]
 struct Span {
@@ -160,6 +164,186 @@ pub fn silence(
         "silences":spans.iter().map(|s|span_json(*s)).collect::<Vec<_>>(),
         "keeps":keeps.iter().map(|s|span_json(*s)).collect::<Vec<_>>()
     }))
+}
+
+/// 生成与输入内容摘要绑定的视频关键帧、静音、峰值和响度证据。
+pub fn evidence(
+    media: &Path,
+    silence_threshold_db: f64,
+    min_silence: f64,
+    keyframe_limit: usize,
+    ffmpeg: Option<&Path>,
+    ffprobe: Option<&Path>,
+) -> Result<Value> {
+    if !media.is_file() {
+        bail!("media-evidence: media not found: {}", media.display());
+    }
+    if min_silence <= 0.0 || keyframe_limit == 0 {
+        bail!("min-silence and keyframe-limit must be greater than zero");
+    }
+    let ffprobe = ffprobe
+        .map(Path::to_path_buf)
+        .or_else(|| crate::probe::ffprobe_path().map(Into::into))
+        .context("media-evidence: ffprobe not found; install ffmpeg or pass --ffprobe-cmd")?;
+    let inventory = Command::new(&ffprobe)
+        .args([
+            "-v",
+            "error",
+            "-show_format",
+            "-show_streams",
+            "-of",
+            "json",
+        ])
+        .arg(media)
+        .output()
+        .with_context(|| format!("running {}", ffprobe.display()))?;
+    if !inventory.status.success() {
+        bail!(
+            "media-evidence: ffprobe inventory failed: {}",
+            String::from_utf8_lossy(&inventory.stderr).trim()
+        );
+    }
+    let inventory: Value = serde_json::from_slice(&inventory.stdout)
+        .context("media-evidence: ffprobe inventory returned invalid JSON")?;
+    let streams = inventory["streams"].as_array().cloned().unwrap_or_default();
+    let has_video = streams.iter().any(|stream| stream["codec_type"] == "video");
+    let has_audio = streams.iter().any(|stream| stream["codec_type"] == "audio");
+    let duration = inventory["format"]["duration"]
+        .as_str()
+        .and_then(|value| value.parse::<f64>().ok())
+        .or_else(|| {
+            streams
+                .iter()
+                .find_map(|stream| stream["duration"].as_str()?.parse().ok())
+        });
+
+    let keyframes = if has_video {
+        let output = Command::new(&ffprobe)
+            .args([
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-skip_frame",
+                "nokey",
+                "-show_frames",
+                "-show_entries",
+                "frame=best_effort_timestamp_time,pkt_pts_time,pict_type",
+                "-of",
+                "json",
+            ])
+            .arg(media)
+            .output()?;
+        if !output.status.success() {
+            bail!(
+                "media-evidence: keyframe probe failed: {}",
+                String::from_utf8_lossy(&output.stderr).trim()
+            );
+        }
+        let frames: Value = serde_json::from_slice(&output.stdout)
+            .context("media-evidence: keyframe probe returned invalid JSON")?;
+        frames["frames"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .take(keyframe_limit)
+            .filter_map(|frame| {
+                let seconds = frame["best_effort_timestamp_time"]
+                    .as_str()
+                    .or_else(|| frame["pkt_pts_time"].as_str())?
+                    .parse::<f64>()
+                    .ok()?;
+                Some(json!({
+                    "time": round6(seconds),
+                    "time_us": (seconds * US).round() as i64,
+                    "timecode": timecode(seconds),
+                    "picture_type": frame["pict_type"].as_str().unwrap_or("I")
+                }))
+            })
+            .collect::<Vec<_>>()
+    } else {
+        Vec::new()
+    };
+
+    let audio = if has_audio {
+        let ffmpeg = ffmpeg
+            .map(Path::to_path_buf)
+            .or_else(|| crate::probe::ffmpeg_path().map(Into::into))
+            .context("media-evidence: ffmpeg not found; install ffmpeg or pass --ffmpeg-cmd")?;
+        let filter = format!(
+            "silencedetect=noise={silence_threshold_db}dB:d={min_silence},ebur128=peak=true,volumedetect"
+        );
+        let output = Command::new(&ffmpeg)
+            .args(["-hide_banner", "-i"])
+            .arg(media)
+            .args(["-vn", "-af", &filter, "-f", "null", "-"])
+            .output()?;
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if !output.status.success() {
+            bail!("media-evidence: ffmpeg audio analysis failed: {stderr}");
+        }
+        let spans = close_spans(parse_silences(&stderr), duration);
+        json!({
+            "present": true,
+            "silences": spans.iter().map(|span| span_json(*span)).collect::<Vec<_>>(),
+            "integrated_lufs": last_metric(&stderr, "I:"),
+            "true_peak_dbfs": last_metric(&stderr, "Peak:"),
+            "mean_volume_db": last_metric(&stderr, "mean_volume:"),
+            "max_volume_db": last_metric(&stderr, "max_volume:")
+        })
+    } else {
+        json!({
+            "present": false,
+            "silences": [],
+            "integrated_lufs": null,
+            "true_peak_dbfs": null,
+            "mean_volume_db": null,
+            "max_volume_db": null
+        })
+    };
+
+    let metadata = std::fs::metadata(media)?;
+    Ok(json!({
+        "schema": "jianying-media-evidence/v1",
+        "algorithm": EVIDENCE_ALGORITHM,
+        "source": {
+            "path": media,
+            "sha256": sha256_file(media)?,
+            "bytes": metadata.len()
+        },
+        "duration": duration.map(round6),
+        "duration_us": duration.map(|value| (value * US).round() as i64),
+        "video": {"present": has_video, "keyframes": keyframes, "truncated": has_video && keyframes.len() == keyframe_limit},
+        "audio": audio,
+        "parameters": {
+            "silence_threshold_db": silence_threshold_db,
+            "min_silence": min_silence,
+            "keyframe_limit": keyframe_limit
+        }
+    }))
+}
+
+fn sha256_file(path: &Path) -> Result<String> {
+    let mut file = File::open(path)?;
+    let mut hasher = Sha256::new();
+    let mut buffer = [0_u8; 64 * 1024];
+    loop {
+        let read = file.read(&mut buffer)?;
+        if read == 0 {
+            break;
+        }
+        hasher.update(&buffer[..read]);
+    }
+    Ok(format!("{:x}", hasher.finalize()))
+}
+
+fn last_metric(text: &str, label: &str) -> Option<f64> {
+    text.lines()
+        .filter_map(|line| {
+            let (_, rest) = line.rsplit_once(label)?;
+            rest.split_whitespace().next()?.parse::<f64>().ok()
+        })
+        .last()
 }
 
 /// 从 SRT 中识别窗口内重复的口播尝试，默认保留后一次。

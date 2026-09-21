@@ -47,6 +47,7 @@
     {"id":"media.relink","status":"supported","evidence":"CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"},
     {"id":"media.audio","status":"supported","evidence":"tests/media_mutation_contract.rs: probed add-audio, replace and relink transactions; tests/timeline_cli_contract.rs: volume and audio-fade"},
     {"id":"media.analysis","status":"supported","evidence":"CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS + media_analysis_contract"},
+    {"id":"media.quality_evidence","status":"supported","evidence":"tests/media_evidence_contract.rs: content-bound keyframe, silence, loudness and peak black-box evidence"},
     {"id":"media.tts_local","status":"supported","evidence":"media_mutation_contract: local-command/local-process/system Provider transaction plus non-loopback rejection; jianying-media local-http/EdgeTTS contracts"},
     {"id":"media.tts_provider","status":"partial","evidence":"seven provider-specific HTTPS execution routes plus approval, ledger, atomic artifact, draft transaction, reuse, definite-failure and ambiguous loopback black-box tests; Volcengine uses the current V3 unidirectional SSE protocol with X-Api headers, ordered audio-frame concatenation and terminal-frame gating; authorized real-provider canaries remain pending"},
     {"id":"media.sfx","status":"supported","evidence":"CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"},

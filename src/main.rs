@@ -1762,6 +1762,20 @@ enum MediaOp {
         #[arg(long)]
         ffmpeg_cmd: Option<PathBuf>,
     },
+    /// Collect content-bound video keyframe and audio silence/loudness evidence
+    Evidence {
+        media: PathBuf,
+        #[arg(long, default_value_t = -30.0)]
+        silence_threshold_db: f64,
+        #[arg(long, default_value_t = 0.5)]
+        min_silence: f64,
+        #[arg(long, default_value_t = 256)]
+        keyframe_limit: usize,
+        #[arg(long)]
+        ffmpeg_cmd: Option<PathBuf>,
+        #[arg(long)]
+        ffprobe_cmd: Option<PathBuf>,
+    },
     /// Detect repeated takes from an SRT transcript
     Retakes {
         /// Draft directory; omit when using --srt
@@ -2728,6 +2742,24 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                     pad,
                     limit,
                     ffmpeg_cmd.as_deref(),
+                )?,
+                json,
+            ),
+            MediaOp::Evidence {
+                media,
+                silence_threshold_db,
+                min_silence,
+                keyframe_limit,
+                ffmpeg_cmd,
+                ffprobe_cmd,
+            } => print_output(
+                media_analysis::evidence(
+                    &media,
+                    silence_threshold_db,
+                    min_silence,
+                    keyframe_limit,
+                    ffmpeg_cmd.as_deref(),
+                    ffprobe_cmd.as_deref(),
                 )?,
                 json,
             ),

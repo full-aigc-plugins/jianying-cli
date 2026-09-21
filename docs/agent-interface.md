@@ -165,7 +165,7 @@ bubbles，以及 `--human` 表格。28 个命名空间/类别组合已逐项验�
 animations、bubbles、fonts 保持 id-only；手工登记还拒绝非规范 ASCII kebab slug 和危险类别。
 scan/add/sync 的 plan 与 apply 均已和固定 capcut-cli 上游完成语义差分。
 
-### `jianying media scenes|silence|retakes`
+### `jianying media scenes|silence|retakes|evidence`
 
 - `scenes <video>` 使用 ffmpeg scene filter 输出切点和连续分段，支持 `--threshold`、
   `--min-gap`、`--limit` 和 `--ffmpeg-cmd`。
@@ -173,8 +173,11 @@ scan/add/sync 的 plan 与 apply 均已和固定 capcut-cli 上游完成语义�
   `--threshold-db`、`--min-silence`、`--pad`、`--limit` 和 `--ffmpeg-cmd`。
 - `retakes [<draft> | --srt <file>]` 在限定时间窗口中按词序列 LCS 相似度识别重拍，
   将早期尝试输出为 cut spans，默认保留后一次；草稿模式可用 `--track-name` 限定文本轨。
+- `evidence <media>` 生成 `jianying-media-evidence/v1`：把源文件 SHA-256、I 帧时间码、
+  静音区间、综合响度、真峰值和音量峰值绑定到同一份只读证据。无视频或无音轨明确记录为
+  `present=false`；这些技术事实不能单独升级为叙事或主观质量通过。
 
-三项都是只读分析，不修改草稿。固定 capcut-cli 差分报告
+四项都是只读分析，不修改草稿。固定 capcut-cli 差分报告
 `provenance/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json` 用相同伪 ffmpeg 和 SRT 输入验证三项
 JSON 结果完全相等。
 
