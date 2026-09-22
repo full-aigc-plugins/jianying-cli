@@ -1,5 +1,6 @@
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use std::ffi::OsString;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -15,15 +16,35 @@ fn temp_dir(label: &str) -> PathBuf {
     path
 }
 
-fn write_executable(path: &Path, body: &str) {
-    fs::write(path, body).expect("write executable");
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let mut permissions = fs::metadata(path).expect("metadata").permissions();
-        permissions.set_mode(0o755);
-        fs::set_permissions(path, permissions).expect("chmod");
-    }
+fn compile_ffprobe_stub(root: &Path) -> PathBuf {
+    let source = root.join("ffprobe_stub.rs");
+    fs::write(
+        &source,
+        r##"fn main() {
+    println!("{}", r#"{"format":{"duration":"13.000000","size":"13"},"streams":[{"codec_type":"video","codec_name":"h264","width":1080,"height":1920,"avg_frame_rate":"30/1"},{"codec_type":"audio","codec_name":"aac","sample_rate":"44100","channels":2}]}"#);
+}
+"##,
+    )
+    .expect("write ffprobe stub source");
+    let executable = root.join(if cfg!(windows) {
+        "ffprobe_stub.exe"
+    } else {
+        "ffprobe_stub"
+    });
+    let rustc = std::env::var_os("RUSTC").unwrap_or_else(|| OsString::from("rustc"));
+    let output = Command::new(rustc)
+        .arg(&source)
+        .arg("-o")
+        .arg(&executable)
+        .output()
+        .expect("compile ffprobe stub");
+    assert!(
+        output.status.success(),
+        "stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    executable
 }
 
 fn run(args: &[&str]) -> std::process::Output {
@@ -134,15 +155,7 @@ fn fixture(root: &Path) -> (PathBuf, PathBuf) {
     )
     .expect("write acceptance evidence");
 
-    let ffprobe = root.join("ffprobe");
-    write_executable(
-        &ffprobe,
-        r#"#!/bin/sh
-cat <<'JSON'
-{"format":{"duration":"13.000000","size":"13"},"streams":[{"codec_type":"video","codec_name":"h264","width":1080,"height":1920,"avg_frame_rate":"30/1"},{"codec_type":"audio","codec_name":"aac","sample_rate":"44100","channels":2}]}
-JSON
-"#,
-    );
+    let ffprobe = compile_ffprobe_stub(root);
     (evidence, ffprobe)
 }
 
