@@ -305,7 +305,7 @@ fn confirmation_and_host_read_only_guards_leave_config_byte_identical() {
 }
 
 #[test]
-fn machine_catalog_exposes_home_folder_commands_as_partial_until_release_canary() {
+fn machine_catalog_exposes_supported_home_folder_commands_with_exact_access() {
     let catalog = run_ok(&["commands", "--json"]);
     let commands = catalog["commands"].as_array().unwrap();
     let expected = [
@@ -322,7 +322,7 @@ fn machine_catalog_exposes_home_folder_commands_as_partial_until_release_canary(
             .unwrap_or_else(|| panic!("missing command {path}"));
         assert_eq!(command["group"], "home");
         assert_eq!(command["access"], access);
-        assert_eq!(command["status"], "partial");
+        assert_eq!(command["status"], "supported");
         assert_eq!(command["platforms"], json!(["macos", "windows"]));
     }
 }

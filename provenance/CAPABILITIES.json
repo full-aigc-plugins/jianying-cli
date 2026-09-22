@@ -115,7 +115,7 @@
     {"id":"store.restore","status":"supported","evidence":"tests/store_cli_contract.rs + tests/agent_contract.rs: MutationPlan restore"},
     {"id":"store.decrypt_detection","status":"supported","evidence":"tests/store_cli_contract.rs: plaintext/encrypted/corrupted classification; no decryptor"},
     {"id":"store.directories","status":"supported","evidence":"tests/store_cli_contract.rs"},
-    {"id":"home.folder_lifecycle","status":"partial","evidence":"tests/home_folder_cli_contract.rs: source black-box covers exact-id list/create/empty-leaf recycle/restore, unknown-field preservation, safety snapshot and fail-closed non-empty folders; immutable released-binary and real-editor cold-reopen differential remain pending"},
+    {"id":"home.folder_lifecycle","status":"supported","evidence":"provenance/HOME_FOLDER_LIFECYCLE_ACCEPTANCE.json + tests/home_folder_cli_contract.rs: immutable v1.6.23 released binary passed exact-id list, running-editor byte-identical refusal, empty-leaf recycle/readback, two real JianYing 11.6.0-beta3 cold reopens, exact recycle-id restore and final-state readback; non-empty/child/mapped folders remain explicit fail-closed inputs"},
     {"id":"approvals","status":"supported","evidence":"crates/jianying-jobs/tests/approval_store.rs + tests/job_cli_contract.rs"},
     {"id":"config","status":"supported","evidence":"crates/jianying-config/tests/config_store.rs + tests/config_cli_contract.rs"},
     {"id":"mcp.serve","status":"supported","evidence":"tests/mcp_contract.rs: shared tools/list and tools/call handler semantics"},

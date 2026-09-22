@@ -5630,6 +5630,10 @@ fn command_access(path: &str) -> &'static str {
             | "image-animation"
             | "animation"
     ) || path == "render"
+        || matches!(
+            path,
+            "home folder create" | "home folder recycle" | "home folder restore"
+        )
     {
         "write"
     } else {

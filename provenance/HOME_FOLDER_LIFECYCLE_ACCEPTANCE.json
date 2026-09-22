@@ -1,0 +1,89 @@
+{
+  "schema": "jianying-home-folder-lifecycle-acceptance/v1",
+  "observed_at": "2026-09-22",
+  "release": {
+    "ref": "v1.6.23",
+    "source_commit": "ff1cfbe6edce489858ba8e8d60c79728ba1fc843",
+    "workflow_run": "https://github.com/full-aigc-plugins/jianying-cli/actions/runs/35743839693",
+    "immutable": true,
+    "attestation_verified": true,
+    "release_index_sha256": "1c03736a1e9e3a4dab161d20782befb0ba3924fa04dfe3d557abefc6aebd084d",
+    "darwin_arm64_archive_sha256": "35e3969046c6f99a41e717517775a18feead8939d30420c17d904e2fe4393392",
+    "darwin_arm64_binary_sha256": "06d9be0ee0344d130ec33a8cfb5922b1399f729e91861e8e7563271f8271a940"
+  },
+  "editor": {
+    "application": "/Applications/VideoFusion-macOS.app",
+    "bundle_id": "com.lemon.lvpro",
+    "short_version": "11.5.13245",
+    "build_version": "11.6.0-beta3",
+    "config_protocol": "LocalDraftFolder/v1.0"
+  },
+  "fixture": {
+    "kind": "real_empty_leaf_home_folder",
+    "folder_id": "bb68c5dc-f614-4dfb-b388-dbe8e2099d39",
+    "name": "新建文件夹",
+    "recycle_id": "{b58babe0-5a41-4ccd-9e10-55c03f5de339}"
+  },
+  "observations": [
+    {
+      "stage": "running_editor_read_only",
+      "active_folders": 1,
+      "recycled_folders": 0,
+      "config_bytes_unchanged": true
+    },
+    {
+      "stage": "running_editor_write_refusal",
+      "error": "editor_running",
+      "config_bytes_unchanged": true
+    },
+    {
+      "stage": "released_binary_recycle",
+      "active_folders_before": 1,
+      "active_folders_after": 0,
+      "recycled_folders_before": 0,
+      "recycled_folders_after": 1,
+      "snapshot_retained": true,
+      "config_digest": "54fe75dca28b6bb171c01aac8f8f6d6e593ce3e8d4bfae07755d3f1776743bf6"
+    },
+    {
+      "stage": "cold_reopen_after_recycle",
+      "active_folders": 0,
+      "recycled_folders": 1,
+      "exact_recycle_id_observed": true
+    },
+    {
+      "stage": "released_binary_restore",
+      "active_folders_before": 0,
+      "active_folders_after": 1,
+      "recycled_folders_before": 1,
+      "recycled_folders_after": 0,
+      "snapshot_retained": true,
+      "config_digest": "c0a6e66fe68dbb6653b16021533cb445557894751c54de326dd82c68942574f2"
+    },
+    {
+      "stage": "cold_reopen_after_restore",
+      "active_folders": 1,
+      "recycled_folders": 0,
+      "folder_identity_preserved": true,
+      "editor_left_running": true
+    }
+  ],
+  "supported_scope": [
+    "home folder list",
+    "home folder create",
+    "home folder recycle for empty leaf folders",
+    "home folder list-recycled",
+    "home folder restore for empty leaf folders"
+  ],
+  "fail_closed_scope": [
+    "folders containing child folders",
+    "folders containing draft mappings",
+    "unknown LocalDraftFolder versions",
+    "real configuration writes while the editor is running"
+  ],
+  "final_state": {
+    "active_folders": 1,
+    "recycled_folders": 0,
+    "original_folder_restored": true
+  }
+}
