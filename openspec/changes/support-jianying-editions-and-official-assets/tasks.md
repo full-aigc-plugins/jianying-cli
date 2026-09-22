@@ -24,6 +24,7 @@
 - [x] 2.14 以 TDD 实现 `home folder list/create/recycle/list-recycled/restore`：精确 ID 定位、未知字段无损、真实配置运行中拒写、操作前快照、多文件原子提交与失败回滚；未观测到原生格式的非空文件夹必须失败关闭。
 - [x] 2.15 以 TDD 增加 `timeline track-mute` 草稿协议命令：保持未知位与片段音量不变，精确 ID 定位、双镜像原子写入和前后回读；发布二进制及真实剪映验收前保持控件 `partial`。
 - [x] 2.16 以 TDD 增加 `timeline track-rename` 草稿协议命令：精确 ID、非空名称、默认命名标记、未知字段无损、双镜像原子写入和提交后回读；发布二进制及真实剪映验收前保持界面操作 `partial`。
+- [x] 2.17 以 TDD 增加 `home folder rename` 原生配置命令：精确 ID、同级重名拒绝、非空名称、关系与未知字段无损、真实配置运行中拒写、事务快照及提交后按 ID 回读；发布二进制与真实剪映冷重开前保持 `partial`。
 
 ## 3. 插件 GUI Adapter 与 Harness
 

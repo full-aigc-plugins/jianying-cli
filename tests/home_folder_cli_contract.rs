@@ -212,6 +212,90 @@ fn create_preserves_unknown_fields_and_rejects_duplicate_names() {
 }
 
 #[test]
+fn rename_preserves_folder_relationships_and_rejects_ambiguous_targets() {
+    let (sandbox, config_root) = fixture();
+    let config = config_root.to_string_lossy();
+    let mut folders = read_json(&config_root.join("folder_meta_info.json"));
+    folders["folders"].as_array_mut().unwrap().push(json!({
+        "id": "folder-two", "name": "已有名称", "parentId": "",
+        "createdTime": "2026-09-22T19:10:00", "modifiedTime": "2026-09-22T19:10:00",
+        "future_folder": {"retain": true}
+    }));
+    write_json(&config_root.join("folder_meta_info.json"), &folders);
+    let mut mappings = read_json(&config_root.join("draft_folder_mappings.json"));
+    mappings["mappings"].as_array_mut().unwrap().push(json!({
+        "draftId": "mapped-draft", "folderId": "folder-one",
+        "mappedTime": "2026-09-22T19:20:00", "future_mapping": 9
+    }));
+    write_json(&config_root.join("draft_folder_mappings.json"), &mappings);
+
+    let result = run_ok(&[
+        "home",
+        "folder",
+        "rename",
+        "folder-one",
+        "交付素材",
+        "--config-root",
+        &config,
+        "--at",
+        "2026-09-23T09:00:00",
+        "--json",
+    ]);
+    assert_eq!(result["status"], "renamed");
+    assert_eq!(result["folder_id"], "folder-one");
+    assert_eq!(result["old_name"], "新建文件夹");
+    assert_eq!(result["new_name"], "交付素材");
+    assert!(Path::new(result["snapshot_path"].as_str().unwrap()).is_dir());
+    let updated = read_json(&config_root.join("folder_meta_info.json"));
+    assert_eq!(updated["folders"][0]["id"], "folder-one");
+    assert_eq!(updated["folders"][0]["parentId"], "");
+    assert_eq!(updated["folders"][0]["future_folder"], json!([1, 2, 3]));
+    assert_eq!(updated["folders"][0]["modifiedTime"], "2026-09-23T09:00:00");
+    assert_eq!(updated["folders"][1]["name"], "已有名称");
+    assert_eq!(updated["timestamp"], "2026-09-23T09:00:00");
+    assert_eq!(
+        read_json(&config_root.join("draft_folder_mappings.json")),
+        mappings
+    );
+
+    let names = [
+        "folder_meta_info.json",
+        "draft_folder_mappings.json",
+        "recycle_bin.json",
+        "draft_mapping_recycle_bin.json",
+    ];
+    let before: Vec<Vec<u8>> = names
+        .iter()
+        .map(|name| std::fs::read(config_root.join(name)).unwrap())
+        .collect();
+    for (id, name) in [
+        ("missing", "允许的名称"),
+        ("folder-one", "已有名称"),
+        ("folder-one", "  "),
+        ("folder-one", "非法\n名称"),
+    ] {
+        let failed = run(&[
+            "home",
+            "folder",
+            "rename",
+            id,
+            name,
+            "--config-root",
+            &config,
+            "--json",
+        ]);
+        assert_eq!(failed.status.code(), Some(1));
+        for (index, file) in names.iter().enumerate() {
+            assert_eq!(
+                std::fs::read(config_root.join(file)).unwrap(),
+                before[index]
+            );
+        }
+    }
+    let _ = std::fs::remove_dir_all(sandbox);
+}
+
+#[test]
 fn nonempty_or_conflicting_folder_operations_fail_without_writes() {
     let (sandbox, config_root) = fixture();
     let config = config_root.to_string_lossy();
@@ -295,6 +379,19 @@ fn confirmation_and_host_read_only_guards_leave_config_byte_identical() {
     ]);
     assert_eq!(read_only.status.code(), Some(1));
     assert!(String::from_utf8_lossy(&read_only.stdout).contains("host_read_only"));
+    let rename_read_only = run(&[
+        "--host-read-only",
+        "home",
+        "folder",
+        "rename",
+        "folder-one",
+        "不可写",
+        "--config-root",
+        &config,
+        "--json",
+    ]);
+    assert_eq!(rename_read_only.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&rename_read_only.stdout).contains("host_read_only"));
     for (index, name) in names.iter().enumerate() {
         assert_eq!(
             std::fs::read(config_root.join(name)).unwrap(),
@@ -325,4 +422,12 @@ fn machine_catalog_exposes_supported_home_folder_commands_with_exact_access() {
         assert_eq!(command["status"], "supported");
         assert_eq!(command["platforms"], json!(["macos", "windows"]));
     }
+    let rename = commands
+        .iter()
+        .find(|command| command["path"] == "home folder rename")
+        .expect("missing home folder rename");
+    assert_eq!(rename["group"], "home");
+    assert_eq!(rename["access"], "write");
+    assert_eq!(rename["status"], "partial");
+    assert_eq!(rename["platforms"], json!(["macos", "windows"]));
 }

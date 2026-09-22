@@ -258,3 +258,19 @@ timeline track-rename → project verify`。两份草稿镜像逐字节一致，
 `project verify` 无问题。由于真实剪映正在运行，合成草稿命令在测试进程中隔离
 编辑器进程探测；这不等于真实剪映冷重开或界面回读。发布二进制能力清单继续返回
 `timeline.track_rename=partial`，不作为自动 GUI 路由依据。
+
+## 2026-09-23：首页文件夹重命名（任务 2.17）
+
+在已观测的 `LocalDraftFolder` v1.0 协议上新增 `jianying home folder rename`。
+测试先因子命令不存在失败，再实现精确 ID、同级重名拒绝、非空且无控制字符名称、
+父子关系和草稿映射不变、未知字段保留、四文件事务快照、提交后按 ID 回读。
+提交器现在还将四个实际回读文件与拟写文档比较，不一致时执行既有全量回滚。
+合成配置测试覆盖带草稿映射的文件夹、无效目标、重复名称和宿主只读失败，
+不写入真实剪映配置，也不操作 GUI。新命令能力与机器命令目录均标为 `partial`：
+正式发布二进制和真实剪映冷重开验证仍是独立门禁。
+
+本地 `v1.6.27` release-mode 二进制通过 `verify_release_runtime.py`，随后对隔离的
+`LocalDraftFolder` v1.0 合成配置执行重命名。返回 `status=renamed`、活动文件夹和
+草稿映射计数均保持 `1`，CLI 独立 `home folder list` 回读到新名称、原 ID/父节点、
+新 `modifiedTime` 和未知字段；命令目录仅将新增重命名标为 `partial`，已有恢复命令
+仍为 `supported`。这不是不可变 Release 制品，也不是剪映 GUI 冷重开证据。

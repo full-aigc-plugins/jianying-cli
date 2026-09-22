@@ -155,6 +155,74 @@ pub fn create(root: &Path, name: &str, parent_id: &str, at: &str) -> Result<Valu
     }))
 }
 
+/// 以精确活动文件夹 ID 重命名；保留父子关系、草稿映射及未知字段。
+pub fn rename(root: &Path, folder_id: &str, name: &str, at: &str) -> Result<Value> {
+    validate_name(name)?;
+    if folder_id.trim().is_empty() {
+        bail!("home_folder_id_invalid: folder id must not be blank");
+    }
+    ensure_safe_mutation_target(root)?;
+    let mut documents = load_documents(root)?;
+    let folders = array(&documents.folder_meta, "folders")?;
+    let matches: Vec<&Value> = folders
+        .iter()
+        .filter(|folder| folder.get("id").and_then(Value::as_str) == Some(folder_id))
+        .collect();
+    if matches.len() != 1 {
+        bail!(
+            "home_folder_id_ambiguous: expected exactly one active folder id {folder_id}, found {}",
+            matches.len()
+        );
+    }
+    let old_name = required_string(matches[0], "name")?.to_owned();
+    let parent_id = matches[0]
+        .get("parentId")
+        .and_then(Value::as_str)
+        .with_context(|| format!("home_folder_invalid: {folder_id} parentId must be a string"))?
+        .to_owned();
+    required_string(matches[0], "modifiedTime")?;
+    if folders.iter().any(|folder| {
+        folder.get("id").and_then(Value::as_str) != Some(folder_id)
+            && folder.get("name").and_then(Value::as_str) == Some(name)
+            && folder.get("parentId").and_then(Value::as_str) == Some(parent_id.as_str())
+    }) {
+        bail!("home_folder_name_conflict: {name} already exists under parent {parent_id}");
+    }
+    let before = counts(&documents)?;
+    let target = array_mut(&mut documents.folder_meta, "folders")?
+        .iter_mut()
+        .find(|folder| folder.get("id").and_then(Value::as_str) == Some(folder_id))
+        .expect("unique target verified");
+    let target = target
+        .as_object_mut()
+        .with_context(|| format!("home_folder_invalid: {folder_id} must be an object"))?;
+    target.insert("name".to_owned(), Value::String(name.to_owned()));
+    target.insert("modifiedTime".to_owned(), Value::String(at.to_owned()));
+    set_timestamp(&mut documents.folder_meta, at)?;
+    let after = counts(&documents)?;
+    let snapshot = commit_documents(root, &documents)?;
+    let readback = load_documents(root)?;
+    let written = array(&readback.folder_meta, "folders")?
+        .iter()
+        .filter(|folder| folder.get("id").and_then(Value::as_str) == Some(folder_id))
+        .collect::<Vec<_>>();
+    if written.len() != 1
+        || written[0].get("name").and_then(Value::as_str) != Some(name)
+        || written[0].get("modifiedTime").and_then(Value::as_str) != Some(at)
+        || written[0].get("parentId").and_then(Value::as_str) != Some(parent_id.as_str())
+    {
+        bail!(
+            "home_folder_rename_readback_failed: {folder_id}; snapshot={}",
+            snapshot.display()
+        );
+    }
+    Ok(json!({
+        "status": "renamed", "folder_id": folder_id, "old_name": old_name,
+        "new_name": name, "parent_id": parent_id, "before": before, "after": after,
+        "snapshot_path": snapshot, "config_digest": digest_documents(root)?
+    }))
+}
+
 /// 将精确 ID 对应的空叶子文件夹移入“最近删除”。
 ///
 /// 当文件夹含子文件夹或草稿映射时，原生回收站 wire 格式尚未取得差分证据，
@@ -284,6 +352,7 @@ pub fn restore(root: &Path, recycle_id: &str, at: &str) -> Result<Value> {
     }))
 }
 
+#[derive(PartialEq)]
 struct Documents {
     folder_meta: Value,
     draft_mappings: Value,
@@ -520,7 +589,13 @@ where
             ),
         }
     }
-    if let Err(error) = load_documents(root) {
+    let readback = load_documents(root).and_then(|actual| {
+        if actual != *documents {
+            bail!("committed homepage config differs from staged documents");
+        }
+        Ok(())
+    });
+    if let Err(error) = readback {
         let failed = parent.join(format!(
             ".{root_name}.jianying-home-folder-invalid-{transaction_id}"
         ));

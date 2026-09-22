@@ -128,6 +128,11 @@ GUI Adapter MAY 搜索、预览和下载用户账号可访问的官方素材，�
 ### Requirement: Homepage local-folder lifecycle is atomic and lossless
 系统 SHALL 通过 Rust CLI 管理首页本地文件夹的查询、创建、移入“最近删除”、回收站查询与恢复。写操作 MUST 以精确 ID 为目标，在剪映运行时拒绝修改真实配置，保留未知字段，在任何文件变更前生成可恢复快照，并对相关配置文件执行原子提交或全量回滚。
 
+#### Scenario: Rename an active folder without changing its relationships
+- **WHEN** 用户指定唯一的活动文件夹 ID 和有效新名称，且真实首页配置未被运行中的剪映占用
+- **THEN** CLI 仅更新该文件夹的 `name`、`modifiedTime` 和所属文件的时间戳，保留 ID、父节点、子节点、草稿映射及未知字段，并返回操作前快照和提交后按 ID 回读的名称
+- **AND** 目标 ID 不存在、同级重名或新名称无效时不修改任何配置文件；没有真实剪映冷重开验收前，该新增命令不得作为已支持的生产路由
+
 #### Scenario: Empty leaf folder is recycled and restored
 - **WHEN** 用户按精确文件夹 ID 将一个无子文件夹、无草稿映射的本地文件夹移入“最近删除”，然后按精确回收 ID 恢复
 - **THEN** CLI 返回操作前后的文件夹与回收条目计数、绑定 ID 和快照路径，最终活动列表恢复该文件夹且回收条目消失

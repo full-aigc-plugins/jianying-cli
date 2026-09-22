@@ -2048,6 +2048,16 @@ enum HomeFolderOp {
         #[arg(long)]
         at: Option<String>,
     },
+    /// Rename one exact local homepage folder without changing its relationships
+    Rename {
+        folder_id: String,
+        name: String,
+        #[arg(long)]
+        config_root: Option<PathBuf>,
+        /// Deterministic timestamp used by black-box tests and replay
+        #[arg(long)]
+        at: Option<String>,
+    },
     /// Move one exact empty leaf folder to Recently Deleted
     Recycle {
         folder_id: String,
@@ -3862,6 +3872,19 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                         let at = at.map(Ok).unwrap_or_else(home_folder::current_timestamp)?;
                         print_output(home_folder::create(&root, &name, &parent_id, &at)?, json)
                     }
+                    HomeFolderOp::Rename {
+                        folder_id,
+                        name,
+                        config_root,
+                        at,
+                    } => {
+                        if host_read_only || host_read_only_from_env() {
+                            bail!("host_read_only: homepage config mutation is disabled");
+                        }
+                        let root = home_folder::resolve_config_root(config_root.as_deref())?;
+                        let at = at.map(Ok).unwrap_or_else(home_folder::current_timestamp)?;
+                        print_output(home_folder::rename(&root, &folder_id, &name, &at)?, json)
+                    }
                     HomeFolderOp::Recycle {
                         folder_id,
                         config_root,
@@ -5518,7 +5541,7 @@ fn command_entry(
         }
         properties.insert(name, serde_json::Value::Object(schema));
     }
-    let status = command_status(&group, capability_manifest);
+    let status = command_status(&group, &command_path, capability_manifest);
     let replacement = legacy_replacement(&command_path);
     serde_json::json!({
         "path": command_path,
@@ -5564,7 +5587,33 @@ fn command_group(path: &[String]) -> String {
     .to_owned()
 }
 
-fn command_status(group: &str, manifest: &serde_json::Value) -> &'static str {
+fn command_status(group: &str, path: &str, manifest: &serde_json::Value) -> &'static str {
+    if path == "home folder rename" {
+        return match manifest["capabilities"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|capability| capability["id"] == "home.folder_rename")
+            .and_then(|capability| capability["status"].as_str())
+        {
+            Some("supported") => "supported",
+            Some("external_dependency") => "external_dependency",
+            _ => "partial",
+        };
+    }
+    if group == "home" {
+        return match manifest["capabilities"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|capability| capability["id"] == "home.folder_lifecycle")
+            .and_then(|capability| capability["status"].as_str())
+        {
+            Some("supported") => "supported",
+            Some("external_dependency") => "external_dependency",
+            _ => "partial",
+        };
+    }
     let prefix = format!("{group}.");
     let statuses: Vec<&str> = manifest["capabilities"]
         .as_array()
@@ -5655,7 +5704,10 @@ fn command_access(path: &str) -> &'static str {
     ) || path == "render"
         || matches!(
             path,
-            "home folder create" | "home folder recycle" | "home folder restore"
+            "home folder create"
+                | "home folder rename"
+                | "home folder recycle"
+                | "home folder restore"
         )
     {
         "write"
