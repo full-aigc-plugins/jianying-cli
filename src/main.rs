@@ -5,9 +5,9 @@ use anyhow::{bail, Context, Result};
 use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
-    capabilities, caption_ops, control_catalog, draft, interchange, job_runner, media_analysis,
-    media_ops, plan, probe, project_ops, render, runtime_acceptance, srt, store, template, tim,
-    timeline_ops,
+    capabilities, caption_ops, control_catalog, draft, home_folder, interchange, job_runner,
+    media_analysis, media_ops, plan, probe, project_ops, render, runtime_acceptance, srt, store,
+    template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -2017,6 +2017,61 @@ enum OfficialMediaOp {
     },
 }
 
+#[derive(Subcommand)]
+enum HomeFolderOp {
+    /// List active local homepage folders with their exact ids and hierarchy
+    List {
+        #[arg(long)]
+        config_root: Option<PathBuf>,
+    },
+    /// Create a local homepage folder without selecting a target by display name
+    Create {
+        name: String,
+        #[arg(long, default_value = "")]
+        parent_id: String,
+        #[arg(long)]
+        config_root: Option<PathBuf>,
+        /// Deterministic timestamp used by black-box tests and replay
+        #[arg(long)]
+        at: Option<String>,
+    },
+    /// Move one exact empty leaf folder to Recently Deleted
+    Recycle {
+        folder_id: String,
+        #[arg(long)]
+        config_root: Option<PathBuf>,
+        /// Deterministic timestamp used by black-box tests and replay
+        #[arg(long)]
+        at: Option<String>,
+        /// Confirm the recoverable mutation
+        #[arg(long)]
+        yes: bool,
+    },
+    /// List Recently Deleted folder entries with their exact recycle ids
+    ListRecycled {
+        #[arg(long)]
+        config_root: Option<PathBuf>,
+    },
+    /// Restore one exact empty leaf folder from Recently Deleted
+    Restore {
+        recycle_id: String,
+        #[arg(long)]
+        config_root: Option<PathBuf>,
+        /// Deterministic timestamp used by black-box tests and replay
+        #[arg(long)]
+        at: Option<String>,
+    },
+}
+
+#[derive(Subcommand)]
+enum HomeOp {
+    /// Manage local folders shown on the JianYing start page
+    Folder {
+        #[command(subcommand)]
+        op: HomeFolderOp,
+    },
+}
+
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct OfficialResourcePreflightDocument {
@@ -2162,6 +2217,11 @@ enum Command {
     Store {
         #[command(subcommand)]
         op: StoreOp,
+    },
+    /// JianYing start-page state managed through versioned local protocols
+    Home {
+        #[command(subcommand)]
+        op: HomeOp,
     },
     /// 结构 lint：引用完整/主轨连续/时长一致（只读）
     Verify(DraftPathArgs),
@@ -3759,6 +3819,61 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 print_output(store::restore(&snapshot, &target)?, json)
             }
         },
+        Command::Home { op } => {
+            match op {
+                HomeOp::Folder { op } => match op {
+                    HomeFolderOp::List { config_root } => {
+                        let root = home_folder::resolve_config_root(config_root.as_deref())?;
+                        print_output(home_folder::list(&root)?, json)
+                    }
+                    HomeFolderOp::Create {
+                        name,
+                        parent_id,
+                        config_root,
+                        at,
+                    } => {
+                        if host_read_only || host_read_only_from_env() {
+                            bail!("host_read_only: homepage config mutation is disabled");
+                        }
+                        let root = home_folder::resolve_config_root(config_root.as_deref())?;
+                        let at = at.map(Ok).unwrap_or_else(home_folder::current_timestamp)?;
+                        print_output(home_folder::create(&root, &name, &parent_id, &at)?, json)
+                    }
+                    HomeFolderOp::Recycle {
+                        folder_id,
+                        config_root,
+                        at,
+                        yes,
+                    } => {
+                        if !yes {
+                            bail!("home_folder_confirmation_required: refusing to recycle without --yes");
+                        }
+                        if host_read_only || host_read_only_from_env() {
+                            bail!("host_read_only: homepage config mutation is disabled");
+                        }
+                        let root = home_folder::resolve_config_root(config_root.as_deref())?;
+                        let at = at.map(Ok).unwrap_or_else(home_folder::current_timestamp)?;
+                        print_output(home_folder::recycle(&root, &folder_id, &at)?, json)
+                    }
+                    HomeFolderOp::ListRecycled { config_root } => {
+                        let root = home_folder::resolve_config_root(config_root.as_deref())?;
+                        print_output(home_folder::list_recycled(&root)?, json)
+                    }
+                    HomeFolderOp::Restore {
+                        recycle_id,
+                        config_root,
+                        at,
+                    } => {
+                        if host_read_only || host_read_only_from_env() {
+                            bail!("host_read_only: homepage config mutation is disabled");
+                        }
+                        let root = home_folder::resolve_config_root(config_root.as_deref())?;
+                        let at = at.map(Ok).unwrap_or_else(home_folder::current_timestamp)?;
+                        print_output(home_folder::restore(&root, &recycle_id, &at)?, json)
+                    }
+                },
+            }
+        }
         Command::Job { op } => match op {
             JobOp::Run {
                 job,
@@ -5483,6 +5598,8 @@ fn command_access(path: &str) -> &'static str {
             | "backup"
             | "restore"
             | "restore-snapshot"
+            | "create"
+            | "recycle"
             | "batch"
             | "run"
             | "cancel"
@@ -5521,7 +5638,7 @@ fn command_access(path: &str) -> &'static str {
 }
 
 fn command_platforms(group: &str) -> Vec<&'static str> {
-    if group == "runtime" {
+    if matches!(group, "runtime" | "home") {
         vec!["macos", "windows"]
     } else {
         vec!["macos", "windows", "linux"]

@@ -1,6 +1,6 @@
 [package]
 name = "jianying-cli"
-version = "1.6.22"
+version = "1.6.23"
 edition = "2021"
 description = "Local JianYing/CapCut draft CLI in Rust — full-capability draft building from jianying-cli-plan/v1, verified and publishable, no account, no upload."
 license = "Apache-2.0"
@@ -33,7 +33,7 @@ serde_json = { version = "1", features = ["preserve_order"] }
 uuid = { version = "1", features = ["v4"] }
 thiserror = "2"
 sha2 = "0.10"
-time = { version = "0.3", features = ["formatting"] }
+time = { version = "0.3", features = ["formatting", "local-offset"] }
 regex = "1"
 jianying-domain = { path = "crates/jianying-domain" }
 jianying-schema = { path = "crates/jianying-schema" }

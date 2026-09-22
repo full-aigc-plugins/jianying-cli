@@ -10,6 +10,7 @@ pub mod draft;
 pub mod error_contract;
 pub mod extend_mode;
 pub mod fixture_ops;
+pub mod home_folder;
 pub mod interchange;
 pub mod job_runner;
 pub mod mcp_server;

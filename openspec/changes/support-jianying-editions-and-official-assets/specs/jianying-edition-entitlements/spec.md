@@ -114,3 +114,22 @@ GUI Adapter MAY 搜索、预览和下载用户账号可访问的官方素材，�
 #### Scenario: GUI fallback reports success
 - **WHEN** 可访问性或视觉兜底完成一个界面动作
 - **THEN** CLI 仍须用草稿、会话状态或产物证据验证效果，单次点击成功不能满足完成门禁
+
+### Requirement: Homepage local-folder lifecycle is atomic and lossless
+系统 SHALL 通过 Rust CLI 管理首页本地文件夹的查询、创建、移入“最近删除”、回收站查询与恢复。写操作 MUST 以精确 ID 为目标，在剪映运行时拒绝修改真实配置，保留未知字段，在任何文件变更前生成可恢复快照，并对相关配置文件执行原子提交或全量回滚。
+
+#### Scenario: Empty leaf folder is recycled and restored
+- **WHEN** 用户按精确文件夹 ID 将一个无子文件夹、无草稿映射的本地文件夹移入“最近删除”，然后按精确回收 ID 恢复
+- **THEN** CLI 返回操作前后的文件夹与回收条目计数、绑定 ID 和快照路径，最终活动列表恢复该文件夹且回收条目消失
+
+#### Scenario: Unknown fields survive the lifecycle
+- **WHEN** 文件夹、映射或回收配置包含当前 CLI 尚未建模的根字段或条目字段
+- **THEN** 列表、回收与恢复全程保留这些字段及其值，不通过强类型重序列化丢失未知数据
+
+#### Scenario: Folder mutation cannot be proven safe
+- **WHEN** 目标 ID 缺失或冲突、目标包含未建模的草稿/子文件夹回收语义、配置结构不完整，或真实剪映配置正被运行中的编辑器使用
+- **THEN** CLI 以结构化错误失败关闭，不写入任何相关文件，不按名称猜测目标，也不把 GUI 中条目消失视为恢复成功
+
+#### Scenario: Multi-file commit fails
+- **WHEN** 原子提交中任一配置文件无法落盘、重命名或回读校验
+- **THEN** CLI 从操作前快照恢复所有已触及文件，返回失败阶段与快照身份，不留下部分更新状态
