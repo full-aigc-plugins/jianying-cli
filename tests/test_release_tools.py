@@ -40,9 +40,23 @@ ATTESTATION_SPEC = importlib.util.spec_from_file_location(
 )
 ATTESTATION = importlib.util.module_from_spec(ATTESTATION_SPEC)
 ATTESTATION_SPEC.loader.exec_module(ATTESTATION)
+UTILITY_SPEC = importlib.util.spec_from_file_location(
+    "capcut_utility_differential", ROOT / "tools" / "capcut_utility_differential.py"
+)
+UTILITY = importlib.util.module_from_spec(UTILITY_SPEC)
+UTILITY_SPEC.loader.exec_module(UTILITY)
 
 
 class ReleaseIndexTests(unittest.TestCase):
+    def test_capcut_utility_runner_survives_upstream_mid_codepoint_truncation(self) -> None:
+        truncated = subprocess.CompletedProcess([], 0, b'[{"name":"\xe4\xb8', b"")
+        with patch.object(UTILITY.subprocess, "run", return_value=truncated) as run:
+            output = UTILITY.invoke(["node", "dist/index.js", "enums"])
+
+        self.assertEqual(output, '[{"name":"\ufffd')
+        self.assertTrue(run.call_args.kwargs["capture_output"])
+        self.assertNotIn("text", run.call_args.kwargs)
+
     def test_release_packager_decodes_binary_output_as_utf8(self) -> None:
         capability_entries = [
             {"id": capability, "status": "supported"}

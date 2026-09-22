@@ -14,13 +14,18 @@ PINNED = "49f70e3b07f1a236d45acb9b49a70c141dd1ee98"
 
 
 def invoke(argv: list[str]) -> str:
-    process = subprocess.run(argv, text=True, capture_output=True, check=False)
+    process = subprocess.run(argv, capture_output=True, check=False)
+    # 固定上游会在约 128 KiB 处截断部分枚举 JSON；截断点可能落在 UTF-8
+    # 多字节字符中间。先以替换模式解码，让下游的“已批准上游截断”分支按
+    # 固定 src/enums.json 复核内容，而不是由 Python 在 JSON 校验前随机崩溃。
+    stdout = process.stdout.decode("utf-8", errors="replace")
+    stderr = process.stderr.decode("utf-8", errors="replace")
     if process.returncode != 0:
         raise RuntimeError(
             f"command failed ({process.returncode}): {argv!r}\n"
-            f"stdout={process.stdout}\nstderr={process.stderr}"
+            f"stdout={stdout}\nstderr={stderr}"
         )
-    return process.stdout
+    return stdout
 
 
 def rust_json(binary: pathlib.Path, *args: str) -> dict:
