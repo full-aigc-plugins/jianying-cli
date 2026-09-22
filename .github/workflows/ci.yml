@@ -8,6 +8,7 @@ name: ci
 env:
   PYJYD_REF: c3318066d964744e2bfc66f75c71745fe8cea52a
   CAPCUT_REF: 49f70e3b07f1a236d45acb9b49a70c141dd1ee98
+  CAPCUT_NPM_VERSION: 10.9.3
 
 jobs:
   test:
@@ -67,8 +68,11 @@ jobs:
         run: |
           git clone https://github.com/renezander030/capcut-cli.git /tmp/capcut-cli
           git -C /tmp/capcut-cli checkout "$CAPCUT_REF"
-          npm --prefix /tmp/capcut-cli ci --ignore-scripts
-          npm --prefix /tmp/capcut-cli run build
+          # npm 11 rejects this pinned upstream lock despite its package metadata
+          # being synchronized. Keep the parity source immutable and pin the last
+          # verified npm 10 installer instead of rewriting the upstream lock.
+          npx --yes npm@"$CAPCUT_NPM_VERSION" --prefix /tmp/capcut-cli ci --ignore-scripts
+          npx --yes npm@"$CAPCUT_NPM_VERSION" --prefix /tmp/capcut-cli run build
       - name: Project command black-box differentials
         run: python3 tools/capcut_project_differential.py --upstream /tmp/capcut-cli --rust-bin target/release/jianying --output /tmp/CAPCUT_PROJECT_DIFFERENTIALS.json
       - name: Project differential report must match the checked-in evidence

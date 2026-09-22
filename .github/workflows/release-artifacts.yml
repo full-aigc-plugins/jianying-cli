@@ -15,6 +15,7 @@ concurrency:
 env:
   PYJYD_REF: c3318066d964744e2bfc66f75c71745fe8cea52a
   CAPCUT_REF: 49f70e3b07f1a236d45acb9b49a70c141dd1ee98
+  CAPCUT_NPM_VERSION: 10.9.3
 
 jobs:
   source-parity-gate:
@@ -80,8 +81,10 @@ jobs:
           git -C /tmp/capcut-cli checkout "$CAPCUT_REF"
           (
             cd /tmp/capcut-cli
-            npm ci --ignore-scripts
-            npm run build
+            # Match CI: do not rewrite the immutable upstream lock merely to
+            # accommodate npm 11's root-package compatibility regression.
+            npx --yes npm@"$CAPCUT_NPM_VERSION" ci --ignore-scripts
+            npx --yes npm@"$CAPCUT_NPM_VERSION" run build
           )
       - name: Verify source policy, catalogs and all black-box differentials
         run: |
