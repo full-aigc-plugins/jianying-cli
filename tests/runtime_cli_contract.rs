@@ -55,6 +55,17 @@ fn semantic_control_catalog_prefers_direct_draft_routes_and_contains_no_coordina
         .unwrap();
     assert_eq!(undo["route"], "runtime_native");
     assert_eq!(undo["status"], "partial");
+    let mute = controls
+        .iter()
+        .find(|control| control["semantic_id"] == "track.audio.mute")
+        .unwrap();
+    assert_eq!(mute["route"], "draft_protocol");
+    assert_eq!(mute["status"], "partial");
+    assert_eq!(mute["capability"], "timeline.track_mute");
+    assert!(mute["command"]
+        .as_str()
+        .unwrap()
+        .contains("timeline track-mute"));
     assert!(!serde_json::to_string(&envelope)
         .unwrap()
         .contains("screen_coordinate"));

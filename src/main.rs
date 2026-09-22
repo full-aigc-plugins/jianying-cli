@@ -685,6 +685,13 @@ enum TimelineOp {
         id: String,
         level: f64,
     },
+    /// Set one track's draft-protocol mute bit without changing segment volume
+    TrackMute {
+        draft: PathBuf,
+        track_id: String,
+        #[arg(action = clap::ArgAction::Set)]
+        muted: bool,
+    },
     /// Trim one segment's source window
     Trim {
         draft: PathBuf,
@@ -2496,6 +2503,11 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             TimelineOp::Volume { draft, id, level } => {
                 print_output(timeline_ops::volume(&draft, &id, level)?, json)
             }
+            TimelineOp::TrackMute {
+                draft,
+                track_id,
+                muted,
+            } => print_output(timeline_ops::track_mute(&draft, &track_id, muted)?, json),
             TimelineOp::Trim {
                 draft,
                 id,

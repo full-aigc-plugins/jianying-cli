@@ -198,3 +198,21 @@ CLI 的提交后全量回读与插件的独立二次回读均要求目标 ID 位
 据此任务 4.6 完成，`home.folder_lifecycle` 在已声明范围内提升为 `supported`：支持列表、创建、
 空叶子文件夹回收、回收站列表和恢复；非空、含子文件夹或关联草稿的文件夹仍以
 `nonempty_folder_schema_unverified` 失败关闭，未擅自猜测尚未观测的原生 wire 格式。
+
+## 2026-09-23：轨道静音草稿协议原子命令（任务 2.15）
+
+上游 Apache-2.0 固定参考把轨道静音编码为 `attribute` 的最低位；本项目独立实现
+`jianying timeline track-mute <draft> <track_id> <true|false> --json`。命令只按精确轨道 ID
+变更该位，保留其他位、未知轨道字段和片段原始音量，经隔离工作副本验证、双镜像原子提交后，
+重新读取草稿确认属性值。无效轨道 ID 或非法属性在提交前失败，原草稿字节不变。
+
+- RED：新增黑盒用例初次因 `track-mute` 命令不存在而失败。
+- GREEN：`timeline_cli_contract` 17/17、`agent_contract` 17/17、
+  `runtime_cli_contract` 定向目录断言均通过；`cargo clippy --all-targets --all-features -- -D warnings`、
+  `cargo fmt --check`、OpenSpec strict 与 `git diff --check` 通过。`cargo build --release --locked`
+  构建 `v1.6.25`，发布模式二进制通过 `verify_release_runtime.py --binary`；Python 32/32 通过。
+- 全量 `cargo test --workspace` 首次被宿主正在运行的 `VideoFusion-macOS` 触发草稿拒写门禁；
+  未关闭或操作编辑器。仅在第二次测试进程的 `PATH` 前置合成 `ps` 替身后，工作区全量测试通过。
+  此隔离不改变生产二进制的进程探测和运行中拒写逻辑。
+- `track.audio.mute` 与 `timeline.track_mute` 仍标为 `partial`：尚无新命令的不可变发布
+  二进制和真实剪映冷重开/播放差分证据，不能将本地草稿结构测试冒充界面验收。

@@ -273,6 +273,51 @@ pub fn volume(draft: &Path, id: &str, level: f64) -> Result<Value> {
     })
 }
 
+/// 按精确轨道 ID 设置静音位；保留其余属性位、未知字段和片段音量。
+pub fn track_mute(draft: &Path, track_id: &str, muted: bool) -> Result<Value> {
+    if track_id.trim().is_empty() {
+        bail!("track id must not be blank");
+    }
+    let change = mutate(draft, |timeline| {
+        let track = timeline["tracks"]
+            .as_array_mut()
+            .context("tracks must be an array")?
+            .iter_mut()
+            .find(|track| track["id"].as_str() == Some(track_id))
+            .with_context(|| format!("track not found: {track_id}"))?;
+        let old_attribute = track["attribute"]
+            .as_i64()
+            .filter(|value| *value >= 0)
+            .with_context(|| format!("track {track_id} has invalid attribute"))?;
+        let new_attribute = if muted {
+            old_attribute | 1
+        } else {
+            old_attribute & !1
+        };
+        track["attribute"] = json!(new_attribute);
+        Ok(json!({
+            "ok":true,"track_id":track_id,
+            "old_muted":old_attribute & 1 != 0,"new_muted":muted,
+            "old_attribute":old_attribute,"new_attribute":new_attribute
+        }))
+    })?;
+    // 事务提交后从真实草稿回读，而非仅相信内存中的拟写值。
+    let timeline = crate::draft::load_timeline(draft)?;
+    let track = timeline["tracks"]
+        .as_array()
+        .context("tracks must be an array")?
+        .iter()
+        .find(|track| track["id"].as_str() == Some(track_id))
+        .with_context(|| format!("track missing after mute commit: {track_id}"))?;
+    let readback_attribute = track["attribute"]
+        .as_i64()
+        .with_context(|| format!("track {track_id} has invalid attribute after commit"))?;
+    if readback_attribute != change["new_attribute"].as_i64().unwrap_or(-1) {
+        bail!("track mute readback mismatch for {track_id}");
+    }
+    Ok(change)
+}
+
 /// 修剪片段的素材入点和持续时间。
 pub fn trim(draft: &Path, id: &str, start_us: i64, duration_us: i64) -> Result<Value> {
     if start_us < 0 || duration_us <= 0 {

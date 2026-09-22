@@ -83,6 +83,7 @@
     {"id":"timeline.mask","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream resource/geometry/field differential"},
     {"id":"timeline.background_blur","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream canvas/reference differential"},
     {"id":"timeline.volume","status":"supported","evidence":"exact black-box differential + transactional CLI"},
+    {"id":"timeline.track_mute","status":"partial","evidence":"tests/timeline_cli_contract.rs: exact-track mute-bit mutation and draft readback; published-binary and native-editor canary pending"},
     {"id":"timeline.audio_fade","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream prefix/conversion/replacement differential"},
     {"id":"timeline.filter","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream catalogue/raw/full-range differential"},
     {"id":"timeline.effect","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream catalogue/raw/params/bind/full-range differential"},

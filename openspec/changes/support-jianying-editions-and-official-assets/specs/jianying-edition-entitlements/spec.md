@@ -95,6 +95,11 @@ GUI Adapter MAY 搜索、预览和下载用户账号可访问的官方素材，�
 - **WHEN** 按钮语义可由分割、裁剪、移动、删除、轨道、关键帧、滤镜、特效或转场等已有草稿操作完整表达
 - **THEN** CLI 直接修改隔离草稿并输出前后差分，不启动编辑器或模拟点击
 
+#### Scenario: Track mute is applied through the draft protocol
+- **WHEN** 调用方以精确轨道 ID 设置轨道静音状态
+- **THEN** CLI 只设置草稿轨道 `attribute` 的静音位，保留其他位、未知字段和每个片段原有音量；返回旧/新静音状态及原始位值，并通过重新读取草稿确认结果
+- **AND** 无效轨道 ID 或非法 `attribute` 必须在事务提交前失败，双镜像保持不变；在真实剪映及发布二进制验收前，该控件不得标记为 `supported`
+
 #### Scenario: Control only changes editor session state
 - **WHEN** 按钮控制撤销栈、磁吸、联动、录音或时间线缩放等编辑器会话状态
 - **THEN** CLI 通过版本绑定的 Runtime Control 探测并设置该状态，不把会话状态伪造为草稿字段

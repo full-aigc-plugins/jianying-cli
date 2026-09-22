@@ -79,6 +79,98 @@ fn audio_probe_stub(path: &Path) -> Result<MediaInfo> {
 }
 
 #[test]
+fn track_mute_preserves_unknown_track_state_and_segment_volume() {
+    let root = std::env::temp_dir().join(format!(
+        "jianying-track-mute-{}",
+        uuid::Uuid::new_v4().simple()
+    ));
+    std::fs::create_dir_all(&root).unwrap();
+    std::fs::write(root.join("music.wav"), b"fixture").unwrap();
+    let plan: Plan = serde_json::from_value(serde_json::json!({
+        "schema":"jianying-cli-plan/v1","name":"track-mute",
+        "canvas":{"width":1920,"height":1080,"fps":30},
+        "tracks":[{"type":"audio","segments":[{
+            "start_us":0,"duration_us":3000000,"source":"music.wav"
+        }]}]
+    }))
+    .unwrap();
+    let output = root.join("draft");
+    draft::build(&plan, &root, &output, None, &audio_probe_stub).unwrap();
+    let mut timeline = draft::load_timeline(&output).unwrap();
+    let track_id = timeline["tracks"][0]["id"].as_str().unwrap().to_owned();
+    timeline["tracks"][0]["attribute"] = serde_json::json!(8);
+    timeline["tracks"][0]["unrecognized_track_field"] = serde_json::json!({"keep":true});
+    timeline["tracks"][0]["segments"][0]["volume"] = serde_json::json!(0.37);
+    jianying_cli::template::save_timeline(&output, &timeline).unwrap();
+
+    let muted = run_ok(&[
+        "timeline",
+        "track-mute",
+        &output.to_string_lossy(),
+        &track_id,
+        "true",
+        "--json",
+    ]);
+    assert_eq!(muted["old_muted"], false);
+    assert_eq!(muted["new_muted"], true);
+    assert_eq!(muted["old_attribute"], 8);
+    assert_eq!(muted["new_attribute"], 9);
+    let after = draft::load_timeline(&output).unwrap();
+    assert_eq!(after["tracks"][0]["attribute"], 9);
+    assert_eq!(after["tracks"][0]["unrecognized_track_field"]["keep"], true);
+    assert_eq!(after["tracks"][0]["segments"][0]["volume"], 0.37);
+    assert_eq!(
+        run_ok(&["timeline", "tracks", &output.to_string_lossy(), "--json"])[0]["muted"],
+        true
+    );
+
+    let unmuted = run_ok(&[
+        "timeline",
+        "track-mute",
+        &output.to_string_lossy(),
+        &track_id,
+        "false",
+        "--json",
+    ]);
+    assert_eq!(unmuted["old_attribute"], 9);
+    assert_eq!(unmuted["new_attribute"], 8);
+    let before_invalid = std::fs::read(output.join("draft_content.json")).unwrap();
+    let unknown = run(&[
+        "timeline",
+        "track-mute",
+        &output.to_string_lossy(),
+        "missing-track",
+        "true",
+        "--json",
+    ]);
+    assert_eq!(unknown.status.code(), Some(1));
+    assert_eq!(
+        std::fs::read(output.join("draft_content.json")).unwrap(),
+        before_invalid
+    );
+    let mut invalid = draft::load_timeline(&output).unwrap();
+    invalid["tracks"][0]["attribute"] = serde_json::json!("unknown");
+    let malformed_wire = serde_json::to_vec_pretty(&invalid).unwrap();
+    std::fs::write(output.join("draft_content.json"), &malformed_wire).unwrap();
+    std::fs::write(output.join("draft_info.json"), &malformed_wire).unwrap();
+    let before_invalid_attribute = std::fs::read(output.join("draft_content.json")).unwrap();
+    let malformed = run(&[
+        "timeline",
+        "track-mute",
+        &output.to_string_lossy(),
+        &track_id,
+        "true",
+        "--json",
+    ]);
+    assert_eq!(malformed.status.code(), Some(1));
+    assert_eq!(
+        std::fs::read(output.join("draft_content.json")).unwrap(),
+        before_invalid_attribute
+    );
+    let _ = std::fs::remove_dir_all(&root);
+}
+
+#[test]
 fn quantization_report_is_exposed_as_a_read_only_cli_contract() {
     let report = run_ok(&[
         "timeline",
