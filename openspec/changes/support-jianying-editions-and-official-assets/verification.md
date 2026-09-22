@@ -239,3 +239,22 @@ Python 32/32、Clippy、格式校验及 OpenSpec strict 通过。
 属性位仍为 `0`，`project verify` 无问题。此阶段尚非不可变 `v1.6.26` 发布制品，
 更未在真实剪映冷重开后验证界面呈现；`track.rename` 与
 `timeline.track_rename` 必须保持 `partial`。
+
+## 2026-09-23：不可变 v1.6.26 正式制品差分补验
+
+`v1.6.26` Release 已发布且仓库 Immutable Releases 开启；tag 在发布前后均解析到
+`0a1affe71d27385f07663f5fe1c8a351d0cca3c8`。源码差分、三平台工作区测试、
+发布二进制、SBOM 和 10 个 Release 资产通过正式流水线。Release index SHA-256 为
+`0258288154dff1127a8583b37d6149f717c3f77ac53c91c903ef0199e1a17b53`；
+darwin-arm64 压缩包 SHA-256 为
+`7d2e9a61391b72adabd0aa9ce906f134975181751081b577a7a37a3e7fea5893`，
+其中二进制 SHA-256 为
+`6e9047260fdb9b86602c006c08fa70f8c744968b41920d1b8c421d55b289a0fd`。
+`gh release verify` 与该压缩包的 `gh release verify-asset` 均通过。
+
+下载该正式二进制后，在隔离三秒合成音频草稿执行 `project quickstart →
+timeline track-rename → project verify`。两份草稿镜像逐字节一致，名称均为
+“正式制品配乐轨”，`is_default_name=false`，`attribute=0`、片段音量 `1.0`，
+`project verify` 无问题。由于真实剪映正在运行，合成草稿命令在测试进程中隔离
+编辑器进程探测；这不等于真实剪映冷重开或界面回读。发布二进制能力清单继续返回
+`timeline.track_rename=partial`，不作为自动 GUI 路由依据。
