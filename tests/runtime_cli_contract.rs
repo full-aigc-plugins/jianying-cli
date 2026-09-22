@@ -66,6 +66,17 @@ fn semantic_control_catalog_prefers_direct_draft_routes_and_contains_no_coordina
         .as_str()
         .unwrap()
         .contains("timeline track-mute"));
+    let rename = controls
+        .iter()
+        .find(|control| control["semantic_id"] == "track.rename")
+        .unwrap();
+    assert_eq!(rename["route"], "draft_protocol");
+    assert_eq!(rename["status"], "partial");
+    assert_eq!(rename["capability"], "timeline.track_rename");
+    assert!(rename["command"]
+        .as_str()
+        .unwrap()
+        .contains("timeline track-rename"));
     assert!(!serde_json::to_string(&envelope)
         .unwrap()
         .contains("screen_coordinate"));

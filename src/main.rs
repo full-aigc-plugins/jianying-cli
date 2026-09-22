@@ -692,6 +692,12 @@ enum TimelineOp {
         #[arg(action = clap::ArgAction::Set)]
         muted: bool,
     },
+    /// Rename one track in the draft without changing its segments or attributes
+    TrackRename {
+        draft: PathBuf,
+        track_id: String,
+        name: String,
+    },
     /// Trim one segment's source window
     Trim {
         draft: PathBuf,
@@ -2508,6 +2514,11 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 track_id,
                 muted,
             } => print_output(timeline_ops::track_mute(&draft, &track_id, muted)?, json),
+            TimelineOp::TrackRename {
+                draft,
+                track_id,
+                name,
+            } => print_output(timeline_ops::track_rename(&draft, &track_id, &name)?, json),
             TimelineOp::Trim {
                 draft,
                 id,

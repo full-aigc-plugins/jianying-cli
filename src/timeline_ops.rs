@@ -279,12 +279,7 @@ pub fn track_mute(draft: &Path, track_id: &str, muted: bool) -> Result<Value> {
         bail!("track id must not be blank");
     }
     let change = mutate(draft, |timeline| {
-        let track = timeline["tracks"]
-            .as_array_mut()
-            .context("tracks must be an array")?
-            .iter_mut()
-            .find(|track| track["id"].as_str() == Some(track_id))
-            .with_context(|| format!("track not found: {track_id}"))?;
+        let track = find_unique_track_mut(timeline, track_id)?;
         let old_attribute = track["attribute"]
             .as_i64()
             .filter(|value| *value >= 0)
@@ -314,6 +309,48 @@ pub fn track_mute(draft: &Path, track_id: &str, muted: bool) -> Result<Value> {
         .with_context(|| format!("track {track_id} has invalid attribute after commit"))?;
     if readback_attribute != change["new_attribute"].as_i64().unwrap_or(-1) {
         bail!("track mute readback mismatch for {track_id}");
+    }
+    Ok(change)
+}
+
+/// 以精确轨道 ID 修改名称和默认命名标记，并在事务提交后读取两个草稿镜像。
+pub fn track_rename(draft: &Path, track_id: &str, name: &str) -> Result<Value> {
+    if track_id.trim().is_empty() {
+        bail!("track id must not be blank");
+    }
+    if name.trim().is_empty() || name.chars().any(char::is_control) {
+        bail!("track name must be non-blank and contain no control characters");
+    }
+    let change = mutate(draft, |timeline| {
+        let track = find_unique_track_mut(timeline, track_id)?;
+        let old_name = track["name"]
+            .as_str()
+            .with_context(|| format!("track {track_id} has invalid name"))?
+            .to_owned();
+        let old_is_default_name = track["is_default_name"]
+            .as_bool()
+            .with_context(|| format!("track {track_id} has invalid is_default_name"))?;
+        track["name"] = json!(name);
+        track["is_default_name"] = json!(false);
+        Ok(json!({
+            "ok":true,"track_id":track_id,"old_name":old_name,"new_name":name,
+            "old_is_default_name":old_is_default_name,"new_is_default_name":false
+        }))
+    })?;
+    // 两个镜像都必须含有同一条轨道及提交值，不能仅依赖内存中的拟写结果。
+    for mirror in ["draft_content.json", "draft_info.json"] {
+        let timeline: Value = serde_json::from_slice(&std::fs::read(draft.join(mirror))?)?;
+        let track = timeline["tracks"]
+            .as_array()
+            .with_context(|| format!("{mirror} tracks must be an array"))?
+            .iter()
+            .find(|track| track["id"].as_str() == Some(track_id))
+            .with_context(|| {
+                format!("track missing after rename commit in {mirror}: {track_id}")
+            })?;
+        if track["name"].as_str() != Some(name) || track["is_default_name"] != false {
+            bail!("track rename readback mismatch in {mirror} for {track_id}");
+        }
     }
     Ok(change)
 }
@@ -2662,6 +2699,22 @@ fn find_segment_mut<'a>(timeline: &'a mut Value, id: &str) -> Result<&'a mut Val
         }
     }
     bail!("segment not found: {id}")
+}
+
+fn find_unique_track_mut<'a>(timeline: &'a mut Value, track_id: &str) -> Result<&'a mut Value> {
+    let tracks = timeline["tracks"]
+        .as_array_mut()
+        .context("tracks must be an array")?;
+    let matches = tracks
+        .iter()
+        .enumerate()
+        .filter_map(|(index, track)| (track["id"].as_str() == Some(track_id)).then_some(index))
+        .collect::<Vec<_>>();
+    match matches.as_slice() {
+        [index] => Ok(&mut tracks[*index]),
+        [] => bail!("track not found: {track_id}"),
+        _ => bail!("duplicate track id: {track_id}"),
+    }
 }
 
 fn segment_summary(timeline: &Value, track: &Value, segment: &Value) -> Value {

@@ -171,6 +171,128 @@ fn track_mute_preserves_unknown_track_state_and_segment_volume() {
 }
 
 #[test]
+fn track_rename_preserves_track_state_and_reads_back_both_draft_mirrors() {
+    let root = std::env::temp_dir().join(format!(
+        "jianying-track-rename-{}",
+        uuid::Uuid::new_v4().simple()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(root.join("music.wav"), b"fixture").unwrap();
+    let plan: Plan = serde_json::from_value(serde_json::json!({
+        "schema":"jianying-cli-plan/v1","name":"track-rename",
+        "canvas":{"width":1920,"height":1080,"fps":30},
+        "tracks":[{"type":"audio","segments":[{
+            "start_us":0,"duration_us":3000000,"source":"music.wav"
+        }]}]
+    }))
+    .unwrap();
+    let draft_path = root.join("draft");
+    draft::build(&plan, &root, &draft_path, None, &audio_probe_stub).unwrap();
+    let mut timeline = draft::load_timeline(&draft_path).unwrap();
+    let track_id = timeline["tracks"][0]["id"].as_str().unwrap().to_owned();
+    timeline["tracks"][0]["attribute"] = serde_json::json!(8);
+    timeline["tracks"][0]["is_default_name"] = serde_json::json!(true);
+    timeline["tracks"][0]["unrecognized_track_field"] = serde_json::json!({"keep":true});
+    timeline["tracks"][0]["segments"][0]["volume"] = serde_json::json!(0.37);
+    let old_name = timeline["tracks"][0]["name"].as_str().unwrap().to_owned();
+    jianying_cli::template::save_timeline(&draft_path, &timeline).unwrap();
+
+    let changed = run_ok(&[
+        "timeline",
+        "track-rename",
+        &draft_path.to_string_lossy(),
+        &track_id,
+        "配乐轨道",
+        "--json",
+    ]);
+    assert_eq!(changed["old_name"], old_name);
+    assert_eq!(changed["new_name"], "配乐轨道");
+    assert_eq!(changed["old_is_default_name"], true);
+    assert_eq!(changed["new_is_default_name"], false);
+    for mirror in ["draft_content.json", "draft_info.json"] {
+        let wire: serde_json::Value =
+            serde_json::from_slice(&fs::read(draft_path.join(mirror)).unwrap()).unwrap();
+        assert_eq!(wire["tracks"][0]["name"], "配乐轨道");
+        assert_eq!(wire["tracks"][0]["is_default_name"], false);
+        assert_eq!(wire["tracks"][0]["attribute"], 8);
+        assert_eq!(wire["tracks"][0]["unrecognized_track_field"]["keep"], true);
+        assert_eq!(wire["tracks"][0]["segments"][0]["volume"], 0.37);
+    }
+
+    let before = fs::read(draft_path.join("draft_content.json")).unwrap();
+    let before_info = fs::read(draft_path.join("draft_info.json")).unwrap();
+    for (id, name) in [("missing-track", "不应写入"), (&track_id[..], "   ")] {
+        let failed = run(&[
+            "timeline",
+            "track-rename",
+            &draft_path.to_string_lossy(),
+            id,
+            name,
+            "--json",
+        ]);
+        assert_eq!(failed.status.code(), Some(1));
+        assert_eq!(
+            fs::read(draft_path.join("draft_content.json")).unwrap(),
+            before
+        );
+        assert_eq!(
+            fs::read(draft_path.join("draft_info.json")).unwrap(),
+            before_info
+        );
+    }
+    let mut duplicated = draft::load_timeline(&draft_path).unwrap();
+    let duplicate_track = duplicated["tracks"][0].clone();
+    duplicated["tracks"]
+        .as_array_mut()
+        .unwrap()
+        .push(duplicate_track);
+    let duplicated_wire = serde_json::to_vec_pretty(&duplicated).unwrap();
+    fs::write(draft_path.join("draft_content.json"), &duplicated_wire).unwrap();
+    fs::write(draft_path.join("draft_info.json"), &duplicated_wire).unwrap();
+    let rejected_duplicate = run(&[
+        "timeline",
+        "track-rename",
+        &draft_path.to_string_lossy(),
+        &track_id,
+        "拒绝重复 ID",
+        "--json",
+    ]);
+    assert_eq!(rejected_duplicate.status.code(), Some(1));
+    assert_eq!(
+        fs::read(draft_path.join("draft_content.json")).unwrap(),
+        duplicated_wire
+    );
+    fs::write(draft_path.join("draft_content.json"), &before).unwrap();
+    fs::write(draft_path.join("draft_info.json"), &before_info).unwrap();
+
+    let mut malformed = draft::load_timeline(&draft_path).unwrap();
+    malformed["tracks"][0]["is_default_name"] = serde_json::json!("unknown");
+    let malformed_wire = serde_json::to_vec_pretty(&malformed).unwrap();
+    fs::write(draft_path.join("draft_content.json"), &malformed_wire).unwrap();
+    fs::write(draft_path.join("draft_info.json"), &malformed_wire).unwrap();
+    let before_malformed_content = fs::read(draft_path.join("draft_content.json")).unwrap();
+    let before_malformed_info = fs::read(draft_path.join("draft_info.json")).unwrap();
+    let rejected = run(&[
+        "timeline",
+        "track-rename",
+        &draft_path.to_string_lossy(),
+        &track_id,
+        "拒绝写入",
+        "--json",
+    ]);
+    assert_eq!(rejected.status.code(), Some(1));
+    assert_eq!(
+        fs::read(draft_path.join("draft_content.json")).unwrap(),
+        before_malformed_content
+    );
+    assert_eq!(
+        fs::read(draft_path.join("draft_info.json")).unwrap(),
+        before_malformed_info
+    );
+    let _ = fs::remove_dir_all(&root);
+}
+
+#[test]
 fn quantization_report_is_exposed_as_a_read_only_cli_contract() {
     let report = run_ok(&[
         "timeline",

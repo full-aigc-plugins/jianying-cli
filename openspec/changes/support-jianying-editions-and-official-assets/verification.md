@@ -216,3 +216,26 @@ CLI 的提交后全量回读与插件的独立二次回读均要求目标 ID 位
   此隔离不改变生产二进制的进程探测和运行中拒写逻辑。
 - `track.audio.mute` 与 `timeline.track_mute` 仍标为 `partial`：尚无新命令的不可变发布
   二进制和真实剪映冷重开/播放差分证据，不能将本地草稿结构测试冒充界面验收。
+
+## 2026-09-23：不可变静音二进制复核与轨道重命名（任务 2.16）
+
+`v1.6.25` 的不可变 CLI Release 已发布，tag 在发布前后均解析到
+`eafb33587341800fd348e780240edab53a1033c3`。darwin-arm64 发布二进制
+SHA-256 为 `9b7f30b7576756190d307eb0e7bd1e34c63826eb6a41bb7ff46c9f2780a47439`。
+该真实发布二进制在隔离三秒合成音频草稿上执行 `track-mute false → true → false`，
+轨道 `attribute` 为 `0 → 1 → 0`，片段音量保持 `1.0`，两份草稿镜像逐字节一致，
+`project verify` 无问题。剪映处于运行中，因此本次合成草稿黑盒测试仅对测试进程
+隔离 `ps` 探测；生产二进制未修改，真实剪映冷重开、播放和导出仍未验收。
+
+新增 `jianying timeline track-rename <draft> <track_id> <name> --json`：只按精确轨道 ID
+写入名称及 `is_default_name=false`。未知轨道字段、`attribute` 位和片段音量保持不变；
+无效 ID、空白名称或非法旧标记在事务提交前失败，两份镜像字节不变。测试先因命令不存在
+RED，再 GREEN；`timeline_cli_contract` 18/18、`runtime_cli_contract` 10/10、
+`cargo test --workspace --locked` 全量通过（合成草稿测试进程隔离宿主编辑器探测），
+Python 32/32、Clippy、格式校验及 OpenSpec strict 通过。
+
+本地 `v1.6.26` release-mode 二进制经 `verify_release_runtime.py` 验证，在隔离三秒合成
+音频草稿上完成重命名并双镜像回读：名称均为“配乐轨道”、默认命名标记均为 `false`、
+属性位仍为 `0`，`project verify` 无问题。此阶段尚非不可变 `v1.6.26` 发布制品，
+更未在真实剪映冷重开后验证界面呈现；`track.rename` 与
+`timeline.track_rename` 必须保持 `partial`。
