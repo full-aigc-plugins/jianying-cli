@@ -135,6 +135,7 @@ fn compile_preflights_builds_refs_operations_batch_and_job_v2() {
         "--json",
     ]);
     assert_eq!(built["ok"], true);
+    assert_eq!(built["compiler"], "draft_project_to_wire");
     assert_eq!(built["tracks"], 3);
     assert_eq!(built["segments"], 8);
     assert_eq!(built["duration_us"], 5_000_000);
@@ -215,6 +216,7 @@ fn compile_preflights_builds_refs_operations_batch_and_job_v2() {
     ]);
     assert_eq!(job_result["operation"], "create");
     assert_eq!(job_result["compile"]["ok"], true);
+    assert_eq!(job_result["compile"]["compiler"], "draft_project_to_wire");
     assert!(job_out.join("draft_content.json").is_file());
     let _ = std::fs::remove_dir_all(root);
 }

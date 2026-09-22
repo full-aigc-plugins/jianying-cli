@@ -20,6 +20,67 @@ fn drawtext_escape(s: &str) -> String {
         .replace('\n', " ")
 }
 
+fn material_crop_filter(material: &Value) -> Result<Option<String>> {
+    let Some(crop) = material.get("crop").and_then(Value::as_object) else {
+        return Ok(None);
+    };
+    let value = |field: &str| -> Result<f64> {
+        crop.get(field)
+            .and_then(Value::as_f64)
+            .with_context(|| format!("video crop requires numeric {field}"))
+    };
+    let left = value("upper_left_x")?.min(value("lower_left_x")?);
+    let right = value("upper_right_x")?.max(value("lower_right_x")?);
+    let top = value("upper_left_y")?.min(value("upper_right_y")?);
+    let bottom = value("lower_left_y")?.max(value("lower_right_y")?);
+    let width = right - left;
+    let height = bottom - top;
+    if [left, top, width, height]
+        .iter()
+        .any(|value| !value.is_finite())
+        || left < 0.0
+        || top < 0.0
+        || width <= 0.0
+        || height <= 0.0
+        || right > 1.0
+        || bottom > 1.0
+    {
+        bail!("video crop is outside the normalized source rectangle");
+    }
+    if left.abs() < 1e-9
+        && top.abs() < 1e-9
+        && (width - 1.0).abs() < 1e-9
+        && (height - 1.0).abs() < 1e-9
+    {
+        return Ok(None);
+    }
+    Ok(Some(format!(
+        "crop=iw*{width:.9}:ih*{height:.9}:iw*{left:.9}:ih*{top:.9}"
+    )))
+}
+
+fn cjk_caption_font_file() -> Option<PathBuf> {
+    let mut candidates = Vec::new();
+    if let Some(windows_root) = std::env::var_os("WINDIR") {
+        let fonts = PathBuf::from(windows_root).join("Fonts");
+        candidates.extend([
+            fonts.join("msyh.ttc"),
+            fonts.join("msyhbd.ttc"),
+            fonts.join("simhei.ttf"),
+            fonts.join("simsun.ttc"),
+        ]);
+    }
+    candidates.extend([
+        PathBuf::from("/System/Library/Fonts/Hiragino Sans GB.ttc"),
+        PathBuf::from("/System/Library/Fonts/STHeiti Light.ttc"),
+        PathBuf::from("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"),
+        PathBuf::from("/usr/share/fonts/opentype/noto/NotoSansCJKsc-Regular.otf"),
+        PathBuf::from("/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"),
+        PathBuf::from("/usr/share/fonts/truetype/arphic/uming.ttc"),
+    ]);
+    candidates.into_iter().find(|path| path.is_file())
+}
+
 /// Build and run the ffmpeg graph. Returns the output path.
 pub fn render(
     draft_dir: &Path,
@@ -51,13 +112,13 @@ pub fn render(
     let main = tracks.iter().find(|t| t["type"] == "video");
     if let Some(t) = main {
         for s in t["segments"].as_array().unwrap() {
-            let path = &tl["materials"]["videos"]
+            let material = tl["materials"]["videos"]
                 .as_array()
                 .unwrap()
                 .iter()
                 .find(|m| m["id"] == s["material_id"])
-                .map(|m| m["path"].as_str().unwrap_or_default().to_string())
-                .unwrap_or_default();
+                .with_context(|| format!("video material {} is missing", s["material_id"]))?;
+            let path = material["path"].as_str().unwrap_or_default().to_string();
             if path.is_empty() {
                 bail!("main-track material has no path");
             }
@@ -65,14 +126,8 @@ pub fn render(
             let dur = s["target_timerange"]["duration"].as_i64().unwrap_or(0);
             let speed = s["speed"].as_f64().unwrap_or(1.0);
             inputs.push("-i".into());
-            inputs.push(path.clone());
-            let is_photo = tl["materials"]["videos"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .find(|m| m["id"] == s["material_id"])
-                .map(|m| m["type"] == "photo")
-                .unwrap_or(false);
+            inputs.push(path);
+            let is_photo = material["type"] == "photo";
             let mut chain = if is_photo {
                 "loop=loop=-1:size=1:start=0".to_string()
             } else {
@@ -83,6 +138,10 @@ pub fn render(
                     speed
                 )
             };
+            if let Some(crop) = material_crop_filter(material)? {
+                chain.push(',');
+                chain.push_str(&crop);
+            }
             chain.push_str(&format!(
                 ",scale={out_w}:{out_h}:force_original_aspect_ratio=decrease,pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p"
             ));
@@ -175,6 +234,7 @@ pub fn render(
 
     // optional caption burning from text segments
     let mut drawtext: Vec<String> = Vec::new();
+    let caption_font = burn_captions.then(cjk_caption_font_file).flatten();
     if burn_captions {
         for t in tracks.iter().filter(|t| t["type"] == "text") {
             for s in t["segments"].as_array().unwrap() {
@@ -189,6 +249,11 @@ pub fn render(
                 if text.is_empty() {
                     continue;
                 }
+                if !text.is_ascii() && caption_font.is_none() {
+                    bail!(
+                        "proxy caption text contains non-ASCII characters, but no CJK-capable system font was found"
+                    );
+                }
                 let start = s["target_timerange"]["start"].as_i64().unwrap_or(0);
                 let dur = s["target_timerange"]["duration"].as_i64().unwrap_or(0);
                 let font_size = (out_h as f64 / 640.0
@@ -197,8 +262,17 @@ pub fn render(
                 .max(12.0);
                 let y = s["clip"]["transform"]["y"].as_f64().unwrap_or(-0.6);
                 let y_px = ((1.0 - (y + 1.0) / 2.0) * out_h as f64).round().max(0.0);
+                let font = caption_font
+                    .as_ref()
+                    .map(|path| {
+                        format!(
+                            "fontfile='{}':",
+                            drawtext_escape(path.to_string_lossy().as_ref())
+                        )
+                    })
+                    .unwrap_or_default();
                 drawtext.push(format!(
-                    "drawtext=text='{}':fontsize={font_size}:fontcolor=white:borderw=2:bordercolor=black:x=(w-text_w)/2:y={y_px}:enable='between(t,{},{})'",
+                    "drawtext={font}text='{}':fontsize={font_size}:fontcolor=white:borderw=2:bordercolor=black:x=(w-text_w)/2:y={y_px}:enable='between(t,{},{})'",
                     drawtext_escape(text),
                     us_to_secs(start),
                     us_to_secs(start + dur)
@@ -255,6 +329,7 @@ pub fn render(
         "video_tracks_flattened": input_idx,
         "audio_segments_mixed": if has_audio { aidx - input_idx } else { 0 },
         "captions_burned": if burn_captions { drawtext.len() } else { 0 },
+        "caption_font_file": caption_font,
     }))
 }
 

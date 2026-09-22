@@ -35,6 +35,137 @@ fn temp_root(name: &str) -> PathBuf {
 }
 
 #[test]
+fn job_create_with_relative_output_registers_assets_against_the_final_draft() {
+    let root = temp_root("relative-job-output");
+    let media = root.join("source.mp4");
+    let generated = match Command::new("ffmpeg")
+        .args([
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=blue:s=320x240:d=1",
+            "-y",
+        ])
+        .arg(&media)
+        .output()
+    {
+        Ok(output) => output,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("ffmpeg unavailable — skipping");
+            return;
+        }
+        Err(error) => panic!("failed to execute ffmpeg: {error}"),
+    };
+    if !generated.status.success() {
+        eprintln!("ffmpeg unavailable — skipping");
+        return;
+    }
+
+    let job_path = root.join("job.json");
+    write_json(
+        &job_path,
+        &json!({
+            "schema":"jianying-job/v2","operation":"create",
+            "project":{"type":"new","project":{
+                "name":"relative-output","width":320,"height":240,
+                "frame_rate":{"numerator":30,"denominator":1},
+                "materials":[{"type":"video","id":"m1","path":media}],
+                "timeline":{"tracks":[{"id":"v1","kind":"video","segments":[{
+                    "type":"video","id":"s1","range":{"start_us":0,"duration_us":1_000_000},
+                    "material_id":"m1","source_range":{"start_us":0,"duration_us":1_000_000},
+                    "speed":1,"volume":1
+                }]}]}
+            }}
+        }),
+    );
+
+    let output = bin()
+        .current_dir(&root)
+        .args([
+            "job",
+            "run",
+            job_path.to_str().unwrap(),
+            "--out",
+            "draft",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let draft = root.join("draft");
+    let timeline: Value =
+        serde_json::from_slice(&std::fs::read(draft.join("draft_content.json")).unwrap()).unwrap();
+    let registered = Path::new(timeline["materials"]["videos"][0]["path"].as_str().unwrap());
+    assert!(registered.is_absolute());
+    assert!(registered.starts_with(draft.canonicalize().unwrap()));
+    assert!(registered.is_file());
+}
+
+#[test]
+fn v1_compatibility_payload_cannot_override_the_converted_domain_project() {
+    let root = temp_root("job-domain-create-authority");
+    let plan_path = root.join("plan.json");
+    write_json(
+        &plan_path,
+        &json!({
+            "schema": "jianying-cli-plan/v1",
+            "name": "domain-authority",
+            "canvas": {"width": 640, "height": 360, "fps": 30},
+            "tracks": [{"type": "text", "segments": [{
+                "start_us": 0,
+                "duration_us": 1_000_000,
+                "text": "领域模型必须决定生产输出"
+            }]}]
+        }),
+    );
+    let plan = Plan::load(&plan_path).unwrap();
+    let mut job = serde_json::to_value(job_from_v1_plan(&plan).unwrap()).unwrap();
+
+    // compatibility 只保留输入转换证据；即使其中的合法旧输入与领域项目冲突，
+    // 生产 create 也必须以已经校验过的 DraftProject 为唯一执行事实源。
+    job["compatibility"]["payload"]["name"] = json!("compatibility-must-not-execute");
+    job["compatibility"]["payload"]["tracks"][0]["segments"][0]["text"] = json!("错误的旧执行路径");
+    let job_path = root.join("job.json");
+    write_json(&job_path, &job);
+
+    let draft = root.join("draft");
+    let created = run(&[
+        "job",
+        "run",
+        job_path.to_str().unwrap(),
+        "--out",
+        draft.to_str().unwrap(),
+        "--json",
+    ]);
+    assert!(
+        created.status.success(),
+        "stdout={} stderr={}",
+        String::from_utf8_lossy(&created.stdout),
+        String::from_utf8_lossy(&created.stderr)
+    );
+
+    let inspected = stdout_json(&run(&["inspect", draft.to_str().unwrap()]));
+    assert_eq!(inspected["name"], "domain-authority");
+    let timeline: Value =
+        serde_json::from_slice(&std::fs::read(draft.join("draft_content.json")).unwrap()).unwrap();
+    let content: Value = serde_json::from_str(
+        timeline["materials"]["texts"][0]["content"]
+            .as_str()
+            .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(content["text"], "领域模型必须决定生产输出");
+}
+
+#[test]
 fn v1_and_v2_job_create_have_equivalent_observable_draft_semantics() {
     let root = temp_root("job-equivalence");
     let media = root.join("a.mp4");
@@ -300,6 +431,234 @@ fn job_source_range_controls_proxy_duration() {
 }
 
 #[test]
+fn proxy_render_applies_the_registered_video_crop_before_canvas_scaling() {
+    let root = temp_root("proxy-crop");
+    let media = root.join("split.mp4");
+    let generated = match Command::new("ffmpeg")
+        .args([
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=red:s=160x240:d=1",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=blue:s=160x240:d=1",
+            "-filter_complex",
+            "hstack=inputs=2",
+            "-pix_fmt",
+            "yuv420p",
+            "-y",
+        ])
+        .arg(&media)
+        .output()
+    {
+        Ok(output) => output,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("ffmpeg unavailable — skipping");
+            return;
+        }
+        Err(error) => panic!("failed to execute ffmpeg: {error}"),
+    };
+    if !generated.status.success() {
+        eprintln!("ffmpeg unavailable — skipping");
+        return;
+    }
+
+    let plan_path = root.join("plan.json");
+    write_json(
+        &plan_path,
+        &json!({
+            "schema":"jianying-cli-plan/v1","name":"proxy-crop",
+            "canvas":{"width":160,"height":240,"fps":30},
+            "tracks":[{"type":"video","segments":[{
+                "start_us":0,"duration_us":1_000_000,"source":media,
+                "crop":{
+                    "upper_left_x":0.5,"upper_left_y":0.0,
+                    "upper_right_x":1.0,"upper_right_y":0.0,
+                    "lower_left_x":0.5,"lower_left_y":1.0,
+                    "lower_right_x":1.0,"lower_right_y":1.0
+                }
+            }]}]
+        }),
+    );
+    let draft = root.join("draft");
+    let built = run(&[
+        "build",
+        plan_path.to_str().unwrap(),
+        "--out",
+        draft.to_str().unwrap(),
+    ]);
+    assert!(
+        built.status.success(),
+        "{}",
+        String::from_utf8_lossy(&built.stderr)
+    );
+
+    let preview = root.join("preview.mp4");
+    let rendered = run(&[
+        "render",
+        "proxy",
+        draft.to_str().unwrap(),
+        "--out",
+        preview.to_str().unwrap(),
+        "--scale",
+        "1",
+        "--crf",
+        "18",
+    ]);
+    assert!(
+        rendered.status.success(),
+        "{}",
+        String::from_utf8_lossy(&rendered.stderr)
+    );
+
+    let pixel = Command::new("ffmpeg")
+        .args(["-v", "error", "-ss", "0.2", "-i"])
+        .arg(&preview)
+        .args([
+            "-vf",
+            "crop=1:1:10:120,format=rgb24",
+            "-frames:v",
+            "1",
+            "-f",
+            "rawvideo",
+            "pipe:1",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        pixel.status.success(),
+        "{}",
+        String::from_utf8_lossy(&pixel.stderr)
+    );
+    assert!(pixel.stdout.len() >= 3, "ffmpeg returned no RGB sample");
+    let [red, _green, blue] = [pixel.stdout[0], pixel.stdout[1], pixel.stdout[2]];
+    assert!(
+        blue > red.saturating_add(100) && blue > 120,
+        "left output pixel was not sourced from the blue cropped half: rgb={:?}",
+        &pixel.stdout[..3]
+    );
+}
+
+#[test]
+fn proxy_render_uses_distinct_cjk_glyphs_instead_of_missing_character_boxes() {
+    let root = temp_root("proxy-cjk-font");
+    let media = root.join("black.mp4");
+    let generated = match Command::new("ffmpeg")
+        .args([
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=black:s=320x240:d=1",
+            "-pix_fmt",
+            "yuv420p",
+            "-y",
+        ])
+        .arg(&media)
+        .output()
+    {
+        Ok(output) => output,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("ffmpeg unavailable — skipping");
+            return;
+        }
+        Err(error) => panic!("failed to execute ffmpeg: {error}"),
+    };
+    if !generated.status.success() {
+        eprintln!("ffmpeg unavailable — skipping");
+        return;
+    }
+
+    let plan_path = root.join("plan.json");
+    write_json(
+        &plan_path,
+        &json!({
+            "schema":"jianying-cli-plan/v1","name":"proxy-cjk-font",
+            "canvas":{"width":320,"height":240,"fps":30},
+            "tracks":[
+                {"type":"video","segments":[{
+                    "start_us":0,"duration_us":1_000_000,"source":media
+                }]},
+                {"type":"text","segments":[
+                    {"start_us":0,"duration_us":500_000,"text":"园","size":80},
+                    {"start_us":500_000,"duration_us":500_000,"text":"区","size":80}
+                ]}
+            ]
+        }),
+    );
+    let draft = root.join("draft");
+    let built = run(&[
+        "build",
+        plan_path.to_str().unwrap(),
+        "--out",
+        draft.to_str().unwrap(),
+    ]);
+    assert!(
+        built.status.success(),
+        "{}",
+        String::from_utf8_lossy(&built.stderr)
+    );
+    let preview = root.join("preview.mp4");
+    let rendered = run(&[
+        "render",
+        "proxy",
+        draft.to_str().unwrap(),
+        "--out",
+        preview.to_str().unwrap(),
+        "--scale",
+        "1",
+        "--crf",
+        "18",
+        "--burn-captions",
+    ]);
+    assert!(
+        rendered.status.success(),
+        "{}",
+        String::from_utf8_lossy(&rendered.stderr)
+    );
+
+    let frame = |time: &str| {
+        let output = Command::new("ffmpeg")
+            .args(["-v", "error", "-ss", time, "-i"])
+            .arg(&preview)
+            .args([
+                "-frames:v",
+                "1",
+                "-pix_fmt",
+                "gray",
+                "-f",
+                "rawvideo",
+                "pipe:1",
+            ])
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        output.stdout
+    };
+    let first = frame("0.25");
+    let second = frame("0.75");
+    assert_eq!(first.len(), second.len());
+    let different_foreground_pixels = first
+        .iter()
+        .zip(&second)
+        .filter(|(left, right)| (**left >= 96) != (**right >= 96))
+        .count();
+    assert!(
+        different_foreground_pixels > 20,
+        "distinct Chinese characters rendered as the same missing-glyph box; differing pixels={different_foreground_pixels}"
+    );
+}
+
+#[test]
 fn json_mode_rejects_unknown_schema_with_a_structured_failure() {
     let root = temp_root("unknown-schema");
     let job_path = root.join("job.json");
@@ -521,6 +880,277 @@ fn job_edit_applies_typed_operations_to_an_isolated_copy() {
             .file_name()
             .to_string_lossy()
             .starts_with("unsupported-copy.jianying-edit-")
+    }));
+}
+
+#[test]
+fn job_edit_adds_a_fully_typed_segment_and_executes_track_operations() {
+    let root = temp_root("typed-add-segment");
+    let media = root.join("overlay.mp4");
+    let generated = match Command::new("ffmpeg")
+        .args([
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=green:s=320x240:d=2",
+            "-y",
+        ])
+        .arg(&media)
+        .output()
+    {
+        Ok(output) => output,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("ffmpeg unavailable — skipping");
+            return;
+        }
+        Err(error) => panic!("failed to execute ffmpeg: {error}"),
+    };
+    if !generated.status.success() {
+        eprintln!("ffmpeg unavailable — skipping");
+        return;
+    }
+
+    let plan_path = root.join("source-plan.json");
+    write_json(
+        &plan_path,
+        &json!({
+            "schema":"jianying-cli-plan/v1",
+            "name":"typed-edit-source",
+            "canvas":{"width":320,"height":240,"fps":30},
+            "tracks":[{"type":"text","name":"原字幕","segments":[{
+                "start_us":0,"duration_us":1_000_000,"text":"源草稿保持不变"
+            }]}]
+        }),
+    );
+    let source = root.join("source");
+    let built = run(&[
+        "build",
+        plan_path.to_str().unwrap(),
+        "--out",
+        source.to_str().unwrap(),
+    ]);
+    assert!(
+        built.status.success(),
+        "{}",
+        String::from_utf8_lossy(&built.stderr)
+    );
+    let source_before = std::fs::read(source.join("draft_content.json")).unwrap();
+
+    let job_path = root.join("edit.json");
+    write_json(
+        &job_path,
+        &json!({
+            "schema":"jianying-job/v2","operation":"edit",
+            "project":{"type":"existing","source":"source","output":"edited"},
+            "operations":[
+                {"operation":"add_material","material":{
+                    "type":"video","id":"overlay-material","path":"overlay.mp4"
+                }},
+                {"operation":"add_track","track_id":"overlay-track","name":"叠加画面",
+                    "kind":"video","index":0},
+                {"operation":"add_segment","track_id":"overlay-track","segment":{
+                    "type":"video","id":"overlay-segment",
+                    "range":{"start_us":0,"duration_us":1_000_000},
+                    "material_id":"overlay-material",
+                    "source_range":{"start_us":0,"duration_us":1_000_000},
+                    "speed":1.0,"volume":0.8,"change_pitch":true,
+                    "scale":1.1,"x":0.1,"y":-0.1,"rotation":5.0,"opacity":0.9,
+                    "crop":{"upper_left_x":0.1,"upper_left_y":0.0,
+                        "upper_right_x":0.9,"upper_right_y":0.0,
+                        "lower_left_x":0.1,"lower_left_y":1.0,
+                        "lower_right_x":0.9,"lower_right_y":1.0},
+                    "keyframes":{"scale":[{"at_us":0,"value":1.0},{"at_us":500000,"value":1.2}]},
+                    "mask":{"name":"圆形","size":0.6,"feather":10.0},
+                    "chroma":{"color":"#00FF00","intensity":30.0,"shadow":0.0,
+                        "edge_smooth":10.0,"spill":0.0},
+                    "background_filling":{"type":"blur","blur":0.375,"color":""},
+                    "mix_mode":"正片叠底",
+                    "animation_in":{"name":"渐显","duration_us":200000},
+                    "transition_out":{"name":"闪黑","duration_us":200000},
+                    "fade":{"in_us":100000,"out_us":100000}
+                }},
+                {"operation":"add_track","track_id":"temporary-track","name":"临时字幕",
+                    "kind":"text","index":2},
+                {"operation":"reorder_track","track_id":"temporary-track","index":1},
+                {"operation":"remove_track","track_id":"temporary-track"}
+            ]
+        }),
+    );
+
+    let edited = bin()
+        .current_dir(&root)
+        .args(["job", "run", "edit.json", "--json"])
+        .output()
+        .unwrap();
+    assert!(
+        edited.status.success(),
+        "stdout={} stderr={}",
+        String::from_utf8_lossy(&edited.stdout),
+        String::from_utf8_lossy(&edited.stderr)
+    );
+    let result = stdout_json(&edited);
+    assert_eq!(
+        result["data"]["operation_results"]
+            .as_array()
+            .unwrap()
+            .len(),
+        6
+    );
+    assert_eq!(result["data"]["isolation"]["source_unchanged"], true);
+    assert_eq!(
+        std::fs::read(source.join("draft_content.json")).unwrap(),
+        source_before
+    );
+
+    let output = root.join("edited");
+    let timeline: Value =
+        serde_json::from_slice(&std::fs::read(output.join("draft_content.json")).unwrap()).unwrap();
+    let overlay = timeline["tracks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|track| track["id"] == "overlay-track")
+        .expect("typed track must preserve its declared id");
+    assert_eq!(overlay["name"], "叠加画面");
+    assert_eq!(overlay["segments"].as_array().unwrap().len(), 1);
+    let segment = &overlay["segments"][0];
+    assert_eq!(segment["id"], "overlay-segment");
+    assert_eq!(segment["speed"], 1.0);
+    assert_eq!(segment["volume"], 0.8);
+    assert_eq!(segment["clip"]["alpha"], 0.9);
+    assert_eq!(segment["clip"]["scale"]["x"], 1.1);
+    assert_eq!(segment["clip"]["transform"]["x"], 0.1);
+    assert!(!segment["common_keyframes"].as_array().unwrap().is_empty());
+    let material_id = segment["material_id"].as_str().unwrap();
+    let material = timeline["materials"]["videos"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|material| material["id"] == material_id)
+        .unwrap();
+    assert_eq!(material["crop"]["upper_left_x"], 0.1);
+    assert!(Path::new(material["path"].as_str().unwrap()).starts_with(
+        output
+            .canonicalize()
+            .expect("edited output must have a canonical identity")
+    ));
+    assert!(Path::new(material["path"].as_str().unwrap()).is_file());
+    for bucket in [
+        "masks",
+        "chromas",
+        "canvases",
+        "effects",
+        "material_animations",
+        "transitions",
+        "audio_fades",
+    ] {
+        assert!(
+            !timeline["materials"][bucket].as_array().unwrap().is_empty(),
+            "typed segment must compile {bucket}"
+        );
+    }
+    assert!(timeline["tracks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|track| track["id"] != "temporary-track"));
+    assert_eq!(
+        stdout_json(&run(&["verify", output.to_str().unwrap()]))["ok"],
+        true
+    );
+    assert!(!std::fs::read_dir(&root).unwrap().any(|entry| {
+        entry
+            .unwrap()
+            .file_name()
+            .to_string_lossy()
+            .contains("domain-segment")
+    }));
+}
+
+#[test]
+fn job_edit_rejects_unclosed_material_sequences_without_leaking_staging() {
+    let root = temp_root("edit-material-sequence");
+    let plan_path = root.join("source-plan.json");
+    write_json(
+        &plan_path,
+        &json!({
+            "schema":"jianying-cli-plan/v1","name":"sequence-source",
+            "canvas":{"width":320,"height":240,"fps":30},
+            "tracks":[{"type":"text","segments":[{
+                "start_us":0,"duration_us":1_000_000,"text":"源草稿"
+            }]}]
+        }),
+    );
+    let source = root.join("source");
+    assert!(run(&[
+        "build",
+        plan_path.to_str().unwrap(),
+        "--out",
+        source.to_str().unwrap(),
+    ])
+    .status
+    .success());
+    let source_before = std::fs::read(source.join("draft_content.json")).unwrap();
+    std::fs::write(root.join("unused.bin"), b"unused").unwrap();
+
+    let unused_job = root.join("unused.json");
+    write_json(
+        &unused_job,
+        &json!({
+            "schema":"jianying-job/v2","operation":"edit",
+            "project":{"type":"existing","source":"source","output":"unused-output"},
+            "operations":[{"operation":"add_material","material":{
+                "type":"video","id":"unused-material","path":"unused.bin"
+            }}]
+        }),
+    );
+    let unused = run(&["job", "run", unused_job.to_str().unwrap(), "--json"]);
+    assert_eq!(unused.status.code(), Some(1));
+    let unused_error = stdout_json(&unused);
+    assert_eq!(unused_error["error"]["type"], "invalid_job");
+    assert_eq!(
+        unused_error["error"]["details"]["reason"],
+        "declared materials were not consumed by add_segment: unused-material"
+    );
+    assert!(!root.join("unused-output").exists());
+
+    let missing_job = root.join("missing.json");
+    write_json(
+        &missing_job,
+        &json!({
+            "schema":"jianying-job/v2","operation":"edit",
+            "project":{"type":"existing","source":"source","output":"missing-output"},
+            "operations":[
+                {"operation":"add_track","track_id":"video-track","kind":"video"},
+                {"operation":"add_segment","track_id":"video-track","segment":{
+                    "type":"video","id":"video-segment",
+                    "range":{"start_us":0,"duration_us":1_000_000},
+                    "material_id":"missing-material",
+                    "source_range":{"start_us":0,"duration_us":1_000_000},
+                    "speed":1.0,"volume":1.0
+                }}
+            ]
+        }),
+    );
+    let missing = run(&["job", "run", missing_job.to_str().unwrap(), "--json"]);
+    assert_eq!(missing.status.code(), Some(1));
+    let missing_error = stdout_json(&missing);
+    assert_eq!(missing_error["error"]["type"], "invalid_job");
+    assert_eq!(
+        missing_error["error"]["details"]["reason"],
+        "add_segment video-segment references undeclared material missing-material"
+    );
+    assert!(!root.join("missing-output").exists());
+    assert_eq!(
+        std::fs::read(source.join("draft_content.json")).unwrap(),
+        source_before
+    );
+    assert!(!std::fs::read_dir(&root).unwrap().any(|entry| {
+        let name = entry.unwrap().file_name();
+        let name = name.to_string_lossy();
+        name.contains("jianying-edit") || name.contains("domain-segment")
     }));
 }
 

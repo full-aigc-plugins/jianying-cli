@@ -50,3 +50,24 @@ fn parity_failures_emit_pointer_fixture_and_reproduction_argv() {
     assert_eq!(report["fixture"], "tests/parity/scenarios/01-basic.json");
     assert!(report["reproduce"].as_array().unwrap().len() >= 6);
 }
+
+#[test]
+fn pyjianyingdraft_completion_claim_tracks_partial_rows_and_open_tasks() {
+    let parity: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string("provenance/PARITY_MATRIX.json").unwrap())
+            .unwrap();
+    assert_eq!(parity["source_claims"]["pyjianyingdraft"], "incomplete");
+    let rows = parity["functions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .chain(parity["data_structures"].as_array().unwrap());
+    let partial = rows
+        .filter(|row| row["source"] == "pyjianyingdraft" && row["status"] == "partial")
+        .collect::<Vec<_>>();
+    assert_eq!(partial.len(), 4);
+    for row in partial {
+        assert!(row["gap"].as_str().is_some_and(|value| !value.is_empty()));
+        assert!(!row["blocking_tasks"].as_array().unwrap().is_empty());
+    }
+}

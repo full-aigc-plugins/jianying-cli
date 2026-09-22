@@ -6,7 +6,8 @@ use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
     capabilities, caption_ops, control_catalog, draft, interchange, job_runner, media_analysis,
-    media_ops, plan, probe, project_ops, render, srt, store, template, tim, timeline_ops,
+    media_ops, plan, probe, project_ops, render, runtime_acceptance, srt, store, template, tim,
+    timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -402,6 +403,19 @@ enum RuntimeControlsOp {
     },
 }
 
+#[derive(Subcommand)]
+enum RuntimeAcceptanceOp {
+    /// Verify a real-editor acceptance record and recompute native media identity
+    Verify {
+        evidence: PathBuf,
+        #[arg(long)]
+        ffprobe_cmd: Option<PathBuf>,
+        /// Require the human review field to be passed instead of pending
+        #[arg(long)]
+        require_human_review: bool,
+    },
+}
+
 #[derive(Args)]
 struct RuntimeControlTargetArgs {
     #[arg(long)]
@@ -433,6 +447,11 @@ enum RuntimeOp {
     Controls {
         #[command(subcommand)]
         op: RuntimeControlsOp,
+    },
+    /// Validate real-editor acceptance evidence without controlling the GUI
+    Acceptance {
+        #[command(subcommand)]
+        op: RuntimeAcceptanceOp,
     },
     /// Discover installed editors and known draft roots without enabling native routing
     Discover {
@@ -1260,6 +1279,9 @@ enum TemplateOp {
         index: usize,
         /// Replacement text
         text: String,
+        /// Keep original UTF-16 style ranges instead of proportional recalculation
+        #[arg(long)]
+        no_recalc_style: bool,
     },
     /// replace_material_by_name / by_seg parity: swap the source file
     ReplaceMaterial {
@@ -1275,6 +1297,21 @@ enum TemplateOp {
         track: Option<String>,
         #[arg(long)]
         index: Option<usize>,
+        /// Replace the source material crop with a full-frame crop
+        #[arg(long)]
+        replace_crop: bool,
+        /// Source-range start for segment replacement
+        #[arg(long)]
+        source_start: Option<String>,
+        /// Source-range duration for segment replacement
+        #[arg(long)]
+        source_duration: Option<String>,
+        /// Shorter-material policy: cut_head, cut_tail, cut_tail_align or shrink
+        #[arg(long, default_value = "cut_tail")]
+        shrink_mode: String,
+        /// Ordered longer-material policy; may be repeated
+        #[arg(long = "extend-mode")]
+        extend_modes: Vec<String>,
     },
     /// import_track parity: copy a track from another draft
     ImportTrack {
@@ -3623,20 +3660,47 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 track,
                 index,
                 text,
-            } => print_output(template::replace_text(&draft, &track, index, &text)?, json),
+                no_recalc_style,
+            } => print_output(
+                template::replace_text_with_options(
+                    &draft,
+                    &track,
+                    index,
+                    &text,
+                    !no_recalc_style,
+                )?,
+                json,
+            ),
             TemplateOp::ReplaceMaterial {
                 draft,
                 source,
                 name,
                 track,
                 index,
+                replace_crop,
+                source_start,
+                source_duration,
+                shrink_mode,
+                extend_modes,
             } => print_output(
-                template::replace_material(
+                template::replace_material_with_options(
                     &draft,
                     name.as_deref(),
                     track.as_deref(),
                     index,
                     &source,
+                    replace_crop,
+                    source_start.as_deref().map(tim::parse).transpose()?,
+                    source_duration.as_deref().map(tim::parse).transpose()?,
+                    jianying_cli::shrink_mode::ShrinkMode::parse(&shrink_mode)?,
+                    &if extend_modes.is_empty() {
+                        vec![jianying_cli::extend_mode::ExtendMode::CutMaterialTail]
+                    } else {
+                        extend_modes
+                            .iter()
+                            .map(|mode| jianying_cli::extend_mode::ExtendMode::parse(mode))
+                            .collect::<Result<Vec<_>>>()?
+                    },
                 )?,
                 json,
             ),
@@ -5549,6 +5613,23 @@ fn run_runtime(op: RuntimeOp, json: bool) -> Result<()> {
             print_output(value, json);
             Ok(())
         }
+        RuntimeOp::Acceptance { op } => match op {
+            RuntimeAcceptanceOp::Verify {
+                evidence,
+                ffprobe_cmd,
+                require_human_review,
+            } => {
+                print_output(
+                    runtime_acceptance::verify(
+                        &evidence,
+                        ffprobe_cmd.as_deref(),
+                        require_human_review,
+                    )?,
+                    json,
+                );
+                Ok(())
+            }
+        },
         RuntimeOp::Discover {
             platform,
             mut search_roots,

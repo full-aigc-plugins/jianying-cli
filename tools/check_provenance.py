@@ -7,8 +7,8 @@ import argparse
 import copy
 import hashlib
 import json
+import re
 from pathlib import Path
-
 
 EXPECTED_CAPCUT_COMMANDS = [
     "info", "version", "lint", "tracks", "segments", "texts", "set-text", "shift",
@@ -66,6 +66,10 @@ NATIVE_RUNTIME_CASES = {
 EVIDENCE_LEVELS = [
     "unit", "differential", "structural", "app-open", "cold-reopen",
     "playback", "native-export",
+]
+PYJYD_TEMPLATE_TIMING_CASES = [
+    "cut_head", "cut_tail", "cut_tail_align", "shrink", "extend_head",
+    "extend_tail", "push_tail", "fallback_cut_material_tail",
 ]
 
 
@@ -160,6 +164,7 @@ def validate(root: Path, source_manifest: dict, parity: dict, v1: dict) -> None:
         for row in rows:
             if row.get("source") not in sources or not row.get("rust_target"):
                 raise GateError(f"invalid {section} row {row.get('id')}")
+    validate_pyjianyingdraft_completion(root, parity)
 
     if v1.get("schema") != "jianying-v1-baseline/v1":
         raise GateError("unsupported v1 baseline schema")
@@ -170,6 +175,49 @@ def validate(root: Path, source_manifest: dict, parity: dict, v1: dict) -> None:
         raise GateError("v1 parity fixture baseline drifted")
     if not (root / "provenance" / "MIGRATION_SCOPE.md").is_file():
         raise GateError("migration scope decision record is missing")
+
+
+def validate_pyjianyingdraft_completion(root: Path, parity: dict) -> None:
+    """防止 OpenSpec 与 pyJianYingDraft parity 完成声明互相矛盾。"""
+    rows = [
+        row
+        for section in ("functions", "data_structures")
+        for row in parity.get(section, [])
+        if row.get("source") == "pyjianyingdraft"
+    ]
+    partial = [row for row in rows if row.get("status") == "partial"]
+    claim = parity.get("source_claims", {}).get("pyjianyingdraft")
+    expected_claim = "incomplete" if partial else "complete"
+    if claim != expected_claim:
+        raise GateError(
+            "pyJianYingDraft completion claim conflicts with partial parity rows"
+        )
+    if not partial:
+        return
+
+    tasks_path = root / "openspec/changes/unify-rust-jianying-engine/tasks.md"
+    try:
+        tasks = tasks_path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise GateError(f"cannot read {tasks_path}: {error}") from error
+    for row in partial:
+        identifier = row.get("id")
+        gap = row.get("gap")
+        blocking_tasks = row.get("blocking_tasks")
+        if not isinstance(gap, str) or not gap.strip():
+            raise GateError(f"partial pyJianYingDraft row lacks a gap: {identifier}")
+        if not isinstance(blocking_tasks, list) or not blocking_tasks:
+            raise GateError(
+                f"partial pyJianYingDraft row lacks blocking tasks: {identifier}"
+            )
+        for task_id in blocking_tasks:
+            if not isinstance(task_id, str) or not re.search(
+                rf"^- \[ \] {re.escape(task_id)}(?:\s|$)", tasks, re.MULTILINE
+            ):
+                raise GateError(
+                    f"partial pyJianYingDraft row {identifier} does not reference "
+                    f"an open task: {task_id}"
+                )
 
 
 def validate_protocol_differentials(root: Path, protocol: dict, run: dict) -> None:
@@ -212,6 +260,35 @@ def validate_protocol_differentials(root: Path, protocol: dict, run: dict) -> No
                 raise GateError(f"protocol object {name} has incompatible evidence {scenario}")
         if mode == "approved_difference" and not row.get("rationale"):
             raise GateError(f"approved protocol difference lacks rationale: {name}")
+
+
+def validate_pyjyd_template_differentials(source_manifest: dict, report: dict) -> None:
+    """固定素材替换与文字样式差分必须绑定获准的 pyJianYingDraft 提交。"""
+    if report.get("schema") != "jianying-pyjyd-template-differential/v1":
+        raise GateError("unsupported pyJianYingDraft template differential schema")
+    expected_commit = next(
+        source["commit"]
+        for source in source_manifest["sources"]
+        if source["id"] == "pyjianyingdraft"
+    )
+    if report.get("upstream_commit") != expected_commit:
+        raise GateError("template differential source commit drifted")
+    cases = report.get("timing_cases", [])
+    if [case.get("name") for case in cases] != PYJYD_TEMPLATE_TIMING_CASES:
+        raise GateError("template timing differential cases are incomplete or reordered")
+    for case in cases:
+        if (
+            not isinstance(case.get("segments"), list)
+            or not case["segments"]
+            or not isinstance(case.get("extend_modes"), list)
+            or case.get("source_duration_us", 0) <= 0
+        ):
+            raise GateError(f"invalid template timing case: {case.get('name')}")
+    style_cases = report.get("style_cases", [])
+    if [case.get("name") for case in style_cases] != ["ascii_proportional_growth"]:
+        raise GateError("template style differential baseline is incomplete")
+    if not report.get("approved_differences"):
+        raise GateError("UTF-16 template style difference lacks an approval record")
 
 
 def validate_command_evidence(root: Path, source_manifest: dict, parity: dict, evidence: dict) -> None:
@@ -365,7 +442,7 @@ def validate_capcut_utility_differentials(source_manifest: dict, report: dict) -
     }
     expected_enums = {
         (namespace, category)
-        for namespace in {"capcut", "jianying"}
+        for namespace in ("capcut", "jianying")
         for category in categories
     }
     actual_enums = {
@@ -595,6 +672,15 @@ def negative_self_test(root: Path, source_manifest: dict, parity: dict, v1: dict
     else:
         raise GateError("negative self-test accepted a restricted fixture source")
 
+    false_completion = copy.deepcopy(parity)
+    false_completion["source_claims"]["pyjianyingdraft"] = "complete"
+    try:
+        validate(root, source_manifest, false_completion, v1)
+    except GateError:
+        pass
+    else:
+        raise GateError("negative self-test accepted a false pyJianYingDraft completion claim")
+
 
 def negative_protocol_self_test(root: Path, protocol: dict, run: dict) -> None:
     failed_run = copy.deepcopy(run)
@@ -616,6 +702,17 @@ def negative_protocol_self_test(root: Path, protocol: dict, run: dict) -> None:
         pass
     else:
         raise GateError("negative self-test accepted an incomplete protocol matrix")
+
+
+def negative_template_differential_self_test(source_manifest: dict, report: dict) -> None:
+    drifted = copy.deepcopy(report)
+    drifted["upstream_commit"] = "0" * 40
+    try:
+        validate_pyjyd_template_differentials(source_manifest, drifted)
+    except GateError:
+        pass
+    else:
+        raise GateError("negative self-test accepted a drifted template source commit")
 
 
 def negative_native_runtime_self_test(
@@ -666,6 +763,7 @@ def main() -> int:
     v1 = load_json(root / "provenance" / "V1_BASELINE.json")
     protocol = load_json(root / "provenance" / "PROTOCOL_DIFFERENTIALS.json")
     parity_run = load_json(root / "provenance" / "PARITY_RUN.json")
+    pyjyd_template = load_json(root / "provenance" / "PYJYD_TEMPLATE_DIFFERENTIALS.json")
     capcut_project = load_json(root / "provenance" / "CAPCUT_PROJECT_DIFFERENTIALS.json")
     capcut_timeline = load_json(root / "provenance" / "CAPCUT_TIMELINE_DIFFERENTIALS.json")
     capcut_utility = load_json(root / "provenance" / "CAPCUT_UTILITY_DIFFERENTIALS.json")
@@ -681,6 +779,7 @@ def main() -> int:
     migration_rollback = load_json(root / "provenance" / "MIGRATION_ROLLBACK_EVIDENCE.json")
     validate(root, source_manifest, parity, v1)
     validate_protocol_differentials(root, protocol, parity_run)
+    validate_pyjyd_template_differentials(source_manifest, pyjyd_template)
     validate_capcut_project_differentials(source_manifest, capcut_project)
     validate_capcut_timeline_differentials(source_manifest, capcut_timeline)
     validate_capcut_utility_differentials(source_manifest, capcut_utility)
@@ -697,6 +796,7 @@ def main() -> int:
     if args.self_test_negative_cases:
         negative_self_test(root, source_manifest, parity, v1)
         negative_protocol_self_test(root, protocol, parity_run)
+        negative_template_differential_self_test(source_manifest, pyjyd_template)
         negative_native_runtime_self_test(root, source_manifest, native_runtime)
         negative_evidence_model_self_test(root, evidence_model)
         negative_command_completion_self_test(root, source_manifest, parity, command_evidence)
@@ -708,6 +808,7 @@ def main() -> int:
                       "capcut_material_discovery_differentials": 2,
                       "capcut_interchange_differentials": 2,
                       "capcut_command_evidence": 86,
+                      "pyjyd_template_differentials": 9,
                       "migration_rollback": "passed",
                       "native_runtime_cases": 5}))
     return 0

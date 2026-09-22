@@ -17,6 +17,7 @@ fn runtime_help_exposes_probe_and_owned_process_controls() {
     let help = String::from_utf8(output.stdout).unwrap();
     for operation in [
         "discover",
+        "acceptance",
         "controls",
         "entitlement",
         "status",
@@ -99,6 +100,8 @@ fn screenshot_surface_inventory_accounts_for_every_visible_entry_without_coordin
     );
     let envelope: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(envelope["data"]["coverage"]["expected_surfaces"], 50);
+    assert_eq!(envelope["data"]["coverage"]["expandable_parents"], 7);
+    assert_eq!(envelope["data"]["coverage"]["enumerated_parents"], 0);
     let surfaces = envelope["data"]["surfaces"].as_array().unwrap();
     assert_eq!(surfaces.len(), 50);
     for (region, expected) in [
@@ -140,6 +143,30 @@ fn screenshot_surface_inventory_accounts_for_every_visible_entry_without_coordin
     assert!(unresolved.status.success());
     let unresolved: Value = serde_json::from_slice(&unresolved.stdout).unwrap();
     assert_eq!(unresolved["data"]["surfaces"].as_array().unwrap().len(), 5);
+
+    let expandable = surfaces
+        .iter()
+        .filter(|surface| surface.get("expansion").is_some())
+        .collect::<Vec<_>>();
+    assert_eq!(expandable.len(), 7);
+    assert!(expandable.iter().all(|surface| {
+        matches!(
+            surface["expansion"]["status"].as_str(),
+            Some("pending_accessibility" | "partial")
+        )
+    }));
+    let settings = expandable
+        .iter()
+        .find(|surface| surface["surface_id"] == "view.more")
+        .unwrap();
+    assert_eq!(settings["expansion"]["status"], "partial");
+    assert_eq!(
+        settings["expansion"]["child_surface_ids"]
+            .as_array()
+            .unwrap()
+            .len(),
+        4
+    );
 }
 
 #[test]

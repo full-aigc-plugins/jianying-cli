@@ -1,5 +1,5 @@
 use anyhow::Result;
-use jianying_cli::{draft, plan::Plan, probe::MediaInfo};
+use jianying_cli::{draft, plan::Plan, probe::MediaInfo, template};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
@@ -50,6 +50,16 @@ fn run_ok(args: &[&str]) -> Value {
         String::from_utf8_lossy(&output.stderr)
     );
     serde_json::from_slice::<Value>(&output.stdout).unwrap()["data"].clone()
+}
+
+fn count_files(path: &Path) -> usize {
+    if !path.is_dir() {
+        return usize::from(path.is_file());
+    }
+    std::fs::read_dir(path)
+        .unwrap()
+        .map(|entry| count_files(&entry.unwrap().path()))
+        .sum()
 }
 
 #[test]
@@ -214,5 +224,130 @@ fn template_text_preset_is_validated_and_applied_transactionally() {
         .code(),
         Some(1)
     );
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
+fn template_material_replacement_isolated_segment_timing_and_failure_are_atomic() {
+    if Command::new("ffmpeg").arg("-version").output().is_err() {
+        eprintln!("ffmpeg unavailable — skipping");
+        return;
+    }
+    let root = std::env::temp_dir().join(format!(
+        "jianying-template-replace-{}-{}",
+        std::process::id(),
+        uuid::Uuid::new_v4().simple()
+    ));
+    std::fs::create_dir_all(&root).unwrap();
+    let original = root.join("original.mp4");
+    let replacement = root.join("replacement.mp4");
+    for (path, input) in [
+        (&original, "color=c=red:s=320x240:d=2"),
+        (&replacement, "color=c=blue:s=640x360:d=1"),
+    ] {
+        let status = Command::new("ffmpeg")
+            .args(["-hide_banner", "-loglevel", "error", "-y"])
+            .args(["-f", "lavfi", "-i", input, "-an", "-c:v", "libx264"])
+            .arg(path)
+            .status()
+            .unwrap();
+        assert!(status.success());
+    }
+
+    let output = root.join("draft");
+    run_ok(&[
+        "project",
+        "init",
+        "replace-contract",
+        "--out",
+        &output.to_string_lossy(),
+        "--json",
+    ]);
+    run_ok(&[
+        "media",
+        "add-video",
+        &output.to_string_lossy(),
+        &original.to_string_lossy(),
+        "0us",
+        "2s",
+        "--track-name",
+        "主画面",
+        "--json",
+    ]);
+    run_ok(&[
+        "media",
+        "add-video",
+        &output.to_string_lossy(),
+        &original.to_string_lossy(),
+        "2500ms",
+        "2s",
+        "--track-name",
+        "主画面",
+        "--json",
+    ]);
+    let mut before = draft::load_timeline(&output).unwrap();
+    let old_material_id = before["tracks"][0]["segments"][0]["material_id"].clone();
+    before["tracks"][0]["segments"][1]["material_id"] = old_material_id.clone();
+    template::save_timeline(&output, &before).unwrap();
+
+    let replaced = run_ok(&[
+        "template",
+        "replace-material",
+        &output.to_string_lossy(),
+        &replacement.to_string_lossy(),
+        "--track",
+        "主画面",
+        "--index",
+        "0",
+        "--source-duration",
+        "1s",
+        "--shrink-mode",
+        "cut_tail_align",
+        "--json",
+    ]);
+    assert_eq!(replaced["replacement"]["mode"], "cut_tail_align");
+    let timeline = draft::load_timeline(&output).unwrap();
+    let segments = timeline["tracks"][0]["segments"].as_array().unwrap();
+    assert_ne!(segments[0]["material_id"], old_material_id);
+    assert_eq!(segments[1]["material_id"], old_material_id);
+    assert_eq!(segments[0]["target_timerange"]["duration"], 1_000_000);
+    assert_eq!(segments[1]["target_timerange"]["start"], 1_500_000);
+    let replacement_material_id = segments[0]["material_id"].as_str().unwrap();
+    let replacement_material = timeline["materials"]["videos"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|material| material["id"].as_str() == Some(replacement_material_id))
+        .unwrap();
+    let stored = Path::new(replacement_material["path"].as_str().unwrap());
+    assert!(stored.starts_with(&output));
+    assert!(stored.is_file());
+    assert_eq!(draft::verify(&output).unwrap()["ok"], true);
+
+    let content_path = output.join("draft_content.json");
+    let content_before_failure = std::fs::read(&content_path).unwrap();
+    let files_before_failure = count_files(&output);
+    let failed = run(&[
+        "template",
+        "replace-material",
+        &output.to_string_lossy(),
+        &replacement.to_string_lossy(),
+        "--track",
+        "主画面",
+        "--index",
+        "1",
+        "--source-start",
+        "800ms",
+        "--source-duration",
+        "500ms",
+        "--json",
+    ]);
+    assert_eq!(failed.status.code(), Some(1));
+    assert_eq!(
+        std::fs::read(&content_path).unwrap(),
+        content_before_failure
+    );
+    assert_eq!(count_files(&output), files_before_failure);
+    assert_eq!(draft::verify(&output).unwrap()["ok"], true);
     let _ = std::fs::remove_dir_all(root);
 }

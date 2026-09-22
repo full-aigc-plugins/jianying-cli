@@ -109,6 +109,43 @@ fn invalid_operation_shapes_and_unknown_schema_are_rejected() {
 }
 
 #[test]
+fn track_edit_operations_have_closed_round_trip_contracts() {
+    let operations = [
+        serde_json::json!({
+            "operation":"add_track",
+            "track_id":"video-overlay",
+            "name":"叠加画面",
+            "kind":"video",
+            "index":1
+        }),
+        serde_json::json!({
+            "operation":"reorder_track",
+            "track_id":"video-overlay",
+            "index":0
+        }),
+        serde_json::json!({
+            "operation":"remove_track",
+            "track_id":"video-overlay"
+        }),
+    ];
+    for value in operations {
+        let operation: EditOperation = serde_json::from_value(value.clone()).unwrap();
+        operation.validate().unwrap();
+        assert_eq!(serde_json::to_value(operation).unwrap(), value);
+    }
+
+    for invalid in [
+        serde_json::json!({"operation":"add_track","track_id":"","kind":"video"}),
+        serde_json::json!({"operation":"add_track","track_id":"v","name":" ","kind":"video"}),
+        serde_json::json!({"operation":"remove_track","track_id":""}),
+        serde_json::json!({"operation":"reorder_track","track_id":"","index":0}),
+    ] {
+        let operation = serde_json::from_value::<EditOperation>(invalid).unwrap();
+        assert!(operation.validate().is_err());
+    }
+}
+
+#[test]
 fn checked_in_json_schema_covers_the_seven_operations() {
     let schema: serde_json::Value =
         serde_json::from_str(include_str!("../schemas/jianying-job-v2.schema.json")).unwrap();
@@ -142,6 +179,27 @@ fn checked_in_json_schema_covers_the_seven_operations() {
         schema["properties"]["operations"]["items"]["$ref"],
         "#/$defs/editOperation"
     );
+    let edit_operations = schema["$defs"]["editOperation"]["oneOf"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|operation| operation["properties"]["operation"]["const"].as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    for operation in [
+        "add_material",
+        "add_segment",
+        "add_track",
+        "remove_track",
+        "reorder_track",
+        "remove_segment",
+        "move_segment",
+        "replace_text",
+    ] {
+        assert!(
+            edit_operations.contains(operation),
+            "Job v2 schema is missing {operation}"
+        );
+    }
     assert_eq!(
         schema["properties"]["compatibility"]["properties"]["schema"]["enum"],
         serde_json::json!(["jianying-cli-plan/v1", "capcut-cli-compile/v1"])
@@ -153,6 +211,51 @@ fn checked_in_json_schema_covers_the_seven_operations() {
             .len(),
         2
     );
+    for field in [
+        "keyframes",
+        "mask",
+        "chroma",
+        "background_filling",
+        "mix_mode",
+        "animation_in",
+        "animation_out",
+        "animation_group",
+        "transition_out",
+        "fade",
+    ] {
+        assert!(
+            schema["$defs"]["videoSegment"]["properties"]
+                .get(field)
+                .is_some(),
+            "video domain schema is missing {field}"
+        );
+    }
+    for field in ["keyframes", "fade", "audio_effects"] {
+        assert!(
+            schema["$defs"]["audioSegment"]["properties"]
+                .get(field)
+                .is_some(),
+            "audio domain schema is missing {field}"
+        );
+    }
+    let text_properties = &schema["$defs"]["segment"]["oneOf"][2]["properties"];
+    for field in [
+        "keyframes",
+        "animation_in",
+        "animation_out",
+        "animation_group",
+        "size",
+        "background",
+        "shadow",
+        "styles",
+        "text_effect",
+        "bubble",
+    ] {
+        assert!(
+            text_properties.get(field).is_some(),
+            "text domain schema is missing {field}"
+        );
+    }
 }
 
 #[test]

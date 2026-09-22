@@ -308,19 +308,153 @@ pub fn opacity(draft: &Path, id: &str, alpha: f64) -> Result<Value> {
 
 /// 新增空轨道；视频轨保持在其他类型之前。
 pub fn add_track(draft: &Path, kind: &str, name: &str) -> Result<Value> {
+    let id = uuid::Uuid::new_v4().simple().to_string();
+    add_track_at(draft, &id, kind, name, None)
+}
+
+/// 使用调用方声明的稳定标识新增轨道，并可指定绝对轨道位置。
+pub fn add_track_at(
+    draft: &Path,
+    id: &str,
+    kind: &str,
+    name: &str,
+    index: Option<usize>,
+) -> Result<Value> {
     if !["video", "audio", "text", "sticker", "effect", "filter"].contains(&kind) {
         bail!("unsupported track type: {kind}");
     }
+    if id.trim().is_empty() || name.trim().is_empty() {
+        bail!("track id and name must not be blank");
+    }
     mutate(draft, |timeline| {
-        let id = uuid::Uuid::new_v4().simple().to_string();
-        let track = json!({"attribute":0,"flag":0,"id":id,"is_default_name":false,
-            "name":name,"segments":[],"type":kind});
         let tracks = timeline["tracks"]
             .as_array_mut()
             .context("tracks must be an array")?;
-        let index = if kind == "video" { 0 } else { tracks.len() };
+        if tracks.iter().any(|track| track["id"].as_str() == Some(id)) {
+            bail!("duplicate track id: {id}");
+        }
+        let index = index.unwrap_or_else(|| if kind == "video" { 0 } else { tracks.len() });
+        if index > tracks.len() {
+            bail!("track index {index} exceeds track count {}", tracks.len());
+        }
+        let track = json!({"attribute":0,"flag":0,"id":id,"is_default_name":false,
+            "name":name,"segments":[],"type":kind});
         tracks.insert(index, track);
         Ok(json!({"ok":true,"track_id":id,"index":index,"type":kind,"name":name}))
+    })
+}
+
+/// 删除整条轨道，并按剩余片段引用保守清扫孤儿素材。
+pub fn remove_track(draft: &Path, id: &str) -> Result<Value> {
+    mutate(draft, |timeline| {
+        let tracks = timeline["tracks"]
+            .as_array_mut()
+            .context("tracks must be an array")?;
+        let index = tracks
+            .iter()
+            .position(|track| track["id"].as_str() == Some(id))
+            .with_context(|| format!("track not found: {id}"))?;
+        let removed = tracks.remove(index);
+        let segment_count = removed["segments"].as_array().map_or(0, Vec::len);
+        let (materials_removed, materials_by_type) = prune_in_timeline(timeline)?;
+        Ok(json!({"ok":true,"track_id":id,"index":index,
+            "segments_removed":segment_count,"materials_removed":materials_removed,
+            "materials_by_type":materials_by_type}))
+    })
+}
+
+/// 将轨道移动到给定绝对索引；索引按移除前的最终轨道数量解释。
+pub fn reorder_track(draft: &Path, id: &str, index: usize) -> Result<Value> {
+    mutate(draft, |timeline| {
+        let tracks = timeline["tracks"]
+            .as_array_mut()
+            .context("tracks must be an array")?;
+        if index >= tracks.len() {
+            bail!(
+                "track index {index} exceeds final track count {}",
+                tracks.len()
+            );
+        }
+        let old_index = tracks
+            .iter()
+            .position(|track| track["id"].as_str() == Some(id))
+            .with_context(|| format!("track not found: {id}"))?;
+        let track = tracks.remove(old_index);
+        tracks.insert(index, track);
+        Ok(json!({"ok":true,"track_id":id,"old_index":old_index,"index":index}))
+    })
+}
+
+/// 将刚导入的单片段临时轨道收敛到目标轨道，并恢复领域片段标识。
+pub fn adopt_imported_segment(
+    draft: &Path,
+    imported_track_name: &str,
+    target_track_id: &str,
+    segment_id: &str,
+) -> Result<Value> {
+    mutate(draft, |timeline| {
+        let tracks = timeline["tracks"]
+            .as_array_mut()
+            .context("tracks must be an array")?;
+        let source_index = tracks
+            .iter()
+            .position(|track| track["name"].as_str() == Some(imported_track_name))
+            .with_context(|| format!("imported track not found: {imported_track_name}"))?;
+        let source_track = tracks.remove(source_index);
+        let source_kind = source_track["type"]
+            .as_str()
+            .context("imported track type is missing")?
+            .to_owned();
+        let mut source_segments = source_track["segments"]
+            .as_array()
+            .context("imported track segments must be an array")?
+            .clone();
+        if source_segments.len() != 1 {
+            bail!("imported track must contain exactly one segment");
+        }
+        if tracks.iter().any(|track| {
+            track["segments"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .any(|segment| segment["id"].as_str() == Some(segment_id))
+        }) {
+            bail!("duplicate segment id: {segment_id}");
+        }
+        let target = tracks
+            .iter_mut()
+            .find(|track| track["id"].as_str() == Some(target_track_id))
+            .with_context(|| format!("track not found: {target_track_id}"))?;
+        if target["type"].as_str() != Some(source_kind.as_str()) {
+            bail!("track {target_track_id} has incompatible type");
+        }
+        let mut segment = source_segments.remove(0);
+        let start = segment["target_timerange"]["start"].as_i64().unwrap_or(0);
+        let end = start
+            + segment["target_timerange"]["duration"]
+                .as_i64()
+                .unwrap_or(0);
+        let target_segments = target["segments"]
+            .as_array_mut()
+            .context("target segments must be an array")?;
+        if target_segments.iter().any(|other| {
+            let other_start = other["target_timerange"]["start"].as_i64().unwrap_or(0);
+            let other_end =
+                other_start + other["target_timerange"]["duration"].as_i64().unwrap_or(0);
+            other_start < end && other_end > start
+        }) {
+            bail!("track {target_track_id} is occupied over the target range");
+        }
+        segment["id"] = json!(segment_id);
+        segment["raw_segment_id"] = json!(target_track_id);
+        let material_id = segment["material_id"].clone();
+        let references = segment["extra_material_refs"].clone();
+        target_segments.push(segment);
+        target_segments.sort_by_key(|item| item["target_timerange"]["start"].as_i64().unwrap_or(0));
+        Ok(
+            json!({"ok":true,"track_id":target_track_id,"segment_id":segment_id,
+            "material_id":material_id,"extra_material_refs":references}),
+        )
     })
 }
 
@@ -684,7 +818,7 @@ pub fn prune(draft: &Path, dry_run: bool) -> Result<Value> {
     })
 }
 
-fn remove_in_timeline(
+pub(crate) fn remove_in_timeline(
     timeline: &mut Value,
     id: &str,
     keep_track: bool,

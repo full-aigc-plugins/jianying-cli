@@ -34,14 +34,18 @@ edit 作业从 Job 文件所在目录解析相对 `source`/`output`，不使用 
 
 - `replace_text`：替换文字片段正文，并保留既有样式和未知字段；
 - `move_segment`：把目标片段设置到明确的微秒起点和时长；
-- `remove_segment`：删除片段但保留被清空的轨道。
+- `remove_segment`：删除片段但保留被清空的轨道；
+- `add_material`：声明后续片段使用的本地视频、音频或图片；
+- `add_segment`：通过统一领域模型编译完整片段语义，并复制素材引用闭包；
+- `add_track` / `reorder_track` / `remove_track`：使用稳定轨道 ID 新增、重排或删除轨道。
 
 执行器先把源草稿完整复制到随机临时目录，逐项运行事务化编辑，再将素材路径和
 草稿元数据身份统一改写到最终 `output`，完成完整 bundle 校验和源目录逐文件快照
 比对后才通过同目录 rename 提交。任何操作失败都会移除本轮生成的临时副本，不会
-创建最终输出。`add_material` 与 `add_segment` 已进入强类型 Schema，但原生素材引用
-闭包映射尚未完成；它们分别返回 `job.edit.add_material` / `job.edit.add_segment` 的
-`incompatible_capability`，不得自动路由。
+创建最终输出。新增素材必须先于引用它的片段声明，并且必须在同一 Job 中被消费；
+未声明引用、重复声明、未消费声明、不相容轨道类型和重叠片段均以 `invalid_job`
+失败并回滚。字体和只含编辑器资源 ID 的素材仍返回 `job.edit.add_material` 的
+`incompatible_capability`，不能冒充已经复制了本地引用闭包。
 
 ## 版本兼容规则
 
@@ -53,8 +57,7 @@ edit 作业从 Job 文件所在目录解析相对 `source`/`output`，不使用 
 
 ## 当前边界
 
-根 CLI 已支持 `job run` 的 create、上述三类 isolated edit、inspect、verify、publish、
-proxy export 与非嵌套 batch 分派。尚未实现的 edit 新增素材/片段、native export 和
-archive export 会返回 `incompatible_capability`，不会静默降级。插件可依赖 v2 解析
-和 `job.run` 机器契约，但只能按 capability manifest 路由已标记为 `supported` 的
-细分能力。
+根 CLI 已支持 `job run` 的 create、上述八类 isolated edit、inspect、verify、publish、
+proxy export 与非嵌套 batch 分派。尚未实现的 native export 和 archive export 会返回
+`incompatible_capability`，不会静默降级。插件可依赖 v2 解析和 `job.run` 机器契约，
+但只能按 capability manifest 路由已标记为 `supported` 的细分能力。

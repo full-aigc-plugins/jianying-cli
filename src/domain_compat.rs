@@ -1,7 +1,9 @@
 use anyhow::{anyhow, Result};
 use jianying_domain::{
-    DraftProject, FrameRate, Material, MaterialId, Segment, SegmentId, TimeRange, Timeline, Track,
-    TrackKind,
+    Animation, AudioEffect, AudioEffects, BackgroundFilling, BlendMode, ChromaKey, ClipSettings,
+    CropSettings, DraftProject, Fade, FrameRate, KeyframePoint, Keyframes, Mask, Material,
+    MaterialId, RawIds, Segment, SegmentId, StyleRange, TextBackground, TextShadow, TextStyle,
+    TimeRange, Timeline, Track, TrackKind, Transform, Transition,
 };
 use jianying_schema::{CompatibilityInput, JobV2};
 
@@ -38,6 +40,12 @@ pub fn from_v1_plan(plan: &Plan) -> Result<DraftProject> {
                     let source_range =
                         TimeRange::new(source_segment.source_start_us, source_duration)
                             .map_err(|error| anyhow!("{location}: {error}"))?;
+                    let clip = ClipSettings::new(
+                        source_segment.speed.unwrap_or(1.0),
+                        source_segment.volume.unwrap_or(1.0),
+                        source_segment.change_pitch,
+                    )
+                    .map_err(|error| anyhow!("{location}: {error}"))?;
                     if kind == TrackKind::Video {
                         let material = if source_segment.photo {
                             Material::image(material_id.clone(), path)
@@ -45,22 +53,99 @@ pub fn from_v1_plan(plan: &Plan) -> Result<DraftProject> {
                             Material::video(material_id.clone(), path)
                         };
                         materials.push(material);
-                        Segment::video(id, range, material_id, source_range)?
+                        Segment::video_with_advanced_settings(
+                            id,
+                            range,
+                            material_id,
+                            source_range,
+                            clip,
+                            transform(source_segment)
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            source_segment
+                                .crop
+                                .as_ref()
+                                .map(crop_settings)
+                                .transpose()
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            keyframes(source_segment)
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            source_segment
+                                .mask
+                                .as_ref()
+                                .map(mask)
+                                .transpose()
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            source_segment
+                                .chroma
+                                .as_ref()
+                                .map(chroma)
+                                .transpose()
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            source_segment
+                                .background_filling
+                                .as_ref()
+                                .map(background_filling)
+                                .transpose()
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            source_segment
+                                .mix_mode
+                                .as_deref()
+                                .map(BlendMode::new)
+                                .transpose()
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            animation(source_segment.animation_in.as_ref())
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            animation(source_segment.animation_out.as_ref())
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            animation(source_segment.animation_group.as_ref())
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            transition(source_segment.transition_out.as_ref())
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            source_segment
+                                .fade
+                                .as_ref()
+                                .map(|fade| Fade::new(fade.in_us, fade.out_us))
+                                .transpose()
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                        )?
                     } else {
                         materials.push(Material::audio(material_id.clone(), path));
-                        Segment::audio(id, range, material_id, source_range)?
+                        Segment::audio_with_advanced_settings(
+                            id,
+                            range,
+                            material_id,
+                            source_range,
+                            clip,
+                            keyframes(source_segment)
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                            audio_effects(source_segment)
+                                .map_err(|error| anyhow!("{location}: {error}"))?,
+                        )?
                     }
                 }
-                TrackKind::Text => {
-                    Segment::text(id, range, source_segment.text.clone().unwrap_or_default())?
-                }
-                TrackKind::Sticker => Segment::sticker(
+                TrackKind::Text => Segment::text_with_settings(
+                    id,
+                    range,
+                    source_segment.text.clone().unwrap_or_default(),
+                    transform(source_segment).map_err(|error| anyhow!("{location}: {error}"))?,
+                    keyframes(source_segment).map_err(|error| anyhow!("{location}: {error}"))?,
+                    animation(source_segment.animation_in.as_ref())
+                        .map_err(|error| anyhow!("{location}: {error}"))?,
+                    animation(source_segment.animation_out.as_ref())
+                        .map_err(|error| anyhow!("{location}: {error}"))?,
+                    animation(source_segment.animation_group.as_ref())
+                        .map_err(|error| anyhow!("{location}: {error}"))?,
+                    text_style(source_segment).map_err(|error| anyhow!("{location}: {error}"))?,
+                )?,
+                TrackKind::Sticker => Segment::sticker_with_motion(
                     id,
                     range,
                     source_segment
                         .resource_id
                         .clone()
                         .ok_or_else(|| anyhow!("{location}: resource_id is required"))?,
+                    transform(source_segment).map_err(|error| anyhow!("{location}: {error}"))?,
+                    keyframes(source_segment).map_err(|error| anyhow!("{location}: {error}"))?,
                 )?,
                 TrackKind::Filter => {
                     let filter = source_segment
@@ -102,7 +187,12 @@ pub fn from_v1_plan(plan: &Plan) -> Result<DraftProject> {
             .as_deref()
             .map(|name| format!("{name}-{track_index}"))
             .unwrap_or_else(|| format!("{}-{track_index}", source_track.kind));
-        tracks.push(Track::new(track_id, kind, segments)?);
+        tracks.push(Track::new_named(
+            track_id,
+            source_track.name.clone(),
+            kind,
+            segments,
+        )?);
     }
 
     let timeline = Timeline::new(tracks)?;
@@ -119,6 +209,180 @@ pub fn from_v1_plan(plan: &Plan) -> Result<DraftProject> {
         timeline,
         materials,
     )?)
+}
+
+fn transform(segment: &crate::plan::Segment) -> Result<Transform, jianying_domain::DomainError> {
+    Transform::new(
+        segment.scale,
+        segment.x,
+        segment.y,
+        segment.rotation,
+        segment.opacity,
+    )
+}
+
+fn crop_settings(
+    crop: &crate::plan::CropSettings,
+) -> Result<CropSettings, jianying_domain::DomainError> {
+    CropSettings::new([
+        crop.upper_left_x,
+        crop.upper_left_y,
+        crop.upper_right_x,
+        crop.upper_right_y,
+        crop.lower_left_x,
+        crop.lower_left_y,
+        crop.lower_right_x,
+        crop.lower_right_y,
+    ])
+}
+
+fn keyframes(
+    segment: &crate::plan::Segment,
+) -> Result<Option<Keyframes>, jianying_domain::DomainError> {
+    segment
+        .keyframes
+        .as_ref()
+        .map(|channels| {
+            channels
+                .iter()
+                .map(|(channel, points)| {
+                    points
+                        .iter()
+                        .map(|point| KeyframePoint::new(point.at_us, point.value))
+                        .collect::<Result<Vec<_>, _>>()
+                        .map(|points| (channel.clone(), points))
+                })
+                .collect::<Result<std::collections::BTreeMap<_, _>, _>>()
+                .and_then(Keyframes::new)
+        })
+        .transpose()
+}
+
+fn mask(value: &crate::plan::Mask) -> Result<Mask, jianying_domain::DomainError> {
+    Mask::new(
+        value.name.clone(),
+        value.center_x,
+        value.center_y,
+        value.size,
+        value.rotation,
+        value.feather,
+        value.invert,
+        value.rect_width,
+        value.round_corner,
+    )
+}
+
+fn chroma(value: &crate::plan::Chroma) -> Result<ChromaKey, jianying_domain::DomainError> {
+    ChromaKey::new(
+        value.color.clone(),
+        value.intensity,
+        value.shadow,
+        value.edge_smooth,
+        value.spill,
+    )
+}
+
+fn background_filling(
+    value: &crate::plan::BackgroundFilling,
+) -> Result<BackgroundFilling, jianying_domain::DomainError> {
+    BackgroundFilling::new(value.fill_type.clone(), value.blur, value.color.clone())
+}
+
+fn animation(
+    value: Option<&crate::plan::Animation>,
+) -> Result<Option<Animation>, jianying_domain::DomainError> {
+    value
+        .map(|animation| Animation::new(animation.name.clone(), animation.duration_us))
+        .transpose()
+}
+
+fn transition(
+    value: Option<&crate::plan::TransitionOut>,
+) -> Result<Option<Transition>, jianying_domain::DomainError> {
+    value
+        .map(|transition| Transition::new(transition.name.clone(), transition.duration_us))
+        .transpose()
+}
+
+fn audio_effects(
+    segment: &crate::plan::Segment,
+) -> Result<AudioEffects, jianying_domain::DomainError> {
+    let fade = segment
+        .fade
+        .as_ref()
+        .map(|fade| Fade::new(fade.in_us, fade.out_us))
+        .transpose()?;
+    let effects = segment
+        .audio_effects
+        .iter()
+        .map(|effect| AudioEffect::new(effect.name.clone(), effect.params.clone()))
+        .collect::<Result<Vec<_>, _>>()?;
+    AudioEffects::new(fade, effects)
+}
+
+fn text_style(segment: &crate::plan::Segment) -> Result<TextStyle, jianying_domain::DomainError> {
+    let background = segment
+        .background
+        .as_ref()
+        .map(|background| {
+            TextBackground::new(
+                background.color.clone(),
+                background.style,
+                background.alpha,
+                background.round_radius,
+                background.height,
+                background.width,
+                background.horizontal_offset,
+                background.vertical_offset,
+            )
+        })
+        .transpose()?;
+    let shadow = segment
+        .shadow
+        .as_ref()
+        .map(|shadow| {
+            TextShadow::new(
+                shadow.color.clone(),
+                shadow.alpha,
+                shadow.angle,
+                shadow.distance,
+                shadow.diffuse,
+            )
+        })
+        .transpose()?;
+    let styles = segment
+        .styles
+        .iter()
+        .map(|style| {
+            StyleRange::new(
+                style.range,
+                style.size,
+                style.bold,
+                style.italic,
+                style.underline,
+                style.color.clone(),
+            )
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    let raw_ids = |value: &crate::plan::RawIds| {
+        RawIds::new(value.effect_id.clone(), value.resource_id.clone())
+    };
+    TextStyle::new(
+        segment.size,
+        segment.color.clone(),
+        segment.border_color.clone(),
+        segment.border_width,
+        segment.bold,
+        segment.italic,
+        segment.underline,
+        segment.alignment,
+        segment.font.clone(),
+        background,
+        shadow,
+        styles,
+        segment.text_effect.as_ref().map(raw_ids).transpose()?,
+        segment.bubble.as_ref().map(raw_ids).transpose()?,
+    )
 }
 
 /// 将兼容的 v1 plan 包装为通过语义校验的 `jianying-job/v2` create 作业。

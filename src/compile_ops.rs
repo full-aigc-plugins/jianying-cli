@@ -479,7 +479,11 @@ fn compile_staged(
     output: &Path,
 ) -> Result<Value> {
     let probes = build_probe_map(spec, spec_dir)?;
-    let plan = to_plan(spec, spec_dir, &probes)?;
+    // capcut 声明式输入先完成强类型解析与预检，再转换为统一 DraftProject。
+    // 后续 wire 构建只消费领域投影，不允许声明式兼容对象直接进入草稿构建器。
+    let compatibility_plan = to_plan(spec, spec_dir, &probes)?;
+    let project = crate::domain_compat::from_v1_plan(&compatibility_plan)?;
+    let plan = crate::job_runner::plan_from_project(&project)?;
     let build_report = crate::draft::build(&plan, spec_dir, staging, None, &|path| {
         probes
             .get(path)
@@ -673,6 +677,7 @@ fn compile_staged(
     Ok(json!({
         "ok":true,"name":spec.name.as_deref().unwrap_or_else(|| output.file_name().and_then(|v|v.to_str()).unwrap_or("compiled-draft")),
         "draft_path":output,"file_path":output.join("draft_content.json"),
+        "compiler":"draft_project_to_wire",
         "tracks":spec.tracks.len(),
         "segments":build_report.segments + extra_segments,
         "duration_us":max_end,"warnings":warnings,"refs":refs,

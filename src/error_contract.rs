@@ -254,6 +254,17 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
                     task_id,
                 ),
             ),
+            job_runner::JobRunError::InvalidEditSequence { reason } => {
+                ErrorEnvelope::with_details(
+                    "invalid_job",
+                    job_error.to_string(),
+                    task_details(json!({"reason":reason}), task_id),
+                    task_recovery(
+                        vec!["order add_material and add_track before add_segment, then consume every declared material".to_owned()],
+                        task_id,
+                    ),
+                )
+            }
         };
     }
     ErrorEnvelope::with_details(

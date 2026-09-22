@@ -4,6 +4,12 @@
 `schemas/evidence-record-v1.schema.json`。等级只能表达已经观察到的事实，不能按“理论上应该工作”
 自动晋级。
 
+真实剪映整体验收记录可用发布二进制执行
+`jianying --json runtime acceptance verify <acceptance-evidence.json>`。该命令重新计算原生输出、
+联系表和来源清单摘要，并用 `ffprobe` 复核视频、音频、时长、画幅与帧率；缺少运行时身份、
+草稿摘要、明确批准、冷重开/连续播放/原生导出观察时失败关闭。人工审查默认保留为独立状态，
+发布终门禁使用 `--require-human-review` 强制其为 `passed`。
+
 | 等级 | 能证明什么 | 不能证明什么 |
 |---|---|---|
 | `unit` | 单个类型、状态机或门禁满足隔离契约 | 上游 parity、真实草稿可打开 |

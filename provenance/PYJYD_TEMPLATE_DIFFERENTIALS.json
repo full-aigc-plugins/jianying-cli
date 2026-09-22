@@ -1,0 +1,123 @@
+{
+  "schema": "jianying-pyjyd-template-differential/v1",
+  "upstream_commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
+  "timing_cases": [
+    {
+      "name": "cut_head",
+      "segment_index": 1,
+      "source_start_us": 0,
+      "source_duration_us": 1000000,
+      "shrink_mode": "cut_head",
+      "extend_modes": [],
+      "segments": [
+        {"id":"previous","material_id":"material","target_timerange":{"start":0,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"target","material_id":"material","target_timerange":{"start":3000000,"duration":2000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"following","material_id":"material","target_timerange":{"start":4500000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0}
+      ]
+    },
+    {
+      "name": "cut_tail",
+      "segment_index": 1,
+      "source_start_us": 0,
+      "source_duration_us": 1000000,
+      "shrink_mode": "cut_tail",
+      "extend_modes": [],
+      "segments": [
+        {"id":"previous","material_id":"material","target_timerange":{"start":0,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"target","material_id":"material","target_timerange":{"start":2000000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"following","material_id":"material","target_timerange":{"start":4500000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0}
+      ]
+    },
+    {
+      "name": "cut_tail_align",
+      "segment_index": 1,
+      "source_start_us": 0,
+      "source_duration_us": 1000000,
+      "shrink_mode": "cut_tail_align",
+      "extend_modes": [],
+      "segments": [
+        {"id":"previous","material_id":"material","target_timerange":{"start":0,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"target","material_id":"material","target_timerange":{"start":2000000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"following","material_id":"material","target_timerange":{"start":3500000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0}
+      ]
+    },
+    {
+      "name": "shrink",
+      "segment_index": 1,
+      "source_start_us": 0,
+      "source_duration_us": 1000000,
+      "shrink_mode": "shrink",
+      "extend_modes": [],
+      "segments": [
+        {"id":"previous","material_id":"material","target_timerange":{"start":0,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"target","material_id":"material","target_timerange":{"start":2500000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"following","material_id":"material","target_timerange":{"start":4500000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0}
+      ]
+    },
+    {
+      "name": "extend_head",
+      "segment_index": 1,
+      "source_start_us": 0,
+      "source_duration_us": 3000000,
+      "shrink_mode": "cut_tail",
+      "extend_modes": ["extend_head"],
+      "segments": [
+        {"id":"previous","material_id":"material","target_timerange":{"start":0,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"target","material_id":"material","target_timerange":{"start":1000000,"duration":2000000},"source_timerange":{"start":0,"duration":3000000},"speed":1.0},
+        {"id":"following","material_id":"material","target_timerange":{"start":4500000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0}
+      ]
+    },
+    {
+      "name": "extend_tail",
+      "segment_index": 1,
+      "source_start_us": 0,
+      "source_duration_us": 3000000,
+      "shrink_mode": "cut_tail",
+      "extend_modes": ["extend_tail"],
+      "segments": [
+        {"id":"previous","material_id":"material","target_timerange":{"start":0,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"target","material_id":"material","target_timerange":{"start":2000000,"duration":3000000},"source_timerange":{"start":0,"duration":3000000},"speed":1.0},
+        {"id":"following","material_id":"material","target_timerange":{"start":5500000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0}
+      ]
+    },
+    {
+      "name": "push_tail",
+      "segment_index": 1,
+      "source_start_us": 0,
+      "source_duration_us": 3000000,
+      "shrink_mode": "cut_tail",
+      "extend_modes": ["push_tail"],
+      "segments": [
+        {"id":"previous","material_id":"material","target_timerange":{"start":0,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0},
+        {"id":"target","material_id":"material","target_timerange":{"start":2000000,"duration":3000000},"source_timerange":{"start":0,"duration":3000000},"speed":1.0},
+        {"id":"following","material_id":"material","target_timerange":{"start":5000000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0}
+      ]
+    },
+    {
+      "name": "fallback_cut_material_tail",
+      "segment_index": 0,
+      "source_start_us": 0,
+      "source_duration_us": 3000000,
+      "shrink_mode": "cut_tail",
+      "extend_modes": ["extend_head","cut_material_tail"],
+      "segments": [
+        {"id":"target","material_id":"material","target_timerange":{"start":0,"duration":2000000},"source_timerange":{"start":0,"duration":2000000},"speed":1.0},
+        {"id":"following","material_id":"material","target_timerange":{"start":2500000,"duration":1000000},"source_timerange":{"start":0,"duration":1000000},"speed":1.0}
+      ]
+    }
+  ],
+  "style_cases": [
+    {
+      "name": "ascii_proportional_growth",
+      "old_text": "ABCD",
+      "new_text": "ABCDEFGH",
+      "styles": [
+        {"range":[0,8],"bold":false},
+        {"range":[2,6],"bold":true}
+      ]
+    }
+  ],
+  "approved_differences": [
+    "Rust applies proportional style ranges to UTF-16 code units so emoji offsets remain valid; upstream Python uses Unicode code-point length."
+  ]
+}

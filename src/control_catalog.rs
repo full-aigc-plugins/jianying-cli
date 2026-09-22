@@ -270,6 +270,8 @@ fn validate_surface_inventory(value: &Value, catalogue: &Value) -> Result<()> {
         .collect::<BTreeSet<_>>();
     let mut surface_ids = BTreeSet::new();
     let mut observed_regions = std::collections::BTreeMap::<&str, usize>::new();
+    let mut expandable_parents = 0usize;
+    let mut enumerated_parents = 0usize;
     for surface in surfaces {
         let surface_id = surface["surface_id"]
             .as_str()
@@ -297,6 +299,63 @@ fn validate_surface_inventory(value: &Value, catalogue: &Value) -> Result<()> {
         {
             bail!("invalid or coordinate-bound timeline surface: {surface_id}");
         }
+        if let Some(expansion) = surface.get("expansion") {
+            expandable_parents += 1;
+            if !matches!(
+                expansion["kind"].as_str(),
+                Some("menu" | "dropdown" | "popover" | "context_menu")
+            ) || !matches!(
+                expansion["status"].as_str(),
+                Some("pending_accessibility" | "partial" | "enumerated")
+            ) || !expansion["child_surface_ids"].is_array()
+                || expansion["evidence"]
+                    .as_str()
+                    .is_none_or(|value| value.trim().is_empty())
+            {
+                bail!("invalid timeline surface expansion: {surface_id}");
+            }
+            if expansion["status"] == "enumerated" {
+                enumerated_parents += 1;
+                if expansion["child_surface_ids"]
+                    .as_array()
+                    .is_none_or(Vec::is_empty)
+                {
+                    bail!("enumerated timeline surface has no children: {surface_id}");
+                }
+            }
+        }
+    }
+    if value["coverage"]["expandable_parents"].as_u64() != Some(expandable_parents as u64)
+        || value["coverage"]["enumerated_parents"].as_u64() != Some(enumerated_parents as u64)
+    {
+        bail!("timeline surface expansion coverage differs from observed parents");
+    }
+    for surface in surfaces {
+        let Some(expansion) = surface.get("expansion") else {
+            continue;
+        };
+        let parent_id = surface["surface_id"].as_str().unwrap_or_default();
+        for child_id in expansion["child_surface_ids"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(Value::as_str)
+        {
+            let child = surfaces
+                .iter()
+                .find(|candidate| candidate["surface_id"] == child_id)
+                .ok_or_else(|| anyhow::anyhow!("unknown expanded child surface: {child_id}"))?;
+            if child["parent_surface_id"] != parent_id {
+                bail!("expanded child {child_id} does not reference parent {parent_id}");
+            }
+            if expansion["status"] == "enumerated"
+                && child["accessibility_name"]
+                    .as_str()
+                    .is_none_or(|value| value.trim().is_empty())
+            {
+                bail!("enumerated child lacks accessibility name: {child_id}");
+            }
+        }
     }
     for (region, count) in value["coverage"]["regions"]
         .as_object()
@@ -313,4 +372,44 @@ fn validate_surface_inventory(value: &Value, catalogue: &Value) -> Result<()> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn expanded_parent_requires_named_accessible_children() {
+        let catalog: Value = serde_json::from_str(CATALOG).unwrap();
+        let mut inventory: Value = serde_json::from_str(SURFACE_INVENTORY).unwrap();
+        validate_surface_inventory(&inventory, &catalog).unwrap();
+
+        inventory["coverage"]["enumerated_parents"] = 1.into();
+        let surfaces = inventory["surfaces"].as_array_mut().unwrap();
+        let parent = surfaces
+            .iter_mut()
+            .find(|surface| surface["surface_id"] == "view.more")
+            .unwrap();
+        parent["expansion"]["status"] = "enumerated".into();
+        let error = validate_surface_inventory(&inventory, &catalog).unwrap_err();
+        assert!(error.to_string().contains("lacks accessibility name"));
+
+        for child in inventory["surfaces"].as_array_mut().unwrap().iter_mut() {
+            if child["parent_surface_id"] == "view.more" {
+                child["accessibility_name"] = child["label"].clone();
+            }
+        }
+        validate_surface_inventory(&inventory, &catalog).unwrap();
+    }
+
+    #[test]
+    fn expansion_coverage_count_must_match_inventory() {
+        let catalog: Value = serde_json::from_str(CATALOG).unwrap();
+        let mut inventory: Value = serde_json::from_str(SURFACE_INVENTORY).unwrap();
+        inventory["coverage"]["expandable_parents"] = 8.into();
+        let error = validate_surface_inventory(&inventory, &catalog).unwrap_err();
+        assert!(error
+            .to_string()
+            .contains("expansion coverage differs from observed parents"));
+    }
 }

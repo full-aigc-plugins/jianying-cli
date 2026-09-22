@@ -226,6 +226,104 @@ fn template_duplicate_replace_import() {
 }
 
 #[test]
+fn import_track_remaps_nested_material_closure_and_owns_local_files() {
+    let root = tmpdir("nested-import");
+    let source = build_simple(&root, "nested-source");
+    let target = build_simple(&root, "nested-target");
+    let mut source_timeline = draft::load_timeline(&source).unwrap();
+    let text_track_index = source_timeline["tracks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .position(|track| track["type"] == "text")
+        .unwrap();
+    source_timeline["tracks"][text_track_index]["name"] = json!("嵌套字幕");
+    let old_track_id = source_timeline["tracks"][text_track_index]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let old_segment_id = source_timeline["tracks"][text_track_index]["segments"][0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let old_text_id = source_timeline["tracks"][text_track_index]["segments"][0]["material_id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let old_video_id = source_timeline["materials"]["videos"][0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let wrapper_id = "nested-wrapper-material";
+    source_timeline["materials"]["texts"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!({
+            "id":wrapper_id,
+            "type":"text_wrapper",
+            "content":serde_json::to_string(&json!({
+                "text":"x","styles":[{"range":[0,1]}],"text_material_id":old_text_id
+            })).unwrap(),
+            "text_material_id":old_text_id,
+            "poster_material_id":old_video_id,
+            "nested_json":format!(r#"{{ "ref": "{}" }}"#, old_text_id),
+            "opaque_json":r#"{ "untouched": true }"#
+        }));
+    source_timeline["tracks"][text_track_index]["segments"][0]["material_id"] = json!(wrapper_id);
+    template::save_timeline(&source, &source_timeline).unwrap();
+
+    let result = template::import_track_at(&target, &source, "嵌套字幕", None).unwrap();
+    assert_eq!(result["materials"], 3);
+    assert_eq!(result["ids_remapped"], 3);
+    let imported = draft::load_timeline(&target).unwrap();
+    let imported_track = imported["tracks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|track| track["name"] == "嵌套字幕")
+        .unwrap();
+    assert_ne!(imported_track["id"], old_track_id);
+    assert_ne!(imported_track["segments"][0]["id"], old_segment_id);
+    let imported_wrapper_id = imported_track["segments"][0]["material_id"]
+        .as_str()
+        .unwrap();
+    assert_ne!(imported_wrapper_id, wrapper_id);
+    let wrapper = imported["materials"]["texts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|material| material["id"].as_str() == Some(imported_wrapper_id))
+        .unwrap();
+    let imported_text_id = wrapper["text_material_id"].as_str().unwrap();
+    let imported_video_id = wrapper["poster_material_id"].as_str().unwrap();
+    assert_ne!(imported_text_id, old_text_id);
+    assert_ne!(imported_video_id, old_video_id);
+    assert!(imported["materials"]["texts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|material| material["id"].as_str() == Some(imported_text_id)));
+    let imported_video = imported["materials"]["videos"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|material| material["id"].as_str() == Some(imported_video_id))
+        .unwrap();
+    let imported_video_path = Path::new(imported_video["path"].as_str().unwrap());
+    assert!(imported_video_path.starts_with(&target));
+    assert!(imported_video_path.is_file());
+    assert_eq!(
+        serde_json::from_str::<Value>(wrapper["nested_json"].as_str().unwrap()).unwrap()["ref"],
+        imported_text_id
+    );
+    assert_eq!(wrapper["opaque_json"], r#"{ "untouched": true }"#);
+
+    std::fs::remove_dir_all(&source).unwrap();
+    draft::validate_bundle(&target).unwrap();
+    assert!(imported_video_path.is_file());
+}
+
+#[test]
 fn verify_catches_injected_corruption() {
     let dir = tmpdir("verify");
     let built = build_simple(&dir, "v1");

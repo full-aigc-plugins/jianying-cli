@@ -1,4 +1,4 @@
-use crate::{DomainError, Material, Segment, SegmentId, TimeRange};
+use crate::{DomainError, Material, Segment, SegmentId, TimeRange, TrackKind};
 use serde::{Deserialize, Serialize};
 
 /// 可审计的强类型编辑操作；执行层据此生成 MutationPlan。
@@ -10,7 +10,22 @@ pub enum EditOperation {
     },
     AddSegment {
         track_id: String,
-        segment: Segment,
+        segment: Box<Segment>,
+    },
+    AddTrack {
+        track_id: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        name: Option<String>,
+        kind: TrackKind,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        index: Option<usize>,
+    },
+    RemoveTrack {
+        track_id: String,
+    },
+    ReorderTrack {
+        track_id: String,
+        index: usize,
     },
     RemoveSegment {
         segment_id: SegmentId,
@@ -31,13 +46,32 @@ impl EditOperation {
         match self {
             Self::AddMaterial { material } => material.validate(),
             Self::AddSegment { track_id, segment } => {
-                if track_id.trim().is_empty() {
+                validate_track_id(track_id)?;
+                segment.validate()
+            }
+            Self::AddTrack {
+                track_id,
+                name,
+                kind,
+                ..
+            } => {
+                validate_track_id(track_id)?;
+                if name.as_deref().is_some_and(|value| value.trim().is_empty()) {
                     return Err(DomainError::InvalidField {
-                        field: "track_id",
-                        reason: "must not be blank".to_owned(),
+                        field: "track_name",
+                        reason: "must not be blank when present".to_owned(),
                     });
                 }
-                segment.validate()
+                if *kind == TrackKind::Composite {
+                    return Err(DomainError::InvalidField {
+                        field: "track_kind",
+                        reason: "composite tracks are not writable by the draft adapter".to_owned(),
+                    });
+                }
+                Ok(())
+            }
+            Self::RemoveTrack { track_id } | Self::ReorderTrack { track_id, .. } => {
+                validate_track_id(track_id)
             }
             Self::RemoveSegment { segment_id } => validate_segment_id(segment_id),
             Self::MoveSegment { segment_id, target } => {
@@ -57,6 +91,16 @@ impl EditOperation {
             }
         }
     }
+}
+
+fn validate_track_id(track_id: &str) -> Result<(), DomainError> {
+    if track_id.trim().is_empty() {
+        return Err(DomainError::InvalidField {
+            field: "track_id",
+            reason: "must not be blank".to_owned(),
+        });
+    }
+    Ok(())
 }
 
 fn validate_segment_id(segment_id: &SegmentId) -> Result<(), DomainError> {

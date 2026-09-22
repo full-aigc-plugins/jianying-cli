@@ -75,6 +75,19 @@ GUI Adapter MAY 搜索、预览和下载用户账号可访问的官方素材，�
 - **WHEN** GUI Adapter 提交完整收据且本地文件通过身份与权益校验
 - **THEN** Rust CLI 输出不含账号秘密的机器可读验证结果
 
+### Requirement: Real-editor acceptance evidence is replayable and content-bound
+系统 SHALL 通过 Rust CLI 独立复核真实剪映验收记录。原生导出证据 MUST 绑定精确编辑器身份、
+发布 CLI 身份、草稿摘要、明确批准、来源清单、冷重开/连续播放/导出观察、原生输出摘要及媒体流；
+人工审查状态 MUST 独立报告，不得由导出成功自动推断。
+
+#### Scenario: Complete native-export evidence is replayed
+- **WHEN** 验收记录包含全部身份与观察绑定，且原生输出、联系表、来源清单和 `ffprobe` 媒体事实与记录一致
+- **THEN** CLI 返回 `native-export` 等级的机器可读通过结果，并保留真实人工审查状态
+
+#### Scenario: Acceptance binding or artifact drift is detected
+- **WHEN** 验收记录缺少草稿摘要或批准 ID，或者输出/联系表摘要及媒体属性发生漂移
+- **THEN** CLI 失败关闭，不得把文档中的“导出成功”提升为可交付证据
+
 ### Requirement: Every editor control has a semantic execution route
 系统 SHALL 为目标剪映版本中观察到的每个工具栏按钮分配稳定语义 ID、状态探测方式、参数合同、首选执行路由、完成证据和回退路由。首选顺序 MUST 为草稿协议直接编辑、原生 Runtime 控制、可访问性 GUI Adapter、视觉兜底。
 

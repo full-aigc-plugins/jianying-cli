@@ -79,7 +79,14 @@ impl DraftProject {
             .timeline
             .tracks()
             .iter()
-            .map(|track| crate::Track::new(track.id(), track.kind(), track.segments().to_vec()))
+            .map(|track| {
+                crate::Track::new_named(
+                    track.id(),
+                    track.name().map(str::to_owned),
+                    track.kind(),
+                    track.segments().to_vec(),
+                )
+            })
             .collect::<Result<Vec<_>, _>>()?;
         let timeline = Timeline::new(tracks)?;
         Self::new(

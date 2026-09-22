@@ -1,4 +1,8 @@
-use crate::{DomainError, MaterialId, SegmentId, TimeRange, TrackKind};
+use crate::{
+    Animation, AudioEffects, BackgroundFilling, BlendMode, ChromaKey, ClipSettings, CropSettings,
+    DomainError, Fade, Keyframes, Mask, MaterialId, SegmentId, TextStyle, TimeRange, TrackKind,
+    Transform, Transition,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
@@ -11,26 +15,70 @@ pub enum Segment {
         range: TimeRange,
         material_id: MaterialId,
         source_range: TimeRange,
-        speed: f64,
-        volume: f64,
+        #[serde(flatten)]
+        clip: ClipSettings,
+        #[serde(flatten)]
+        transform: Transform,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        crop: Option<CropSettings>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        keyframes: Option<Keyframes>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        mask: Option<Mask>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        chroma: Option<ChromaKey>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        background_filling: Option<BackgroundFilling>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        mix_mode: Option<BlendMode>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        animation_in: Option<Animation>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        animation_out: Option<Animation>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        animation_group: Option<Animation>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        transition_out: Option<Transition>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        fade: Option<Fade>,
     },
     Audio {
         id: SegmentId,
         range: TimeRange,
         material_id: MaterialId,
         source_range: TimeRange,
-        speed: f64,
-        volume: f64,
+        #[serde(flatten)]
+        clip: ClipSettings,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        keyframes: Option<Keyframes>,
+        #[serde(flatten)]
+        audio_effects: AudioEffects,
     },
     Text {
         id: SegmentId,
         range: TimeRange,
         text: String,
+        #[serde(flatten)]
+        transform: Transform,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        keyframes: Option<Keyframes>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        animation_in: Option<Animation>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        animation_out: Option<Animation>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        animation_group: Option<Animation>,
+        #[serde(flatten)]
+        style: TextStyle,
     },
     Sticker {
         id: SegmentId,
         range: TimeRange,
         resource_id: String,
+        #[serde(flatten)]
+        transform: Transform,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        keyframes: Option<Keyframes>,
     },
     Filter {
         id: SegmentId,
@@ -52,6 +100,19 @@ pub enum Segment {
 }
 
 impl Segment {
+    /// 返回项目内稳定的片段标识。
+    pub fn id(&self) -> &SegmentId {
+        match self {
+            Self::Video { id, .. }
+            | Self::Audio { id, .. }
+            | Self::Text { id, .. }
+            | Self::Sticker { id, .. }
+            | Self::Filter { id, .. }
+            | Self::Effect { id, .. }
+            | Self::Composite { id, .. } => id,
+        }
+    }
+
     /// 创建视频片段。
     pub fn video(
         id: SegmentId,
@@ -59,14 +120,90 @@ impl Segment {
         material_id: MaterialId,
         source_range: TimeRange,
     ) -> Result<Self, DomainError> {
-        Ok(Self::Video {
+        Self::video_with_settings(
             id,
             range,
             material_id,
             source_range,
-            speed: 1.0,
-            volume: 1.0,
-        })
+            ClipSettings::default(),
+            Transform::default(),
+            None,
+        )
+    }
+
+    /// 使用强类型 clip、视觉变换和裁剪设置创建视频片段。
+    pub fn video_with_settings(
+        id: SegmentId,
+        range: TimeRange,
+        material_id: MaterialId,
+        source_range: TimeRange,
+        clip: ClipSettings,
+        transform: Transform,
+        crop: Option<CropSettings>,
+    ) -> Result<Self, DomainError> {
+        Self::video_with_advanced_settings(
+            id,
+            range,
+            material_id,
+            source_range,
+            clip,
+            transform,
+            crop,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+    }
+
+    /// 使用完整强类型视觉设置创建视频片段。
+    #[allow(clippy::too_many_arguments)]
+    pub fn video_with_advanced_settings(
+        id: SegmentId,
+        range: TimeRange,
+        material_id: MaterialId,
+        source_range: TimeRange,
+        clip: ClipSettings,
+        transform: Transform,
+        crop: Option<CropSettings>,
+        keyframes: Option<Keyframes>,
+        mask: Option<Mask>,
+        chroma: Option<ChromaKey>,
+        background_filling: Option<BackgroundFilling>,
+        mix_mode: Option<BlendMode>,
+        animation_in: Option<Animation>,
+        animation_out: Option<Animation>,
+        animation_group: Option<Animation>,
+        transition_out: Option<Transition>,
+        fade: Option<Fade>,
+    ) -> Result<Self, DomainError> {
+        let segment = Self::Video {
+            id,
+            range,
+            material_id,
+            source_range,
+            clip,
+            transform,
+            crop,
+            keyframes,
+            mask,
+            chroma,
+            background_filling,
+            mix_mode,
+            animation_in,
+            animation_out,
+            animation_group,
+            transition_out,
+            fade,
+        };
+        segment.validate()?;
+        Ok(segment)
     }
 
     /// 创建音频片段。
@@ -76,14 +213,55 @@ impl Segment {
         material_id: MaterialId,
         source_range: TimeRange,
     ) -> Result<Self, DomainError> {
-        Ok(Self::Audio {
+        Self::audio_with_settings(
             id,
             range,
             material_id,
             source_range,
-            speed: 1.0,
-            volume: 1.0,
-        })
+            ClipSettings::default(),
+        )
+    }
+
+    /// 使用强类型 clip 设置创建音频片段。
+    pub fn audio_with_settings(
+        id: SegmentId,
+        range: TimeRange,
+        material_id: MaterialId,
+        source_range: TimeRange,
+        clip: ClipSettings,
+    ) -> Result<Self, DomainError> {
+        Self::audio_with_advanced_settings(
+            id,
+            range,
+            material_id,
+            source_range,
+            clip,
+            None,
+            AudioEffects::default(),
+        )
+    }
+
+    /// 使用关键帧和音频效果创建音频片段。
+    pub fn audio_with_advanced_settings(
+        id: SegmentId,
+        range: TimeRange,
+        material_id: MaterialId,
+        source_range: TimeRange,
+        clip: ClipSettings,
+        keyframes: Option<Keyframes>,
+        audio_effects: AudioEffects,
+    ) -> Result<Self, DomainError> {
+        let segment = Self::Audio {
+            id,
+            range,
+            material_id,
+            source_range,
+            clip,
+            keyframes,
+            audio_effects,
+        };
+        segment.validate()?;
+        Ok(segment)
     }
 
     /// 创建文本片段并拒绝空正文。
@@ -94,7 +272,55 @@ impl Segment {
                 reason: "must not be blank".to_owned(),
             });
         }
-        Ok(Self::Text { id, range, text })
+        Self::text_with_transform(id, range, text, Transform::default())
+    }
+
+    /// 使用强类型视觉变换创建文字片段。
+    pub fn text_with_transform(
+        id: SegmentId,
+        range: TimeRange,
+        text: String,
+        transform: Transform,
+    ) -> Result<Self, DomainError> {
+        Self::text_with_settings(
+            id,
+            range,
+            text,
+            transform,
+            None,
+            None,
+            None,
+            None,
+            TextStyle::default(),
+        )
+    }
+
+    /// 使用关键帧、动画和文字样式创建文字片段。
+    #[allow(clippy::too_many_arguments)]
+    pub fn text_with_settings(
+        id: SegmentId,
+        range: TimeRange,
+        text: String,
+        transform: Transform,
+        keyframes: Option<Keyframes>,
+        animation_in: Option<Animation>,
+        animation_out: Option<Animation>,
+        animation_group: Option<Animation>,
+        style: TextStyle,
+    ) -> Result<Self, DomainError> {
+        let segment = Self::Text {
+            id,
+            range,
+            text,
+            transform,
+            keyframes,
+            animation_in,
+            animation_out,
+            animation_group,
+            style,
+        };
+        segment.validate()?;
+        Ok(segment)
     }
 
     /// 创建贴纸片段。
@@ -109,11 +335,36 @@ impl Segment {
                 reason: "must not be blank".to_owned(),
             });
         }
-        Ok(Self::Sticker {
+        Self::sticker_with_transform(id, range, resource_id, Transform::default())
+    }
+
+    /// 使用强类型视觉变换创建贴纸片段。
+    pub fn sticker_with_transform(
+        id: SegmentId,
+        range: TimeRange,
+        resource_id: String,
+        transform: Transform,
+    ) -> Result<Self, DomainError> {
+        Self::sticker_with_motion(id, range, resource_id, transform, None)
+    }
+
+    /// 使用视觉变换和关键帧创建贴纸片段。
+    pub fn sticker_with_motion(
+        id: SegmentId,
+        range: TimeRange,
+        resource_id: String,
+        transform: Transform,
+        keyframes: Option<Keyframes>,
+    ) -> Result<Self, DomainError> {
+        let segment = Self::Sticker {
             id,
             range,
             resource_id,
-        })
+            transform,
+            keyframes,
+        };
+        segment.validate()?;
+        Ok(segment)
     }
 
     /// 创建滤镜片段。
@@ -179,7 +430,8 @@ impl Segment {
         }
     }
 
-    pub(crate) fn track_kind(&self) -> TrackKind {
+    /// 返回该片段唯一兼容的轨道类型。
+    pub fn track_kind(&self) -> TrackKind {
         match self {
             Self::Video { .. } => TrackKind::Video,
             Self::Audio { .. } => TrackKind::Audio,
@@ -201,40 +453,118 @@ impl Segment {
         match self {
             Self::Video {
                 source_range,
-                speed,
-                volume,
-                ..
-            }
-            | Self::Audio {
-                source_range,
-                speed,
-                volume,
+                clip,
+                transform,
+                crop,
+                keyframes,
+                mask,
+                chroma,
+                background_filling,
+                mix_mode,
+                animation_in,
+                animation_out,
+                animation_group,
+                transition_out,
+                fade,
                 ..
             } => {
                 TimeRange::new(source_range.start_us(), source_range.duration_us())?;
-                if !speed.is_finite()
-                    || !volume.is_finite()
-                    || !(0.1..=8.0).contains(speed)
-                    || !(0.0..=4.0).contains(volume)
+                clip.validate()?;
+                transform.validate()?;
+                if let Some(crop) = crop {
+                    crop.validate()?;
+                }
+                if let Some(keyframes) = keyframes {
+                    keyframes.validate_for(TrackKind::Video, range.duration_us())?;
+                }
+                if let Some(mask) = mask {
+                    mask.validate()?;
+                }
+                if let Some(chroma) = chroma {
+                    chroma.validate()?;
+                }
+                if let Some(background) = background_filling {
+                    background.validate()?;
+                }
+                if let Some(mix_mode) = mix_mode {
+                    mix_mode.validate()?;
+                }
+                for animation in [animation_in, animation_out, animation_group]
+                    .into_iter()
+                    .flatten()
                 {
+                    animation.validate()?;
+                }
+                if let Some(transition) = transition_out {
+                    transition.validate()?;
+                }
+                if fade.is_some_and(|fade| fade.in_us() < 0 || fade.out_us() < 0) {
                     return Err(DomainError::InvalidField {
-                        field: "media_segment",
-                        reason: "speed must be 0.1..8 and volume must be 0..4".to_owned(),
+                        field: "fade",
+                        reason: "durations must be non-negative".to_owned(),
                     });
                 }
                 Ok(())
             }
-            Self::Text { text, .. } if text.trim().is_empty() => Err(DomainError::InvalidField {
-                field: "text",
-                reason: "must not be blank".to_owned(),
-            }),
-            Self::Sticker { resource_id, .. } | Self::Effect { resource_id, .. }
-                if resource_id.trim().is_empty() =>
-            {
-                Err(DomainError::InvalidField {
-                    field: "resource_id",
-                    reason: "must not be blank".to_owned(),
-                })
+            Self::Audio {
+                source_range,
+                clip,
+                keyframes,
+                audio_effects,
+                ..
+            } => {
+                TimeRange::new(source_range.start_us(), source_range.duration_us())?;
+                clip.validate()?;
+                if let Some(keyframes) = keyframes {
+                    keyframes.validate_for(TrackKind::Audio, range.duration_us())?;
+                }
+                audio_effects.validate()
+            }
+            Self::Text {
+                text,
+                transform,
+                keyframes,
+                animation_in,
+                animation_out,
+                animation_group,
+                style,
+                ..
+            } => {
+                if text.trim().is_empty() {
+                    return Err(DomainError::InvalidField {
+                        field: "text",
+                        reason: "must not be blank".to_owned(),
+                    });
+                }
+                transform.validate()?;
+                if let Some(keyframes) = keyframes {
+                    keyframes.validate_for(TrackKind::Text, range.duration_us())?;
+                }
+                for animation in [animation_in, animation_out, animation_group]
+                    .into_iter()
+                    .flatten()
+                {
+                    animation.validate()?;
+                }
+                style.validate(text)
+            }
+            Self::Sticker {
+                resource_id,
+                transform,
+                keyframes,
+                ..
+            } => {
+                if resource_id.trim().is_empty() {
+                    return Err(DomainError::InvalidField {
+                        field: "resource_id",
+                        reason: "must not be blank".to_owned(),
+                    });
+                }
+                transform.validate()?;
+                if let Some(keyframes) = keyframes {
+                    keyframes.validate_for(TrackKind::Sticker, range.duration_us())?;
+                }
+                Ok(())
             }
             Self::Filter {
                 resource_id,
@@ -261,6 +591,12 @@ impl Segment {
                 Err(DomainError::InvalidField {
                     field: "composite.children",
                     reason: "must not be empty".to_owned(),
+                })
+            }
+            Self::Effect { resource_id, .. } if resource_id.trim().is_empty() => {
+                Err(DomainError::InvalidField {
+                    field: "resource_id",
+                    reason: "must not be blank".to_owned(),
                 })
             }
             _ => Ok(()),

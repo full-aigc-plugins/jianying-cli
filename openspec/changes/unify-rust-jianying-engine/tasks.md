@@ -34,6 +34,18 @@
 - [x] 4.5 为每类协议对象增加 Python 参考输出与 Rust 输出的完全相等、规范化等价或批准差异记录
 - [x] 4.6 扩充边界 fixture，覆盖空轨、重叠、负偏移、变速、缺失资源、Unicode 和未知字段写回
 - [x] 4.7 在完整协议矩阵达到门禁前阻止“pyJianYingDraft parity 完成”发布声明
+- [x] 4.8 将 clip、crop、transform、关键帧、蒙版、色度、背景、混合、动画、转场、音频效果与文字样式提升为独立领域值对象，并完成 v1 双向投影
+  - 第一批增量（2026-09-22）：`ClipSettings`、`CropSettings`、`Transform` 进入 `jianying-domain`，v1 转换和 Domain→Plan 投影保持平面 Job v2 JSON 兼容；55/55 固定提交差分仍逐字节匹配。当时其余值对象尚未迁移，因此未勾选任务。
+  - 第二批完成（2026-09-22）：关键帧、蒙版、色度抠图、背景填充、混合模式、动画、转场、淡入淡出/音频效果和文字样式均成为可独立校验的领域值对象；视频、音频、文字、贴纸片段完成 v1→Domain→Plan 双向投影，Job v2 schema 同步声明全部字段。55 个冻结 fixture 的 4.8 字段逐片段等价，固定 `c3318066` Python/Rust 草稿差分 55/55 通过且报告与基线逐字节一致。
+- [x] 4.9 让 `jianying-job/v2` create 仅通过 `DraftProject -> Domain-to-Wire` 编译；v1 compatibility 只作为输入转换证据，不再承担生产执行
+  - 完成（2026-09-22）：普通 `jianying-cli-plan/v1` 已只通过转换后的 `DraftProject` 执行；黑盒冲突载荷测试证明 compatibility 中的名称和文字不能覆盖领域项目。迁移同时补齐轨道稳定 ID 与显示名的分离语义。
+  - `capcut-cli-compile/v1` compatibility-only Job 先解析为严格 `CompileSpec`，再将基础轨道转换成 `DraftProject` 后进入同一 Domain-to-Wire 编译；九类后处理只消费强类型 `CompileOperation`。单稿、批量和 Job v2 黑盒均确认 `compiler=draft_project_to_wire`。
+- [x] 4.10 扩展 `EditOperation` 与共享 handler，完成新增素材/片段、轨道操作和全部强类型语义的隔离事务执行
+  - 完成（2026-09-22）：Job v2 新增稳定 ID 的 `add_track`、`remove_track`、`reorder_track`，并将本地视频/音频/图片 `add_material` 与完整强类型 `add_segment` 接入隔离 edit handler。片段只通过 `DraftProject -> Domain-to-Wire` 编译，导入时复制主素材与伴随引用闭包；关键帧、蒙版、色度、背景、混合、动画、转场、淡入淡出等字段均由黑盒产物验证。未声明、重复、缺失或未消费素材结构化失败，源草稿、最终输出和临时草稿保持原子边界。
+- [x] 4.11 实现素材替换长短策略、文本样式区间重算、轨道导入 ID 重映射与引用闭包，并建立 Python/Rust 差分
+  - 完成（2026-09-22）：固定 pyJianYingDraft `c3318066` 的 8 类长短策略与文字样式观察值进入 `PYJYD_TEMPLATE_DIFFERENTIALS.json`；Rust 按相同顺序执行裁头、裁尾、裁尾对齐、居中收缩、向前/向后延长、推动后续和截断素材尾部。文字替换使用 UTF-16 码元比例重算并记录相对 Python code-point 的获准增强差异。
+  - 按片段替换会拆分共享素材身份并通过 `MutationPlan` 原子提交；失败黑盒证明草稿字节和素材文件数均不变。轨道导入递归收集普通字段和 JSON 字符串中的素材引用，重映射轨道/片段/素材 ID、复制本地文件且保留无关 JSON 原文；删除源草稿后目标仍通过 bundle 校验。
+- [ ] 4.12 将 pyJianYingDraft 四个 `partial` 提升为有差分和真实剪映证据的 `supported`；CI 必须拒绝完成声明与 parity 状态不一致
 
 ## 5. 领域命令树与机器契约
 

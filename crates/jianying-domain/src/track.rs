@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Track {
     id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
     kind: TrackKind,
     segments: Vec<Segment>,
 }
@@ -16,11 +18,27 @@ impl Track {
         kind: TrackKind,
         segments: Vec<Segment>,
     ) -> Result<Self, DomainError> {
+        Self::new_named(id, None, kind, segments)
+    }
+
+    /// 创建带可选显示名的轨道；显示名与稳定内部标识相互独立。
+    pub fn new_named(
+        id: impl Into<String>,
+        name: Option<String>,
+        kind: TrackKind,
+        segments: Vec<Segment>,
+    ) -> Result<Self, DomainError> {
         let id = id.into();
         if id.trim().is_empty() {
             return Err(DomainError::InvalidField {
                 field: "track_id",
                 reason: "must not be blank".to_owned(),
+            });
+        }
+        if name.as_deref().is_some_and(|value| value.trim().is_empty()) {
+            return Err(DomainError::InvalidField {
+                field: "track_name",
+                reason: "must not be blank when present".to_owned(),
             });
         }
         let mut previous_end_us = 0;
@@ -41,12 +59,22 @@ impl Track {
             }
             previous_end_us = segment.range().end_us();
         }
-        Ok(Self { id, kind, segments })
+        Ok(Self {
+            id,
+            name,
+            kind,
+            segments,
+        })
     }
 
     /// 返回轨道标识。
     pub fn id(&self) -> &str {
         &self.id
+    }
+
+    /// 返回用户可见的轨道名称；缺失时由 wire adapter 使用轨道类型默认名。
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
     }
 
     /// 返回轨道类型。

@@ -259,7 +259,9 @@ queued/running/succeeded/failed 状态；成功且制品哈希未漂移的重复
 同名拒绝（换名重建，绝不覆盖用户草稿）。
 
 ### `jianying render proxy <dir> --out <mp4> [--scale 0.5] [--burn-captions] [--crf 28]`
-ffmpeg 代理预览：平铺主视频轨 + 混音全部音频轨（含淡入淡出）+ 可选烧字幕。
+ffmpeg 代理预览：按素材 crop 裁剪后平铺主视频轨 + 混音全部音频轨（含淡入淡出）+ 可选烧字幕。
+烧录中文时自动选择当前系统可用的 CJK 字体，并在成功结果的 `caption_font_file` 中报告；
+找不到兼容字体时明确失败，避免静默生成缺字方框。
 **不含转场/特效/蒙版**——权威出口是剪映内导出。
 批量代理渲染和 Job JSONL 服务见 [`render-batch.md`](render-batch.md)。
 
@@ -279,9 +281,13 @@ result 会再次校验磁盘制品。该命令面完成任务治理闭环，不�
 `list/save/apply/make-preset/apply-preset`（模板库与文字样式预设，详见
 [`template-library.md`](template-library.md)）/ `inspect`（轨道+材料清单）/
 `duplicate <src> <新名>` / `replace-text <dir> --track <t>
---index <i> <文本>` / `replace-material <dir> <新素材> (--name <n> | --track <t> --index <i>)`
-/ `import-track <目标> <源> <轨名> [--before <锚轨>]`（--before=插到锚轨之前，pyJYD insert_track 语义）。对齐 pyJYD 模板模式；replace 后回写并保持
-段 source 范围钳制。
+--index <i> <文本> [--no-recalc-style]` / `replace-material <dir> <新素材>
+(--name <n> | --track <t> --index <i>) [--source-start <time>]
+[--source-duration <time>] [--shrink-mode <mode>] [--extend-mode <mode>...] [--replace-crop]`
+/ `import-track <目标> <源> <轨名> [--before <锚轨>]`。文字替换默认按 UTF-16 码元比例重算样式区间；
+素材替换支持 `cut_head/cut_tail/cut_tail_align/shrink` 与按顺序回退的
+`extend_head/extend_tail/push_tail/cut_material_tail`。按片段替换会拆分共享素材身份；轨道导入会递归重映射
+素材引用闭包并复制本地文件。全部写入均经隔离事务提交。
 
 ### `jianying store <op>`
 `list` / `has <名>` / `remove <名> --yes`（删除草稿目录并从 root_meta_info 注销）。

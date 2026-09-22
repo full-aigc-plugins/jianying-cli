@@ -426,6 +426,17 @@ pub fn replace_text(
     seg_index: usize,
     new_text: &str,
 ) -> Result<Value> {
+    replace_text_with_options(draft, track_name, seg_index, new_text, true)
+}
+
+/// 替换文字并可选择按 UTF-16 码元比例重算原有样式区间。
+pub fn replace_text_with_options(
+    draft: &Path,
+    track_name: &str,
+    seg_index: usize,
+    new_text: &str,
+    recalculate_styles: bool,
+) -> Result<Value> {
     let mut tl = load(draft)?;
     let material_id = {
         let track = tl["tracks"]
@@ -456,24 +467,20 @@ pub fn replace_text(
         .find(|m| m["id"] == json!(material_id))
         .ok_or_else(|| anyhow::anyhow!("text material {material_id} not found"))?;
     let mut content: Value = serde_json::from_str(mat["content"].as_str().unwrap_or("{}"))?;
-    content["text"] = json!(new_text);
-    let utf16_len = new_text.encode_utf16().count() as i64;
-    if let Some(styles) = content["styles"].as_array_mut() {
-        if let Some(base) = styles.first_mut() {
-            base["range"] = json!([0, utf16_len]);
-        }
-        for s in styles.iter_mut().skip(1) {
-            if let Some(range) = s["range"].as_array_mut() {
-                let end = range.get(1).and_then(Value::as_i64).unwrap_or(utf16_len);
-                range[1] = json!(end.min(utf16_len));
-            }
+    let old_text = content["text"].as_str().unwrap_or_default().to_owned();
+    if recalculate_styles {
+        if let Some(styles) = content["styles"].as_array_mut() {
+            crate::text_style_range::recalculate_style_ranges(styles, &old_text, new_text)?;
         }
     }
+    content["text"] = json!(new_text);
+    let utf16_len = new_text.encode_utf16().count() as i64;
     mat["content"] = json!(content.to_string());
     save(draft, &tl)?;
     Ok(
         json!({"status": "replaced", "track": track_name, "segment": seg_index,
-              "text": new_text, "utf16_len": utf16_len}),
+              "text": new_text, "utf16_len": utf16_len,
+              "styles_recalculated":recalculate_styles}),
     )
 }
 
@@ -487,76 +494,175 @@ pub fn replace_material(
     seg_index: Option<usize>,
     new_source: &Path,
 ) -> Result<Value> {
-    let mut tl = load(draft)?;
-    let info = probe::probe(new_source)?;
-    let stored_source = copy_replacement_asset(draft, new_source)?;
-    let mut target_id = String::new();
-    if let Some(name) = by_name {
-        for bucket in ["videos", "audios"] {
-            if let Some(items) = tl["materials"][bucket].as_array_mut() {
-                if let Some(m) = items.iter_mut().find(|m| {
-                    m["material_name"].as_str() == Some(name) || m["name"].as_str() == Some(name)
-                }) {
-                    apply_material_swap(m, bucket, &stored_source, &info)?;
-                    target_id = m["id"].as_str().unwrap_or_default().to_string();
-                    break;
-                }
-            }
-        }
-    } else if let (Some(track_name), Some(idx)) = (track, seg_index) {
-        let t = tl["tracks"]
-            .as_array_mut()
-            .unwrap()
-            .iter_mut()
-            .find(|t| t["name"] == json!(track_name))
-            .ok_or_else(|| anyhow::anyhow!("track {track_name} not found"))?;
-        let seg = &t["segments"].as_array().unwrap()[idx];
-        target_id = seg["material_id"].as_str().unwrap_or_default().to_string();
-        for bucket in ["videos", "audios"] {
-            if let Some(items) = tl["materials"][bucket].as_array_mut() {
-                if let Some(m) = items.iter_mut().find(|m| m["id"] == json!(target_id)) {
-                    apply_material_swap(m, bucket, &stored_source, &info)?;
-                    break;
-                }
-            }
-        }
-    } else {
-        bail!("provide --name or --track + --index");
-    }
-    if target_id.is_empty() {
-        bail!("material not found");
-    }
-    // clamp every segment source range that references this material
-    for t in tl["tracks"].as_array_mut().unwrap() {
-        for s in t["segments"].as_array_mut().unwrap_or(&mut Vec::new()) {
-            if s["material_id"] == json!(target_id) {
-                if let Some(src) = s["source_timerange"].as_object_mut() {
-                    let start = src.get("start").and_then(Value::as_i64).unwrap_or(0);
-                    let dur = src.get("duration").and_then(Value::as_i64).unwrap_or(0);
-                    let clamped = dur.min((info.duration_us - start).max(0));
-                    src.insert("duration".into(), json!(clamped));
-                }
-            }
-        }
-    }
-    save(draft, &tl)?;
-    Ok(json!({"status": "replaced", "material_id": target_id,
-              "source": stored_source.to_string_lossy(), "duration_us": info.duration_us}))
+    replace_material_with_options(
+        draft,
+        by_name,
+        track,
+        seg_index,
+        new_source,
+        false,
+        None,
+        None,
+        crate::shrink_mode::ShrinkMode::CutTail,
+        &[crate::extend_mode::ExtendMode::CutMaterialTail],
+    )
 }
 
-fn copy_replacement_asset(draft: &Path, source: &Path) -> Result<std::path::PathBuf> {
-    if !source.is_file() {
-        bail!("replacement material does not exist: {}", source.display());
-    }
-    let target_dir = draft.join("assets/replaced");
-    std::fs::create_dir_all(&target_dir)?;
-    let file_name = source
-        .file_name()
-        .map(|name| name.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "material.bin".to_owned());
-    let target = target_dir.join(format!("{}-{file_name}", hex_id()));
-    std::fs::copy(source, &target)?;
-    Ok(target)
+/// 按 pyJianYingDraft 长短策略替换素材；按片段替换时创建独立素材身份。
+#[allow(clippy::too_many_arguments)]
+pub fn replace_material_with_options(
+    draft: &Path,
+    by_name: Option<&str>,
+    track: Option<&str>,
+    seg_index: Option<usize>,
+    new_source: &Path,
+    replace_crop: bool,
+    source_start_us: Option<i64>,
+    source_duration_us: Option<i64>,
+    shrink_mode: crate::shrink_mode::ShrinkMode,
+    extend_modes: &[crate::extend_mode::ExtendMode],
+) -> Result<Value> {
+    let info = probe::probe(new_source)?;
+    crate::timeline_ops::mutate_with_path(draft, |tl, work_copy, identity| {
+        let (target_id, replacement_result) = if let Some(name) = by_name {
+            let bucket = if info.has_video || info.is_image {
+                "videos"
+            } else if info.has_audio {
+                "audios"
+            } else {
+                bail!("replacement has no supported video, image or audio stream");
+            };
+            let matches = tl["materials"][bucket]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .enumerate()
+                .filter(|(_, material)| {
+                    material["material_name"].as_str() == Some(name)
+                        || material["name"].as_str() == Some(name)
+                })
+                .map(|(index, _)| index)
+                .collect::<Vec<_>>();
+            if matches.len() != 1 {
+                bail!(
+                    "expected one {bucket} material named {name}, found {}",
+                    matches.len()
+                );
+            }
+            let stored_source = stage_replacement_asset(work_copy, identity, new_source, bucket)?;
+            let material = &mut tl["materials"][bucket][matches[0]];
+            let target_id = material["id"].as_str().unwrap_or_default().to_owned();
+            apply_material_swap(material, bucket, &stored_source, &info, replace_crop)?;
+            (target_id, json!({"mode":"by_name","ranges_preserved":true}))
+        } else if let (Some(track_name), Some(index)) = (track, seg_index) {
+            let track_index = tl["tracks"]
+                .as_array()
+                .context("tracks must be an array")?
+                .iter()
+                .position(|candidate| candidate["name"].as_str() == Some(track_name))
+                .with_context(|| format!("track {track_name} not found"))?;
+            let track_type = tl["tracks"][track_index]["type"]
+                .as_str()
+                .context("track type is missing")?
+                .to_owned();
+            let bucket = match track_type.as_str() {
+                "video" if info.has_video || info.is_image => "videos",
+                "audio" if info.has_audio => "audios",
+                "video" | "audio" => {
+                    bail!("replacement media type does not match {track_type} track")
+                }
+                _ => bail!("track {track_name} does not support material replacement"),
+            };
+            let segment = tl["tracks"][track_index]["segments"]
+                .as_array()
+                .context("track segments must be an array")?
+                .get(index)
+                .with_context(|| format!("segment index {index} is out of range"))?;
+            let speed = segment["speed"].as_f64().unwrap_or(1.0);
+            if (speed - 1.0).abs() > f64::EPSILON {
+                bail!("replacement does not support speed-adjusted segments");
+            }
+            let old_material_id = segment["material_id"]
+                .as_str()
+                .context("segment material id is missing")?
+                .to_owned();
+            let old_material = tl["materials"][bucket]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .find(|material| material["id"].as_str() == Some(&old_material_id))
+                .cloned()
+                .with_context(|| format!("material {old_material_id} not found"))?;
+            let target_duration = segment["target_timerange"]["duration"]
+                .as_i64()
+                .context("target duration is missing")?;
+            let source_start_us = source_start_us.unwrap_or(0);
+            let source_duration_us = source_duration_us.unwrap_or({
+                if info.is_image {
+                    target_duration
+                } else {
+                    info.duration_us
+                }
+            });
+            if !info.is_image
+                && source_start_us
+                    .checked_add(source_duration_us)
+                    .is_none_or(|end| end > info.duration_us)
+            {
+                bail!("replacement source range exceeds probed media duration");
+            }
+            let replacement_result = crate::replacement_timing::apply_replacement_timing(
+                tl["tracks"][track_index]["segments"]
+                    .as_array_mut()
+                    .context("track segments must be an array")?,
+                index,
+                source_start_us,
+                source_duration_us,
+                shrink_mode,
+                extend_modes,
+            )?;
+            let stored_source = stage_replacement_asset(work_copy, identity, new_source, bucket)?;
+            let new_material_id = hex_id();
+            let mut new_material = old_material;
+            for field in ["id", "material_id", "local_material_id", "music_id"] {
+                if field == "id" || new_material.get(field).is_some() {
+                    new_material[field] = json!(&new_material_id);
+                }
+            }
+            apply_material_swap(
+                &mut new_material,
+                bucket,
+                &stored_source,
+                &info,
+                replace_crop,
+            )?;
+            tl["tracks"][track_index]["segments"][index]["material_id"] = json!(&new_material_id);
+            tl["materials"][bucket]
+                .as_array_mut()
+                .context("material bucket must be an array")?
+                .push(new_material);
+            (new_material_id, replacement_result)
+        } else {
+            bail!("provide --name or --track + --index");
+        };
+        if target_id.is_empty() {
+            bail!("material not found");
+        }
+        Ok(json!({"status": "replaced", "material_id": target_id,
+                  "source":new_source, "duration_us": info.duration_us,
+                  "replacement":replacement_result}))
+    })
+}
+
+fn stage_replacement_asset(
+    work_copy: &Path,
+    identity: &Path,
+    source: &Path,
+    bucket: &str,
+) -> Result<std::path::PathBuf> {
+    let kind = if bucket == "audios" { "audio" } else { "video" };
+    let staged = std::path::PathBuf::from(crate::draft::copy_asset(work_copy, kind, source)?);
+    Ok(identity.join(staged.strip_prefix(work_copy).unwrap_or(&staged)))
 }
 
 fn apply_material_swap(
@@ -564,6 +670,7 @@ fn apply_material_swap(
     bucket: &str,
     new_source: &Path,
     info: &probe::MediaInfo,
+    replace_crop: bool,
 ) -> Result<()> {
     let name = new_source
         .file_name()
@@ -577,6 +684,15 @@ fn apply_material_swap(
         m["material_name"] = json!(name);
         m["type"] = json!(if info.has_video { "video" } else { "photo" });
         m["has_audio"] = json!(info.has_audio);
+        if replace_crop {
+            m["crop"] = json!({
+                "upper_left_x":0.0,"upper_left_y":0.0,
+                "upper_right_x":1.0,"upper_right_y":0.0,
+                "lower_left_x":0.0,"lower_left_y":1.0,
+                "lower_right_x":1.0,"lower_right_y":1.0
+            });
+            m["crop_ratio"] = json!("free");
+        }
     } else {
         m["name"] = json!(name);
     }
@@ -592,7 +708,6 @@ pub fn import_track_at(
     track_name: &str,
     before: Option<&str>,
 ) -> Result<Value> {
-    let mut target = load(target_draft)?;
     let source = load(source_draft)?;
     let track = source["tracks"]
         .as_array()
@@ -601,107 +716,171 @@ pub fn import_track_at(
         .find(|t| t["name"] == json!(track_name) || t["type"] == json!(track_name))
         .ok_or_else(|| anyhow::anyhow!("track {track_name} not found in source"))?
         .clone();
-    if target["tracks"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|t| t["name"] == track["name"])
-    {
-        bail!("target already has a track named {}", track["name"]);
-    }
-    let mut id_map: std::collections::BTreeMap<String, String> = Default::default();
-    let mut new_track = track.clone();
-    new_track["id"] = json!(hex_id());
-    for seg in new_track["segments"].as_array_mut().context("segments")? {
-        seg["id"] = json!(hex_id());
-        let old_mid = seg["material_id"].as_str().unwrap_or_default().to_string();
-        let new_mid = copy_material(&source, &mut target, &old_mid, source_draft, target_draft)?;
-        id_map.insert(old_mid.clone(), new_mid.clone());
-        seg["material_id"] = json!(new_mid);
-        if let Some(refs) = seg["extra_material_refs"].as_array_mut() {
-            for r in refs.iter_mut() {
-                let old = r.as_str().unwrap_or_default().to_string();
-                let mapped = if let Some(mapped) = id_map.get(&old) {
-                    mapped.clone()
-                } else {
-                    let new =
-                        copy_material(&source, &mut target, &old, source_draft, target_draft)?;
-                    id_map.insert(old, new.clone());
-                    new
-                };
-                *r = json!(mapped);
+    let source_materials = index_materials(&source)?;
+    let mut closure = std::collections::BTreeSet::new();
+    collect_known_ids(&track, &source_materials, &mut closure);
+    let mut queue = std::collections::VecDeque::from_iter(closure.iter().cloned());
+    let mut processed = std::collections::BTreeSet::new();
+    while let Some(material_id) = queue.pop_front() {
+        if !processed.insert(material_id.clone()) {
+            continue;
+        }
+        let (_, material) = source_materials
+            .get(&material_id)
+            .with_context(|| format!("material {material_id} not found in source"))?;
+        let mut discovered = std::collections::BTreeSet::new();
+        collect_known_ids(material, &source_materials, &mut discovered);
+        for discovered_id in discovered {
+            if closure.insert(discovered_id.clone()) {
+                queue.push_back(discovered_id);
             }
         }
     }
-    let tracks = target["tracks"].as_array_mut().unwrap();
-    match before {
-        Some(anchor) => {
-            let pos = tracks
-                .iter()
-                .position(|t| t["name"] == json!(anchor))
-                .ok_or_else(|| anyhow::anyhow!("track {anchor} not found in target"))?;
-            tracks.insert(pos, new_track);
-        }
-        None => tracks.push(new_track),
-    }
-    let new_dur = target["tracks"]
-        .as_array()
-        .unwrap()
+    let id_map = closure
         .iter()
-        .filter_map(|t| t["segments"].as_array().cloned())
-        .flatten()
-        .map(|s| {
-            s["target_timerange"]["start"].as_i64().unwrap_or(0)
-                + s["target_timerange"]["duration"].as_i64().unwrap_or(0)
-        })
-        .max()
-        .unwrap_or(0);
-    target["duration"] = json!(new_dur);
-    save(target_draft, &target)?;
-    Ok(json!({"status": "imported", "track": track_name,
-              "before": before,
-              "source": source_draft.to_string_lossy(),
-              "segments": track["segments"].as_array().map(|a| a.len()).unwrap_or(0)}))
+        .map(|old| (old.clone(), hex_id()))
+        .collect::<std::collections::BTreeMap<_, _>>();
+    crate::timeline_ops::mutate_with_path(target_draft, |target, work_copy, identity| {
+        if target["tracks"]
+            .as_array()
+            .context("tracks must be an array")?
+            .iter()
+            .any(|candidate| candidate["name"] == track["name"])
+        {
+            bail!("target already has a track named {}", track["name"]);
+        }
+        for old_id in &closure {
+            let (bucket, material) = source_materials
+                .get(old_id)
+                .with_context(|| format!("material {old_id} not found in source"))?;
+            let mut copy = material.clone();
+            remap_known_ids(&mut copy, &id_map)?;
+            let new_id = id_map.get(old_id).context("material remap id is missing")?;
+            copy_material_file(&mut copy, source_draft, work_copy, identity, new_id)?;
+            target["materials"][bucket]
+                .as_array_mut()
+                .with_context(|| format!("bucket {bucket} missing in target"))?
+                .push(copy);
+        }
+
+        let mut new_track = track.clone();
+        let new_track_id = hex_id();
+        new_track["id"] = json!(&new_track_id);
+        remap_known_ids(&mut new_track, &id_map)?;
+        for segment in new_track["segments"].as_array_mut().context("segments")? {
+            segment["id"] = json!(hex_id());
+            if segment.get("raw_segment_id").is_some() {
+                segment["raw_segment_id"] = json!(&new_track_id);
+            }
+        }
+        let tracks = target["tracks"]
+            .as_array_mut()
+            .context("tracks must be an array")?;
+        match before {
+            Some(anchor) => {
+                let position = tracks
+                    .iter()
+                    .position(|candidate| candidate["name"] == json!(anchor))
+                    .ok_or_else(|| anyhow::anyhow!("track {anchor} not found in target"))?;
+                tracks.insert(position, new_track);
+            }
+            None => tracks.push(new_track),
+        }
+        Ok(json!({"status": "imported", "track": track_name,
+                      "track_id":new_track_id,"before": before,
+                      "source": source_draft.to_string_lossy(),
+                      "segments": track["segments"].as_array().map(|a| a.len()).unwrap_or(0),
+                      "materials":closure.len(),"ids_remapped":id_map.len()}))
+    })
 }
 
-fn copy_material(
-    source: &Value,
-    target: &mut Value,
-    material_id: &str,
-    source_draft: &Path,
-    target_draft: &Path,
-) -> Result<String> {
-    for (bucket, items) in source["materials"].as_object().context("materials")? {
-        if let Some(arr) = items.as_array() {
-            if let Some(m) = arr.iter().find(|m| m["id"] == json!(material_id)) {
-                let new_id = hex_id();
-                let mut copy = m.clone();
-                copy["id"] = json!(new_id);
-                if copy.get("material_id").is_some() {
-                    copy["material_id"] = json!(new_id);
-                }
-                if copy.get("local_material_id").and_then(Value::as_str) == Some(material_id) {
-                    copy["local_material_id"] = json!(new_id);
-                }
-                if copy.get("music_id").and_then(Value::as_str) == Some(material_id) {
-                    copy["music_id"] = json!(new_id);
-                }
-                copy_material_file(&mut copy, source_draft, target_draft, &new_id)?;
-                target["materials"][bucket]
-                    .as_array_mut()
-                    .with_context(|| format!("bucket {bucket} missing in target"))?
-                    .push(copy);
-                return Ok(new_id);
+fn index_materials(
+    timeline: &Value,
+) -> Result<std::collections::BTreeMap<String, (String, Value)>> {
+    let mut indexed = std::collections::BTreeMap::new();
+    for (bucket, items) in timeline["materials"].as_object().context("materials")? {
+        for material in items.as_array().into_iter().flatten() {
+            let Some(id) = material["id"].as_str() else {
+                continue;
+            };
+            if indexed
+                .insert(id.to_owned(), (bucket.clone(), material.clone()))
+                .is_some()
+            {
+                bail!("duplicate source material id: {id}");
             }
         }
     }
-    bail!("material {material_id} not found in source")
+    Ok(indexed)
+}
+
+fn collect_known_ids(
+    value: &Value,
+    known: &std::collections::BTreeMap<String, (String, Value)>,
+    found: &mut std::collections::BTreeSet<String>,
+) {
+    match value {
+        Value::String(raw) => {
+            if known.contains_key(raw) {
+                found.insert(raw.clone());
+            } else if matches!(raw.trim_start().chars().next(), Some('{') | Some('[')) {
+                if let Ok(nested) = serde_json::from_str::<Value>(raw) {
+                    collect_known_ids(&nested, known, found);
+                }
+            }
+        }
+        Value::Array(items) => {
+            for item in items {
+                collect_known_ids(item, known, found);
+            }
+        }
+        Value::Object(fields) => {
+            for item in fields.values() {
+                collect_known_ids(item, known, found);
+            }
+        }
+        Value::Null | Value::Bool(_) | Value::Number(_) => {}
+    }
+}
+
+fn remap_known_ids(
+    value: &mut Value,
+    id_map: &std::collections::BTreeMap<String, String>,
+) -> Result<()> {
+    match value {
+        Value::String(raw) => {
+            if let Some(mapped) = id_map.get(raw) {
+                *raw = mapped.clone();
+            } else if matches!(raw.trim_start().chars().next(), Some('{') | Some('[')) {
+                if let Ok(mut nested) = serde_json::from_str::<Value>(raw) {
+                    let original = nested.clone();
+                    remap_known_ids(&mut nested, id_map)?;
+                    if nested != original {
+                        *raw = serde_json::to_string(&nested)?;
+                    }
+                }
+            }
+        }
+        Value::Array(items) => {
+            for item in items {
+                remap_known_ids(item, id_map)?;
+            }
+        }
+        Value::Object(fields) => {
+            for item in fields.values_mut() {
+                remap_known_ids(item, id_map)?;
+            }
+        }
+        Value::Null | Value::Bool(_) | Value::Number(_) => {}
+    }
+    Ok(())
 }
 
 fn copy_material_file(
     material: &mut Value,
     source_draft: &Path,
-    target_draft: &Path,
+    target_resource: &Path,
+    target_identity: &Path,
     new_id: &str,
 ) -> Result<()> {
     let field = if material["path"]
@@ -734,11 +913,16 @@ fn copy_material_file(
         .file_name()
         .map(|name| name.to_string_lossy().into_owned())
         .unwrap_or_else(|| "material.bin".to_owned());
-    let target_dir = target_draft.join("assets/imported");
+    let target_dir = target_resource.join("assets/imported");
     std::fs::create_dir_all(&target_dir)?;
     let target_path = target_dir.join(format!("{new_id}-{file_name}"));
     std::fs::copy(&source_path, &target_path)?;
-    material[field] = json!(target_path.to_string_lossy());
+    let stored_path = target_identity.join(
+        target_path
+            .strip_prefix(target_resource)
+            .unwrap_or(&target_path),
+    );
+    material[field] = json!(stored_path.to_string_lossy());
     Ok(())
 }
 
@@ -775,7 +959,13 @@ pub fn build_on_template(
                     if !already && !entry_id.is_empty() {
                         let mut copied = m.clone();
                         if matches!(bucket.as_str(), "videos" | "audios") {
-                            copy_material_file(&mut copied, template_dir, target_dir, entry_id)?;
+                            copy_material_file(
+                                &mut copied,
+                                template_dir,
+                                target_dir,
+                                target_dir,
+                                entry_id,
+                            )?;
                         }
                         bm.entry(bucket.to_string())
                             .or_insert_with(|| json!([]))

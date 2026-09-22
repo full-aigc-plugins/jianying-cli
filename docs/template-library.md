@@ -28,3 +28,18 @@ jianying template apply-preset ./draft ./presets/large-blue.json --json
 jianying template duplicate ./draft copy --root ./drafts --json
 jianying template import-track ./target ./source 字幕 --json
 ```
+
+文字替换默认按 UTF-16 码元比例重算既有样式区间；只有明确需要保留原始区间时才使用
+`--no-recalc-style`。素材替换可选择短素材和长素材策略：
+
+```bash
+jianying template replace-text ./draft --track 字幕 --index 0 '新文案' --json
+jianying template replace-material ./draft ./new.mp4 \
+  --track 主画面 --index 0 --source-start 1s --source-duration 3s \
+  --shrink-mode cut_tail_align \
+  --extend-mode extend_tail --extend-mode push_tail --json
+```
+
+按片段替换会创建新的素材身份，因此同一原素材被多个片段共享时不会连带修改其他片段。
+轨道导入递归复制素材引用闭包、重映射轨道/片段/素材 ID，并把本地文件纳入目标草稿；
+源草稿删除后，目标草稿仍应独立通过 `project verify`。
