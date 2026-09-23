@@ -78,6 +78,46 @@ fn segment_clip_scale(segment: &Value) -> Result<(f64, f64)> {
     Ok((x, y))
 }
 
+fn segment_canvas_blur(timeline: &Value, segment: &Value) -> Result<Option<f64>> {
+    let Some(refs) = segment.get("extra_material_refs").and_then(Value::as_array) else {
+        return Ok(None);
+    };
+    let materials = timeline["materials"]
+        .as_object()
+        .context("draft materials must be an object")?;
+    let mut blur = None;
+    for reference in refs {
+        let id = reference
+            .as_str()
+            .context("extra material ref must be a string")?;
+        let matches: Vec<&Value> = materials
+            .values()
+            .filter_map(Value::as_array)
+            .flat_map(|bucket| bucket.iter())
+            .filter(|material| material["id"].as_str() == Some(id))
+            .collect();
+        if matches.is_empty() {
+            bail!("segment has dangling material ref {id}");
+        }
+        if matches.len() != 1 {
+            bail!("segment material ref {id} is ambiguous");
+        }
+        if matches[0]["type"] == "canvas_blur" {
+            if blur.is_some() {
+                bail!("segment references more than one canvas_blur material");
+            }
+            let strength = matches[0]["blur"]
+                .as_f64()
+                .context("canvas_blur.blur must be numeric")?;
+            if !strength.is_finite() || !(0.0..=1.0).contains(&strength) {
+                bail!("canvas_blur.blur must be finite and within [0, 1]");
+            }
+            blur = Some(strength);
+        }
+    }
+    Ok(blur)
+}
+
 fn cjk_caption_font_file() -> Option<PathBuf> {
     let mut candidates = Vec::new();
     if let Some(windows_root) = std::env::var_os("WINDIR") {
@@ -130,6 +170,7 @@ pub fn render(
     let mut vparts: Vec<String> = Vec::new();
     let mut apart: Vec<String> = Vec::new();
     let mut input_idx = 0usize;
+    let mut background_blur_segments = 0usize;
 
     let tracks = tl["tracks"].as_array().unwrap();
     let main = tracks.iter().find(|t| t["type"] == "video");
@@ -166,22 +207,47 @@ pub fn render(
                 chain.push_str(&crop);
             }
             let (scale_x, scale_y) = segment_clip_scale(s)?;
-            chain.push_str(&format!(
-                ",scale={out_w}:{out_h}:force_original_aspect_ratio=decrease"
-            ));
+            let blur = segment_canvas_blur(&tl, s)?;
+            let mut foreground =
+                format!("scale={out_w}:{out_h}:force_original_aspect_ratio=decrease");
             if (scale_x - 1.0).abs() > 1e-9 || (scale_y - 1.0).abs() > 1e-9 {
                 // 先按画布等比适配，再还原剪映片段缩放；裁切超出画布的部分，
                 // 对小于画布的结果居中补边。尺寸取偶数以满足 yuv420p/x264。
-                chain.push_str(&format!(
+                foreground.push_str(&format!(
                     ",scale=ceil(iw*{scale_x:.9}/2)*2:ceil(ih*{scale_y:.9}/2)*2,crop=min(iw\\,{out_w}):min(ih\\,{out_h}):(iw-ow)/2:(ih-oh)/2"
                 ));
             }
-            chain.push_str(&format!(
-                ",pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={fps:.9},format=yuv420p"
-            ));
             // ffmpeg 输入标签必须绑定真实输入流；`[vN]` 只作为本段滤镜输出。
             // 若把 `[vN]` 同时当输入，代理渲染会绕过 trim 并输出完整源文件。
-            vparts.push(format!("[{input_idx}:v]{chain}[v{input_idx}]"));
+            if let Some(strength) = blur {
+                background_blur_segments += 1;
+                // 背景使用同一已裁切视频帧的放大副本；前景先转带 alpha 格式，
+                // 再以透明边距居中叠放，避免黑色 padding 盖住模糊背景。
+                vparts.push(format!(
+                    "[{input_idx}:v]{chain},split=2[fgsrc{input_idx}][bgsrc{input_idx}]"
+                ));
+                vparts.push(format!(
+                    "[fgsrc{input_idx}]{foreground},format=yuva420p,pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2:color=black@0,setsar=1[fg{input_idx}]"
+                ));
+                let mut background = format!(
+                    "scale={out_w}:{out_h}:force_original_aspect_ratio=increase,crop={out_w}:{out_h}:(iw-ow)/2:(ih-oh)/2"
+                );
+                if strength > 0.0 {
+                    // 剪映私有模糊核并未公开；代理强度仅为可见预览近似。
+                    background.push_str(&format!(",gblur=sigma={:.3}", 0.5 + strength * 32.0));
+                }
+                vparts.push(format!(
+                    "[bgsrc{input_idx}]{background},setsar=1,format=yuv420p[bg{input_idx}]"
+                ));
+                vparts.push(format!(
+                    "[bg{input_idx}][fg{input_idx}]overlay=0:0:shortest=1:format=auto,setsar=1,fps={fps:.9},format=yuv420p[v{input_idx}]"
+                ));
+            } else {
+                chain.push_str(&format!(
+                    ",{foreground},pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={fps:.9},format=yuv420p"
+                ));
+                vparts.push(format!("[{input_idx}:v]{chain}[v{input_idx}]"));
+            }
             input_idx += 1;
         }
     }
@@ -359,8 +425,9 @@ pub fn render(
         "status": "rendered",
         "output": out.to_string_lossy(),
         "preview": true,
-        "note": "proxy render only — 转场/特效/蒙版不在此渲染；权威出口是剪映内导出",
+        "note": "proxy render only — 背景模糊是预览近似，转场/特效/蒙版不在此渲染；权威出口是剪映内导出",
         "video_tracks_flattened": input_idx,
+        "background_blur_segments": background_blur_segments,
         "target_fps": fps,
         "audio_segments_mixed": if has_audio { aidx - input_idx } else { 0 },
         "captions_burned": if burn_captions { drawtext.len() } else { 0 },
