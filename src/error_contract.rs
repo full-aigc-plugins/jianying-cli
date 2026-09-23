@@ -103,6 +103,10 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
             vec![
                 "refresh entitlement evidence or select a resource with matching rights".to_owned(),
             ]
+        } else if error_type == "control_profile_mismatch" {
+            vec!["this editor build is not covered by the version-bound control catalog; recapture and verify the controls for this exact build, publish a compatible CLI, then run `jianying runtime probe`".to_owned()]
+        } else if error_type == "control_unavailable" {
+            vec!["this control has no verified state readback; use a supported draft-protocol command when it has the same semantics, otherwise keep the action blocked until a version-bound adapter is verified".to_owned()]
         } else {
             vec!["run `jianying runtime probe` with the exact profile and executable".to_owned()]
         };

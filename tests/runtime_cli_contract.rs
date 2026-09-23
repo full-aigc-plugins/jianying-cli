@@ -321,6 +321,10 @@ fn runtime_control_mutations_fail_closed_with_version_bound_structured_errors() 
     assert_eq!(mismatch["error"]["type"], "control_profile_mismatch");
     assert_eq!(mismatch["error"]["details"]["field"], "version");
     assert_eq!(mismatch["error"]["details"]["expected"], "11.5.13243");
+    assert!(mismatch["error"]["recovery"][0]
+        .as_str()
+        .unwrap()
+        .contains("version-bound control catalog"));
 
     let unavailable = run(&[
         "--json",
@@ -346,6 +350,10 @@ fn runtime_control_mutations_fail_closed_with_version_bound_structured_errors() 
         .as_str()
         .unwrap()
         .contains("undo_depth readback is not implemented"));
+    assert!(unavailable["error"]["recovery"][0]
+        .as_str()
+        .unwrap()
+        .contains("verified state readback"));
 
     let wrong_operation = run(&[
         "--json",

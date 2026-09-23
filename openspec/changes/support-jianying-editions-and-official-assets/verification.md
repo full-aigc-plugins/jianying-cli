@@ -1,5 +1,13 @@
 # 验证记录
 
+## 2026-09-23：当前安装版本与发布控件目录漂移
+
+- 不触碰 GUI 的发布二进制 `jianying 1.6.30` 从不可变 Release `v1.6.30` 的 macOS arm64 资产取得，归档 SHA-256 为 `e56505aa0d250d36bed1810180ce0795c2b1b50c6460acd3cf01254bd8304b1c`。
+- `runtime discover` 观察到 `/Applications/VideoFusion-macOS.app` 为 `com.lemon.lvpro`，当前版本 `11.5.13245`，build `11.6.0-beta3`；`Info.plist` 独立回读一致。账号专业权益未由应用名称推断。
+- 同一发布二进制的 `runtime controls list/surfaces` 仍绑定 `11.5.13243 / 11.6.0-beta2`，51 个控件登记为 15 supported、30 partial、6 unresolved；7 个可展开父入口中 0 个完成递归枚举。以上 `supported` 只对目录绑定版本成立，不代表当前安装可操作。
+- 对 `timeline.session.snap` 的版本绑定 `set` 请求在任何动作前返回 `control_profile_mismatch`，expected `11.5.13243`、observed `11.5.13245`。此前恢复提示只建议 `runtime probe`，无法修复控件目录漂移；新增失败优先测试并改为要求重采集、验证、发布精确版本目录。相同目录版本下缺状态回读时，`control_unavailable` 改为建议保持阻断或使用语义相同的已支持草稿命令，不暗示 `probe` 可实现回读。
+- 当前只完成结构化失败恢复合同，不提升控件状态。任务 2.12、真实官方资源及编辑器验收继续未勾选，且未启动/激活剪映或占用用户屏幕。
+
 ## 2026-09-22：插件 GUI Adapter、只读版型观察与 Harness 路由
 
 实现位于独立插件仓库 `jianying-edit-plugin` 的 OpenSpec 变更

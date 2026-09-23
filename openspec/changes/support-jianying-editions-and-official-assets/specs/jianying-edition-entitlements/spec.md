@@ -113,6 +113,14 @@ GUI Adapter MAY 搜索、预览和下载用户账号可访问的官方素材，�
 - **WHEN** 当前编辑器版本无法将按钮映射到已验证的语义 ID
 - **THEN** 系统记录未知控件并停止自动执行，不复用旧坐标或按图标外观猜测
 
+#### Scenario: Installed editor is newer than the control catalogue
+- **WHEN** 已发布 CLI 的控件目录绑定旧编辑器版本，而当前安装的版本或 build 不同
+- **THEN** 版本绑定的控制请求返回 `control_profile_mismatch`，说明必须重采集并验证当前版本的控件目录；单独重跑 `runtime probe` 不得被描述为可修复目录漂移
+
+#### Scenario: Session control lacks verified readback
+- **WHEN** 目录版本匹配，但会话控件尚未实现状态回读
+- **THEN** 返回 `control_unavailable` 并维持阻断；只有语义相同且已支持的草稿协议命令可作为替代，不得退回坐标点击或盲重试
+
 #### Scenario: The same semantic control appears more than once
 - **WHEN** 锁定、显示、页签切换或波形选项等语义在不同轨道或不同入口重复出现
 - **THEN** 系统在界面表面清单中逐实例登记，并全部引用受校验的语义控制；不得因为语义相同而漏掉可操作入口
