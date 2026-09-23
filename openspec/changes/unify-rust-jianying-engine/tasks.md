@@ -95,8 +95,7 @@
 - [x] 6.36 补齐 capcut-cli `diagnose` 的 canonical/layout/version、标准候选、字节/时间线哈希、镜像分歧、编辑器状态、人类输出和脱敏 bundle，并建立固定提交差分
 - [x] 6.37 补齐 capcut-cli `fixture` 的时间线-only bundle、路径/邮件/设备标识脱敏、嵌套 Timelines、mask-keyframe 证据、媒体排除和独立泄漏复检，并建立固定提交差分
 - [x] 6.38 补齐 capcut-cli `compile` 的声明式轨道、refs、九类操作、全量预检、JSONL 批量和 `jianying-job/v2` 兼容载荷，并建立固定提交差分
-- [ ] 6.39 以真实素材触发的 25→30 fps 代理偏差为 RED，修复 `render proxy` 对草稿帧率的忠实输出；用 Job v2、ffprobe 和发布二进制回归 25/30 fps、无效帧率失败关闭及代理证据身份。
-- [ ] 7.9 修复 Windows 三平台发布时 8 写入者 SQLite WAL 竞争超过 5 秒的失败；保持 revision CAS、有限等待和 256 任务无丢失回归，并用 Windows CI 复验。
+- [x] 6.39 以真实素材触发的 25→30 fps 代理偏差为 RED，修复 `render proxy` 对草稿帧率的忠实输出；用 Job v2、ffprobe 和发布二进制回归 25/30 fps、无效帧率失败关闭及代理证据身份。
 - [x] 6.11 逐项消除命令矩阵剩余 `partial`：实现完整可观察语义、固定提交黑盒差分和逐命令证据；不得以已有计划路径或结构测试冒充完成
 
 ## 7. 写事务、任务、审批与配置
@@ -109,6 +108,7 @@
 - [x] 7.6 实现 profile 隔离以及 config schema/validate/get/set/patch/unset 和宿主只读模式
 - [x] 7.7 实现 stdio MCP server 与工具目录，并验证它与 CLI 调用共享相同 handler 和错误语义
 - [x] 7.8 使用官方 Rust SDK 增加 Streamable HTTP 与 SSE 响应模式，并验证远程监听的 token、Host、Origin 和 fail-closed 门禁
+- [x] 7.9 修复 Windows 三平台发布时 8 写入者 SQLite WAL 竞争超过 5 秒的失败；保持 revision CAS、有限等待和 256 任务无丢失回归，并用 Windows CI 复验。
 
 ## 8. 自主 headless 对标能力
 

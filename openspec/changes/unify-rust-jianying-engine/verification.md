@@ -74,4 +74,6 @@ Task 4.11 is complete. Task 4.12 remains open; the four partial pyJianYingDraft 
 Windows 2025 的 256 任务/8 写入者 SQLite WAL 回归在 5 秒等待后返回
 `database is locked`，publish 被跳过。候选将有限 busy timeout 提高到 30 秒，
 保持 CAS 与 256 任务测试不变；本地全量工作区测试、Clippy 和严格 OpenSpec
-通过，Windows CI 及不可变 `v1.6.28` 发布制品仍待复验。
+通过。发布流水线 `35819162956` 的 source-parity、macOS arm64/x64、Windows 2025 与 publish 均成功；Windows 日志明确记录 `sqlite_rejects_lost_updates_for_one_task` 和 `json_and_sqlite_preserve_parallel_volume_without_record_loss` 均为 `ok`。后者保持 8 写入者/256 任务及无丢失断言。正式 `v1.6.28` Release 为非草稿、非预发布且 `isImmutable=true`，10 个资产齐全，`gh release verify` 与下载的 release index、darwin-arm64 归档 `verify-asset` 均通过。注释 tag 解引用至提交 `6e491133c9e8deec07373b66232f76f2f2bbb14b`，与发布源提交一致。
+
+下载的正式 macOS arm64 二进制报告 `jianying 1.6.28`。它对真实旅行素材的 revision 2 草稿渲染 13 秒代理，JSON `target_fps=25`，独立 ffprobe 回读 `r_frame_rate=avg_frame_rate=25/1`、时长 `13.000000` 秒；只在隔离副本中把草稿 fps 改为 30 后，发布二进制输出 `30/1`；改为 0 后返回结构化失败 `proxy draft fps must be a finite number in [1, 240]`，目标文件未创建。下载索引 SHA-256 为 `9f03c770d936f35707e0f14a79889e79f6cbaabdb89f7be1da2d7829e7b76cd6`，归档 SHA-256 为 `0e9904a946ee7b1998e9e8fe7b83b8f3a2c25227b155cd618e6d68c4505e364b`。这完成 6.39、7.9 的发布制品回归，不等于真实剪映原生导出或人工视频质量验收。
