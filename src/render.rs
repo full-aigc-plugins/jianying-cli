@@ -59,6 +59,25 @@ fn material_crop_filter(material: &Value) -> Result<Option<String>> {
     )))
 }
 
+fn segment_clip_scale(segment: &Value) -> Result<(f64, f64)> {
+    let Some(scale) = segment.pointer("/clip/scale") else {
+        return Ok((1.0, 1.0));
+    };
+    let x = scale["x"]
+        .as_f64()
+        .context("clip.scale.x must be numeric")?;
+    let y = scale["y"]
+        .as_f64()
+        .context("clip.scale.y must be numeric")?;
+    if [x, y]
+        .iter()
+        .any(|value| !value.is_finite() || !(0.01..=10.0).contains(value))
+    {
+        bail!("clip scale must be finite and within [0.01, 10]");
+    }
+    Ok((x, y))
+}
+
 fn cjk_caption_font_file() -> Option<PathBuf> {
     let mut candidates = Vec::new();
     if let Some(windows_root) = std::env::var_os("WINDIR") {
@@ -146,8 +165,19 @@ pub fn render(
                 chain.push(',');
                 chain.push_str(&crop);
             }
+            let (scale_x, scale_y) = segment_clip_scale(s)?;
             chain.push_str(&format!(
-                ",scale={out_w}:{out_h}:force_original_aspect_ratio=decrease,pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={fps:.9},format=yuv420p"
+                ",scale={out_w}:{out_h}:force_original_aspect_ratio=decrease"
+            ));
+            if (scale_x - 1.0).abs() > 1e-9 || (scale_y - 1.0).abs() > 1e-9 {
+                // 先按画布等比适配，再还原剪映片段缩放；裁切超出画布的部分，
+                // 对小于画布的结果居中补边。尺寸取偶数以满足 yuv420p/x264。
+                chain.push_str(&format!(
+                    ",scale=ceil(iw*{scale_x:.9}/2)*2:ceil(ih*{scale_y:.9}/2)*2,crop=min(iw\\,{out_w}):min(ih\\,{out_h}):(iw-ow)/2:(ih-oh)/2"
+                ));
+            }
+            chain.push_str(&format!(
+                ",pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={fps:.9},format=yuv420p"
             ));
             // ffmpeg 输入标签必须绑定真实输入流；`[vN]` 只作为本段滤镜输出。
             // 若把 `[vN]` 同时当输入，代理渲染会绕过 trim 并输出完整源文件。
