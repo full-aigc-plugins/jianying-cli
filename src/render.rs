@@ -100,6 +100,10 @@ pub fn render(
         crate::probe::ffmpeg_path().ok_or_else(|| anyhow::anyhow!("ffmpeg not found on PATH"))?;
     let width = tl["canvas_config"]["width"].as_u64().unwrap_or(1920);
     let height = tl["canvas_config"]["height"].as_u64().unwrap_or(1080);
+    let fps = tl["fps"]
+        .as_f64()
+        .filter(|fps| fps.is_finite() && (1.0..=240.0).contains(fps))
+        .context("proxy draft fps must be a finite number in [1, 240]")?;
     let out_w = ((width as f64 * scale).round() as i64) & !1;
     let out_h = ((height as f64 * scale).round() as i64) & !1;
 
@@ -143,7 +147,7 @@ pub fn render(
                 chain.push_str(&crop);
             }
             chain.push_str(&format!(
-                ",scale={out_w}:{out_h}:force_original_aspect_ratio=decrease,pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30,format=yuv420p"
+                ",scale={out_w}:{out_h}:force_original_aspect_ratio=decrease,pad={out_w}:{out_h}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={fps:.9},format=yuv420p"
             ));
             // ffmpeg 输入标签必须绑定真实输入流；`[vN]` 只作为本段滤镜输出。
             // 若把 `[vN]` 同时当输入，代理渲染会绕过 trim 并输出完整源文件。
@@ -327,6 +331,7 @@ pub fn render(
         "preview": true,
         "note": "proxy render only — 转场/特效/蒙版不在此渲染；权威出口是剪映内导出",
         "video_tracks_flattened": input_idx,
+        "target_fps": fps,
         "audio_segments_mixed": if has_audio { aidx - input_idx } else { 0 },
         "captions_burned": if burn_captions { drawtext.len() } else { 0 },
         "caption_font_file": caption_font,

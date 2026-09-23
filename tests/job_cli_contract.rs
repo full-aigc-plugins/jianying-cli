@@ -363,7 +363,7 @@ fn job_source_range_controls_proxy_duration() {
             "schema":"jianying-job/v2","operation":"create",
             "project":{"type":"new","project":{
                 "name":"trimmed-proxy","width":320,"height":240,
-                "frame_rate":{"numerator":30,"denominator":1},
+                "frame_rate":{"numerator":25,"denominator":1},
                 "materials":[{"type":"video","id":"m1","path":media}],
                 "timeline":{"tracks":[{"id":"v1","kind":"video","segments":[{
                     "type":"video","id":"s1","range":{"start_us":0,"duration_us":2_000_000},
@@ -427,6 +427,70 @@ fn job_source_range_controls_proxy_duration() {
         (1.9..=2.1).contains(&duration),
         "proxy duration {duration} ignored the Job source range"
     );
+    let frame_rate = Command::new("ffprobe")
+        .args([
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=r_frame_rate",
+            "-of",
+            "default=nw=1:nk=1",
+        ])
+        .arg(&preview)
+        .output()
+        .expect("ffprobe must accompany ffmpeg in this integration test");
+    assert!(frame_rate.status.success());
+    assert_eq!(String::from_utf8(frame_rate.stdout).unwrap().trim(), "25/1");
+
+    let mut timeline = jianying_cli::draft::load_timeline(&draft).unwrap();
+    timeline["fps"] = json!(30.0);
+    jianying_cli::template::save_timeline(&draft, &timeline).unwrap();
+    let preview_30 = root.join("preview-30.mp4");
+    let render_30 = run(&[
+        "render",
+        "proxy",
+        draft.to_str().unwrap(),
+        "--out",
+        preview_30.to_str().unwrap(),
+        "--json",
+    ]);
+    assert!(render_30.status.success());
+    let frame_rate_30 = Command::new("ffprobe")
+        .args([
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=r_frame_rate",
+            "-of",
+            "default=nw=1:nk=1",
+        ])
+        .arg(&preview_30)
+        .output()
+        .unwrap();
+    assert!(frame_rate_30.status.success());
+    assert_eq!(
+        String::from_utf8(frame_rate_30.stdout).unwrap().trim(),
+        "30/1"
+    );
+
+    timeline["fps"] = json!(0.0);
+    jianying_cli::template::save_timeline(&draft, &timeline).unwrap();
+    let invalid_output = root.join("must-not-render.mp4");
+    let invalid = run(&[
+        "render",
+        "proxy",
+        draft.to_str().unwrap(),
+        "--out",
+        invalid_output.to_str().unwrap(),
+        "--json",
+    ]);
+    assert_eq!(invalid.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&invalid.stdout).contains("proxy draft fps"));
+    assert!(!invalid_output.exists());
     let _ = std::fs::remove_dir_all(root);
 }
 

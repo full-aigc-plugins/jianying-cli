@@ -128,7 +128,9 @@ impl SqliteJobStore {
             .map_err(|_| JobError::Sqlite("database initialization lock poisoned".to_owned()))?;
         let connection = Connection::open(&self.path).map_err(JobError::sqlite)?;
         connection
-            .busy_timeout(Duration::from_secs(5))
+            // Windows runner 与杀毒扫描下 8 个并发写入者可能排队超过 5 秒；
+            // SQLite 自身有界等待，不能把可恢复锁竞争误判为任务失败。
+            .busy_timeout(Duration::from_secs(30))
             .map_err(JobError::sqlite)?;
         if !initialized.contains(&self.path) {
             // WAL 切换需要数据库级锁；同一进程内只在首次连接时串行执行，避免并发首写互锁。

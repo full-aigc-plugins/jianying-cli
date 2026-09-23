@@ -57,3 +57,21 @@ Task 4.10 is complete. Tasks 4.11 and 4.12 remain open; replacement/import refer
 - Strict OpenSpec validation and the provenance gate with negative self-tests passed. Release-mode fixed-source draft parity remained 55/55 and byte-identical to `provenance/PARITY_RUN.json`, SHA-256 `bc8c2a95e4c582274f35fd5e6f5e97635252f2e81264a1042603e0b2e56ef430`.
 
 Task 4.11 is complete. Task 4.12 remains open; the four partial pyJianYingDraft rows are not promoted without the required real-editor evidence.
+# 2026-09-23：真实 Vlog 素材揭示代理帧率偏差与 Windows 锁竞争
+
+三个已记录来源和 SHA-256 的 Pexels 旅行素材在独立验收目录中组成两轮
+`jianying-job/v2`：六秒开场的 revision 1 为 16 秒，三秒开场的 revision 2 为
+13 秒。不可变 CLI `v1.6.26` 均生成三片段、无结构问题的草稿和可解码代理，
+但两份草稿声明 25 fps，发布代理却是 30 fps。故不能把旧代理作为帧率忠实的质量证据。
+
+回归测试先以 `left: 30/1, right: 25/1` RED，再使 `render proxy` 从草稿读取并
+校验 1–240 fps 的有限帧率，写入 FFmpeg 滤镜；25 和 30 fps 均由 ffprobe 独立
+回读，0 fps 在输出文件创建前失败。对上述真实素材用本地 `v1.6.28` 候选重新
+生成的两个代理，发布模式 CLI 独立探测为 25 fps，时长分别 16、13 秒。
+这仍是代理证据，不是剪映冷重开、连续播放、原生导出或人工叙事验收。
+
+`v1.6.27` tag 的发布流水线 `35788716642` 未发布：macOS arm64/x64 通过，
+Windows 2025 的 256 任务/8 写入者 SQLite WAL 回归在 5 秒等待后返回
+`database is locked`，publish 被跳过。候选将有限 busy timeout 提高到 30 秒，
+保持 CAS 与 256 任务测试不变；本地全量工作区测试、Clippy 和严格 OpenSpec
+通过，Windows CI 及不可变 `v1.6.28` 发布制品仍待复验。
