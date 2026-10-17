@@ -82,11 +82,20 @@ def parse_member(meta_kind, argstr):
 
 MEMBER_RE = re.compile(r'^\s+\S+\s*=\s*(\w+Meta)\((.*)$', re.M)
 
+def write_lf(path: Path, text: str) -> None:
+    """以固定 LF 写盘。
+
+    catalog 的 sha256 取自落盘字节，必须跨平台稳定；若沿用 Python 默认的
+    os.linesep 转换，Windows 上会写出 CRLF 并让全部摘要漂移。
+    """
+    with open(path, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(text)
+
 def convert(meta_dir: Path, out_dir: Path, source_ref: str):
     index = {}
     for domain, (fname, meta_kind) in DOMAINS.items():
         src = meta_dir / fname
-        text = src.read_text()
+        text = src.read_text(encoding="utf-8")
         matches = list(MEMBER_RE.finditer(text))
         entries = []
         for idx, m in enumerate(matches):
@@ -112,14 +121,15 @@ def convert(meta_dir: Path, out_dir: Path, source_ref: str):
             except Exception as exc:
                 print(f"WARN {domain}: skip member: {exc}", file=sys.stderr)
         out = out_dir / f"{domain}.json"
-        out.write_text(json.dumps(entries, ensure_ascii=False, indent=1) + "\n")
+        write_lf(out, json.dumps(entries, ensure_ascii=False, indent=1) + "\n")
         vip = sum(1 for e in entries if e.get("vip"))
         index[domain] = {"count": len(entries), "vip": vip,
                          "sha256": hashlib.sha256(out.read_bytes()).hexdigest()}
         print(f"{domain}: {len(entries)} entries ({vip} vip)")
     index_meta = {"source": "GuanYixuan/pyJianYingDraft (Apache-2.0)",
                   "source_ref": source_ref, "catalogs": index}
-    (out_dir / "index.json").write_text(json.dumps(index_meta, ensure_ascii=False, indent=1) + "\n")
+    write_lf(out_dir / "index.json",
+             json.dumps(index_meta, ensure_ascii=False, indent=1) + "\n")
 
 def main():
     import argparse
@@ -143,7 +153,7 @@ def main():
                 committed = repo / f.name
                 if not committed.is_file():
                     drift.append(f"+ {f.name} (missing in repo)")
-                elif committed.read_text() != f.read_text():
+                elif committed.read_bytes() != f.read_bytes():
                     drift.append(f"~ {f.name} (content differs)")
             for f in sorted(repo.glob("*.json")):
                 if not (tmp / f.name).is_file():

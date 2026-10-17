@@ -13,6 +13,21 @@ jianying store rename old-name new-name --root ./draft-store --json
 `register` 是 `publish` 的兼容命令名：验证输入草稿、复制到草稿库、重定位素材并写入
 `root_meta_info.json`。重命名保留 draft id，并同步时间线名称、sidecar 路径和根登记项。
 
+## 宿主编辑器守卫
+
+写操作在剪映/CapCut 运行时 fail closed。守卫读取宿主进程清单；测试可用
+`JIANYING_CLI_PROCESS_LIST` 指向一个清单文件来替换**清单来源**（不改变“发现编辑器即拒绝”
+的判定语义），生产路径不应设置该变量。Windows 的 `tasklist` 固定位于 System32 且优先于
+PATH，因此不能像 unix 那样用 PATH 替身隔离。
+
+在剪映运行中的开发机上跑写操作测试时，把该变量指向一个只含表头的空清单即可模拟“无宿主”：
+
+```bash
+JIANYING_CLI_PROCESS_LIST=/tmp/no-editor.txt cargo test --workspace
+```
+
+CI 在 macOS 上不运行剪映，因此不需要该变量。
+
 ## 时间线镜像
 
 `draft_content.json` 是同步命令的显式 canonical。默认只输出计划；`--apply` 仅覆盖发生

@@ -1,5 +1,9 @@
+// 本文件全部用例依赖 POSIX shell 替身，非 unix 平台上整体为空；
+// 辅助函数与导入同样按平台门控，否则 Windows 的 -D warnings 会判为死代码。
+#[cfg(unix)]
 use std::process::{Command, Output};
 
+#[cfg(unix)]
 fn run(args: &[&str]) -> Output {
     Command::new(env!("CARGO_BIN_EXE_jianying"))
         .args(args)

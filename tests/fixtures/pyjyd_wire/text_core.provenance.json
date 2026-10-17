@@ -5,5 +5,8 @@
   "input": "tests/parity/scenarios/17-text-styles.json#plan",
   "generator": "tools/parity_reference.py",
   "normalization": "drop volatile identifiers, timestamps, paths, material references and text source_timerange; retain canvas, timeline duration/fps, track identity and segment placement/transform fields",
-  "generated_at": "2026-09-19"
+  "generated_at": "2026-09-19",
+  "reverified_commit": "6bb2d06a713f7b58e1375269daec835a03882086",
+  "reverified_at": "2026-10-18",
+  "reverification": "Generated at the recorded commit and kept byte-identical. At reverified_commit the text wire is unchanged: scenario 17-text-styles passes in provenance/PARITY_RUN.json (55/55) and tests/wire_model_differential.rs still matches the Rust normalisation. No generator for the normalised bytes is shipped, so this fixture is frozen rather than regenerated."
 }

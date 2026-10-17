@@ -128,9 +128,12 @@ fn seed_from_donor(root: &Path, content: &mut Value) -> Option<String> {
 
 fn base_segment(material_id: &str, seg: &Segment, render_index: i64) -> Value {
     let speed = seg.speed.unwrap_or(1.0);
+    // pyJianYingDraft 用 Python 的 round()，即银行家舍入（ties-to-even）。
+    // 例如 5µs × 0.5 = 2.5 在参考实现里是 2，Rust 的 f64::round() 会给 3；
+    // 这 1µs 会直接进入 source_timerange，属于 wire 级差异。
     let src_duration = seg
         .source_duration_us
-        .unwrap_or((seg.duration_us as f64 * speed).round() as i64);
+        .unwrap_or((seg.duration_us as f64 * speed).round_ties_even() as i64);
     json!({
         "id": hex_id(),
         "material_id": material_id,
@@ -1411,4 +1414,43 @@ pub fn inspect(draft_dir: &Path) -> Result<Value> {
         "canvas": tl["canvas_config"], "fps": tl["fps"],
         "platform": tl["platform"], "tracks": tracks,
     }))
+}
+
+#[cfg(test)]
+mod rounding_tests {
+    use super::base_segment;
+    use crate::plan::Segment;
+    use serde_json::json;
+
+    /// pyJianYingDraft 用 Python 的 round()（ties-to-even）；Rust 的
+    /// f64::round() 在 .5 上向远离零取整，二者会在 source_timerange 上
+    /// 相差 1µs，属于 wire 级偏差。
+    #[test]
+    fn source_duration_rounds_half_to_even_like_the_reference() {
+        let half_even = Segment {
+            duration_us: 5,
+            speed: Some(0.5),
+            ..Default::default()
+        };
+        let built = base_segment("material-under-test", &half_even, 0);
+        // 5 × 0.5 = 2.5 → 2（ties-to-even），而不是 f64::round() 的 3。
+        assert_eq!(built["source_timerange"]["duration"], json!(2));
+
+        let other_tie = Segment {
+            duration_us: 3,
+            speed: Some(0.5),
+            ..Default::default()
+        };
+        let built = base_segment("material-under-test", &other_tie, 0);
+        // 3 × 0.5 = 1.5 → 2（ties-to-even 向偶数），也不是截断的 1。
+        assert_eq!(built["source_timerange"]["duration"], json!(2));
+
+        let plain = Segment {
+            duration_us: 10,
+            speed: Some(2.0),
+            ..Default::default()
+        };
+        let built = base_segment("material-under-test", &plain, 0);
+        assert_eq!(built["source_timerange"]["duration"], json!(20));
+    }
 }

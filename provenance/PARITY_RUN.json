@@ -2,7 +2,7 @@
   "schema": "jianying-python-rust-parity-run/v1",
   "python_source": {
     "project": "GuanYixuan/pyJianYingDraft",
-    "commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086",
     "media_probe": "tools/pymediainfo.py ffprobe compatibility adapter"
   },
   "rust_binary": "target/release/jianying",

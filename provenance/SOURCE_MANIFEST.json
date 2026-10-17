@@ -9,8 +9,8 @@
     {
       "id": "pyjianyingdraft",
       "repository": "https://github.com/GuanYixuan/pyJianYingDraft",
-      "commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
-      "tree": "95f3b5549730eaee9f779afa845145f9ffcf1ec4",
+      "commit": "6bb2d06a713f7b58e1375269daec835a03882086",
+      "tree": "64c0ac1219e358d4cdac2716e54254070e972367",
       "declared_license": "Apache-2.0",
       "license_sha256": "308aaff89f5e69a7d715885bc8cc5f0001bfed9db7e5c056496be559c6e27455",
       "usage_mode": ["copied_assets", "generated_metadata", "wire_differential_reference"],
@@ -53,7 +53,7 @@
       "id": "pyjyd-catalogs",
       "pattern": "catalogs/*.json",
       "file_count": 17,
-      "tree_sha256": "d35a6f283ac8004b266819aa8e01102812e00edab919a52e70cf78fb1e3f38d4",
+      "tree_sha256": "491edcfa9a2a12546414855f691527490b686b21803da0e6e4ee2a5b0216742d",
       "source": "pyjianyingdraft",
       "usage_mode": "generated_metadata"
     },
@@ -69,7 +69,7 @@
       "id": "pyjyd-frozen-wire-reference",
       "pattern": "tests/fixtures/pyjyd_wire/*.json",
       "file_count": 2,
-      "tree_sha256": "1424a0b166c815cbd935e03777dde4c5fbc84ea806774f2d0b8bdc3712a1e9a7",
+      "tree_sha256": "3bc69229cfebe771e276d14e68b20e22be06af3690c7683700fe9e730b0839c8",
       "source": "pyjianyingdraft",
       "usage_mode": "normalized_wire_differential_reference"
     },

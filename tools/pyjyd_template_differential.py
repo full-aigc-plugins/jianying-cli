@@ -23,6 +23,13 @@ def segment(segment_id: str, start: int, duration: int) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pyjyd-src", type=Path, required=True)
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="write the report here as UTF-8 with LF instead of stdout "
+             "(shell redirection on Windows would emit UTF-16)",
+    )
     args = parser.parse_args()
     source = args.pyjyd_src.resolve()
     sys.path.insert(0, str(source.parent))
@@ -147,8 +154,13 @@ def main() -> int:
             "Rust applies proportional style ranges to UTF-16 code units so emoji offsets remain valid; upstream Python uses Unicode code-point length."
         ],
     }
-    json.dump(report, sys.stdout, ensure_ascii=False, indent=2)
-    sys.stdout.write("\n")
+    payload = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
+    if args.out is not None:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        with open(args.out, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(payload)
+    else:
+        sys.stdout.write(payload)
     return 0
 
 

@@ -105,7 +105,11 @@ fn job_create_with_relative_output_registers_assets_against_the_final_draft() {
         serde_json::from_slice(&std::fs::read(draft.join("draft_content.json")).unwrap()).unwrap();
     let registered = Path::new(timeline["materials"]["videos"][0]["path"].as_str().unwrap());
     assert!(registered.is_absolute());
-    assert!(registered.starts_with(draft.canonicalize().unwrap()));
+    // Windows 的 canonicalize 会加上 \\?\ 前缀，两侧都规范化后才能比较前缀。
+    assert!(registered
+        .canonicalize()
+        .expect("registered material must resolve")
+        .starts_with(draft.canonicalize().unwrap()));
     assert!(registered.is_file());
 }
 
@@ -1095,12 +1099,17 @@ fn job_edit_adds_a_fully_typed_segment_and_executes_track_operations() {
         .find(|material| material["id"] == material_id)
         .unwrap();
     assert_eq!(material["crop"]["upper_left_x"], 0.1);
-    assert!(Path::new(material["path"].as_str().unwrap()).starts_with(
-        output
-            .canonicalize()
-            .expect("edited output must have a canonical identity")
-    ));
-    assert!(Path::new(material["path"].as_str().unwrap()).is_file());
+    let material_path = Path::new(material["path"].as_str().unwrap());
+    // 同上：Windows 上 canonicalize 带 \\?\ 前缀，必须两侧同时规范化。
+    assert!(material_path
+        .canonicalize()
+        .expect("material must resolve")
+        .starts_with(
+            output
+                .canonicalize()
+                .expect("edited output must have a canonical identity")
+        ));
+    assert!(material_path.is_file());
     for bucket in [
         "masks",
         "chromas",

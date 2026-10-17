@@ -1,10 +1,15 @@
-//! pyJianYingDraft-compatible flexible time parsing (`tim()`).
+//! Flexible time parsing for `*_us` plan fields (a superset of pyJianYingDraft's `tim()`).
 //!
-//! Plan fields ending in `_us` may be given as integers (microseconds) or as
-//! strings using the same grammar pyJianYingDraft accepts: "1h52m3s",
-//! "0.5s", "500ms", "1500us", compound forms, and SRT timestamps
-//! ("00:01:02,500"). Preprocessing converts strings to integer microseconds
-//! before deserialization.
+//! pyJianYingDraft's own `tim()` only understands the `h`/`m`/`s` components and
+//! rounds the accumulated total once; it does not accept `ms`/`us` or SRT
+//! timestamps inside `tim()`. This parser additionally accepts `ms`, `us` and
+//! SRT forms because the dual-source reference builder
+//! (`tools/parity_reference.py`) uses that wider grammar. Everything the
+//! reference grammar accepts parses here too; the reverse widening is a
+//! deliberate CLI convenience, not a parity promise.
+//!
+//! Preprocessing converts strings to integer microseconds before
+//! deserialization.
 
 use anyhow::{bail, Result};
 use serde_json::Value;

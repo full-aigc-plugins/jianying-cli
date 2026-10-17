@@ -1,11 +1,41 @@
-use std::process::Command;
+use std::process::{Command, Output};
+
+/// 依次尝试常见解释器，返回第一个真正执行成功的结果。
+///
+/// CI 上只有 `python3`；Windows 上 `python3` 可能是 Microsoft Store 占位别名
+/// （存在但一执行就失败，退出码 9009），而 `python` 往往是 `.cmd` 包装，
+/// Rust 的 `Command` 无法直接执行。因此这里优先接受 `PYTHON` 环境变量，
+/// 再按真实退出码逐个尝试，全部失败时返回最后一次输出供断言打印诊断。
+fn run_python(args: &[&str]) -> Output {
+    let mut candidates: Vec<String> = Vec::new();
+    if let Ok(explicit) = std::env::var("PYTHON") {
+        if !explicit.trim().is_empty() {
+            candidates.push(explicit);
+        }
+    }
+    for name in ["python3", "python", "py"] {
+        candidates.push(name.to_string());
+    }
+
+    let mut last: Option<Output> = None;
+    for candidate in candidates {
+        match Command::new(&candidate).args(args).output() {
+            Ok(output) if output.status.success() => return output,
+            Ok(output) => last = Some(output),
+            Err(_) => continue,
+        }
+    }
+    last.unwrap_or_else(|| {
+        Command::new("python3")
+            .args(args)
+            .output()
+            .expect("a python interpreter must be available")
+    })
+}
 
 #[test]
 fn repository_provenance_gate_accepts_the_checked_in_baseline() {
-    let output = Command::new("python3")
-        .args(["tools/check_provenance.py", "--root", "."])
-        .output()
-        .expect("python3 must be available for the provenance gate");
+    let output = run_python(&["tools/check_provenance.py", "--root", "."]);
     assert!(
         output.status.success(),
         "provenance gate failed:\nstdout:\n{}\nstderr:\n{}",
@@ -16,15 +46,12 @@ fn repository_provenance_gate_accepts_the_checked_in_baseline() {
 
 #[test]
 fn repository_provenance_gate_rejects_unknown_and_restricted_fixture_origins() {
-    let output = Command::new("python3")
-        .args([
-            "tools/check_provenance.py",
-            "--root",
-            ".",
-            "--self-test-negative-cases",
-        ])
-        .output()
-        .expect("python3 must be available for the provenance gate");
+    let output = run_python(&[
+        "tools/check_provenance.py",
+        "--root",
+        ".",
+        "--self-test-negative-cases",
+    ]);
     assert!(
         output.status.success(),
         "negative provenance cases were not rejected:\nstdout:\n{}\nstderr:\n{}",
@@ -35,10 +62,7 @@ fn repository_provenance_gate_rejects_unknown_and_restricted_fixture_origins() {
 
 #[test]
 fn parity_failures_emit_pointer_fixture_and_reproduction_argv() {
-    let output = Command::new("python3")
-        .args(["tools/parity_run.py", "--self-test-diagnostics"])
-        .output()
-        .expect("python3 must be available for the parity diagnostic self-test");
+    let output = run_python(&["tools/parity_run.py", "--self-test-diagnostics"]);
     assert!(
         output.status.success(),
         "parity diagnostic contract failed:\nstdout:\n{}\nstderr:\n{}",

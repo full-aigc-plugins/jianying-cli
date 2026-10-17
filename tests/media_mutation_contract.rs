@@ -172,6 +172,9 @@ fn add_replace_and_relink_are_atomic_and_keep_the_bundle_valid() {
     let _ = std::fs::remove_dir_all(root);
 }
 
+// 该用例用 `#!/bin/sh` 脚本充当 TTS provider；Windows 的 CreateProcess 无法直接
+// 执行脚本，需要以 .exe 为载体的替身，属于尚未补齐的 Windows 覆盖。
+#[cfg(unix)]
 #[test]
 fn tts_sfx_and_draft_retakes_use_the_rust_runtime_only() {
     if Command::new("ffmpeg").arg("-version").output().is_err() {

@@ -998,13 +998,55 @@ fn referenced_material_ids(timeline: &Value) -> std::collections::HashSet<String
     ids
 }
 
-/// 为视觉片段设置混合模式素材，旧混合模式引用会被替换。
+/// 为视觉片段设置混合模式素材；同一片段只保留一条，重复设置会原地更新。
 pub fn composite(draft: &Path, id: &str, mode: &str) -> Result<Value> {
     let entry = crate::catalogs::resolve(crate::catalogs::mix_modes(), "mix mode", mode, false)?;
     let effect_id = entry["effect_id"].clone();
     let resource_id = entry["resource_id"].clone();
     let display_name = entry["name"].clone();
     mutate(draft, |timeline| {
+        // 片段已引用的 mix_mode 素材：沿用同一 material id 原地改写 identity，
+        // 与 pyJianYingDraft 6bb2d06 起的行为一致，避免每次设置都留下孤儿素材。
+        let existing_id = {
+            let segment = find_segment_mut(timeline, id)?;
+            let referenced: Vec<String> = segment["extra_material_refs"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect();
+            timeline["materials"]["effects"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .find(|item| {
+                    item["type"].as_str() == Some("mix_mode")
+                        && item["id"]
+                            .as_str()
+                            .is_some_and(|mid| referenced.iter().any(|known| known == mid))
+                })
+                .and_then(|item| item["id"].as_str())
+                .map(str::to_owned)
+        };
+        if let Some(material_id) = existing_id {
+            if let Some(materials) = timeline["materials"]["effects"].as_array_mut() {
+                for item in materials.iter_mut() {
+                    if item["id"].as_str() == Some(material_id.as_str()) {
+                        item["effect_id"] = effect_id.clone();
+                        item["resource_id"] = resource_id.clone();
+                        item["name"] = display_name.clone();
+                        break;
+                    }
+                }
+            }
+            return Ok(json!({
+                "ok":true,"id":id,"mode":mode,
+                "material_id":material_id,"updated":true
+            }));
+        }
+
+        // 历史草稿可能残留多条 mix_mode 引用，创建新素材前先清掉本片段的旧引用。
         let old_mix_ids: Vec<String> = timeline["materials"]["effects"]
             .as_array()
             .into_iter()
@@ -1024,7 +1066,10 @@ pub fn composite(draft: &Path, id: &str, mode: &str) -> Result<Value> {
             "value":1.0,"apply_target_type":0,"platform":"all","source_platform":0,
             "category_id":"","category_name":"","sub_type":"none","time_range":null,"id":new_id
         }));
-        Ok(json!({"ok":true,"id":id,"mode":mode,"material_id":new_id}))
+        Ok(json!({
+            "ok":true,"id":id,"mode":mode,
+            "material_id":new_id,"updated":false
+        }))
     })
 }
 

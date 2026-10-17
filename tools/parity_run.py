@@ -270,6 +270,44 @@ parity_reference.build({json.dumps(str(plan_path))}, {json.dumps(str(out_dir))})
     run([sys.executable, str(script)])
 
 
+def reference_commit(pyjyd_src):
+    """Resolve the checked-out reference commit.
+
+    The emitted report must describe the source that actually ran; a
+    hard-coded SHA would keep claiming the old baseline after any upgrade.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(pyjyd_src), "rev-parse", "HEAD"],
+            capture_output=True, text=True, check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise RuntimeError(
+            f"cannot resolve the reference commit for {pyjyd_src}: {error}"
+        ) from error
+    commit = result.stdout.strip()
+    if len(commit) != 40 or any(c not in "0123456789abcdef" for c in commit):
+        raise RuntimeError(f"reference commit is not a full SHA: {commit!r}")
+    return commit
+
+
+def report_binary_label(bin_path):
+    """Render the tested binary in a platform-stable form.
+
+    CI compares the checked-in report byte-for-byte with `cmp`; a Windows run
+    must therefore emit the same label as macOS: POSIX separators and no
+    `.exe` suffix. Relative arguments are resolved against the invocation
+    directory before being relativized to the repository root.
+    """
+    resolved = bin_path if bin_path.is_absolute() else (Path.cwd() / bin_path)
+    try:
+        relative = resolved.resolve().relative_to(ROOT.resolve())
+    except ValueError:
+        return resolved.as_posix()
+    label = relative.as_posix()
+    return label[:-4] if label.endswith(".exe") else label
+
+
 def main():
     args = sys.argv[1:]
     if "--self-test-diagnostics" in args:
@@ -358,17 +396,20 @@ def main():
     print(f"\nparity: {passed} passed, {len(failed)} failed")
     if report_path:
         report_path.parent.mkdir(parents=True, exist_ok=True)
-        report_path.write_text(json.dumps({
+        payload = json.dumps({
             "schema": "jianying-python-rust-parity-run/v1",
             "python_source": {
                 "project": "GuanYixuan/pyJianYingDraft",
-                "commit": "c3318066d964744e2bfc66f75c71745fe8cea52a",
+                "commit": reference_commit(pyjyd_src),
                 "media_probe": "tools/pymediainfo.py ffprobe compatibility adapter",
             },
-            "rust_binary": str(bin_path.relative_to(ROOT) if bin_path.is_relative_to(ROOT) else bin_path),
+            "rust_binary": report_binary_label(bin_path),
             "summary": {"passed": passed, "failed": len(failed), "total": len(records)},
             "scenarios": records,
-        }, ensure_ascii=False, indent=2) + "\n")
+        }, ensure_ascii=False, indent=2) + "\n"
+        # 固定 LF：CI 用 cmp 逐字节比较该报告，CRLF 会让 Windows 运行无法复现。
+        with open(report_path, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(payload)
     if failed:
         sys.exit(1)
 

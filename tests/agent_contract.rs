@@ -2,7 +2,7 @@
 //! exit codes, single-JSON stdout, error chains on stderr, --help surface.
 
 use std::process::{Command, Output};
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 use std::sync::OnceLock;
 
 fn bin() -> Command {
@@ -19,7 +19,23 @@ fn run_without_host_editor(args: &[&str]) -> Output {
     // 草稿迁移合同只测试临时 fixture；开发机上真实剪映进程不应污染该黑盒用例。
     #[cfg(unix)]
     command.env("PATH", isolated_process_path());
+    // Windows 的 tasklist 固定位于 System32 且优先于 PATH，只能用清单注入点隔离。
+    #[cfg(windows)]
+    command.env("JIANYING_CLI_PROCESS_LIST", empty_process_listing());
     command.output().unwrap()
+}
+
+#[cfg(windows)]
+fn empty_process_listing() -> &'static str {
+    static PATH: OnceLock<String> = OnceLock::new();
+    PATH.get_or_init(|| {
+        let path = std::env::temp_dir().join(format!(
+            "jianying-agent-contract-processes-{}.txt",
+            std::process::id()
+        ));
+        std::fs::write(&path, "Image Name,PID\r\n").unwrap();
+        path.to_string_lossy().into_owned()
+    })
 }
 
 #[cfg(unix)]
@@ -937,4 +953,59 @@ fn build_with_tim_strings_produces_verifiable_draft() {
         out.to_str().unwrap(),
     ]);
     assert_eq!(again.status.code(), Some(1));
+}
+
+/// 进程清单注入点必须既能隐藏宿主编辑器，也能照常识别它；
+/// 否则 `run_without_host_editor` 的隔离会退化成无条件放行。
+#[test]
+fn doctor_reads_editors_from_the_process_listing_seam() {
+    let dir = std::env::temp_dir().join(format!(
+        "jianying-agent-contract-editors-{}",
+        std::process::id()
+    ));
+    std::fs::create_dir_all(&dir).unwrap();
+
+    let listing = if cfg!(windows) {
+        "Image Name,PID\r\nJianyingPro.exe,4242\r\n"
+    } else {
+        "JianyingPro\n"
+    };
+    let detected = dir.join("with-editor.txt");
+    std::fs::write(&detected, listing).unwrap();
+    let out = bin()
+        .args(["doctor", "--json"])
+        .env("JIANYING_CLI_PROCESS_LIST", &detected)
+        .output()
+        .unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let report = stdout_json(&out);
+    assert_eq!(
+        report["data"]["editors_running"]
+            .as_array()
+            .map(|v| v.len()),
+        Some(1),
+        "seam must still detect a running editor: {report}"
+    );
+
+    let quiet = dir.join("no-editor.txt");
+    std::fs::write(&quiet, "").unwrap();
+    let out = bin()
+        .args(["doctor", "--json"])
+        .env("JIANYING_CLI_PROCESS_LIST", &quiet)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0));
+    let report = stdout_json(&out);
+    assert_eq!(
+        report["data"]["editors_running"]
+            .as_array()
+            .map(|v| v.len()),
+        Some(0),
+        "empty listing must report no editors: {report}"
+    );
 }

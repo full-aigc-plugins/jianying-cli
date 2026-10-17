@@ -575,6 +575,77 @@ fn visual_timeline_opacity_and_composite_remain_structurally_valid() {
 }
 
 #[test]
+fn composite_updates_the_existing_mix_mode_material_in_place() {
+    let root = std::env::temp_dir().join(format!("jianying-mixmode-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    std::fs::create_dir_all(&root).unwrap();
+    std::fs::write(root.join("clip.mp4"), b"fixture").unwrap();
+    let plan: Plan = serde_json::from_value(serde_json::json!({
+        "schema":"jianying-cli-plan/v1","name":"mixmode",
+        "canvas":{"width":1920,"height":1080,"fps":30},
+        "tracks":[{"type":"video","segments":[{
+            "start_us":0,"duration_us":2000000,"source":"clip.mp4"
+        }]}]
+    }))
+    .unwrap();
+    let output = root.join("draft");
+    draft::build(&plan, &root, &output, None, &probe_stub).unwrap();
+    let listed = run_ok(&[
+        "timeline",
+        "segments",
+        &output.to_string_lossy(),
+        "--track",
+        "video",
+        "--json",
+    ]);
+    let id = listed[0]["id"].as_str().unwrap().to_owned();
+
+    let created = run_ok(&[
+        "timeline",
+        "composite",
+        &output.to_string_lossy(),
+        &id,
+        "滤色",
+        "--json",
+    ]);
+    assert_eq!(created["updated"], serde_json::json!(false));
+    let material_id = created["material_id"].as_str().unwrap().to_owned();
+
+    let updated = run_ok(&[
+        "timeline",
+        "composite",
+        &output.to_string_lossy(),
+        &id,
+        "正片叠底",
+        "--json",
+    ]);
+    assert_eq!(updated["updated"], serde_json::json!(true));
+    assert_eq!(updated["material_id"], serde_json::json!(material_id));
+
+    let content: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(output.join("draft_content.json")).unwrap())
+            .unwrap();
+    let mix_modes: Vec<&serde_json::Value> = content["materials"]["effects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|item| item["type"].as_str() == Some("mix_mode"))
+        .collect();
+    assert_eq!(
+        mix_modes.len(),
+        1,
+        "重新设置混合模式必须原地更新，不能新增素材: {mix_modes:?}"
+    );
+    assert_eq!(mix_modes[0]["id"], serde_json::json!(material_id));
+    assert_eq!(mix_modes[0]["name"], serde_json::json!("正片叠底"));
+    assert_eq!(
+        run_ok(&["project", "verify", &output.to_string_lossy(), "--json"])["ok"],
+        true
+    );
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
 fn project_prune_is_conservative_and_dry_run_is_read_only() {
     let root = std::env::temp_dir().join(format!("jianying-prune-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&root);

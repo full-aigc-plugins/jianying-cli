@@ -97,26 +97,56 @@ mod editor_process_tests {
     }
 }
 
-pub fn editors_running() -> Vec<String> {
-    let mut found = vec![];
-    #[cfg(unix)]
-    {
-        if let Ok(out) = Command::new("ps").args(["-axo", "comm="]).output() {
-            let text = String::from_utf8_lossy(&out.stdout);
-            found.extend(editors_from_process_listing(&text));
-        }
+/// 读取宿主进程清单文本。
+///
+/// `JIANYING_CLI_PROCESS_LIST` 可指向一个测试用进程清单文件；该注入点只替换
+/// **清单来源**，不改变“发现编辑器即拒绝写入”的判定语义，生产路径不应设置它。
+/// Windows 的 `tasklist` 位于 System32 且优先于 PATH，无法像 unix 那样用 PATH
+/// 替身隔离，因此需要这一显式注入点来编写无宿主干扰的黑盒用例。
+fn process_listing() -> Option<String> {
+    if let Some(path) = std::env::var_os("JIANYING_CLI_PROCESS_LIST") {
+        return std::fs::read_to_string(path).ok();
     }
-    #[cfg(windows)]
-    {
-        if let Ok(out) = Command::new("tasklist").args(["/FO", "CSV"]).output() {
-            let text = String::from_utf8_lossy(&out.stdout);
-            for needle in ["JianyingPro.exe", "CapCut.exe"] {
-                if text.to_lowercase().contains(&needle.to_lowercase()) {
-                    found.push(needle.to_string());
-                }
+    read_platform_process_listing()
+}
+
+#[cfg(unix)]
+fn read_platform_process_listing() -> Option<String> {
+    let out = Command::new("ps").args(["-axo", "comm="]).output().ok()?;
+    Some(String::from_utf8_lossy(&out.stdout).into_owned())
+}
+
+#[cfg(windows)]
+fn read_platform_process_listing() -> Option<String> {
+    let out = Command::new("tasklist")
+        .args(["/FO", "CSV"])
+        .output()
+        .ok()?;
+    Some(String::from_utf8_lossy(&out.stdout).into_owned())
+}
+
+#[cfg(not(any(unix, windows)))]
+fn read_platform_process_listing() -> Option<String> {
+    None
+}
+
+/// 返回正在运行的剪映/CapCut 进程名；空列表表示可以安全写入草稿。
+pub fn editors_running() -> Vec<String> {
+    let Some(text) = process_listing() else {
+        return vec![];
+    };
+    #[cfg(unix)]
+    let mut found = editors_from_process_listing(&text);
+    #[cfg(not(unix))]
+    let mut found = {
+        let mut names = vec![];
+        for needle in ["JianyingPro.exe", "CapCut.exe"] {
+            if text.to_lowercase().contains(&needle.to_lowercase()) {
+                names.push(needle.to_string());
             }
         }
-    }
+        names
+    };
     found.sort();
     found.dedup();
     found

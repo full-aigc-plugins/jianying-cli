@@ -10,9 +10,21 @@ fn replacement_timing_and_style_ranges_match_the_fixed_python_baseline() {
         "../provenance/PYJYD_TEMPLATE_DIFFERENTIALS.json"
     ))
     .unwrap();
+    // 提交号只留一个事实源：SOURCE_MANIFEST 钉住的 pyJianYingDraft commit。
+    // 之前这里硬编码 40 位 SHA，升级基线时必然漏改。
+    let manifest: Value =
+        serde_json::from_str(include_str!("../provenance/SOURCE_MANIFEST.json")).unwrap();
+    let pinned_commit = manifest["sources"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|source| source["id"] == "pyjianyingdraft")
+        .and_then(|source| source["commit"].as_str())
+        .expect("SOURCE_MANIFEST must pin the pyJianYingDraft commit");
     assert_eq!(
-        report["upstream_commit"],
-        "c3318066d964744e2bfc66f75c71745fe8cea52a"
+        report["upstream_commit"].as_str(),
+        Some(pinned_commit),
+        "模板差分报告必须与 SOURCE_MANIFEST 钉住的 pyJianYingDraft 提交一致"
     );
     for case in report["timing_cases"].as_array().unwrap() {
         // Restore the common pre-operation fixture recorded by the runner.
