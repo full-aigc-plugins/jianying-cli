@@ -1,0 +1,532 @@
+{
+  "schema": "jianying-official-capability-map/v1",
+  "kind": "proposal",
+  "note": "纯文档对照提案：来源为剪映专业版 Windows 11.6.0.14552 自带 agent 协议文档（XMLDraft v1），不修改 CAPABILITIES.json 任何既有条目；our_coverage 基于本仓 provenance/CAPABILITIES.json、catalogs/*.json 与 crates/ 实际证据判定。",
+  "official_doc_root": "C:/Users/hnxyh/AppData/Local/JianyingPro/Apps/11.6.0.14552/Resources/canvas_agent/skills/jianying.hub.studio_lyra_xml_timeline_builder_v2",
+  "companion_skills": [
+    "skills/studio.edit.speaker_cut/SKILL.md",
+    "skills/jianying.hub.studio_edit_reference_recall_v2/SKILL.md"
+  ],
+  "generated_at": "2026-10-17",
+  "entries": [
+    {
+      "field": "draft.version",
+      "official_semantics": "根节点声明的 XMLDraft 协议版本；枚举只有 1，省略时按版本 1 处理。",
+      "official_unit": "enum(1)",
+      "source": "references/timeline.md#element:draft 属性表 + SKILL.md#版本速查",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "draft.width/height",
+      "official_semantics": "草稿画布的像素宽高；每次编写 Selection 都必须显式保留或设置成对的正整数 width/height，不得只写 ratio，也不得依赖宿主默认值或 apply 阶段补齐。",
+      "official_unit": "px",
+      "source": "references/timeline.md#element:draft + SKILL.md#编辑范围与素材时间",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-draft/src/canvas_wire.rs: CanvasWire { width: u64, height: u64, ratio: String }（对应 pyJianYingDraft ScriptFile.width/height）"
+    },
+    {
+      "field": "draft.ratio",
+      "official_semantics": "草稿画布宽高比，string 类型；官方禁止只写 ratio 而省略 width/height。",
+      "official_unit": "string",
+      "source": "references/timeline.md#element:draft 属性表",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-draft/src/canvas_wire.rs: ratio: String"
+    },
+    {
+      "field": "draft.fps",
+      "official_semantics": "草稿画布帧率，range minimum_exclusive=0；已有草稿只有在用户或上游结构化契约明确要求改帧率时才修改，未要求时必须沿用当前值，不随画布、素材或导出偏好顺手改写。",
+      "official_unit": "number(fps)",
+      "source": "references/timeline.md#element:draft 属性表 + 编写规则第2条",
+      "our_coverage": "partial",
+      "our_evidence": "CanvasWire 未显式建模 fps，但 unknown_fields flatten 无损写回（crates/jianying-draft/src/canvas_wire.rs）；帧率另见 crates/jianying-domain/src/frame_rate.rs（用于帧量化，非画布 fps 修改能力）"
+    },
+    {
+      "field": "draft.background_color",
+      "official_semantics": "草稿画布背景颜色，color 类型，无默认值声明。",
+      "official_unit": "color",
+      "source": "references/timeline.md#element:draft 属性表",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "draft.loudness_normalize",
+      "official_semantics": "草稿级响度均衡策略，enum on/off；不得仅凭存在音轨、BGM、时间线重叠或手工 volume 推断开启；保持手工音量、静音与淡入淡出不变。",
+      "official_unit": "enum(on|off)",
+      "source": "references/timeline.md#element:draft 属性表",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "global.aspect_ratio / presentation_aspect_ratio / recommended_canvas",
+      "official_semantics": "auto 画布契约：global.aspect_ratio 省略或为 auto 时空草稿优先采用主轨素材 AnalyzeAsset 返回的 recommended_canvas 并显式写入 width/height；presentation_aspect_ratio 是应用像素宽高比和旋转后的可见比例，校验以此真实比例为准；副轨素材不决定画布；工具事实给出 presentation_aspect_ratio=3:4 或 recommended_canvas 1080x1440 时禁止写 1080x1920；收到 draft_auto_canvas_mismatch 必须按提示修正。",
+      "official_unit": "ratio / px",
+      "source": "SKILL.md#编辑范围与素材时间 + references/timeline.md#element:draft 编写规则第1条",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "time.start",
+      "official_semantics": "副轨片段的绝对起始时间，或动画在宿主片段内的起始偏移；0 为对应起点；使用裸毫秒，range minimum=0；us/ms/s/min 等单位后缀均非法；main 片段不写 start。",
+      "official_unit": "ms",
+      "source": "references/timeline.md#property:time 属性表 + 编写规则",
+      "our_coverage": "covered",
+      "our_evidence": "src/timeline_ops.rs 与 crates/jianying-draft/src/time_range_wire.rs 使用 start_us 微秒 wire（毫秒语义 ×1000 换算），Job v2 编辑操作见 tests/timeline_cli_contract.rs"
+    },
+    {
+      "field": "time.duration",
+      "official_semantics": "宿主片段在时间线上占用的持续时长，不随 speed 改写；例如 duration=3000 始终表示时间线上 3 秒；range minimum=0；与 align_end_to 互斥。",
+      "official_unit": "ms",
+      "source": "references/timeline.md#property:time 属性表",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-draft/src/time_range_wire.rs（duration_us wire）；tests/timeline_cli_contract.rs"
+    },
+    {
+      "field": "time.material_start",
+      "official_semantics": "片段从源素材内部开始取用的时间；0 从素材开头取；不是草稿时间线起点；range minimum=0；material_start>0 时 duration 上限为 (素材时长-material_start)/speed。",
+      "official_unit": "ms",
+      "source": "references/timeline.md#property:time 属性表 + 编写规则",
+      "our_coverage": "covered",
+      "our_evidence": "pyJianYingDraft wire material_time 语义由 protocol.pyjyd_wire 差分覆盖：provenance/PROTOCOL_DIFFERENTIALS.json + provenance/PARITY_RUN.json (55/55)"
+    },
+    {
+      "field": "time.speed",
+      "official_semantics": "视频、音频、音效或语音的速度倍率：0.5 半速、1 原速、2 两倍速；range minimum_exclusive=0（无上限声明）；text/subtitle/sticker 的 time 禁止填写 speed，即使值为 1。",
+      "official_unit": "multiplier",
+      "source": "references/timeline.md#property:time 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/clip_settings.rs: speed 校验范围 0.1..=8.0（比官方更窄，含隐式上限 8）；默认 1.0"
+    },
+    {
+      "field": "time.align_start_to/align_end_to/align_*_offset",
+      "official_semantics": "锚定区间：align_start_to 加 align_end_to 成对使用、不得再写 duration；canonical 格式 segment_id.left/.right，主轨整体用 main.left/.right；offset 为毫秒偏移（左负右正）；锚定区间必须能解析为 start<end，禁止依赖循环或反向区间。",
+      "official_unit": "id_ref / ms",
+      "source": "references/timeline.md#property:time + references/selection.md#时间联动",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "transform.layout",
+      "official_semantics": "布局模式 enum absolute/relative；省略表示相对布局；absolute 与相对布局字段不得混用；layout=absolute 必须同时提供数值型 x 和 y。",
+      "official_unit": "enum",
+      "source": "references/transform.md#property:transform 属性表 + 编写规则",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "transform.x / transform.y",
+      "official_semantics": "绝对布局归一化坐标：0 为画布中心、-1 左边界、1 右边界；y：1 为上边界、-1 为下边界（向上为正）；不是像素；必须配合 layout=absolute；中心坐标合法不代表整个对象仍在画内。官方未声明数值范围。",
+      "official_unit": "normalized",
+      "source": "references/transform.md#property:transform 属性表",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-domain/src/transform.rs: x/y 校验 -2.0..=2.0，归一化中心坐标语义与官方一致（范围更宽）；tests/timeline_cli_contract.rs"
+    },
+    {
+      "field": "transform.scale",
+      "official_semantics": "等比缩放倍率；0.5 为基准宽高一半、1 保持、2 两倍；range minimum_exclusive=0，默认 1；0.5 不保证占画布 50%；普通文字字号用 sub.size 不新增 scale。",
+      "official_unit": "multiplier",
+      "source": "references/transform.md#property:transform 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/transform.rs: scale 校验 0.01..=10.0（语义一致但隐式上限 10，官方未声明上限）"
+    },
+    {
+      "field": "transform.rotation",
+      "official_semantics": "角度：逆时针为负、顺时针为正；0 不旋转；使用角度裸数；默认 0。",
+      "official_unit": "degree",
+      "source": "references/transform.md#property:transform 属性表 + references/selection.md#字段语义路由(rotation:counterclockwise=negative)",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-domain/src/transform.rs: rotation 校验 -360.0..=360.0"
+    },
+    {
+      "field": "transform.width / transform.height (percent)",
+      "official_semantics": "最终渲染包围盒占画布宽/高的百分比字面量；range minimum_exclusive=0；同时写时 width 优先；与 max_width/max_height 互斥。",
+      "official_unit": "percent",
+      "source": "references/transform.md#property:transform 属性表 + 编写规则",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "transform.fit",
+      "official_semantics": "视频或图片适配画布方式 enum cover/contain/none/scale-down；与 scale 不得同时输出；仅 absolute_fit 场景。",
+      "official_unit": "enum",
+      "source": "references/transform.md#property:transform 属性表",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "transform.crop / crop_position / crop_rotation",
+      "official_semantics": "crop 为裁剪比例字符串（如 1:1、16:9），可写关闭值重置；crop_position enum left/top/right/bottom/left_top/right_top/left_bottom/right_bottom，省略居中；crop_rotation 单位 degree 默认 0；仅 absolute_scale 场景。",
+      "official_unit": "string / enum / degree",
+      "source": "references/transform.md#property:transform 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/crop_settings.rs 为八点归一化区域（pyJianYingDraft CropSettings），非比例字符串模型；CLI 层 timeline.crop 有 read/ratio/rect/reset 差分（provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json，CAPCUT_TIMELINE_DIFFERENTIALS 32 条之一）；官方 crop_position/crop_rotation 无对应字段"
+    },
+    {
+      "field": "transform 相对布局族(justify-self/align-self/padding-*/offset_*/max_width/max_height/overflow)",
+      "official_semantics": "相对锚点 + 百分比边距/偏移 + 文字双轴上限（max_width/max_height 仅 text/subtitle，overflow enum scale-down(默认)/wrap；width 与 max_width、padding-left+right 与 max_width 等互斥规则）；相对布局字段为 authoring-only，apply 后按最终几何归一化回写。",
+      "official_unit": "enum / percent",
+      "source": "references/transform.md#property:transform 属性表 + 编写规则",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "video.volume / audio.volume / sound.volume",
+      "official_semantics": "音量滑杆值 0–1000：0 静音、50 为原始幅度一半、100 保持原始音量、200 为两倍幅度；默认 100；30% 写裸数 30，不写 0.3 或 30%。",
+      "official_unit": "slider(0-1000,100=unity)",
+      "source": "references/segment-visual.md#segment:video 属性表、references/segment-audio.md#segment:audio/#segment:sound 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/clip_settings.rs: volume 为线性倍数 0.0..=4.0、默认 1.0（=官方滑杆 100；换算 slider/100=倍数）；但本仓上限 4.0 仅相当于官方滑杆 400，官方允许到 1000（=10 倍）——同一物理量的量纲与上限均冲突",
+      "verification": "wire 写 1.0（draft.rs:140 无换算），与 parity 参考实现 pyJianYingDraft 一致且该库产出的草稿可被剪映打开，故 wire 量纲正确。真实差异仅在输入上限：本仓 0..=4 窄于官方面板 0–1000，属能力范围差异，不是协议冲突。"
+    },
+    {
+      "field": "video.z_order",
+      "official_semantics": "同层片段的画面层级，integer，数值越大越靠前。",
+      "official_unit": "integer",
+      "source": "references/segment-visual.md#segment:video 属性表",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "alpha.value",
+      "official_semantics": "视频或图片片段不透明度，0 至 1 裸数；0 完全透明、1 完全不透明；50% 写 value=0.5，不写 50；必填。",
+      "official_unit": "normalized(0-1)",
+      "source": "references/segment-visual.md#property:alpha",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-domain/src/transform.rs: opacity 校验 0.0..=1.0（pyJianYingDraft transform.opacity 语义等价）"
+    },
+    {
+      "field": "canvas.type / canvas.blur",
+      "official_semantics": "画布背景 enum blur/none；blur 强度 0–1 裸数（0.0625 轻微/0.375 中等/0.75 强/1 最强），未指定时运行时默认 0.75；type=none 时不写 blur；画布背景不需要资源 ref。",
+      "official_unit": "enum / normalized(0-1)",
+      "source": "references/segment-visual.md#property:canvas",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/background_filling.rs: type enum 为 blur|color（多出 color、无 none），blur 0..=1 一致但无默认 0.75 声明；对应 pyJianYingDraft CanvasColor/CanvasBlur；CLI timeline.background_blur 见 CAPABILITIES.json"
+    },
+    {
+      "field": "property:filter.intensity（video/image 局部）与 segment:filter.intensity（独立片段）",
+      "official_semantics": "滤镜整体强度使用 0 至 100 的用户面板百分值；70% 强度写 70，不写 0.7 或 70%；此属性只用于 filter，effect 只使用资源召回声明的 slider_params。",
+      "official_unit": "slider(0-100)",
+      "source": "references/segment-visual.md#property:filter、references/segment-effects.md#segment:filter",
+      "our_coverage": "covered",
+      "our_evidence": "src/timeline_ops.rs:1515-1518: add_filter 的 --intensity 必须为 0..1 区间、默认 1.0——与官方 0–100 面板值量纲冲突（需 ×100 换算且 100 写法会被本仓拒绝）",
+      "verification": "plan/领域层收 0..=100（domain segment.rs:377,575），wire 写入统一除以 100（draft.rs:704,867,1079）。parity fixture tests/parity/scenarios/07-filter.json 输入 \"intensity\":55 → wire 0.55，与官方「面板 0–100、wire 0–1」一致。agent 原引 timeline_ops.rs:1515 是 add_filter 命令的入参口径，非 wire 口径。"
+    },
+    {
+      "field": "property:effect（局部特效）/ segment:effect 强度",
+      "official_semantics": "特效不提供通用整体强度属性；所有可调参数必须写入 slider_params，参数名、值域和语义只以本轮 recall 返回的当前 ref 声明为准；召回未声明的参数不得赋值。",
+      "official_unit": "dynamic(slider_params)",
+      "source": "references/segment-visual.md#property:effect 编写规则、references/segment-effects.md#slider_params",
+      "our_coverage": "partial",
+      "our_evidence": "src/timeline_ops.rs:1641-1654: add_effect 暴露通用 --intensity 0..1 与 --params f64 列表，且有默认 1.0——官方协议禁止对 effect 写通用强度；slider_params 动态声明机制在本仓不存在（特效参数走 caps/catalogs 无值域逐字约束）",
+      "verification": "官方协议规定 effect 不得写通用强度、只能用召回声明的 slider_params；本仓 add_effect 暴露通用 --intensity。属真实协议分歧，但尚无线上草稿证据证明它导致渲染错误，需真实剪映 round-trip 判定，暂不记为 contradicted。"
+    },
+    {
+      "field": "transition.ref / transition.duration",
+      "official_semantics": "转场挂在相邻主轨边界左侧 video/image 内；最后一个或唯一 main-track 片段禁止包含 transition；duration 单位 ms、range minimum=0、不参与主轨片段时间线累计；需要结尾淡出时改用 fade 或 animation。",
+      "official_unit": "resource_ref / ms",
+      "source": "references/segment-visual.md#property:transition",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/transition.rs: duration_us 且要求 >0（官方允许 0）；'是否存在后继片段由时间线应用层校验'仅注释声明，未见强制实现；能力证据 timeline.transition = tests/timeline_cli_contract.rs + CAPCUT_TIMELINE_DIFFERENTIALS"
+    },
+    {
+      "field": "mix_mode.mode / mix_mode.ref",
+      "official_semantics": "副轨 video/image 混合模式，主轨禁止使用；mode enum multiply/overlay/screen/darken/lighten/soft_light/hard_light/color_burn/color_dodge/linear_burn/difference/color_filter/off（13 值稳定英文枚举）；启用时 ref 必须引用已绑定 mix_mode 素材，mode=off 不需要 ref。",
+      "official_unit": "enum / resource_ref",
+      "source": "references/segment-visual.md#property:mix_mode",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/blend_mode.rs 为非空名称字符串（目录成员资格在应用层）；catalogs/mix_modes.json 用中文资源名（正片叠底/颜色减淡…，26 条含 resource_id/effect_id），与官方稳定英文枚举需建立映射；src/timeline_ops.rs mix 操作写 wire type=mix_mode 材料；主轨禁用规则未见本仓显式校验"
+    },
+    {
+      "field": "mask.ref / mask.shape",
+      "official_semantics": "mask 使用 ref 引用已绑定 video_mask 素材且语义须匹配 shape；shape enum 10 值：rectangle/circle/heart/pentagram/line/mirror/custom/contour/text/heterosexual；几何字段平铺不嵌套 config；line 表示分割线两侧半平面。",
+      "official_unit": "resource_ref / enum(10)",
+      "source": "references/segment-visual.md#property:mask 编写规则 + 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/mask.rs 用资源名称标识；catalogs/masks.json 仅 6 种：线性|镜面|圆形|矩形|爱心|星形——官方 custom/contour/text/heterosexual 无对应；timeline.mask 能力见 CAPABILITIES.json"
+    },
+    {
+      "field": "mask.width/height/center_x/center_y",
+      "official_semantics": "width/height 为 0–1 裸数、相对画布宽高；center_x/center_y 相对画布中心 ±1（0,0 居中，正上负下）；像素换算 cx=canvas_width/2+center_x*canvas_width/2。",
+      "official_unit": "normalized(canvas-relative)",
+      "source": "references/segment-visual.md#property:mask 属性表 + 编写规则",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/mask.rs: center_x/center_y -1..1（经 size 间接表达宽高），size 0.01..=1.0、另有 rect_width——几何模型与官方 width/height/center 四字段平铺不同构"
+    },
+    {
+      "field": "mask.feather",
+      "official_semantics": "蒙版羽化强度 0 至 1 裸数；0 硬边、0.05–0.12 常规融合、>0.3 不推荐；明确禁止套用 matting 的 0 至 100 或 0 至 1000 量纲。",
+      "official_unit": "normalized(0-1)",
+      "source": "references/segment-visual.md#property:mask 属性表 + 编写规则",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-domain/src/mask.rs:115: feather 校验 0.0..=100.0——与官方 0–1 量纲直接冲突（官方编写规则点名禁止 0–100 量纲）",
+      "verification": "领域层收 0..=100（mask.rs:115），wire 写入除以 100（draft.rs:513 \"feather\": mask.feather / 100.0），最终 wire 为 0–1，与官方一致。"
+    },
+    {
+      "field": "mask.rotation / mask.invert / mask.round_corner",
+      "official_semantics": "rotation 顺时针为正、逆时针为负，角度裸数默认 0；invert 默认 false（false 保留内部）；round_corner 0–1 裸数且只用于 rectangle。",
+      "official_unit": "degree / boolean / normalized(0-1)",
+      "source": "references/segment-visual.md#property:mask 属性表",
+      "our_coverage": "covered",
+      "our_evidence": "rotation(-360..360) 与 invert 一致（crates/jianying-domain/src/mask.rs:114,121）；但 round_corner 校验 0.0..=100.0（mask.rs:121）与官方 0–1 量纲冲突",
+      "verification": "rotation/invert 一致；round_corner 领域层收 0..=100，wire 除以 100（draft.rs:517 \"roundCorner\": ... / 100.0），最终 0–1，与官方一致。"
+    },
+    {
+      "field": "matting.mode",
+      "official_semantics": "抠像工作模式 enum ai/custom/sam3/none；模板 media slot 仅 ai/none；sam3 必须同时写 mask_ref 和非负 segment_time 且禁止 brush；custom 必须有一条合法 brush 或扁平 custom 参数。",
+      "official_unit": "enum(ai|custom|sam3|none)",
+      "source": "references/segment-visual.md#property:matting 编写规则",
+      "our_coverage": "partial",
+      "our_evidence": "src/timeline_ops.rs:1035-1094 matting 仅 enable/disable（flag 0/3 开关），不支持 sam3/custom/brush/mask_ref/segment_time；能力 timeline.matting = 'fixed-upstream enable/disable differential'（provenance/CAPABILITIES.json）"
+    },
+    {
+      "field": "matting.feather / expand",
+      "official_semantics": "普通素材 feather 0–100、expand -20–20；模板槽位均为 0–1000。",
+      "official_unit": "slider",
+      "source": "references/segment-visual.md#property:matting 编写规则 + 属性表",
+      "our_coverage": "uncovered",
+      "our_evidence": "src/timeline_ops.rs matting 实现未写 feather/expand"
+    },
+    {
+      "field": "face_beauty",
+      "official_semantics": "智能美颜必含 category/ref/value/face_mode；category enum skin/shape/feature/makeup；value 0–100；face_mode enum multi/single（single 必写非空 face_id，multi 不写）。",
+      "official_unit": "enum / slider(0-100) / id_ref",
+      "source": "references/segment-visual.md#property:face_beauty",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "body_reshape",
+      "official_semantics": "智能美体必含 ref/value/face_mode，禁止写 category；value 0–100；face_mode 同 face_beauty。",
+      "official_unit": "slider(0-100) / id_ref",
+      "source": "references/segment-visual.md#property:body_reshape",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "animation.animation_type",
+      "official_semantics": "动画作用阶段 enum in/out/loop/group/caption，不得写 combo；text/subtitle 独立动画只支持 in/out/loop，caption/group 只可原样保留模板回读动画。",
+      "official_unit": "enum(in|out|loop|group|caption)",
+      "source": "references/segment-visual.md#property:animation、references/segment-text-sticker.md#property:animation",
+      "our_coverage": "partial",
+      "our_evidence": "本仓动画以名称目录驱动（catalogs/video_animations_{in,out,group}.json、text_animations_{in,loop,out}.json），无显式 animation_type 枚举与 caption 约束；CAPABILITIES.json timeline.animation 证据含 'intro/outro/combo wire differential'——官方协议明令不得写 combo，而本仓 wire 差分含 combo 语义"
+    },
+    {
+      "field": "animation.duration / animation.start / animation.slot_index",
+      "official_semantics": "duration 与 start 使用非负裸毫秒；slot_index 从 0 开始、仅含 template 的 text/subtitle 槽位动画可用；ease/easing 当前被 Blueprint 忽略。",
+      "official_unit": "ms / integer",
+      "source": "references/segment-text-sticker.md#property:animation 属性表 + 编写规则",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/animation.rs: duration_us 支持（微秒 wire），无 start 偏移与 slot_index；动画能力证据见 CAPABILITIES.json timeline.animation/captions.animation"
+    },
+    {
+      "field": "deform (corner_pin)",
+      "official_semantics": "transform 内静态四角变形，仅 video/image/sticker；type 固定 corner_pin；upper_left/upper_right/lower_left/lower_right 四个 x,y 数值对必须成组出现；text/subtitle 阻断。",
+      "official_unit": "enum(corner_pin) / string(x,y 对)",
+      "source": "references/transform.md#property:deform",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "tracking",
+      "official_semantics": "tracker_type enum motion/surface（默认 motion）；motion 用 center_x/center_y（±1 归一化）+ width/height（0–2）+ target_seg_id（必须与宿主不同且时间重叠）；surface 用四角坐标 + surface_name；只作用于 text/sticker 或 multi 中的 video/image follower，主轨 video/image 不得自跟踪；运动与平面字段不得混用。",
+      "official_unit": "enum / normalized / id_ref",
+      "source": "references/transform.md#property:tracking",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "speed_curve",
+      "official_semantics": "视频曲线变速；preset 场景只写 ref（curve_speed 预设），custom 场景不写 ref 且 ≥2 个有序 point（x 为素材归一化进度 0–1、首点 x=0 末点 x=1、端点容差 1e-9；y 为速度倍率 minimum_exclusive=0）；ref 与控制点不得混合；仅 video 宿主。",
+      "official_unit": "resource_ref / normalized / multiplier",
+      "source": "references/timeline.md#property:speed_curve",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "fade.in / fade.out",
+      "official_semantics": "声音淡入/淡出时长，裸毫秒、range minimum=0；video 下作用于原声、audio/sound 下作用于该片段；不把毫秒值当音量百分比；移除淡入淡出须显式删除 fade 节点。",
+      "official_unit": "ms",
+      "source": "references/segment-audio.md#property:fade",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-domain/src/fade.rs（in_us/out_us 非负校验）+ src/timeline_ops.rs:1431 audio_fade（微秒 wire，毫秒 ×1000 换算）；能力 timeline.audio_fade"
+    },
+    {
+      "field": "beats.level / beats.mode",
+      "official_semantics": "节拍配置：mode 固定写数字字面量 1；level integer 0–4 越大越密，0 不表示关闭、移除节拍须删除 beats、档位不是每秒节拍数。",
+      "official_unit": "enum(1) / integer(0-4)",
+      "source": "references/segment-audio.md#property:beats",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "sub.size（文字字号）",
+      "official_semantics": "剪映字号数值，不是像素或画布百分比；不随画布像素数同比放大；预算：竖/方屏标题 12–14、字幕 8–10，横屏标题 14–16、字幕 9–12；默认不要写 14，不要照抄 24/48/64。",
+      "official_unit": "number(jianying-font-size)",
+      "source": "references/segment-text-sticker.md#property:sub 属性表 + 编写规则",
+      "our_coverage": "covered",
+      "our_evidence": "crates/jianying-domain/src/text_style.rs: size Option<f64>（pyJianYingDraft 同口径字号数值）；能力 captions.style = tests/captions_cli_contract.rs"
+    },
+    {
+      "field": "sub.color / sub.text_alpha",
+      "official_semantics": "color 为 canonical 文字颜色只接受 #RRGGBB，同一 sub 不与 text_color 同时输出；text_alpha 0–1（0.5 半透明），与 text_shadow_alpha 的百分制滑杆不同；text_alpha 默认 1。",
+      "official_unit": "color / normalized(0-1)",
+      "source": "references/segment-text-sticker.md#property:sub 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/text_style.rs 支持 color（valid RGB）；sub 级 text_alpha 无独立字段（透明度在 wire 段级样式内由 pyJianYingDraft 差分覆盖，本仓 TextStyle 未显式建模）"
+    },
+    {
+      "field": "letter_spacing / line_spacing",
+      "official_semantics": "text/subtitle 宿主属性滑杆值：用户说字间距 10 就写 10，不折算成 0.1 或像素；禁止写成独立子标签；未要求修改时省略。",
+      "official_unit": "slider",
+      "source": "references/segment-text-sticker.md#segment:text / #segment:subtitle 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "src/draft.rs:920 与 src/caption_ops.rs:794 的 wire 样例 line_spacing: 0.02——wire 为分数值口径，与官方'写 10 不折算'的面板滑杆口径冲突（跨通道换算系数非公开）",
+      "verification": "draft.rs:920 与 caption_ops.rs:794 中的 0.02 是硬编码默认常量而非用户可调量纲，原「wire 口径与面板冲突」的判定不成立。真实待验证点：用户按官方约定写滑杆整数时，我们是否接受并正确换算，尚无测试覆盖。"
+    },
+    {
+      "field": "text_alignment / text_typesetting",
+      "official_semantics": "text_alignment enum left/center/right/top/bottom（横排只用 left/center/right、竖排只用 top/bottom/center）；text_typesetting enum horizontal/vertical。",
+      "official_unit": "enum",
+      "source": "references/segment-text-sticker.md#segment:subtitle 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/text_style.rs alignment 为 Option<u8>（数字编码）；src/compile_ops.rs:1100 存在 ('vertical','typesetting') 映射；枚举约束（横竖排对齐值分组）未见本仓校验"
+    },
+    {
+      "field": "text_shadow* 系列",
+      "official_semantics": "阴影开关 + color(#RRGGBB) + alpha 0–100 百分制滑杆（30% 写 30，不套 text_alpha 的 0.3 写法）+ angle −180–180 + distance 0–100 + smoothing 0–100（不使用底层 0–约0.1667 引擎数值）；首次启用建议同时承接 distance/angle，缺现值参考 8 和 −45。",
+      "official_unit": "boolean / color / slider(0-100) / degree",
+      "source": "references/segment-text-sticker.md#segment:text / #segment:subtitle 属性表 + 编写规则",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/text_shadow.rs: alpha 校验 0.0..=1.0（与官方 0–100 滑杆冲突）；angle -180..180、distance 0..=100、diffuse(≈smoothing) 0..=100 与官方一致——同一结构内量纲分裂",
+      "verification": "领域层 alpha 收 0..1（text_shadow.rs:65），wire 直接写出不换算（draft.rs:481）。官方用户约定为「30% 写 30」的 0–100 滑杆，两者对用户的可接受输入不同；wire 是否正确缺真实草稿证据。另注：同结构内 distance/diffuse 为 0–100，量纲不统一，属可记录的 API 一致性问题。"
+    },
+    {
+      "field": "text_glow_ref / text_glow_strength / text_glow_range",
+      "official_semantics": "发光必须先由 MaterialRecall 以 asset_type=text_glow 绑定返回真实 blueprint_ref，新增发光时必填；strength/range 为百分制滑杆且 requires text_glow_ref；不能单独启用发光。",
+      "official_unit": "resource_ref / slider(0-100)",
+      "source": "references/segment-text-sticker.md#segment:text 属性表",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/text_style.rs 有 text_effect: Option<RawIds>（pyJianYingDraft 文字特效通道），但无 text_glow asset_type 绑定与 strength/range 滑杆语义"
+    },
+    {
+      "field": "keyword（subtitle 重点词）",
+      "official_semantics": "字幕重点词声明：text 匹配原文、occurrence 从 1 开始默认 1、bold 用 true/false、color 只接受 #RRGGBB。",
+      "official_unit": "string / integer / boolean / color",
+      "source": "references/segment-text-sticker.md#property:keyword",
+      "our_coverage": "partial",
+      "our_evidence": "crates/jianying-domain/src/style_range.rs + src/text_style_range.rs 支持区间级加粗/颜色（captions.style_ranges），但无 occurrence 定位模型"
+    },
+    {
+      "field": "template.ref（文字/字幕模板）",
+      "official_semantics": "文字或字幕模板资源引用；当前不支持用空 ref 移除模板；已有 template ref 不支持原地替换，更换模板须以全局唯一新 ID 整体替换宿主节点并保留未要求修改的时间和布局。",
+      "official_unit": "resource_ref",
+      "source": "references/segment-text-sticker.md#property:template",
+      "our_coverage": "partial",
+      "our_evidence": "CAPABILITIES.json template.library/template.replace_text/template.replace_material = supported（pyJYD 模板差分 provenance/PYJYD_TEMPLATE_DIFFERENTIALS.json 9 条）；空 ref 移除限制与'不可原地替换'约束在本仓未见等价校验"
+    },
+    {
+      "field": "speech（TTS）",
+      "official_semantics": "text 子标签：ref 绑定音色资源 + speed 语速倍率（minimum_exclusive=0，与 time.speed 分离）+ slot_index 槽位覆盖。",
+      "official_unit": "resource_ref / multiplier / integer",
+      "source": "references/segment-text-sticker.md#property:speech",
+      "our_coverage": "partial",
+      "our_evidence": "CAPABILITIES.json media.tts_local/media.tts_provider = supported（tests/media_mutation_contract.rs、jianying-media）；但为独立 TTS 流水线而非 XML speech 子标签，无 slot_index 概念"
+    },
+    {
+      "field": "slot（模板包槽位）",
+      "official_semantics": "kind enum media/audio/text/sticker；media/audio/sticker 用 ref、text 写 content+文字样式不写 ref；source_slot_id 为 canonical 寻址字段；promote_to_slot 默认 false 仅显式要求时用；template_package 必须至少一个可由 source_slot_id 唯一寻址的 slot 且不得猜测不存在的槽位。",
+      "official_unit": "enum / resource_ref / id_ref / boolean",
+      "source": "references/segment-packages.md#property:slot + #segment:template_package",
+      "our_coverage": "partial",
+      "our_evidence": "template.replace_material/template.replace_text（CAPABILITIES.json，tests/template_cli_contract.rs + tests/template_semantics_contract.rs）覆盖媒体/文字替换，但无 kind 枚举、promote_to_slot、sync_group 与 source_slot_id 强寻址契约"
+    },
+    {
+      "field": "material_package",
+      "official_semantics": "素材包片段，父角色仅 multi，属性 id/ref，子标签只有 time。",
+      "official_unit": "resource_ref",
+      "source": "references/segment-packages.md#segment:material_package",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "compound / member",
+      "official_semantics": "复合片段：compound 有 id + members（成员 ID 列表紧凑表示），子标签 member/time/tracking；member.segment_id 引用既有片段；父角色 draft/compounds。",
+      "official_unit": "id / string / id_ref",
+      "source": "references/timeline.md#element:compound / #element:member",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "subtitle_recognize（扩展动作）",
+      "official_semantics": "字幕识别占位声明：language 默认 Auto（BCP-47）、translate_language_code 请求双语、order 仅双语可用、keywords 默认 false 为显式 opt-in、keyword_scale 默认 1.0、clear_previous 默认 true、size 建议 8–12、subtitle_template_ref 可选绑定模板；父标签决定识别范围（draft/媒体父标签不填 target，旧 multi 兼容必须填 target）；不接受 recognize_type/animation_ref/mode；先完成普通修改再执行识别，不能预先引用未生成结果。",
+      "official_unit": "mixed",
+      "source": "references/extensions.md#extension_action:subtitle_recognize",
+      "our_coverage": "partial",
+      "our_evidence": "CAPABILITIES.json media.asr_provider/media.asr_whisper_cpp/media.asr_ledger/captions.translate = supported（provenance/ASR_PROTOCOL_SOURCES.json）；识别能力等价但协议形态为独立 ASR 流水线 + captions 导入，无 XML 扩展动作/宿主推导 target/clear_previous 语义"
+    },
+    {
+      "field": "lyric_recognize",
+      "official_semantics": "独立歌词识别：只接受 id/target/animation_ref；每个草稿最多一个；animation_ref 必须绑定 lyric_animation 资源；不支持双语、字体、颜色、字号、阴影、排列或显式 mode；按目标源媒体识别，不受 volume=0 或轨道静音影响。",
+      "official_unit": "id / id_ref / resource_ref",
+      "source": "references/extensions.md#extension_action:lyric_recognize",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "resource_ref / blueprint_ref 白名单",
+      "official_semantics": "资源 ref 只能来自普通工具结果中明确可用的 blueprint_ref 或当前草稿未修改的原引用；写稿前先列出本轮可用 ref 白名单，新增或替换的 videoN/imageN/audioN/soundN/musicN/filterN/effectN/fontN 必须逐字命中白名单；禁止按素材数量、自然顺序、资源名称或期望效果猜测编号；不自行导入、搜索、构造资源引用；已解决资源可独立使用，未解决资源只阻断依赖它的编辑。",
+      "official_unit": "resource_ref",
+      "source": "SKILL.md#输入与资源来源 + references/selection.md#Mutation 与参数(resource_ref)",
+      "our_coverage": "uncovered",
+      "our_evidence": "本仓资源解析走 catalogs/*.json 的 resource_id/effect_id/md5 目录（catalogs/index.json source=GuanYixuan/pyJianYingDraft），无 blueprint_ref 白名单机制；官方资源授权面另有 schemas/jianying-official-resource-preflight-v1.schema.json（license preflight，非引用白名单）"
+    },
+    {
+      "field": "Selection 修改协议（select/mutation/apply 分段）",
+      "official_semantics": "Selector 支持 tag/#id/>/后代/分组/属性匹配/:has 等；select 恰好 1 个、selectAll ≥1；15 种 Mutation；每条语句以英文分号结束；影响 ≤3 个去重片段可一次表达式内 draft.apply()，超过则只保存→核对→独立 apply；限制 expression_bytes=1048576、selector_bytes=8192、fragment_bytes=4194304、statements=1000 等。",
+      "official_unit": "protocol",
+      "source": "references/selection.md#Selector / #Mutation 与参数 / #Fragment 与事务 / #禁止与限制",
+      "our_coverage": "uncovered",
+      "our_evidence": "本仓编辑通道为 Job v2 计划/编译/执行（schemas/jianying-job-v2.schema.json、src/plan.rs、src/compile_ops.rs），无 Selection 表达式层"
+    },
+    {
+      "field": "音频源区间硬约束",
+      "official_semantics": "写入 time 前必须核对 ref 真实 duration；源区间结束点 material_start + duration*speed（speed 缺省 1）不得超过资源时长；短音效只能缩短、换长源或拆分，不能把源区间硬拉到画面时长。",
+      "official_unit": "ms",
+      "source": "references/segment-audio.md#音频源区间约束 + SKILL.md#编辑范围与素材时间",
+      "our_coverage": "uncovered",
+      "our_evidence": "本仓 timeline 增段路径（src/timeline_ops.rs add 系列）未见素材时长越界校验；media.probe 可提供时长事实（tests/media_analysis_contract.rs）但非写入门禁"
+    },
+    {
+      "field": "no-support: property:keyframe / property:keyframes",
+      "official_semantics": "Schema 标记 no-support 的高频暂不支持能力：程序化关键帧及其集合（时间相对宿主片段起点）；命中后官方 agent 通道直接说明不支持、不做同义改写重试。",
+      "official_unit": "n/a(official-channel-unsupported)",
+      "source": "references/no-support.md#Schema 标记的能力",
+      "our_coverage": "covered",
+      "our_evidence": "本仓 wire 层支持关键帧：crates/jianying-domain/src/keyframes.rs（通道/时间/值域校验）+ CAPABILITIES.json timeline.keyframe = supported（tests/timeline_cli_contract.rs）——属通道差异而非语义冲突"
+    },
+    {
+      "field": "no-support: MotionGraph 系列(element:application_params/plane/runtime_target/text_style, segment:motiongraph_effect)",
+      "official_semantics": "Schema 标记 no-support：MotionGraph 特效片段及其应用参数容器、平面目标、运行时目标、文本样式参数；命中即停止。",
+      "official_unit": "n/a(official-channel-unsupported)",
+      "source": "references/no-support.md#Schema 标记的能力",
+      "our_coverage": "uncovered",
+      "our_evidence": null
+    },
+    {
+      "field": "no-support: 人声分离 / 人声美化",
+      "official_semantics": "额外高频不支持能力：当前不支持分离人声与伴奏；不支持人声美化、音色润色等处理。",
+      "official_unit": "n/a(official-channel-unsupported)",
+      "source": "references/no-support.md#额外高频能力",
+      "our_coverage": "uncovered",
+      "our_evidence": "本仓无人声分离/美化能力；tone_effects 目录（catalogs/tone_effects.json 57 条）为变声音色而非人声美化，不构成对应"
+    },
+    {
+      "field": "平台冻结画布（speaker_cut）",
+      "official_semantics": "红白后处理只接受三种标准画布：抖音 1080×1920（9:16）、B站 1920×1080（16:9）、小红书 1080×1440（3:4）；编译前必须核对草稿实际尺寸与冻结画幅，不一致就停止；已有草稿画布与冻结画幅不一致时明确停止（DraftEditing 不支持安全迁移根画布）。",
+      "official_unit": "px / ratio",
+      "source": "skills/studio.edit.speaker_cut/SKILL.md#发布平台与画布硬门禁 + #默认红白后处理 第5步",
+      "our_coverage": "uncovered",
+      "our_evidence": "本仓无平台画幅冻结/校验能力（config-profiles 面向渲染配置，非画布契约）"
+    }
+  ]
+}
