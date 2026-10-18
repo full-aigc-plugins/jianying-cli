@@ -18,6 +18,7 @@ pub mod job_runner;
 pub mod mcp_server;
 pub mod media_analysis;
 pub mod media_ops;
+pub mod pipeline_ops;
 pub mod plan;
 pub mod probe;
 pub mod project_ops;

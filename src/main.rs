@@ -6,8 +6,8 @@ use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
     capabilities, caption_ops, control_catalog, draft, eval_ops, home_folder, interchange,
-    job_runner, media_analysis, media_ops, plan, probe, project_ops, render, resource_ops,
-    runtime_acceptance, skills, srt, store, template, tim, timeline_ops,
+    job_runner, media_analysis, media_ops, pipeline_ops, plan, probe, project_ops, render,
+    resource_ops, runtime_acceptance, skills, srt, store, template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -2354,6 +2354,22 @@ enum Command {
         #[command(subcommand)]
         op: SkillsOp,
     },
+    /// 批量流水线：目录内每份计划 → 构建 → 评分 → 渲染（无客户端）
+    Pipeline {
+        /// 存放 *.json 计划的目录
+        input: PathBuf,
+        /// 输出根目录（每个计划一个子目录）
+        #[arg(long)]
+        out: PathBuf,
+        /// 低于该分数视为失败（退出码 1），用于 CI 门禁
+        #[arg(long)]
+        fail_under: Option<i64>,
+        /// 渲染缩放
+        #[arg(long, default_value_t = 0.5)]
+        scale: f64,
+        #[arg(long, default_value_t = 28)]
+        crf: i32,
+    },
     /// 评估-修正循环：按问题挑安全修复并重评，直到达标或无修复可做
     Loop {
         draft: PathBuf,
@@ -3919,6 +3935,20 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             run_verify(args, json)?;
         }
         Command::Eval(args) => print_output(eval_ops::evaluate(&args.draft)?, json),
+        Command::Pipeline {
+            input,
+            out,
+            fail_under,
+            scale,
+            crf,
+        } => {
+            let report = pipeline_ops::run(&input, &out, fail_under, scale, crf)?;
+            let failed = report["failed"].as_u64().unwrap_or(0);
+            print_output(report, json);
+            if failed > 0 {
+                std::process::exit(1);
+            }
+        }
         Command::Skills { op } => match op {
             SkillsOp::List { status } => {
                 let registry = skills::registry();

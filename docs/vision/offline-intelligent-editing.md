@@ -66,7 +66,7 @@ ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -o
 | V2 dream-loop 闭环 | 🟡 闭环已可运行：`eval` 给 0–100 确定性评分 + 结构化问题，`loop` 按问题挑安全修复并重评（最大轮数、显式停止原因）；**缺**内容级生成与更丰富的修复集 | `src/eval_ops.rs`、`tests/eval_loop_contract.rs` |
 | V3 hypit 计划层 | 🟡 `plan/v1` 可程序化生成/改写，`timeline` 33 条命令可增量修改；缺"计划级组合与回滚语义" | `docs/plan-format.md`、`src/plan.rs` |
 | V4 editor-skill 整合 | 🟡 已建**技能注册表**：14 条工作流技能带状态/意图/命令/缺口，且合同测试校验引用命令真实存在；缺口以 `partial`/`missing` 显式登记 | `src/skills.rs`、`tests/skills_contract.rs`、`jianying skills list` |
-| V5 headless 能力 | 🟡 探针/ASR/TTS/渲染/字幕/资源库齐备，缺批处理编排与"多片一次出"的验收 | `src/render.rs`、`media asr|tts`、`tests/render_batch_contract.rs` |
+| V5 headless 能力 | 🟢 批量流水线已通：`pipeline <计划目录>` 一次完成 构建→评分→渲染，失败按条隔离，`--fail-under` 作 CI 门禁；**渲染仍是预览级** | `src/pipeline_ops.rs`、`tests/pipeline_contract.rs` |
 | V6 无客户端出片 | 🟢 **预览级已通**（§3 实测）；权威导出明确不做 | 本文 §3 |
 
 图例：🟢 已达成 / 🟡 部分 / 🔴 未开始。
