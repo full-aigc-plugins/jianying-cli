@@ -112,6 +112,22 @@ impl ToolRegistry {
                 true,
             ),
             ToolDescriptor::new(
+                "jianying_loop",
+                "评估—修复—重评闭环：跑最多 max_rounds 轮安全修复并返回每轮结果",
+                serde_json::json!({
+                    "type":"object","required":["draft"],"additionalProperties":false,
+                    "properties":{
+                        "draft":{"type":"string","minLength":1},
+                        "max_rounds":{"type":"integer","minimum":0,"maximum":20,"default":3},
+                        "min_score":{"type":"integer","minimum":0,"maximum":100,"default":100},
+                        "deep":{"type":"boolean","default":false},
+                        "policy":{"type":"string","description":"jianying-eval-policy/v1 文件路径"}
+                    }
+                }),
+                envelope_schema(),
+                false,
+            ),
+            ToolDescriptor::new(
                 "jianying_media_probe",
                 "探测媒体时长/分辨率/流/是否图片，等价 `media probe`",
                 serde_json::json!({

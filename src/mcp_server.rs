@@ -165,6 +165,26 @@ impl JianyingMcpServer {
                 let track = arguments.get("track").and_then(Value::as_str);
                 crate::timeline_ops::segments(&draft, track)
             }
+            "jianying_loop" => {
+                let draft = required_path(&arguments, "draft")?;
+                let max_rounds = arguments
+                    .get("max_rounds")
+                    .and_then(Value::as_u64)
+                    .unwrap_or(3) as u32;
+                let min_score = arguments
+                    .get("min_score")
+                    .and_then(Value::as_i64)
+                    .unwrap_or(100);
+                let deep = arguments
+                    .get("deep")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false);
+                let policy = match arguments.get("policy").and_then(Value::as_str) {
+                    Some(path) => crate::eval_policy::Policy::load(Path::new(path))?,
+                    None => crate::eval_policy::Policy::default(),
+                };
+                crate::eval_ops::run_loop(&draft, max_rounds, min_score, deep, &policy)
+            }
             "jianying_media_probe" => {
                 let path = required_path(&arguments, "path")?;
                 let info = crate::probe::probe(&path)?;

@@ -561,6 +561,79 @@ fn integrated_lufs(media: &Path) -> Option<f64> {
     last
 }
 
+/// 评估—修复—重评循环；CLI `loop` 与 MCP `jianying_loop` 共用这一段。
+pub fn run_loop(
+    draft: &Path,
+    max_rounds: u32,
+    min_score: i64,
+    deep: bool,
+    policy: &crate::eval_policy::Policy,
+) -> Result<Value> {
+    let evaluate = |path: &Path| -> Result<Value> {
+        if deep {
+            evaluate_deep_with(path, policy)
+        } else {
+            evaluate_with(path, policy)
+        }
+    };
+    let mut report = evaluate(draft)?;
+    let mut rounds: Vec<Value> = Vec::new();
+    let mut stopped = "clean";
+    for round in 1..=max_rounds {
+        let clean = report["score"].as_i64().unwrap_or(0) >= min_score
+            && report["issues"]
+                .as_array()
+                .map(Vec::is_empty)
+                .unwrap_or(false);
+        if clean {
+            break;
+        }
+        let Some(repair) = next_repair(&report) else {
+            stopped = if report["issues"]
+                .as_array()
+                .map(Vec::is_empty)
+                .unwrap_or(false)
+            {
+                "below-target"
+            } else {
+                "no-safe-repair"
+            };
+            break;
+        };
+        let before = report.clone();
+        let applied = repair_with_policy(draft, repair, policy)?;
+        report = evaluate(draft)?;
+        rounds.push(json!({
+            "round": round,
+            "repair": repair,
+            "applied": applied,
+            "score_before": before["score"],
+            "score_after": report["score"],
+            "issues_before": before["issues"],
+            "issues_after": report["issues"],
+        }));
+        if round == max_rounds {
+            stopped = "max-rounds-reached";
+        }
+    }
+    if report["score"].as_i64().unwrap_or(0) >= min_score
+        && report["issues"]
+            .as_array()
+            .map(Vec::is_empty)
+            .unwrap_or(false)
+    {
+        stopped = "clean";
+    }
+    Ok(json!({
+        "ok": true,
+        "draft": draft.to_string_lossy(),
+        "rounds": rounds,
+        "final": report,
+        "stopped": stopped,
+        "policy": policy.to_json(),
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::{next_repair, permille};

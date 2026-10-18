@@ -755,3 +755,95 @@ fn loop_splits_a_long_shot_without_changing_the_footage() {
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn the_loop_is_reachable_over_mcp() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("mcp-loop");
+    let clip = root.join("long.mp4");
+    ffmpeg_out(&[
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc=s=320x180:d=10",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        "-y",
+        &clip.to_string_lossy(),
+    ]);
+    let plan = json!({
+        "schema":"jianying-cli-plan/v1","name":"mcp-loop",
+        "canvas":{"width":320,"height":180,"fps":30},
+        "tracks":[{"type":"video","segments":[
+            {"start_us":0,"duration_us":10_000_000,"source":"long.mp4"}
+        ]}]
+    });
+    let plan_path = root.join("plan.json");
+    fs::write(&plan_path, serde_json::to_string(&plan).unwrap()).unwrap();
+    let draft = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &plan_path.to_string_lossy(),
+        "--out",
+        &draft.to_string_lossy(),
+        "--json",
+    ]);
+
+    let requests = [
+        json!({"jsonrpc":"2.0","id":1,"method":"initialize",
+               "params":{"protocolVersion":"2024-11-05","capabilities":{},
+                          "clientInfo":{"name":"loop","version":"1"}}}),
+        json!({"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}),
+        json!({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{
+            "name":"jianying_loop",
+            "arguments":{"draft":draft.to_string_lossy(),"max_rounds":2}}}),
+    ];
+    let mut child = Command::new(env!("CARGO_BIN_EXE_jianying"))
+        .args(["mcp", "serve"])
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    {
+        use std::io::Write;
+        let stdin = child.stdin.as_mut().unwrap();
+        for request in &requests {
+            writeln!(stdin, "{request}").unwrap();
+        }
+    }
+    let output = child.wait_with_output().unwrap();
+    let responses: Vec<Value> = String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .filter(|line| line.trim_start().starts_with('{'))
+        .map(|line| serde_json::from_str::<Value>(line).unwrap())
+        .collect();
+
+    let tools: Vec<&str> = responses
+        .iter()
+        .find(|message| message["id"] == json!(2))
+        .unwrap()["result"]["tools"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|tool| tool["name"].as_str().unwrap())
+        .collect();
+    assert!(tools.contains(&"jianying_loop"), "tools={tools:?}");
+
+    let response = responses
+        .iter()
+        .find(|message| message["id"] == json!(3))
+        .expect("loop 响应");
+    let data: Value =
+        serde_json::from_str(response["result"]["content"][0]["text"].as_str().unwrap()).unwrap();
+    let data = data["data"].clone();
+    assert_eq!(data["stopped"], json!("clean"));
+    assert_eq!(data["rounds"][0]["repair"], json!("split-long-shots"));
+    assert_eq!(data["final"]["score"], json!(100));
+    let _ = fs::remove_dir_all(root);
+}

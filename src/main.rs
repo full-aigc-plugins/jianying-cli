@@ -4150,71 +4150,8 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 Some(path) => eval_policy::Policy::load(&path)?,
                 None => eval_policy::Policy::default(),
             };
-            let evaluate = |path: &Path| -> Result<Value> {
-                if deep {
-                    eval_ops::evaluate_deep_with(path, &policy)
-                } else {
-                    eval_ops::evaluate_with(path, &policy)
-                }
-            };
-            let mut report = evaluate(&draft)?;
-            let mut rounds: Vec<Value> = Vec::new();
-            let mut stopped = "clean";
-            for round in 1..=max_rounds {
-                let clean = report["score"].as_f64().unwrap_or(0.0) >= min_score as f64
-                    && report["issues"]
-                        .as_array()
-                        .map(Vec::is_empty)
-                        .unwrap_or(false);
-                if clean {
-                    break;
-                }
-                let Some(repair) = eval_ops::next_repair(&report) else {
-                    stopped = if report["issues"]
-                        .as_array()
-                        .map(Vec::is_empty)
-                        .unwrap_or(false)
-                    {
-                        "below-target"
-                    } else {
-                        "no-safe-repair"
-                    };
-                    break;
-                };
-                let before = report.clone();
-                let applied = eval_ops::repair(&draft, repair)?;
-                report = evaluate(&draft)?;
-                rounds.push(json!({
-                    "round": round,
-                    "repair": repair,
-                    "applied": applied,
-                    "score_before": before["score"],
-                    "score_after": report["score"],
-                    "issues_before": before["issues"],
-                    "issues_after": report["issues"],
-                }));
-                if round == max_rounds {
-                    stopped = "max-rounds-reached";
-                }
-            }
-            if report["score"].as_f64().unwrap_or(0.0) >= min_score as f64
-                && report["issues"]
-                    .as_array()
-                    .map(Vec::is_empty)
-                    .unwrap_or(false)
-            {
-                stopped = "clean";
-            }
-            print_output(
-                json!({
-                    "ok": true,
-                    "draft": draft.to_string_lossy(),
-                    "rounds": rounds,
-                    "final": report,
-                    "stopped": stopped,
-                }),
-                json,
-            );
+            let report = eval_ops::run_loop(&draft, max_rounds, min_score, deep, &policy)?;
+            print_output(report, json);
         }
         Command::Inspect(args) => {
             deprecated_alias("jianying inspect", "jianying project inspect");
