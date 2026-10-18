@@ -719,6 +719,13 @@ enum TimelineOp {
         /// Catalog name (场景音效 / 音色 / 声音成曲)
         name: String,
     },
+    /// Toggle speed-synchronised pitch change (plan `change_pitch` / is_tone_modify)
+    Pitch {
+        draft: PathBuf,
+        id: String,
+        /// `on` or `off`
+        state: String,
+    },
     /// Add an empty track
     AddTrack {
         draft: PathBuf,
@@ -2622,6 +2629,14 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             }
             TimelineOp::AudioEffect { draft, id, name } => {
                 print_output(timeline_ops::audio_effect(&draft, &id, &name)?, json)
+            }
+            TimelineOp::Pitch { draft, id, state } => {
+                let enabled = match state.trim().to_ascii_lowercase().as_str() {
+                    "on" | "true" | "1" => true,
+                    "off" | "false" | "0" => false,
+                    other => bail!("pitch state must be on/off, got {other:?}"),
+                };
+                print_output(timeline_ops::change_pitch(&draft, &id, enabled)?, json)
             }
             TimelineOp::AddTrack { draft, kind, name } => {
                 print_output(timeline_ops::add_track(&draft, &kind, &name)?, json)

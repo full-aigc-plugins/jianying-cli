@@ -2752,6 +2752,19 @@ where
     Ok(output)
 }
 
+/// 设置变速是否同步变调（`is_tone_modify`），与计划字段 `change_pitch` 同义。
+pub fn change_pitch(draft: &Path, id: &str, enabled: bool) -> Result<Value> {
+    mutate(draft, |timeline| {
+        let segment = find_segment_mut(timeline, id)?;
+        let old = segment["is_tone_modify"].as_bool().unwrap_or(false);
+        segment["is_tone_modify"] = json!(enabled);
+        Ok(json!({
+            "ok": true, "id": id,
+            "old_change_pitch": old, "change_pitch": enabled
+        }))
+    })
+}
+
 /// 把用户资源库里的一条素材挂到片段上。
 ///
 /// 资源库来自用户自己草稿的反演（见 `resource_ops`），因此这里只做「按记录落盘」：

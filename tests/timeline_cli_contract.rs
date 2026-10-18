@@ -1956,3 +1956,92 @@ fn audio_effect_attaches_from_the_catalog_and_is_idempotent() {
     assert!(String::from_utf8_lossy(&unknown.stdout).contains("unknown audio effect"));
     let _ = std::fs::remove_dir_all(root);
 }
+
+#[test]
+fn pitch_toggles_is_tone_modify_and_matches_the_plan_field() {
+    let root = std::env::temp_dir().join(format!("jianying-pitch-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    std::fs::create_dir_all(&root).unwrap();
+    std::fs::write(root.join("clip.mp4"), b"fixture").unwrap();
+
+    let authored_root = root.join("authored");
+    std::fs::create_dir_all(&authored_root).unwrap();
+    std::fs::write(authored_root.join("clip.mp4"), b"fixture").unwrap();
+    let authored_plan: Plan = serde_json::from_value(serde_json::json!({
+        "schema":"jianying-cli-plan/v1","name":"pitch-authored",
+        "canvas":{"width":1920,"height":1080,"fps":30},
+        "tracks":[{"type":"video","segments":[{
+            "start_us":0,"duration_us":2000000,"source":"clip.mp4",
+            "speed":1.5,"change_pitch":true
+        }]}]
+    }))
+    .unwrap();
+    let authored = root.join("authored-draft");
+    draft::build(&authored_plan, &authored_root, &authored, None, &probe_stub).unwrap();
+
+    let edited_plan: Plan = serde_json::from_value(serde_json::json!({
+        "schema":"jianying-cli-plan/v1","name":"pitch-edited",
+        "canvas":{"width":1920,"height":1080,"fps":30},
+        "tracks":[{"type":"video","segments":[{
+            "start_us":0,"duration_us":2000000,"source":"clip.mp4","speed":1.5
+        }]}]
+    }))
+    .unwrap();
+    let edited = root.join("edited-draft");
+    draft::build(&edited_plan, &root, &edited, None, &probe_stub).unwrap();
+    let id = run_ok(&[
+        "timeline",
+        "segments",
+        &edited.to_string_lossy(),
+        "--track",
+        "video",
+        "--json",
+    ])[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    let on = run_ok(&[
+        "timeline",
+        "pitch",
+        &edited.to_string_lossy(),
+        &id,
+        "on",
+        "--json",
+    ]);
+    assert_eq!(on["change_pitch"], true);
+    assert_eq!(on["old_change_pitch"], false);
+    let authored_timeline = draft::load_timeline(&authored).unwrap();
+    let edited_timeline = draft::load_timeline(&edited).unwrap();
+    assert_eq!(
+        edited_timeline["tracks"][0]["segments"][0]["is_tone_modify"],
+        authored_timeline["tracks"][0]["segments"][0]["is_tone_modify"],
+        "计划 change_pitch 与事后 timeline pitch 必须写出同一字段"
+    );
+
+    let off = run_ok(&[
+        "timeline",
+        "pitch",
+        &edited.to_string_lossy(),
+        &id,
+        "off",
+        "--json",
+    ]);
+    assert_eq!(off["change_pitch"], false);
+    assert_eq!(
+        run_ok(&["project", "verify", &edited.to_string_lossy(), "--json"])["ok"],
+        true
+    );
+
+    let invalid = run(&[
+        "timeline",
+        "pitch",
+        &edited.to_string_lossy(),
+        &id,
+        "maybe",
+        "--json",
+    ]);
+    assert_eq!(invalid.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&invalid.stdout).contains("pitch state must be on/off"));
+    let _ = std::fs::remove_dir_all(root);
+}
