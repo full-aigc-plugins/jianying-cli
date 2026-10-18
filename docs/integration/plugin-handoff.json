@@ -1,0 +1,80 @@
+{
+  "schema": "jianying-plugin-handoff/v1",
+  "purpose": "jianying-edit-plugin 侧接入本 CLI 新能力的交接契约。CLI 侧只声明并自证，不在本仓库修改插件。",
+  "plugin": {
+    "name": "jianying-edit",
+    "observed_version": "0.27.9",
+    "cli_lock": "runtime/jianying-cli.lock.json",
+    "enforcement": "runtime_adapter.mjs#requireCapabilities: requiredCapabilities 里的每个 id 必须在 `jianying capabilities --json` 中 status=supported"
+  },
+  "cli": {
+    "capability_schema": "jianying-capabilities/v1",
+    "job_schema": "jianying-job/v2",
+    "observed_version": "1.6.31"
+  },
+  "requiredCapabilities": [
+    "capabilities",
+    "schema.job_v2",
+    "job.run",
+    "eval",
+    "loop",
+    "skills",
+    "pipeline",
+    "resource.mine",
+    "resource.list",
+    "resource.apply",
+    "timeline.audio_effect",
+    "pyjyd.api_coverage"
+  ],
+  "commands": [
+    "eval",
+    "loop",
+    "skills list",
+    "skills show",
+    "pipeline",
+    "resource mine",
+    "resource list",
+    "resource resolve",
+    "resource apply",
+    "timeline audio-effect",
+    "timeline pitch"
+  ],
+  "skillRouting": {
+    "jianying-inspect": ["eval", "skills list"],
+    "jianying-export-prep": ["pipeline", "render proxy", "project verify"],
+    "jianying-audio": ["timeline audio-effect", "timeline pitch"],
+    "jianying-use": ["resource mine", "resource apply", "skills show"]
+  },
+  "pluginSteps": [
+    {
+      "order": 1,
+      "owner": "jianying-cli",
+      "action": "发布包含上述能力的 CLI 版本（含各平台产物与 sha256），本次未执行",
+      "gate": "release"
+    },
+    {
+      "order": 2,
+      "owner": "jianying-edit-plugin",
+      "action": "更新 runtime/jianying-cli.lock.json：minimumVersion/resolvedVersion、requiredCapabilities、artifacts 的 url 与 sha256",
+      "gate": "plugin-release"
+    },
+    {
+      "order": 3,
+      "owner": "jianying-edit-plugin",
+      "action": "按 skillRouting 更新对应技能文本，引用确切命令与输出字段",
+      "gate": "plugin-release"
+    },
+    {
+      "order": 4,
+      "owner": "jianying-edit-plugin",
+      "action": "bump 插件版本、同步 marketplaces 清单并发布（其 AGENTS.md 强制要求）",
+      "gate": "plugin-release"
+    }
+  ],
+  "constraints": [
+    "jianying-edit-plugin/AGENTS.md 规定：任何代码改动都必须 bump 版本并发布；因此插件侧改动不能只提交不发布。",
+    "CLI 侧不得伪造产物或 sha256：lock 里的 artifacts 必须来自真实 release。",
+    "插件技能目录由 jianying-skills 上游仓库（skills.lock.json，v2.3.0）锁定，不能在本仓库手改，只能通过上游版本滚动。"
+  ],
+  "blocked": "插件侧（步骤 2-4）需要 CLI 先发布 release artifact，且需要发布授权；本轮只交付本契约与自证测试。"
+}
