@@ -4,7 +4,7 @@
   "release": {
     "ref": "v1.6.23",
     "source_commit": "ff1cfbe6edce489858ba8e8d60c79728ba1fc843",
-    "workflow_run": "https://github.com/full-aigc-plugins/jianying-cli/actions/runs/35743839693",
+    "workflow_run": "https://github.com/full-aigc-plugins/jianying-draft/actions/runs/35743839693",
     "immutable": true,
     "attestation_verified": true,
     "release_index_sha256": "1c03736a1e9e3a4dab161d20782befb0ba3924fa04dfe3d557abefc6aebd084d",

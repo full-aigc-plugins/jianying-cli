@@ -91,23 +91,23 @@ class ReleaseIndexTests(unittest.TestCase):
             commit = "a" * 40
             evidence = {"verificationResult": {"statement": {
                 "predicate": {
-                    "repository": "full-aigc-plugins/jianying-cli",
+                    "repository": "full-aigc-plugins/jianying-draft",
                     "tag": "v1.6.5",
                 },
                 "subject": [
-                    {"uri": "pkg:github/full-aigc-plugins/jianying-cli@v1.6.5",
+                    {"uri": "pkg:github/full-aigc-plugins/jianying-draft@v1.6.5",
                      "digest": {"sha1": commit}},
                     {"name": asset.name,
                      "digest": {"sha256": hashlib.sha256(b"release").hexdigest()}},
                 ],
             }}}
             ATTESTATION.verify(
-                evidence, "full-aigc-plugins/jianying-cli", "v1.6.5",
+                evidence, "full-aigc-plugins/jianying-draft", "v1.6.5",
                 commit, [asset],
             )
             with self.assertRaisesRegex(ValueError, "tag object differs"):
                 ATTESTATION.verify(
-                    evidence, "full-aigc-plugins/jianying-cli", "v1.6.5",
+                    evidence, "full-aigc-plugins/jianying-draft", "v1.6.5",
                     "b" * 40, [asset],
                 )
 
@@ -121,7 +121,7 @@ class ReleaseIndexTests(unittest.TestCase):
             )
 
         self.assertIsNone(PUBLICATION.query_release_metadata(
-            "full-aigc-plugins/jianying-cli", "v1.6.5", missing,
+            "full-aigc-plugins/jianying-draft", "v1.6.5", missing,
         ))
 
         def forbidden(*_args, **_kwargs):
@@ -132,7 +132,7 @@ class ReleaseIndexTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "cannot query GitHub release"):
             PUBLICATION.query_release_metadata(
-                "full-aigc-plugins/jianying-cli", "v1.6.5", forbidden,
+                "full-aigc-plugins/jianying-draft", "v1.6.5", forbidden,
             )
 
     def test_release_query_recovers_tagged_draft_from_release_list(self) -> None:
@@ -147,7 +147,7 @@ class ReleaseIndexTests(unittest.TestCase):
             )
 
         metadata = PUBLICATION.query_release_metadata(
-            "full-aigc-plugins/jianying-cli", "v1.6.5", draft,
+            "full-aigc-plugins/jianying-draft", "v1.6.5", draft,
         )
         self.assertTrue(metadata["isDraft"])
         self.assertEqual(metadata["assets"], [])
@@ -527,10 +527,10 @@ class ReleaseIndexTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self.fixture(root, ("darwin-arm64", "darwin-x64", "win32-x64"))
-            index = INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.5")
+            index = INDEX.build_index(root, "full-aigc-plugins/jianying-draft", "v1.6.5")
             self.assertEqual(index["schema"], "jianying-cli-release-index/v1")
             self.assertEqual(index["releaseRef"], "v1.6.5")
-            self.assertEqual(index["repository"], "full-aigc-plugins/jianying-cli")
+            self.assertEqual(index["repository"], "full-aigc-plugins/jianying-draft")
             self.assertEqual(set(index["artifacts"]), INDEX.PLATFORMS)
             self.assertEqual(index["sourceCommit"], "a" * 40)
             self.assertTrue(index["artifacts"]["win32-x64"]["url"].startswith("https://"))
@@ -551,7 +551,7 @@ class ReleaseIndexTests(unittest.TestCase):
             entry_path.write_text(json.dumps(entry))
             with self.assertRaisesRegex(ValueError, "exact archive name"):
                 INDEX.build_index(
-                    root, "full-aigc-plugins/jianying-cli", "v1.6.5"
+                    root, "full-aigc-plugins/jianying-draft", "v1.6.5"
                 )
 
     def test_missing_platform_and_tampered_archive_are_rejected(self) -> None:
@@ -559,14 +559,14 @@ class ReleaseIndexTests(unittest.TestCase):
             root = Path(temporary)
             self.fixture(root, ("darwin-arm64",))
             with self.assertRaisesRegex(ValueError, "exactly one entry"):
-                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.5")
+                INDEX.build_index(root, "full-aigc-plugins/jianying-draft", "v1.6.5")
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             self.fixture(root, ("darwin-arm64", "darwin-x64", "win32-x64"))
             next(root.rglob("*.zip")).write_bytes(b"tampered")
             with self.assertRaisesRegex(ValueError, "checksum differs"):
-                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.5")
+                INDEX.build_index(root, "full-aigc-plugins/jianying-draft", "v1.6.5")
 
     def test_missing_or_tampered_archive_checksum_sidecar_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -576,7 +576,7 @@ class ReleaseIndexTests(unittest.TestCase):
             sidecar.unlink()
             with self.assertRaisesRegex(ValueError, "checksum sidecar"):
                 INDEX.build_index(
-                    root, "full-aigc-plugins/jianying-cli", "v1.6.5"
+                    root, "full-aigc-plugins/jianying-draft", "v1.6.5"
                 )
 
         with tempfile.TemporaryDirectory() as temporary:
@@ -586,7 +586,7 @@ class ReleaseIndexTests(unittest.TestCase):
             sidecar.write_text(f"{'0' * 64}  wrong-name.zip\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "checksum sidecar"):
                 INDEX.build_index(
-                    root, "full-aigc-plugins/jianying-cli", "v1.6.5"
+                    root, "full-aigc-plugins/jianying-draft", "v1.6.5"
                 )
 
     def test_unreleased_platform_entry_is_rejected(self) -> None:
@@ -599,7 +599,7 @@ class ReleaseIndexTests(unittest.TestCase):
             entry["releaseRef"] = None
             entry_path.write_text(json.dumps(entry))
             with self.assertRaisesRegex(ValueError, "not bound to the release tag"):
-                INDEX.build_index(root, "full-aigc-plugins/jianying-cli", "v1.6.5")
+                INDEX.build_index(root, "full-aigc-plugins/jianying-draft", "v1.6.5")
 
     def test_packager_rejects_stale_binary_contract_and_split_identity(self) -> None:
         embedded = json.loads(

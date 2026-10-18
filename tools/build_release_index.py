@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 PLATFORMS = {"darwin-arm64", "darwin-x64", "win32-x64"}
-CANONICAL_REPOSITORY = "full-aigc-plugins/jianying-cli"
+CANONICAL_REPOSITORY = "full-aigc-plugins/jianying-draft"
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 SEMVER_TAG = re.compile(r"^v(\d+\.\d+\.\d+)$")
 

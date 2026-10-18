@@ -14,7 +14,7 @@ from typing import Callable
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY = "full-aigc-plugins/jianying-cli"
+REPOSITORY = "full-aigc-plugins/jianying-draft"
 
 
 class RemoteQueryError(RuntimeError):

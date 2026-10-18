@@ -69,7 +69,7 @@ canary 尚未完成前，该条目必须保持 `platform=windows`、`status=exte
 verifier 来签发能力状态提前升级的 archive。
 因此未来的三平台制品不能只凭交叉编译或外部 manifest 通过发布门禁。
 
-Release index 还固定 `repository=full-aigc-plugins/jianying-cli` 与 `releaseRef=v<version>`；
+Release index 还固定 `repository=full-aigc-plugins/jianying-draft` 与 `releaseRef=v<version>`；
 聚合器本身只接受该正典仓库，并要求 macOS archive 精确命名为
 `jianying-cli-<version>-darwin-{arm64|x64}.tar.gz`、Windows archive 精确命名为
 `jianying-cli-<version>-win32-x64.zip`；每个 archive 还必须具有内容精确为
@@ -180,7 +180,7 @@ Windows 摘要；后续 `windows-2025` 工作流必须从当前源码重新构�
 ```bash
 python3 tools/build_release_index.py \
   --input-dir dist \
-  --repository full-aigc-plugins/jianying-cli \
+  --repository full-aigc-plugins/jianying-draft \
   --tag v1.6.5 \
   --output dist/jianying-cli-release-index.json
 ```
@@ -211,7 +211,7 @@ tag 触发时，`source-parity-gate` 会在完整 workspace 构建和来源差�
 依赖。手工预演即使前置条件尚未满足也会继续构建，但仍保留报告；tag 路径则在 Rust toolchain、
 完整测试与三平台 runner 启动前 fail closed。publish 阶段继续二次读取设置，防止运行期间漂移。
 
-截至 2026-09-20 的只读实时核对，`full-aigc-plugins/jianying-cli` 与
+截至 2026-09-20 的只读实时核对，`full-aigc-plugins/jianying-draft` 与
 `full-aigc-plugins/jianying-edit-plugin` 的 GitHub Immutable Releases 设置均为 `enabled=false`，
 `full-aigc-skills/jianying-skills` 为 `enabled=true`。本仓库设置尚未开启，因此正式 tag 工作流会按
 上述预检 fail-closed；该快照不是发布授权，也不是 OpenSpec `9.5` 的完成证据。

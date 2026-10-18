@@ -25,6 +25,7 @@ def creation_timestamp() -> str:
             check=True,
             capture_output=True,
             text=True,
+            encoding="utf-8",
         ).stdout.strip()
     try:
         epoch = int(raw_epoch)
@@ -58,6 +59,7 @@ def main() -> int:
         check=True,
         capture_output=True,
         text=True,
+        encoding="utf-8",
     )
     metadata = json.loads(result.stdout)
     packages = sorted(metadata["packages"], key=lambda item: (item["name"], item["version"]))

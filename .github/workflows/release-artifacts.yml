@@ -213,7 +213,7 @@ jobs:
         run: >-
           python3 tools/build_release_index.py
           --input-dir dist
-          --repository full-aigc-plugins/jianying-cli
+          --repository full-aigc-plugins/jianying-draft
           --tag "${GITHUB_REF_NAME}"
           --output dist/jianying-cli-release-index.json
       - name: Require GitHub immutable releases before publishing
