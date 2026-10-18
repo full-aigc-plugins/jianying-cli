@@ -79,13 +79,19 @@ Rust 实现，逐文件复核 `manifest.json` 里的 sha256 与大小；任何�
 - 命令桥与检视工具的用法；
 - lock 文件需要填写的字段。
 
-## 当前状态（本轮结束时）
+## 当前状态（本机实测，未发布）
 
-| 步骤 | 状态 |
-|---|---|
-| 1. 构建 | ✅ 本机完成（release 二进制 24.5 MB） |
-| 2. SBOM | ✅ 237 个包 |
-| 3. 打包 | ✅ zip + sha256 + release-entry |
-| 4. 离线复核 | ✅ `jianying release verify` 通过 |
-| 5. 发布 | ⛔ 未执行（等待授权） |
-| 6. 插件接入 | ⛔ 未执行（等待发版授权） |
+| 步骤 | 状态 | 证据 |
+|---|---|---|
+| 1. 构建 | ✅ | release 二进制 24.5 MB，`1.6.31`，identity=`committed_unreleased` |
+| 2. SBOM | ✅ | `SBOM.spdx.json`，237 个包 |
+| 3. 打包 | ✅ | `jianying-cli-1.6.31-win32-x64.zip`（8.29 MB） |
+| 4. 离线复核 | ✅ | 包内 11 个文件全部匹配；改一个字节后 `sha256 mismatch` |
+| 5. 发布 | ⛔ | 未打 tag、未推送、未上传 |
+| 6. 插件接入 | ⛔ | 未改动 jianying-edit-plugin |
+
+归档 `sha256`：`71bad1cc28f4d5f56d43f0edb4f8b8d1f2c211786bdc407ad4ea029021663fbc`
+
+> 注意：`contentState=committed_unreleased`。插件侧 lock 只应接受真正的
+> `released` 产物（tag 构建），因此现在**还不是**可以写进
+> `runtime/jianying-cli.lock.json` 的东西。
