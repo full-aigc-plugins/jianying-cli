@@ -162,10 +162,9 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
     }
 
     let mut tracks = vec![json!({"type": "video", "name": "main", "segments": segments})];
-    if !original_audio.is_empty() {
-        // 代理渲染只混 `audio` 轨；把画面自带的原声显式落成音轨，预览才有声音。
-        tracks.push(json!({"type": "audio", "name": "original", "segments": original_audio}));
-    }
+    // 画面自带的音轨由代理渲染直接混入，这里不再重复落一条 audio 轨，
+    // 避免同一段声音被混两遍、也避免计划里出现与画面重复的时间线。
+    let _ = &original_audio;
 
     // 背景音乐：从 0 起铺到成片时长（可短于成片）。
     if let Some(music) = brief["music"].as_str() {

@@ -264,6 +264,7 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
     let mut loudness_cache: std::collections::BTreeMap<String, Option<f64>> =
         std::collections::BTreeMap::new();
     let mut analysed = 0_usize;
+    let mut embedded_audio = 0_usize;
     let mut checked = 0_usize;
     let mut media_issues: Vec<Value> = Vec::new();
     for track in timeline["tracks"].as_array().into_iter().flatten() {
@@ -310,6 +311,12 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
             let window_end = source_start + source_length;
             if window_end > source_start {
                 if track_kind == "video" {
+                    if crate::probe::probe(std::path::Path::new(path))
+                        .map(|info| info.has_audio)
+                        .unwrap_or(false)
+                    {
+                        embedded_audio += 1;
+                    }
                     let spans = black_cache
                         .entry(path.clone())
                         .or_insert_with(|| black_spans_us(std::path::Path::new(path)))
@@ -395,6 +402,7 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
     report["deep"] = json!(true);
     report["media_checked"] = json!(checked);
     report["media_analysed"] = json!(analysed);
+    report["embedded_audio_segments"] = json!(embedded_audio);
     report["penalties"] = json!(penalties);
     report["score_before_media"] = json!(base);
     Ok(report)

@@ -170,6 +170,8 @@ pub fn render(
     let mut vparts: Vec<String> = Vec::new();
     let mut apart: Vec<String> = Vec::new();
     let mut input_idx = 0usize;
+    // 画面自带的音轨：显式音轨之外也要参与混音，否则带声音的视频预览是静音的。
+    let mut video_audio: Vec<(usize, i64, i64, i64, f64, f64)> = Vec::new();
     let mut background_blur_segments = 0usize;
 
     let tracks = tl["tracks"].as_array().unwrap();
@@ -248,6 +250,24 @@ pub fn render(
                 ));
                 vparts.push(format!("[{input_idx}:v]{chain}[v{input_idx}]"));
             }
+            if !is_photo {
+                let has_embedded_audio = material["path"]
+                    .as_str()
+                    .map(std::path::Path::new)
+                    .and_then(|p| crate::probe::probe(p).ok())
+                    .map(|info| info.has_audio)
+                    .unwrap_or(false);
+                if has_embedded_audio {
+                    video_audio.push((
+                        input_idx,
+                        src_start,
+                        dur,
+                        s["target_timerange"]["start"].as_i64().unwrap_or(0),
+                        speed,
+                        s["volume"].as_f64().unwrap_or(1.0),
+                    ));
+                }
+            }
             input_idx += 1;
         }
     }
@@ -316,6 +336,22 @@ pub fn render(
             apart.push(chain);
             aidx += 1;
         }
+    }
+    // 视频自带的音轨按源窗口切出来，延迟到目标起点后参与混音。
+    for (vidx, src_start, dur, target_start, speed, volume) in &video_audio {
+        let mut chain = format!(
+            "[{vidx}:a]atrim=start={}:duration={},asetpts=PTS-STARTPTS,atempo={}",
+            us_to_secs(*src_start),
+            us_to_secs(*dur),
+            speed.clamp(0.5, 2.0)
+        );
+        if (*volume - 1.0).abs() > 1e-9 {
+            chain.push_str(&format!(",volume={volume}"));
+        }
+        let delay_ms = target_start / 1_000;
+        chain.push_str(&format!(",adelay={delay_ms}|{delay_ms}[a{aidx}]"));
+        apart.push(chain);
+        aidx += 1;
     }
     let has_audio = !apart.is_empty();
     if has_audio {
