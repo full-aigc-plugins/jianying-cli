@@ -396,7 +396,11 @@ impl Plan {
     pub fn load(path: &Path) -> Result<Plan> {
         let raw = std::fs::read_to_string(path)
             .map_err(|e| anyhow::anyhow!("cannot read plan {}: {e}", path.display()))?;
-        let mut raw_value: Value = serde_json::from_str(&raw)
+        // Windows 上 PowerShell 5.1 的 `-Encoding utf8` 与记事本都会写 UTF-8 BOM；
+        // serde_json 不接受 BOM 前缀，必须先剥掉，否则用户只看到
+        // "expected value at line 1 column 1"。
+        let raw = raw.trim_start_matches('\u{feff}');
+        let mut raw_value: Value = serde_json::from_str(raw)
             .map_err(|e| anyhow::anyhow!("plan is not valid JSON: {e}"))?;
         // pyJianYingDraft tim() parity: *_us fields accept "1h2m3s"-style strings
         crate::tim::preprocess(&mut raw_value);
@@ -944,4 +948,24 @@ pub fn hex_rgb(hex: &str) -> Result<[f64; 3]> {
             .map_err(|e| anyhow::anyhow!("bad color {hex:?}: {e}"))
     };
     Ok([ch(0)?, ch(1)?, ch(2)?])
+}
+
+#[cfg(test)]
+mod bom_tests {
+    use super::Plan;
+
+    /// Windows 的 PowerShell 5.1 `-Encoding utf8` 与记事本都会写 UTF-8 BOM；
+    /// 计划加载必须容忍，否则用户只看到 "expected value at line 1 column 1"。
+    #[test]
+    fn plan_load_tolerates_a_utf8_bom() {
+        let dir = std::env::temp_dir().join(format!("jianying-plan-bom-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("plan.json");
+        let body = r#"{"schema":"jianying-cli-plan/v1","name":"bom","canvas":{"width":640,"height":360,"fps":30},"tracks":[{"type":"text","segments":[{"start_us":0,"duration_us":1000000,"text":"bom"}]}]}"#;
+        std::fs::write(&path, format!("\u{feff}{body}")).unwrap();
+        let plan = Plan::load(&path).expect("BOM plan must load");
+        assert_eq!(plan.name, "bom");
+        let _ = std::fs::remove_dir_all(dir);
+    }
 }

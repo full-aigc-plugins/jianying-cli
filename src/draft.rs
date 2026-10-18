@@ -1244,7 +1244,13 @@ pub fn load_timeline(draft_dir: &Path) -> Result<Value> {
     for name in ["draft_content.json", "draft_info.json"] {
         let p = draft_dir.join(name);
         if p.is_file() {
-            let v: Value = serde_json::from_str(&std::fs::read_to_string(&p)?)?;
+            // 手改或第三方工具写出的草稿可能带 UTF-8 BOM，先剥掉再解析。
+            let raw = std::fs::read_to_string(&p)?;
+            let raw = raw.trim_start_matches('\u{feff}');
+            let v: Value = match serde_json::from_str(raw) {
+                Ok(value) => value,
+                Err(_) => continue,
+            };
             if v.get("tracks").map(Value::is_array).unwrap_or(false) {
                 return Ok(v);
             }
