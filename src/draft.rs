@@ -177,7 +177,11 @@ fn apply_visuals(seg_v: &mut Value, seg: &Segment, video: bool) {
     let has_scale_kf = seg
         .keyframes
         .as_ref()
-        .map(|k| k.contains_key("scale"))
+        .map(|k| {
+            ["scale", "scale_x", "scale_y"]
+                .iter()
+                .any(|channel| k.contains_key(*channel))
+        })
         .unwrap_or(false);
     if video || seg.text.is_some() || seg.sticker_id.is_some() || seg.resource_id.is_some() {
         seg_v["uniform_scale"] = json!({"on": !has_scale_kf, "value": 1.0});
@@ -219,11 +223,22 @@ fn apply_keyframes(seg_v: &mut Value, seg: &Segment) {
     };
     for (channel, points) in kfs {
         match channel.as_str() {
+            // 短别名：与参考构建器一致，`scale` 即 scale_x
             "scale" => push("KFTypeScaleX", points),
             "x" => push("KFTypePositionX", points),
             "y" => push("KFTypePositionY", points),
-            "rotation" => push("KFTypeRotation", points),
             "opacity" => push("KFTypeAlpha", points),
+            // 显式通道：与 `timeline keyframe` 的 11 个通道同名同义
+            "scale_x" => push("KFTypeScaleX", points),
+            "scale_y" => push("KFTypeScaleY", points),
+            "uniform_scale" => push("UNIFORM_SCALE", points),
+            "position_x" => push("KFTypePositionX", points),
+            "position_y" => push("KFTypePositionY", points),
+            "alpha" => push("KFTypeAlpha", points),
+            "saturation" => push("KFTypeSaturation", points),
+            "contrast" => push("KFTypeContrast", points),
+            "brightness" => push("KFTypeBrightness", points),
+            "rotation" => push("KFTypeRotation", points),
             "volume" => push("KFTypeVolume", points),
             other => debug_assert!(false, "validated channel slipped through: {other}"),
         }

@@ -480,3 +480,57 @@ fn scale_keyframe_alias_is_identical_whether_authored_or_applied_afterwards() {
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn plan_expresses_every_keyframe_channel_the_cli_supports() {
+    let root = temp_root("all-channels");
+    fs::write(root.join("clip.mp4"), b"fixture").unwrap();
+
+    // 与 `timeline keyframe` 的 11 个通道一一对应；短别名 scale/x/y/opacity
+    // 与显式短名落到同一通道，这里全部用显式名，避免别名掩盖差异。
+    let channels = [
+        ("scale_x", "KFTypeScaleX"),
+        ("scale_y", "KFTypeScaleY"),
+        ("uniform_scale", "UNIFORM_SCALE"),
+        ("position_x", "KFTypePositionX"),
+        ("position_y", "KFTypePositionY"),
+        ("rotation", "KFTypeRotation"),
+        ("alpha", "KFTypeAlpha"),
+        ("saturation", "KFTypeSaturation"),
+        ("contrast", "KFTypeContrast"),
+        ("brightness", "KFTypeBrightness"),
+        ("volume", "KFTypeVolume"),
+    ];
+    let mut keyframes = serde_json::Map::new();
+    for (channel, _) in channels {
+        keyframes.insert(
+            channel.to_owned(),
+            json!([{"at_us": 0, "value": 1.0}, {"at_us": 1_000_000, "value": 1.0}]),
+        );
+    }
+    let dir = build(
+        &root,
+        "all-channels",
+        video_plan(2_000_000, json!({"keyframes": keyframes})),
+        &video_probe,
+    );
+
+    let mut written: Vec<String> = keyframe_channels(&dir)[0]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|channel| channel["property_type"].as_str().unwrap().to_owned())
+        .collect();
+    written.sort();
+    let mut expected: Vec<String> = channels.iter().map(|(_, wire)| wire.to_string()).collect();
+    expected.sort();
+    assert_eq!(
+        written, expected,
+        "计划必须能表达命令行支持的每一个关键帧通道"
+    );
+    assert_eq!(
+        run_ok(&["project", "verify", &dir.to_string_lossy(), "--json"])["ok"],
+        true
+    );
+    let _ = fs::remove_dir_all(root);
+}

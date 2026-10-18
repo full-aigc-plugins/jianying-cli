@@ -344,11 +344,23 @@ fn check_range(v: f64, lo: f64, hi: f64, what: &str) -> Result<()> {
 }
 
 const KEY_CHANNELS_VIDEO: &[(&str, f64, f64)] = &[
+    // 短别名（历史约定，与 pyJianYingDraft 参考构建器的映射一致）
     ("scale", 0.01, 10.0),
     ("x", -2.0, 2.0),
     ("y", -2.0, 2.0),
     ("rotation", -360.0, 360.0),
     ("opacity", 0.0, 1.0),
+    // 显式通道：与 `timeline keyframe` 的 11 个通道对齐，避免两边能力不对称
+    ("scale_x", 0.01, 10.0),
+    ("scale_y", 0.01, 10.0),
+    ("uniform_scale", 0.01, 10.0),
+    ("position_x", -2.0, 2.0),
+    ("position_y", -2.0, 2.0),
+    ("alpha", 0.0, 1.0),
+    ("saturation", 0.0, 4.0),
+    ("contrast", 0.0, 4.0),
+    ("brightness", 0.0, 4.0),
+    ("volume", 0.0, 4.0),
 ];
 const KEY_CHANNELS_TEXT: &[(&str, f64, f64)] = &[
     ("scale", 0.01, 10.0),
