@@ -275,26 +275,11 @@ fn make_companions(materials: &mut Value, speed: f64, video: bool) -> Vec<String
             "id": vocal_id, "type": "vocal_separation", "choice": 0, "enter_from": "",
             "final_algorithm": "", "production_path": "", "removed_sounds": [], "time_range": null
         }));
-    let mut refs = vec![speed_id, placeholder_id, scm_id, vocal_id];
-    if video {
-        let canvas_id = hex_id();
-        materials["canvases"].as_array_mut().unwrap().push(json!({
-            "id": canvas_id, "type": "canvas_color", "album_image": "", "blur": 0, "color": "",
-            "image": "", "image_id": "", "image_name": "", "source_platform": 0, "team_id": ""
-        }));
-        let color_id = hex_id();
-        materials["material_colors"]
-            .as_array_mut()
-            .unwrap()
-            .push(json!({
-                "id": color_id, "type": "material_color", "gradient_angle": 90,
-                "gradient_colors": [], "gradient_percents": [], "height": 0,
-                "is_color_clip": false, "is_gradient": false, "solid_color": "", "width": 0
-            }));
-        refs.push(canvas_id);
-        refs.push(color_id);
-    }
-    refs
+    // 默认画布与素材颜色不写：pyJianYingDraft 的视频段只带
+    // speeds / material_animations / transitions，背景由素材自带。只有显式
+    // 请求 background_filling 时才写一个 canvas。
+    let _ = video;
+    vec![speed_id, placeholder_id, scm_id, vocal_id]
 }
 
 pub(crate) fn copy_asset(out_dir: &Path, kind: &str, src: &Path) -> Result<String> {
@@ -999,8 +984,10 @@ pub fn build(
                         .push(text_material);
 
                     refs = Vec::new();
+                    // 花字与气泡是不同的素材类型：pyJianYingDraft 写 text_effect / text_shape，
+                    // 两者共用一个 effects 桶但 type 不能混。
                     for (raw, kind) in [
-                        (&seg.text_effect, "text_shape"),
+                        (&seg.text_effect, "text_effect"),
                         (&seg.bubble, "text_shape"),
                     ] {
                         if let Some(r) = raw {
@@ -1018,6 +1005,8 @@ pub fn build(
                     }
 
                     seg_v = base_segment(&material_id, seg, ti as i64);
+                    // pyJianYingDraft 省略文本段的 source_timerange；我们保留它，
+                    // 因为变更路径的 wire 模型依赖该字段（见 parity 策略里的已批准差异）。
                     seg_v["source_timerange"] = json!({"start": 0, "duration": seg.duration_us});
                     apply_visuals(&mut seg_v, seg, false);
                     // pyJianYingDraft TextSegment defaults ClipSettings(transform_y=-0.78)

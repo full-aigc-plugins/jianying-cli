@@ -1,0 +1,247 @@
+{
+  "schema": "jianying-pyjyd-examples/v1",
+  "upstream": {
+    "repository": "GuanYixuan/pyJianYingDraft",
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086",
+    "license": "Apache-2.0",
+    "copied_to": "examples/pyjyd/upstream/"
+  },
+  "total_tests": 51,
+  "cases": [
+    {
+      "id": "demo",
+      "source": "demo.py",
+      "upstream_tests": [],
+      "category": "draft",
+      "status": "compared",
+      "ours": {
+        "plan": "cases/demo-tutorial/plan.json",
+        "runner": "cases/demo-tutorial/ref.py"
+      },
+      "command": "jianying project build cases/demo-tutorial/plan.json --out draft",
+      "evidence": [
+        "examples/pyjyd/cases/demo-tutorial/case.json",
+        "tests/pyjyd_examples_contract.rs"
+      ],
+      "compare": "语义比对：轨道/片段时长、源窗口、音量、速度、关键帧通道、素材引用种类"
+    },
+    {
+      "id": "test_scriptfile_building",
+      "source": "tests/test_scriptfile_building.py",
+      "upstream_tests": [
+        "test_append_track_allows_first_unnamed_track_per_type",
+        "test_append_track_requires_name_for_second_same_type_track",
+        "test_add_segment_updates_script_duration",
+        "test_add_segment_auto_registers_materials_and_effect_refs",
+        "test_dumps_orders_tracks_by_track_order"
+      ],
+      "category": "draft",
+      "status": "pending",
+      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
+      "ours": {
+        "plan": "cases/scriptfile-building/plan.json",
+        "runner": "cases/scriptfile-building/ref.py"
+      },
+      "command": "jianying project build cases/scriptfile-building/plan.json --out draft",
+      "evidence": [
+        "tests/plan_validation.rs",
+        "src/plan.rs"
+      ],
+      "compare": "轨道顺序、片段总时长、素材自动登记、轨道排序"
+    },
+    {
+      "id": "test_import_srt",
+      "source": "tests/test_import_srt.py",
+      "upstream_tests": [
+        "test_import_srt_creates_text_track_when_missing",
+        "test_import_srt_applies_time_offset",
+        "test_import_srt_uses_style_reference_when_provided",
+        "test_import_srt_inserts_new_text_track_after_video_and_text_tracks"
+      ],
+      "category": "draft",
+      "status": "pending",
+      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
+      "ours": {
+        "plan": "cases/import-srt/plan.json",
+        "runner": "cases/import-srt/ref.py"
+      },
+      "command": "jianying captions import-srt <draft> <file.srt>",
+      "evidence": [
+        "tests/captions_cli_contract.rs"
+      ],
+      "compare": "SRT 解析、时间偏移、样式引用、新轨插入位置"
+    },
+    {
+      "id": "test_audio_effect_export",
+      "source": "tests/test_audio_effect_export.py",
+      "upstream_tests": [
+        "test_tone_effect_type_is_exported_from_top_level",
+        "test_tone_effect_exports_minimal_shape",
+        "test_audio_scene_effect_keeps_legacy_export_shape"
+      ],
+      "category": "draft",
+      "status": "pending",
+      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
+      "ours": {
+        "plan": "cases/audio-effect/plan.json",
+        "runner": "cases/audio-effect/ref.py"
+      },
+      "command": "jianying timeline audio-effect <draft> <id> <slug>",
+      "evidence": [
+        "tests/timeline_cli_contract.rs"
+      ],
+      "compare": "音频特效素材字段：type/sub_type/time_range/resource_id"
+    },
+    {
+      "id": "test_video_chroma_export",
+      "source": "tests/test_video_chroma_export.py",
+      "upstream_tests": [
+        "test_video_chroma_exports_minimal_shape",
+        "test_video_chroma_exports_adjusted_params",
+        "test_video_chroma_rejects_duplicate_or_invalid_values"
+      ],
+      "category": "draft",
+      "status": "pending",
+      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
+      "ours": {
+        "plan": "cases/chroma/plan.json",
+        "runner": "cases/chroma/ref.py"
+      },
+      "command": "jianying timeline chroma <draft> <id> --color ...",
+      "evidence": [
+        "tests/timeline_cli_contract.rs"
+      ],
+      "compare": "色度抠图素材：color/intensity/edge_smooth/shadow/spill 与 version"
+    },
+    {
+      "id": "test_video_mix_mode_export",
+      "source": "tests/test_video_mix_mode_export.py",
+      "upstream_tests": [
+        "test_repeated_mix_mode_before_adding_segment_keeps_only_last_mode",
+        "test_repeated_mix_mode_after_adding_segment_updates_registered_material"
+      ],
+      "category": "draft",
+      "status": "pending",
+      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
+      "ours": {
+        "plan": "cases/mix-mode/plan.json",
+        "runner": "cases/mix-mode/ref.py"
+      },
+      "command": "jianying project build cases/mix-mode/plan.json --out draft",
+      "evidence": [
+        "src/plan.rs"
+      ],
+      "compare": "重复设置混合同模式时只保留最后一次"
+    },
+    {
+      "id": "test_template_loading",
+      "source": "tests/test_template_loading.py",
+      "upstream_tests": [
+        "test_load_template_raises_stable_error_for_non_plain_content_without_fallback_loader",
+        "test_load_template_uses_fallback_loader_for_non_plain_content",
+        "test_load_template_accepts_dict_from_fallback_loader",
+        "test_duplicate_as_template_reuses_fallback_loader",
+        "test_load_template_normalizes_sparse_template_content",
+        "test_template_dump_preserves_original_track_array_order",
+        "test_list_imported_tracks_preserves_internal_order_and_supports_type_filter",
+        "test_list_imported_tracks_returns_live_references",
+        "test_get_imported_track_uses_internal_order_for_indexing",
+        "test_import_track_supports_explicit_insert_position"
+      ],
+      "category": "behavior",
+      "status": "mapped",
+      "ours": {
+        "command": "jianying template list|import-track|replace-text|replace-material"
+      },
+      "evidence": [
+        "tests/template_cli_contract.rs",
+        "tests/template_semantics_contract.rs"
+      ],
+      "compare": "模板加载容错、导入轨道顺序、类型过滤、显式插入位置"
+    },
+    {
+      "id": "test_track_append_api",
+      "source": "tests/test_track_append_api.py",
+      "upstream_tests": [
+        "test_append_track_returns_track_ref_and_appends_to_end",
+        "test_append_tracks_preserves_input_order",
+        "test_add_segment_accepts_track_ref",
+        "test_add_segment_rejects_foreign_track_ref"
+      ],
+      "category": "behavior",
+      "status": "mapped",
+      "ours": {
+        "command": "jianying timeline add-track <draft> <type> --name <name>"
+      },
+      "evidence": [
+        "tests/timeline_cli_contract.rs"
+      ],
+      "compare": "追加轨道返回引用、同类型第二轨必须命名、片段必须属于本草稿"
+    },
+    {
+      "id": "test_track_insert_api",
+      "source": "tests/test_track_insert_api.py",
+      "upstream_tests": [
+        "test_insert_track_before_imported_track_preserves_overall_order",
+        "test_insert_tracks_over_track_ref_preserves_block_order",
+        "test_insert_track_at_index_uses_full_track_order",
+        "test_insert_track_rejects_multiple_location_hints",
+        "test_insert_track_rejects_foreign_imported_track_anchor",
+        "test_insert_track_rejects_out_of_range_index"
+      ],
+      "category": "behavior",
+      "status": "mapped",
+      "ours": {
+        "command": "jianying timeline add-track <draft> <type> --index <n>"
+      },
+      "evidence": [
+        "tests/timeline_cli_contract.rs"
+      ],
+      "compare": "按参考轨道/索引插入、拒绝多重定位、越界索引"
+    },
+    {
+      "id": "test_track_basics",
+      "source": "tests/test_track_basics.py",
+      "upstream_tests": [
+        "test_track_accepts_matching_segment_type",
+        "test_track_rejects_mismatched_segment_type",
+        "test_track_rejects_overlapping_segments",
+        "test_track_accepts_beat_aligned_segments_in_seconds",
+        "test_track_still_rejects_one_microsecond_overlap",
+        "test_track_end_time_reflects_last_segment_end"
+      ],
+      "category": "behavior",
+      "status": "mapped",
+      "ours": {
+        "command": "jianying project build（计划校验：重叠即拒绝）"
+      },
+      "evidence": [
+        "tests/plan_validation.rs"
+      ],
+      "compare": "重叠拒绝（含 1µs 边界）、类型匹配、秒级节拍对齐、轨道结束时间"
+    },
+    {
+      "id": "test_time_util",
+      "source": "tests/test_time_util.py",
+      "upstream_tests": [
+        "test_tim_parses_common_duration_strings",
+        "test_tim_supports_negative_offsets",
+        "test_trange_uses_duration_not_end_time",
+        "test_trange_seconds_accepts_end_or_duration",
+        "test_trange_seconds_rounds_absolute_boundaries",
+        "test_trange_seconds_requires_numeric_seconds",
+        "test_timerange_overlap_semantics",
+        "test_timerange_import_json_defaults_missing_start_to_zero"
+      ],
+      "category": "behavior",
+      "status": "mapped",
+      "ours": {
+        "command": "所有时间参数（0s / 1500ms / 1000000us）"
+      },
+      "evidence": [
+        "tests/ops_behavior.rs"
+      ],
+      "compare": "tim/trange 解析与取整：负数偏移、duration 语义、绝对边界四舍五入"
+    }
+  ]
+}

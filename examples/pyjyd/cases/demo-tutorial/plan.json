@@ -1,0 +1,80 @@
+{
+  "schema": "jianying-cli-plan/v1",
+  "name": "demo-tutorial",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "tracks": [
+    {
+      "type": "video",
+      "name": "main_video",
+      "segments": [
+        {
+          "start_us": 0,
+          "duration_us": 4200000,
+          "source": "video.mp4",
+          "animation_in": {
+            "name": "斜切"
+          },
+          "transition_out": {
+            "name": "信号故障"
+          }
+        },
+        {
+          "start_us": 4200000,
+          "duration_us": 2000000,
+          "source": "sticker.gif",
+          "background_filling": {
+            "type": "blur",
+            "blur": 0.0625
+          }
+        }
+      ]
+    },
+    {
+      "type": "audio",
+      "name": "bgm",
+      "segments": [
+        {
+          "start_us": 0,
+          "duration_us": 5000000,
+          "source": "audio.mp3",
+          "volume": 0.6,
+          "fade": {
+            "in_us": 1000000,
+            "out_us": 0
+          }
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "caption",
+      "segments": [
+        {
+          "start_us": 0,
+          "duration_us": 4200000,
+          "text": "据说pyJianYingDraft效果还不错?",
+          "font": "文轩体",
+          "color": "#FFFF00",
+          "y": -0.8,
+          "animation_out": {
+            "name": "故障闪动",
+            "duration_us": 1000000
+          },
+          "bubble": {
+            "effect_id": "361595",
+            "resource_id": "6742029398926430728"
+          },
+          "text_effect": {
+            "effect_id": "7296357486490144036",
+            "resource_id": "7296357486490144036"
+          }
+        }
+      ]
+    }
+  ],
+  "allow_vip": true
+}

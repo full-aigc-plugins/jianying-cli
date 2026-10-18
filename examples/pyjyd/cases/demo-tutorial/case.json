@@ -1,0 +1,68 @@
+{
+  "id": "demo-tutorial",
+  "title": "demo.py：音视频 + GIF 贴纸 + 转场 + 气泡花字文本",
+  "upstream": {
+    "file": "demo.py",
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+  },
+  "category": "draft",
+  "media": [
+    {
+      "name": "video.mp4",
+      "gen": [
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc=s=640x360:d=6",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p"
+      ]
+    },
+    {
+      "name": "audio.mp3",
+      "gen": [
+        "-f",
+        "lavfi",
+        "-i",
+        "sine=frequency=440:duration=6"
+      ]
+    },
+    {
+      "name": "sticker.gif",
+      "gen": [
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc=s=160x160:d=2",
+        "-loop",
+        "0"
+      ]
+    }
+  ],
+  "plan": "cases/demo-tutorial/plan.json",
+  "reference": "cases/demo-tutorial/ref.py",
+  "policy": {
+    "approved_extra_kinds": [
+      "placeholders",
+      "sound_channel_mappings",
+      "vocal_separations",
+      "material_colors"
+    ],
+    "approved_missing_kinds": [
+      "dangling"
+    ],
+    "rationale": {
+      "placeholders": "剪映自身写出的草稿包含占位素材，pyJianYingDraft 省略；保留以避免依赖客户端自动补齐",
+      "sound_channel_mappings": "同上：声道映射由剪映写入，pyJYD 不写",
+      "vocal_separations": "人声分离占位，同上",
+      "material_colors": "素材颜色占位，同上",
+      "dangling": "pyJianYingDraft 的文本段会引用一个不存在于任何 materials 桶的 id；我们不复制这个缺陷（verify 会拒绝悬空引用）",
+      "text.source_duration": "pyJianYingDraft 省略文本段的 source_timerange；我们写 source=targ et，因为草稿变更路径的 wire 模型需要该字段（后续可改为可选）"
+    },
+    "approved_value_differences": [
+      "text.source_duration"
+    ]
+  }
+}

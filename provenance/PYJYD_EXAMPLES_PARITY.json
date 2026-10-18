@@ -1,0 +1,25 @@
+{
+  "schema": "jianying-pyjyd-examples-parity/v1",
+  "pyjyd": {
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+  },
+  "binary": "target\\release\\jianying.exe",
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "differs": 0,
+    "failed": 0
+  },
+  "cases": [
+    {
+      "id": "demo-tutorial",
+      "title": "demo.py：音视频 + GIF 贴纸 + 转场 + 气泡花字文本",
+      "upstream": {
+        "file": "demo.py",
+        "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+      },
+      "status": "passed",
+      "differences": []
+    }
+  ]
+}
