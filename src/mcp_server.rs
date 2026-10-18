@@ -176,10 +176,14 @@ impl JianyingMcpServer {
                     .get("deep")
                     .and_then(Value::as_bool)
                     .unwrap_or(false);
+                let policy = match arguments.get("policy").and_then(Value::as_str) {
+                    Some(path) => crate::eval_policy::Policy::load(Path::new(path))?,
+                    None => crate::eval_policy::Policy::default(),
+                };
                 if deep {
-                    crate::eval_ops::evaluate_deep(&draft)
+                    crate::eval_ops::evaluate_deep_with(&draft, &policy)
                 } else {
-                    crate::eval_ops::evaluate(&draft)
+                    crate::eval_ops::evaluate_with(&draft, &policy)
                 }
             }
             "jianying_command_list" => command_list(),

@@ -32,3 +32,16 @@
 同轨递增不重叠；关键帧线性、首点 at_us=0、≥2 点、speed=1 且 source_start_us=0；
 转场仅主视频轨非末段、≤1s；特效参数名必须在目录声明、值 0-100；
 文本 styles 区间升序不越界（UTF-16）。
+
+## 简报的镜头切分（`max_shot_us`）
+
+`jianying-brief/v1` 支持 `max_shot_us`：给出后同一段素材会被切成多个连续镜头，
+每段源窗口按实际取用长度前移，而不是整段铺满。
+
+```jsonc
+{"schema":"jianying-brief/v1","target_duration_us":5000000,
+ "max_shot_us":1500000,"media":["long.mp4"]}
+```
+
+6s 素材 + 5s 目标 + 1.5s 上限 → 4 个镜头（1.5/1.5/1.5/0.5），
+`source_start_us` 依次为 0/1.5s/3s/4.5s。

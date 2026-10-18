@@ -123,12 +123,13 @@ impl ToolRegistry {
             ),
             ToolDescriptor::new(
                 "jianying_eval",
-                "给草稿打分（0-100）并列出结构化问题，deep=true 时检查素材与画音质量",
+                "给草稿打分（0-100）并列出结构化问题，deep=true 时检查素材与画音质量，policy 可指定评估策略文件",
                 serde_json::json!({
                     "type":"object","required":["draft"],"additionalProperties":false,
                     "properties":{
                         "draft":{"type":"string","minLength":1},
-                        "deep":{"type":"boolean","default":false}
+                        "deep":{"type":"boolean","default":false},
+                        "policy":{"type":"string","description":"jianying-eval-policy/v1 文件路径"}
                     }
                 }),
                 envelope_schema(),

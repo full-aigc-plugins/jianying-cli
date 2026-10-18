@@ -117,39 +117,57 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
     let mut segments: Vec<Value> = Vec::new();
     let mut original_audio: Vec<Value> = Vec::new();
     let keep_original_audio = brief["keep_original_audio"].as_bool().unwrap_or(true);
+    // `max_shot_us` 给了就把同一段素材切成多个镜头（源窗口连续前移），
+    // 这是"整段素材铺满"与"真的剪辑"之间最小的一步。
+    let max_shot_us = brief["max_shot_us"].as_i64().filter(|value| *value > 0);
     let mut cursor = 0_i64;
     for item in &media {
         if cursor >= target_us {
             break;
         }
-        let remaining = target_us - cursor;
-        let available = if item.is_image {
-            remaining
+        let mut available = if item.is_image {
+            target_us - cursor
         } else {
             item.duration_us.max(0)
         };
-        if available <= 0 {
-            continue;
-        }
-        let take = available.min(remaining);
-        let mut segment = json!({
-            "start_us": cursor,
-            "duration_us": take,
-            "source": relative_or_absolute(base, &item.path),
-        });
-        if item.is_image {
-            segment["photo"] = json!(true);
-        }
-        segments.push(segment);
-        if keep_original_audio && item.has_audio && !item.is_image {
-            original_audio.push(json!({
+        let mut source_offset = 0_i64;
+        while available > 0 && cursor < target_us {
+            let remaining = target_us - cursor;
+            let mut take = available.min(remaining);
+            if let Some(limit) = max_shot_us {
+                take = take.min(limit);
+            }
+            if take <= 0 {
+                break;
+            }
+            let mut segment = json!({
                 "start_us": cursor,
                 "duration_us": take,
                 "source": relative_or_absolute(base, &item.path),
-                "source_start_us": 0,
-            }));
+            });
+            if source_offset > 0 {
+                segment["source_start_us"] = json!(source_offset);
+            }
+            if item.is_image {
+                segment["photo"] = json!(true);
+            }
+            segments.push(segment);
+            if keep_original_audio && item.has_audio && !item.is_image {
+                original_audio.push(json!({
+                    "start_us": cursor,
+                    "duration_us": take,
+                    "source": relative_or_absolute(base, &item.path),
+                    "source_start_us": source_offset,
+                }));
+            }
+            cursor += take;
+            source_offset += take;
+            available -= take;
+            if item.is_image {
+                // 图片没有"剩余素材"，切完一段即可。
+                available = 0;
+            }
         }
-        cursor += take;
     }
     if segments.is_empty() {
         bail!("could not build any shot from the given media");

@@ -222,3 +222,55 @@ fn a_strict_threshold_turns_a_passing_draft_into_a_failure() {
         .any(|issue| issue["code"] == "video-black"));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn mcp_eval_accepts_a_policy_file() {
+    let root = temp_root("mcp");
+    let draft = build_text_draft(&root);
+    let policy = root.join("caption-only.json");
+    fs::write(
+        &policy,
+        serde_json::to_string(&json!({
+            "schema":"jianying-eval-policy/v1","name":"caption-only",
+            "weights":{"main":0,"continuity":0,"caption":20,"audio":0}
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+
+    let requests = [
+        json!({"jsonrpc":"2.0","id":1,"method":"initialize",
+               "params":{"protocolVersion":"2024-11-05","capabilities":{},
+                          "clientInfo":{"name":"policy","version":"1"}}}),
+        json!({"jsonrpc":"2.0","id":2,"method":"tools/call","params":{
+            "name":"jianying_eval",
+            "arguments":{"draft":draft.to_string_lossy(),"policy":policy.to_string_lossy()}}}),
+    ];
+    let mut child = Command::new(env!("CARGO_BIN_EXE_jianying"))
+        .args(["mcp", "serve"])
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    {
+        use std::io::Write;
+        let stdin = child.stdin.as_mut().unwrap();
+        for request in &requests {
+            writeln!(stdin, "{request}").unwrap();
+        }
+    }
+    let output = child.wait_with_output().unwrap();
+    let response = String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .filter(|line| line.trim_start().starts_with('{'))
+        .map(|line| serde_json::from_str::<Value>(line).unwrap())
+        .find(|message| message["id"] == json!(2))
+        .expect("eval 响应");
+    let text = response["result"]["content"][0]["text"].as_str().unwrap();
+    let envelope: Value = serde_json::from_str(text).unwrap();
+    assert_eq!(envelope["ok"], json!(true), "{envelope}");
+    assert_eq!(envelope["data"]["policy"]["name"], json!("caption-only"));
+    assert_eq!(envelope["data"]["score"], json!(100));
+    let _ = fs::remove_dir_all(root);
+}

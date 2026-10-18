@@ -8,6 +8,7 @@ jianying loop draft/ --deep --policy policies/douyin.json --json
 ```
 
 不传 `--policy` 时使用默认策略，**分数与历史行为完全一致**。
+MCP 的 `jianying_eval` 也接受 `policy` 参数，Agent 可以按平台切换同一套阈值。
 
 ## 文件结构
 

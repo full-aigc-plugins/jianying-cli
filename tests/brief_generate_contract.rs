@@ -204,3 +204,61 @@ fn generate_adds_bom_tolerant_captions_and_refuses_silent_overwrite() {
     assert!(String::from_utf8_lossy(&refused.stdout).contains("already exists"));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn max_shot_us_splits_one_clip_into_consecutive_shots() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("shots");
+    clip(&root.join("long.mp4"), 6);
+    let brief_path = brief(
+        &root,
+        json!({
+            "schema":"jianying-brief/v1","name":"shots","platform":"bilibili",
+            "target_duration_us":5_000_000,"max_shot_us":1_500_000,"media":["long.mp4"]
+        }),
+    );
+    let out = root.join("plan.json");
+    let report = run_ok(&[
+        "generate",
+        &brief_path.to_string_lossy(),
+        "--out",
+        &out.to_string_lossy(),
+        "--json",
+    ]);
+    assert_eq!(report["duration_us"], json!(5_000_000));
+    assert_eq!(report["shots"], json!(4), "5s / 1.5s 上限应切成 4 段");
+
+    let plan: Value = serde_json::from_str(&fs::read_to_string(&out).unwrap()).unwrap();
+    let segments = plan["tracks"][0]["segments"].as_array().unwrap();
+    let durations: Vec<i64> = segments
+        .iter()
+        .map(|segment| segment["duration_us"].as_i64().unwrap())
+        .collect();
+    assert_eq!(durations, vec![1_500_000, 1_500_000, 1_500_000, 500_000]);
+    let offsets: Vec<i64> = segments
+        .iter()
+        .map(|segment| segment["source_start_us"].as_i64().unwrap_or(0))
+        .collect();
+    assert_eq!(
+        offsets,
+        vec![0, 1_500_000, 3_000_000, 4_500_000],
+        "源窗口必须连续前移"
+    );
+
+    let draft = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &out.to_string_lossy(),
+        "--out",
+        &draft.to_string_lossy(),
+        "--json",
+    ]);
+    assert_eq!(
+        run_ok(&["project", "verify", &draft.to_string_lossy(), "--json"])["ok"],
+        json!(true)
+    );
+    let _ = fs::remove_dir_all(root);
+}

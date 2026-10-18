@@ -644,6 +644,11 @@
       "evidence": "tests/mcp_command_bridge_contract.rs: read-only jianying_draft_inspect / jianying_timeline_segments / jianying_media_probe / jianying_eval answered directly from library functions (no subprocess)"
     },
     {
+      "id": "mcp.eval_policy",
+      "status": "supported",
+      "evidence": "tests/eval_policy_contract.rs: jianying_eval accepts a policy path and returns the score computed with that policy"
+    },
+    {
       "id": "resource.mine",
       "status": "supported",
       "evidence": "tests/resource_cli_contract.rs: plain drafts aggregate, Timelines mirrors skipped, draft-id de-duplication, BOM tolerated, encrypted drafts counted as drafts_encrypted"
@@ -762,6 +767,11 @@
       "id": "generate",
       "status": "supported",
       "evidence": "tests/brief_generate_contract.rs: jianying-brief/v1 -> plan/v1 by deterministic assembly (platform canvas, target-duration cut, music track, BOM-tolerant SRT), short-of-target reported instead of padded"
+    },
+    {
+      "id": "generate.shot_split",
+      "status": "supported",
+      "evidence": "tests/brief_generate_contract.rs: max_shot_us cuts one clip into consecutive shots with source windows advancing by the shot length"
     },
     {
       "id": "generate.not_creative",
