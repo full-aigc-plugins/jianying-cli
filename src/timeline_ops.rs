@@ -2752,6 +2752,72 @@ where
     Ok(output)
 }
 
+/// 修复：把主视频轨重新排成从 0 开始、无空洞无重叠的连续序列。
+///
+/// 保持片段相对顺序与时长，只改 `target_timerange.start`；空洞与重叠都会被吃掉。
+pub fn close_main_track_gaps(draft: &Path) -> Result<Value> {
+    mutate(draft, |timeline| {
+        let mut moved = 0_usize;
+        let mut shift = 0_i64;
+        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            if track["type"] != "video" {
+                continue;
+            }
+            let segments = track["segments"]
+                .as_array_mut()
+                .context("track segments must be an array")?;
+            segments
+                .sort_by_key(|segment| segment["target_timerange"]["start"].as_i64().unwrap_or(0));
+            let mut cursor = 0_i64;
+            for segment in segments.iter_mut() {
+                let start = segment["target_timerange"]["start"].as_i64().unwrap_or(0);
+                let length = segment["target_timerange"]["duration"]
+                    .as_i64()
+                    .unwrap_or(0)
+                    .max(0);
+                if start != cursor {
+                    shift += start - cursor;
+                    segment["target_timerange"]["start"] = json!(cursor);
+                    moved += 1;
+                }
+                cursor += length;
+            }
+            break;
+        }
+        Ok(json!({
+            "ok": true, "repair": "close-main-track-gaps",
+            "moved_segments": moved, "shifted_us": shift
+        }))
+    })
+}
+
+/// 修复：删除没有任何片段的空轨道。
+pub fn drop_empty_tracks(draft: &Path) -> Result<Value> {
+    mutate(draft, |timeline| {
+        let tracks = timeline["tracks"]
+            .as_array_mut()
+            .context("tracks must be an array")?;
+        let before = tracks.len();
+        let mut removed: Vec<String> = Vec::new();
+        tracks.retain(|track| {
+            let empty = track["segments"]
+                .as_array()
+                .map(Vec::is_empty)
+                .unwrap_or(true);
+            if empty {
+                if let Some(name) = track["name"].as_str() {
+                    removed.push(name.to_owned());
+                }
+            }
+            !empty
+        });
+        Ok(json!({
+            "ok": true, "repair": "drop-empty-tracks",
+            "tracks_before": before, "removed": removed
+        }))
+    })
+}
+
 /// 设置变速是否同步变调（`is_tone_modify`），与计划字段 `change_pitch` 同义。
 pub fn change_pitch(draft: &Path, id: &str, enabled: bool) -> Result<Value> {
     mutate(draft, |timeline| {

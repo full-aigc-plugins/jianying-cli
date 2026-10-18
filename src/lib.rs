@@ -9,6 +9,7 @@ pub mod domain_compat;
 pub mod draft;
 pub mod edit_op;
 pub mod error_contract;
+pub mod eval_ops;
 pub mod extend_mode;
 pub mod fixture_ops;
 pub mod home_folder;

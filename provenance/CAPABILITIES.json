@@ -133,7 +133,10 @@
     {"id":"resource.export","status":"supported","evidence":"tests/resource_cli_contract.rs: merged view written as jianying-resource-library/v1"},
     {"id":"resource.apply","status":"supported","evidence":"tests/resource_cli_contract.rs: idempotent attach of text_shape/sticker/video_effect/audio_effect, ambiguous names rejected, filter/transition redirected to timeline commands"},
     {"id":"timeline.audio_effect","status":"supported","evidence":"tests/timeline_cli_contract.rs: catalog audio effect attach onto audio segments, idempotent re-apply, unknown names rejected"},
-    {"id":"resource.no_network_fetch","status":"external_dependency","evidence":"docs/resource-library.md: JianYing material catalogs sit behind signed APIs; this CLI deliberately neither signs requests nor reads the runtime agent token"}
+    {"id":"resource.no_network_fetch","status":"external_dependency","evidence":"docs/resource-library.md: JianYing material catalogs sit behind signed APIs; this CLI deliberately neither signs requests nor reads the runtime agent token"},
+    {"id":"eval","status":"supported","evidence":"tests/eval_loop_contract.rs: deterministic 0-100 score from draft JSON only (main coverage, continuity, caption/audio coverage) plus structured issues; eval is read-only"},
+    {"id":"loop","status":"supported","evidence":"tests/eval_loop_contract.rs: evaluate-repair-re-evaluate with a fixed safe-repair set (close-main-track-gaps, drop-empty-tracks), max-rounds bound and explicit stopped reason"},
+    {"id":"loop.safe_repairs_only","status":"partial","evidence":"docs/vision/offline-intelligent-editing.md: repairs are limited to structural fixes that cannot change creative intent; content-level generation is not implemented"}
   ],
   "truth_rule": "Only status=supported may be advertised as available; partial and external_dependency remain blocked for automatic routing."
 }

@@ -5,9 +5,9 @@ use anyhow::{bail, Context, Result};
 use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
-    capabilities, caption_ops, control_catalog, draft, home_folder, interchange, job_runner,
-    media_analysis, media_ops, plan, probe, project_ops, render, resource_ops, runtime_acceptance,
-    srt, store, template, tim, timeline_ops,
+    capabilities, caption_ops, control_catalog, draft, eval_ops, home_folder, interchange,
+    job_runner, media_analysis, media_ops, plan, probe, project_ops, render, resource_ops,
+    runtime_acceptance, srt, store, template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -2334,6 +2334,18 @@ enum Command {
     },
     /// 结构 lint：引用完整/主轨连续/时长一致（只读）
     Verify(DraftPathArgs),
+    /// 草稿评分：主轨覆盖/连续性/字幕覆盖/音频覆盖 + 结构化问题（只读、确定性）
+    Eval(DraftPathArgs),
+    /// 评估-修正循环：按问题挑安全修复并重评，直到达标或无修复可做
+    Loop {
+        draft: PathBuf,
+        /// 最多修复轮数
+        #[arg(long, default_value_t = 3)]
+        max_rounds: u32,
+        /// 达到该分数即停止
+        #[arg(long, default_value_t = 100)]
+        min_score: i64,
+    },
     /// 草稿摘要：轨道/段数/画布/平台（只读）
     Inspect(DraftPathArgs),
     /// 拷入草稿库并注册 root_meta_info.json（剪映运行中拒绝；同名拒绝）
@@ -3887,6 +3899,63 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
         Command::Verify(args) => {
             deprecated_alias("jianying verify", "jianying project verify");
             run_verify(args, json)?;
+        }
+        Command::Eval(args) => print_output(eval_ops::evaluate(&args.draft)?, json),
+        Command::Loop {
+            draft,
+            max_rounds,
+            min_score,
+        } => {
+            let mut report = eval_ops::evaluate(&draft)?;
+            let mut rounds: Vec<Value> = Vec::new();
+            let mut stopped = "clean";
+            for round in 1..=max_rounds {
+                let clean = report["score"].as_f64().unwrap_or(0.0) >= min_score as f64
+                    && report["issues"]
+                        .as_array()
+                        .map(Vec::is_empty)
+                        .unwrap_or(false);
+                if clean {
+                    break;
+                }
+                let Some(repair) = eval_ops::next_repair(&report) else {
+                    stopped = "no-safe-repair";
+                    break;
+                };
+                let before = report.clone();
+                let applied = eval_ops::repair(&draft, repair)?;
+                report = eval_ops::evaluate(&draft)?;
+                rounds.push(json!({
+                    "round": round,
+                    "repair": repair,
+                    "applied": applied,
+                    "score_before": before["score"],
+                    "score_after": report["score"],
+                    "issues_before": before["issues"],
+                    "issues_after": report["issues"],
+                }));
+                if round == max_rounds {
+                    stopped = "max-rounds-reached";
+                }
+            }
+            if report["score"].as_f64().unwrap_or(0.0) >= min_score as f64
+                && report["issues"]
+                    .as_array()
+                    .map(Vec::is_empty)
+                    .unwrap_or(false)
+            {
+                stopped = "clean";
+            }
+            print_output(
+                json!({
+                    "ok": true,
+                    "draft": draft.to_string_lossy(),
+                    "rounds": rounds,
+                    "final": report,
+                    "stopped": stopped,
+                }),
+                json,
+            );
         }
         Command::Inspect(args) => {
             deprecated_alias("jianying inspect", "jianying project inspect");

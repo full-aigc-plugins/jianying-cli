@@ -63,7 +63,7 @@ ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -o
 | 支柱 | 现状 | 证据 |
 |---|---|---|
 | V1 pyJYD 替代 | 🟡 核心达成：55/55、catalogs 与 SOURCE_MANIFEST 同锚、单一 writer 覆盖 speed/volume/opacity/keyframe 别名；**未完成**：API 面清单、剩余 op 迁移 | `provenance/PARITY_RUN.json`、`tests/path_equivalence.rs`、`src/writer.rs` |
-| V2 dream-loop 闭环 | 🔴 未实现闭环；现有 `job` 状态机 + `audit` 是**地基**，缺"评估器 + 停止条件" | `src/job_runner.rs`、`tests/job_v2_contract.rs` |
+| V2 dream-loop 闭环 | 🟡 闭环已可运行：`eval` 给 0–100 确定性评分 + 结构化问题，`loop` 按问题挑安全修复并重评（最大轮数、显式停止原因）；**缺**内容级生成与更丰富的修复集 | `src/eval_ops.rs`、`tests/eval_loop_contract.rs` |
 | V3 hypit 计划层 | 🟡 `plan/v1` 可程序化生成/改写，`timeline` 33 条命令可增量修改；缺"计划级组合与回滚语义" | `docs/plan-format.md`、`src/plan.rs` |
 | V4 editor-skill 整合 | 🔴 未整合；剪映自带 19 个技能的**能力清单**已抄录，可作为对齐目标 | `docs/reference/jianying-11.6-feature-map.md` §3.3 |
 | V5 headless 能力 | 🟡 探针/ASR/TTS/渲染/字幕/资源库齐备，缺批处理编排与"多片一次出"的验收 | `src/render.rs`、`media asr|tts`、`tests/render_batch_contract.rs` |
@@ -89,3 +89,16 @@ ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -o
 4. **V1 收尾**：pyJYD API 面清单（`uncovered=0` 的可计算版本）。
 
 > 说明：本文的"未验证"指没有在本仓库留下可复现命令与输出的结论。
+
+## 7. 评估-修正闭环实测（2026-10-18）
+
+```
+project build（两段连续主轨）→ eval              → score 100, issues []
+timeline move 第二段 +2.5s      → eval              → score 62, issues [main-track-gap], gap_us 2.5s
+                                → loop --min-score 100
+                                  round 1: close-main-track-gaps  62 → 100
+                                  final: score 100, gap_us 0, stopped "clean"
+```
+
+`eval` 前后 `draft_content.json` 字节一致（只读）；`loop` 的每次修复都走事务
+（快照 → 校验 → 原子提交），失败不会留下半成品。
