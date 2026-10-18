@@ -1,0 +1,89 @@
+{
+  "schema": "jianying-pyjyd-api-mapping/v1",
+  "upstream": "GuanYixuan/pyJianYingDraft",
+  "note": "人工维护的覆盖映射：每个类一行，partial/uncovered 必须写 ours，partial 用 missing 列出未覆盖的方法。tools/pyjyd_api_coverage.py 会把本文件与上游 ast 清单合并生成 PYJYD_API_COVERAGE.json。",
+  "classes": {
+    "animation.Animation": {"status": "covered", "ours": "plan animation_in/out/group", "evidence": "tests/timeline_cli_contract.rs"},
+    "animation.VideoAnimation": {"status": "covered", "ours": "plan animation_in/out/group（视频）", "evidence": "tests/timeline_cli_contract.rs"},
+    "animation.Text_animation": {"status": "covered", "ours": "plan animation_in/out/group（文本）", "evidence": "tests/timeline_cli_contract.rs"},
+    "animation.SegmentAnimations": {"status": "covered", "ours": "timeline image-animation + plan animation", "evidence": "tests/timeline_cli_contract.rs"},
+
+    "audio_segment.AudioEffect": {"status": "covered", "ours": "plan audio_effects + timeline audio-effect", "evidence": "tests/timeline_cli_contract.rs"},
+    "audio_segment.AudioSegment": {"status": "covered", "ours": "plan audio 段 + timeline volume/audio-fade/keyframe", "evidence": "tests/path_equivalence.rs"},
+
+    "draft_folder.DraftFolder": {"status": "partial", "ours": "store list/has/remove/publish + template duplicate", "missing": ["inspect_material"], "note": "素材清单走 `media materials`，不是同名 API", "evidence": "tests/store_cli_contract.rs"},
+
+    "effect_segment.EffectSegment": {"status": "covered", "ours": "plan effect 轨 + timeline add-effect", "evidence": "tests/timeline_cli_contract.rs"},
+    "effect_segment.FilterSegment": {"status": "covered", "ours": "plan filter 轨 + timeline add-filter", "evidence": "tests/timeline_cli_contract.rs"},
+
+    "exceptions.TrackNotFound": {"status": "covered", "ours": "结构化错误 contract（type/message/details/recovery）", "evidence": "src/error_contract.rs"},
+    "exceptions.AmbiguousTrack": {"status": "covered", "ours": "结构化错误 contract", "evidence": "src/error_contract.rs"},
+    "exceptions.SegmentOverlap": {"status": "covered", "ours": "计划校验拒绝重叠；eval 报告 main-track-overlap", "evidence": "tests/eval_loop_contract.rs"},
+    "exceptions.MaterialNotFound": {"status": "covered", "ours": "结构化错误 contract", "evidence": "src/error_contract.rs"},
+    "exceptions.AmbiguousMaterial": {"status": "covered", "ours": "结构化错误 contract + 歧义候选列表", "evidence": "tests/resource_cli_contract.rs"},
+    "exceptions.ExtensionFailed": {"status": "covered", "ours": "template import-track 失败即报错", "evidence": "tests/template_cli_contract.rs"},
+    "exceptions.DraftContentLoadFailed": {"status": "covered", "ours": "结构化错误 contract（含 BOM 容忍）", "evidence": "src/plan.rs"},
+    "exceptions.DraftNotFound": {"status": "covered", "ours": "结构化错误 contract", "evidence": "src/error_contract.rs"},
+    "exceptions.AutomationError": {"status": "out_of_scope", "ours": "runtime 模块只做检测与 fail-closed，不驱动 UI", "note": "L3：客户端 UI 自动化", "evidence": "docs/reference/jianying-11.6-feature-map.md"},
+    "exceptions.ExportTimeout": {"status": "out_of_scope", "ours": "render native 直接 fail-closed", "note": "L3：客户端导出", "evidence": "docs/vision/offline-intelligent-editing.md"},
+
+    "jianying_controller.ExportResolution": {"status": "out_of_scope", "ours": "render proxy 的 --scale", "note": "客户端导出参数，无 UI 自动化", "evidence": "src/render.rs"},
+    "jianying_controller.ExportFramerate": {"status": "out_of_scope", "ours": "计划 canvas.fps", "note": "客户端导出参数", "evidence": "src/plan.rs"},
+    "jianying_controller.ControlFinder": {"status": "out_of_scope", "ours": "无（UIA 控件查找不做）", "note": "L3：UI 自动化", "evidence": "docs/reference/jianying-11.6-feature-map.md"},
+    "jianying_controller.JianyingController": {"status": "out_of_scope", "ours": "runtime detect/status（只读探测）", "note": "L3：UI 自动化与导出", "evidence": "docs/vision/offline-intelligent-editing.md"},
+
+    "keyframe.Keyframe": {"status": "covered", "ours": "plan keyframes + timeline keyframe", "evidence": "tests/path_equivalence.rs"},
+    "keyframe.KeyframeProperty": {"status": "covered", "ours": "11 个通道（含 scale_x/scale_y/uniform_scale/saturation/contrast/brightness）", "evidence": "tests/path_equivalence.rs"},
+    "keyframe.KeyframeList": {"status": "covered", "ours": "timeline keyframe（逐点写入，按时间排序）", "evidence": "tests/timeline_cli_contract.rs"},
+
+    "local_materials.CropSettings": {"status": "covered", "ours": "plan crop + timeline crop", "evidence": "tests/timeline_cli_contract.rs"},
+    "local_materials.VideoMaterial": {"status": "covered", "ours": "媒体材料（probe → materials.videos）", "evidence": "src/draft.rs"},
+    "local_materials.AudioMaterial": {"status": "covered", "ours": "媒体材料（probe → materials.audios）", "evidence": "src/draft.rs"},
+
+    "script_file.ScriptFile": {"status": "covered", "ours": "plan/v1 + project build/dump 等价产物", "evidence": "tests/agent_contract.rs"},
+    "script_material.ScriptMaterial": {"status": "covered", "ours": "plan 源材料解析（相对路径 + probe）", "evidence": "src/plan.rs"},
+
+    "segment.BaseSegment": {"status": "covered", "ours": "plan 段公共字段 + timeline get/set/move", "evidence": "tests/timeline_cli_contract.rs"},
+    "segment.Speed": {"status": "covered", "ours": "plan speed + timeline speed + writer::scaled_source_duration", "evidence": "tests/path_equivalence.rs"},
+    "segment.AudioFade": {"status": "covered", "ours": "plan fade + timeline audio-fade", "evidence": "tests/timeline_cli_contract.rs"},
+    "segment.ClipSettings": {"status": "covered", "ours": "plan scale/x/y/rotation/opacity（clip 对象）", "evidence": "tests/path_equivalence.rs"},
+    "segment.MediaSegment": {"status": "covered", "ours": "plan video/audio 段 + source_timerange 派生", "evidence": "tests/path_equivalence.rs"},
+    "segment.VisualSegment": {"status": "covered", "ours": "plan 视觉字段 + 关键帧", "evidence": "tests/path_equivalence.rs"},
+
+    "template_mode.ShrinkMode": {"status": "covered", "ours": "src/shrink_mode.rs + template 替换时序", "evidence": "tests/template_semantics_contract.rs"},
+    "template_mode.ExtendMode": {"status": "covered", "ours": "src/extend_mode.rs + template 替换时序", "evidence": "tests/template_semantics_contract.rs"},
+    "template_mode.ImportedSegment": {"status": "covered", "ours": "template import-track（无损段 JSON）", "evidence": "tests/template_cli_contract.rs"},
+    "template_mode.ImportedMediaSegment": {"status": "covered", "ours": "template import-track", "evidence": "tests/template_cli_contract.rs"},
+    "template_mode.ImportedTrack": {"status": "covered", "ours": "template import-track", "evidence": "tests/template_cli_contract.rs"},
+    "template_mode.EditableTrack": {"status": "covered", "ours": "template 轨道级替换（start_time/end_time 由导入计算）", "evidence": "tests/template_cli_contract.rs"},
+    "template_mode.ImportedTextTrack": {"status": "covered", "ours": "template replace-text", "evidence": "tests/template_cli_contract.rs"},
+    "template_mode.ImportedMediaTrack": {"status": "partial", "ours": "template import-track", "missing": ["check_material_type", "process_timerange"], "note": "导入时不做材料类型校验与时间窗重算", "evidence": "tests/template_cli_contract.rs"},
+
+    "text_segment.TextStyle": {"status": "covered", "ours": "plan size/color/bold/italic/underline/alignment/vertical/letter_spacing/line_spacing/auto_wrapping/max_line_width/text_alpha", "evidence": "tests/path_equivalence.rs"},
+    "text_segment.TextBorder": {"status": "covered", "ours": "plan border_color/border_width", "evidence": "src/draft.rs"},
+    "text_segment.TextBackground": {"status": "covered", "ours": "plan background{...}", "evidence": "src/draft.rs"},
+    "text_segment.TextBubble": {"status": "covered", "ours": "plan bubble（raw ids）+ resource apply", "evidence": "tests/resource_cli_contract.rs"},
+    "text_segment.TextEffect": {"status": "covered", "ours": "plan text_effect（raw ids）+ resource apply", "evidence": "tests/resource_cli_contract.rs"},
+    "text_segment.TextShadow": {"status": "covered", "ours": "plan shadow{...}", "evidence": "src/draft.rs"},
+    "text_segment.TextSegment": {"status": "partial", "ours": "plan text 段全字段 + template replace-text", "missing": ["create_from_template"], "note": "没有从模板直接新建文本段的同形 API", "evidence": "tests/path_equivalence.rs"},
+
+    "time_util.Timerange": {"status": "covered", "ours": "tim()/毫秒微秒整数 + target/source_timerange", "evidence": "src/tim.rs"},
+
+    "track.TrackTypeMeta": {"status": "covered", "ours": "plan track.type + catalogs", "evidence": "src/plan.rs"},
+    "track.TrackType": {"status": "covered", "ours": "plan track.type（video/audio/text/sticker/filter/effect）", "evidence": "src/plan.rs"},
+    "track.TrackRef": {"status": "covered", "ours": "timeline --track 选择器", "evidence": "tests/timeline_cli_contract.rs"},
+    "track.TrackSpec": {"status": "covered", "ours": "plan tracks[]", "evidence": "src/plan.rs"},
+    "track.BaseTrack": {"status": "covered", "ours": "timeline tracks/add-track/track-rename/track-mute", "evidence": "tests/timeline_cli_contract.rs"},
+    "track.Track": {"status": "covered", "ours": "plan track + timeline add-segment", "evidence": "tests/timeline_cli_contract.rs"},
+
+    "video_segment.Mask": {"status": "covered", "ours": "plan mask + timeline mask", "evidence": "tests/timeline_cli_contract.rs"},
+    "video_segment.Chroma": {"status": "covered", "ours": "plan chroma + timeline chroma", "evidence": "tests/timeline_cli_contract.rs"},
+    "video_segment.VideoEffect": {"status": "covered", "ours": "plan effects[] + timeline add-effect", "evidence": "tests/timeline_cli_contract.rs"},
+    "video_segment.Filter": {"status": "covered", "ours": "plan filters[] + timeline add-filter", "evidence": "tests/timeline_cli_contract.rs"},
+    "video_segment.Transition": {"status": "covered", "ours": "plan transition_out + timeline transition", "evidence": "tests/timeline_cli_contract.rs"},
+    "video_segment.BackgroundFilling": {"status": "covered", "ours": "plan background_filling + timeline bg-blur", "evidence": "tests/timeline_cli_contract.rs"},
+    "video_segment.MixMode": {"status": "covered", "ours": "plan mix_mode + timeline composite（原地更新）", "evidence": "tests/timeline_cli_contract.rs"},
+    "video_segment.VideoSegment": {"status": "covered", "ours": "plan video 段 + 全部视觉命令", "evidence": "tests/path_equivalence.rs"},
+    "video_segment.StickerSegment": {"status": "covered", "ours": "plan sticker 段 + media add-sticker", "evidence": "tests/media_mutation_contract.rs"}
+  }
+}

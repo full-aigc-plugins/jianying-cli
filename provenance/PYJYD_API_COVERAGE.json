@@ -1,0 +1,1114 @@
+{
+  "schema": "jianying-pyjyd-api-coverage/v1",
+  "upstream": {
+    "project": "GuanYixuan/pyJianYingDraft",
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+  },
+  "definitions": {
+    "covered": "本工具能用计划字段或命令直接表达同一语义",
+    "partial": "只覆盖了类的一部分方法或语义受限，缺口写在 missing/note",
+    "uncovered": "没有对应能力",
+    "out_of_scope": "有意排除（客户端 UI 自动化等 L3 行为）"
+  },
+  "summary": {
+    "classes": 68,
+    "by_status": {
+      "covered": 59,
+      "partial": 3,
+      "out_of_scope": 6
+    },
+    "uncovered_classes": [],
+    "methods": 90,
+    "methods_by_status": {
+      "covered": 81,
+      "uncovered": 4,
+      "out_of_scope": 5
+    }
+  },
+  "classes": [
+    {
+      "class": "animation.Animation",
+      "module": "animation",
+      "name": "Animation",
+      "status": "covered",
+      "ours": "plan animation_in/out/group",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "animation.VideoAnimation",
+      "module": "animation",
+      "name": "VideoAnimation",
+      "status": "covered",
+      "ours": "plan animation_in/out/group（视频）",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "animation.Text_animation",
+      "module": "animation",
+      "name": "Text_animation",
+      "status": "covered",
+      "ours": "plan animation_in/out/group（文本）",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "animation.SegmentAnimations",
+      "module": "animation",
+      "name": "SegmentAnimations",
+      "status": "covered",
+      "ours": "timeline image-animation + plan animation",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "get_animation_trange",
+          "status": "covered"
+        },
+        {
+          "name": "add_animation",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "audio_segment.AudioEffect",
+      "module": "audio_segment",
+      "name": "AudioEffect",
+      "status": "covered",
+      "ours": "plan audio_effects + timeline audio-effect",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "audio_segment.AudioSegment",
+      "module": "audio_segment",
+      "name": "AudioSegment",
+      "status": "covered",
+      "ours": "plan audio 段 + timeline volume/audio-fade/keyframe",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "add_effect",
+          "status": "covered"
+        },
+        {
+          "name": "add_fade",
+          "status": "covered"
+        },
+        {
+          "name": "add_keyframe",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "draft_folder.DraftFolder",
+      "module": "draft_folder",
+      "name": "DraftFolder",
+      "status": "partial",
+      "ours": "store list/has/remove/publish + template duplicate",
+      "evidence": "tests/store_cli_contract.rs",
+      "note": "素材清单走 `media materials`，不是同名 API",
+      "methods": [
+        {
+          "name": "list_drafts",
+          "status": "covered"
+        },
+        {
+          "name": "has_draft",
+          "status": "covered"
+        },
+        {
+          "name": "remove",
+          "status": "covered"
+        },
+        {
+          "name": "create_draft",
+          "status": "covered"
+        },
+        {
+          "name": "inspect_material",
+          "status": "uncovered"
+        },
+        {
+          "name": "load_template",
+          "status": "covered"
+        },
+        {
+          "name": "duplicate_as_template",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "effect_segment.EffectSegment",
+      "module": "effect_segment",
+      "name": "EffectSegment",
+      "status": "covered",
+      "ours": "plan effect 轨 + timeline add-effect",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "effect_segment.FilterSegment",
+      "module": "effect_segment",
+      "name": "FilterSegment",
+      "status": "covered",
+      "ours": "plan filter 轨 + timeline add-filter",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.TrackNotFound",
+      "module": "exceptions",
+      "name": "TrackNotFound",
+      "status": "covered",
+      "ours": "结构化错误 contract（type/message/details/recovery）",
+      "evidence": "src/error_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.AmbiguousTrack",
+      "module": "exceptions",
+      "name": "AmbiguousTrack",
+      "status": "covered",
+      "ours": "结构化错误 contract",
+      "evidence": "src/error_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.SegmentOverlap",
+      "module": "exceptions",
+      "name": "SegmentOverlap",
+      "status": "covered",
+      "ours": "计划校验拒绝重叠；eval 报告 main-track-overlap",
+      "evidence": "tests/eval_loop_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.MaterialNotFound",
+      "module": "exceptions",
+      "name": "MaterialNotFound",
+      "status": "covered",
+      "ours": "结构化错误 contract",
+      "evidence": "src/error_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.AmbiguousMaterial",
+      "module": "exceptions",
+      "name": "AmbiguousMaterial",
+      "status": "covered",
+      "ours": "结构化错误 contract + 歧义候选列表",
+      "evidence": "tests/resource_cli_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.ExtensionFailed",
+      "module": "exceptions",
+      "name": "ExtensionFailed",
+      "status": "covered",
+      "ours": "template import-track 失败即报错",
+      "evidence": "tests/template_cli_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.DraftContentLoadFailed",
+      "module": "exceptions",
+      "name": "DraftContentLoadFailed",
+      "status": "covered",
+      "ours": "结构化错误 contract（含 BOM 容忍）",
+      "evidence": "src/plan.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.DraftNotFound",
+      "module": "exceptions",
+      "name": "DraftNotFound",
+      "status": "covered",
+      "ours": "结构化错误 contract",
+      "evidence": "src/error_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "exceptions.AutomationError",
+      "module": "exceptions",
+      "name": "AutomationError",
+      "status": "out_of_scope",
+      "ours": "runtime 模块只做检测与 fail-closed，不驱动 UI",
+      "evidence": "docs/reference/jianying-11.6-feature-map.md",
+      "note": "L3：客户端 UI 自动化",
+      "methods": []
+    },
+    {
+      "class": "exceptions.ExportTimeout",
+      "module": "exceptions",
+      "name": "ExportTimeout",
+      "status": "out_of_scope",
+      "ours": "render native 直接 fail-closed",
+      "evidence": "docs/vision/offline-intelligent-editing.md",
+      "note": "L3：客户端导出",
+      "methods": []
+    },
+    {
+      "class": "jianying_controller.ExportResolution",
+      "module": "jianying_controller",
+      "name": "ExportResolution",
+      "status": "out_of_scope",
+      "ours": "render proxy 的 --scale",
+      "evidence": "src/render.rs",
+      "note": "客户端导出参数，无 UI 自动化",
+      "methods": []
+    },
+    {
+      "class": "jianying_controller.ExportFramerate",
+      "module": "jianying_controller",
+      "name": "ExportFramerate",
+      "status": "out_of_scope",
+      "ours": "计划 canvas.fps",
+      "evidence": "src/plan.rs",
+      "note": "客户端导出参数",
+      "methods": []
+    },
+    {
+      "class": "jianying_controller.ControlFinder",
+      "module": "jianying_controller",
+      "name": "ControlFinder",
+      "status": "out_of_scope",
+      "ours": "无（UIA 控件查找不做）",
+      "evidence": "docs/reference/jianying-11.6-feature-map.md",
+      "note": "L3：UI 自动化",
+      "methods": [
+        {
+          "name": "desc_matcher",
+          "status": "out_of_scope"
+        },
+        {
+          "name": "class_name_matcher",
+          "status": "out_of_scope"
+        }
+      ]
+    },
+    {
+      "class": "jianying_controller.JianyingController",
+      "module": "jianying_controller",
+      "name": "JianyingController",
+      "status": "out_of_scope",
+      "ours": "runtime detect/status（只读探测）",
+      "evidence": "docs/vision/offline-intelligent-editing.md",
+      "note": "L3：UI 自动化与导出",
+      "methods": [
+        {
+          "name": "export_draft",
+          "status": "out_of_scope"
+        },
+        {
+          "name": "switch_to_home",
+          "status": "out_of_scope"
+        },
+        {
+          "name": "get_window",
+          "status": "out_of_scope"
+        }
+      ]
+    },
+    {
+      "class": "keyframe.Keyframe",
+      "module": "keyframe",
+      "name": "Keyframe",
+      "status": "covered",
+      "ours": "plan keyframes + timeline keyframe",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "keyframe.KeyframeProperty",
+      "module": "keyframe",
+      "name": "KeyframeProperty",
+      "status": "covered",
+      "ours": "11 个通道（含 scale_x/scale_y/uniform_scale/saturation/contrast/brightness）",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "keyframe.KeyframeList",
+      "module": "keyframe",
+      "name": "KeyframeList",
+      "status": "covered",
+      "ours": "timeline keyframe（逐点写入，按时间排序）",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "add_keyframe",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "local_materials.CropSettings",
+      "module": "local_materials",
+      "name": "CropSettings",
+      "status": "covered",
+      "ours": "plan crop + timeline crop",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "local_materials.VideoMaterial",
+      "module": "local_materials",
+      "name": "VideoMaterial",
+      "status": "covered",
+      "ours": "媒体材料（probe → materials.videos）",
+      "evidence": "src/draft.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "local_materials.AudioMaterial",
+      "module": "local_materials",
+      "name": "AudioMaterial",
+      "status": "covered",
+      "ours": "媒体材料（probe → materials.audios）",
+      "evidence": "src/draft.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "script_file.ScriptFile",
+      "module": "script_file",
+      "name": "ScriptFile",
+      "status": "covered",
+      "ours": "plan/v1 + project build/dump 等价产物",
+      "evidence": "tests/agent_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "dumps",
+          "status": "covered"
+        },
+        {
+          "name": "dump",
+          "status": "covered"
+        },
+        {
+          "name": "save",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "script_material.ScriptMaterial",
+      "module": "script_material",
+      "name": "ScriptMaterial",
+      "status": "covered",
+      "ours": "plan 源材料解析（相对路径 + probe）",
+      "evidence": "src/plan.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "segment.BaseSegment",
+      "module": "segment",
+      "name": "BaseSegment",
+      "status": "covered",
+      "ours": "plan 段公共字段 + timeline get/set/move",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "start",
+          "status": "covered"
+        },
+        {
+          "name": "start",
+          "status": "covered"
+        },
+        {
+          "name": "duration",
+          "status": "covered"
+        },
+        {
+          "name": "duration",
+          "status": "covered"
+        },
+        {
+          "name": "end",
+          "status": "covered"
+        },
+        {
+          "name": "overlaps",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "segment.Speed",
+      "module": "segment",
+      "name": "Speed",
+      "status": "covered",
+      "ours": "plan speed + timeline speed + writer::scaled_source_duration",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "segment.AudioFade",
+      "module": "segment",
+      "name": "AudioFade",
+      "status": "covered",
+      "ours": "plan fade + timeline audio-fade",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "segment.ClipSettings",
+      "module": "segment",
+      "name": "ClipSettings",
+      "status": "covered",
+      "ours": "plan scale/x/y/rotation/opacity（clip 对象）",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "segment.MediaSegment",
+      "module": "segment",
+      "name": "MediaSegment",
+      "status": "covered",
+      "ours": "plan video/audio 段 + source_timerange 派生",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "segment.VisualSegment",
+      "module": "segment",
+      "name": "VisualSegment",
+      "status": "covered",
+      "ours": "plan 视觉字段 + 关键帧",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "add_keyframe",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "template_mode.ShrinkMode",
+      "module": "template_mode",
+      "name": "ShrinkMode",
+      "status": "covered",
+      "ours": "src/shrink_mode.rs + template 替换时序",
+      "evidence": "tests/template_semantics_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "template_mode.ExtendMode",
+      "module": "template_mode",
+      "name": "ExtendMode",
+      "status": "covered",
+      "ours": "src/extend_mode.rs + template 替换时序",
+      "evidence": "tests/template_semantics_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "template_mode.ImportedSegment",
+      "module": "template_mode",
+      "name": "ImportedSegment",
+      "status": "covered",
+      "ours": "template import-track（无损段 JSON）",
+      "evidence": "tests/template_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "template_mode.ImportedMediaSegment",
+      "module": "template_mode",
+      "name": "ImportedMediaSegment",
+      "status": "covered",
+      "ours": "template import-track",
+      "evidence": "tests/template_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "template_mode.ImportedTrack",
+      "module": "template_mode",
+      "name": "ImportedTrack",
+      "status": "covered",
+      "ours": "template import-track",
+      "evidence": "tests/template_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "template_mode.EditableTrack",
+      "module": "template_mode",
+      "name": "EditableTrack",
+      "status": "covered",
+      "ours": "template 轨道级替换（start_time/end_time 由导入计算）",
+      "evidence": "tests/template_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "start_time",
+          "status": "covered"
+        },
+        {
+          "name": "end_time",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "template_mode.ImportedTextTrack",
+      "module": "template_mode",
+      "name": "ImportedTextTrack",
+      "status": "covered",
+      "ours": "template replace-text",
+      "evidence": "tests/template_cli_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "template_mode.ImportedMediaTrack",
+      "module": "template_mode",
+      "name": "ImportedMediaTrack",
+      "status": "partial",
+      "ours": "template import-track",
+      "evidence": "tests/template_cli_contract.rs",
+      "note": "导入时不做材料类型校验与时间窗重算",
+      "methods": [
+        {
+          "name": "check_material_type",
+          "status": "uncovered"
+        },
+        {
+          "name": "process_timerange",
+          "status": "uncovered"
+        }
+      ]
+    },
+    {
+      "class": "text_segment.TextStyle",
+      "module": "text_segment",
+      "name": "TextStyle",
+      "status": "covered",
+      "ours": "plan size/color/bold/italic/underline/alignment/vertical/letter_spacing/line_spacing/auto_wrapping/max_line_width/text_alpha",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "text_segment.TextBorder",
+      "module": "text_segment",
+      "name": "TextBorder",
+      "status": "covered",
+      "ours": "plan border_color/border_width",
+      "evidence": "src/draft.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "text_segment.TextBackground",
+      "module": "text_segment",
+      "name": "TextBackground",
+      "status": "covered",
+      "ours": "plan background{...}",
+      "evidence": "src/draft.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "text_segment.TextBubble",
+      "module": "text_segment",
+      "name": "TextBubble",
+      "status": "covered",
+      "ours": "plan bubble（raw ids）+ resource apply",
+      "evidence": "tests/resource_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "text_segment.TextEffect",
+      "module": "text_segment",
+      "name": "TextEffect",
+      "status": "covered",
+      "ours": "plan text_effect（raw ids）+ resource apply",
+      "evidence": "tests/resource_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "text_segment.TextShadow",
+      "module": "text_segment",
+      "name": "TextShadow",
+      "status": "covered",
+      "ours": "plan shadow{...}",
+      "evidence": "src/draft.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "text_segment.TextSegment",
+      "module": "text_segment",
+      "name": "TextSegment",
+      "status": "partial",
+      "ours": "plan text 段全字段 + template replace-text",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "没有从模板直接新建文本段的同形 API",
+      "methods": [
+        {
+          "name": "create_from_template",
+          "status": "uncovered"
+        },
+        {
+          "name": "add_animation",
+          "status": "covered"
+        },
+        {
+          "name": "add_bubble",
+          "status": "covered"
+        },
+        {
+          "name": "add_effect",
+          "status": "covered"
+        },
+        {
+          "name": "export_material",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "time_util.Timerange",
+      "module": "time_util",
+      "name": "Timerange",
+      "status": "covered",
+      "ours": "tim()/毫秒微秒整数 + target/source_timerange",
+      "evidence": "src/tim.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "import_json",
+          "status": "covered"
+        },
+        {
+          "name": "end",
+          "status": "covered"
+        },
+        {
+          "name": "overlaps",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "track.TrackTypeMeta",
+      "module": "track",
+      "name": "TrackTypeMeta",
+      "status": "covered",
+      "ours": "plan track.type + catalogs",
+      "evidence": "src/plan.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "track.TrackType",
+      "module": "track",
+      "name": "TrackType",
+      "status": "covered",
+      "ours": "plan track.type（video/audio/text/sticker/filter/effect）",
+      "evidence": "src/plan.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "from_name",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "track.TrackRef",
+      "module": "track",
+      "name": "TrackRef",
+      "status": "covered",
+      "ours": "timeline --track 选择器",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "track.TrackSpec",
+      "module": "track",
+      "name": "TrackSpec",
+      "status": "covered",
+      "ours": "plan tracks[]",
+      "evidence": "src/plan.rs",
+      "note": "",
+      "methods": []
+    },
+    {
+      "class": "track.BaseTrack",
+      "module": "track",
+      "name": "BaseTrack",
+      "status": "covered",
+      "ours": "timeline tracks/add-track/track-rename/track-mute",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "track.Track",
+      "module": "track",
+      "name": "Track",
+      "status": "covered",
+      "ours": "plan track + timeline add-segment",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "end_time",
+          "status": "covered"
+        },
+        {
+          "name": "accept_segment_type",
+          "status": "covered"
+        },
+        {
+          "name": "add_segment",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.Mask",
+      "module": "video_segment",
+      "name": "Mask",
+      "status": "covered",
+      "ours": "plan mask + timeline mask",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.Chroma",
+      "module": "video_segment",
+      "name": "Chroma",
+      "status": "covered",
+      "ours": "plan chroma + timeline chroma",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.VideoEffect",
+      "module": "video_segment",
+      "name": "VideoEffect",
+      "status": "covered",
+      "ours": "plan effects[] + timeline add-effect",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.Filter",
+      "module": "video_segment",
+      "name": "Filter",
+      "status": "covered",
+      "ours": "plan filters[] + timeline add-filter",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.Transition",
+      "module": "video_segment",
+      "name": "Transition",
+      "status": "covered",
+      "ours": "plan transition_out + timeline transition",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.BackgroundFilling",
+      "module": "video_segment",
+      "name": "BackgroundFilling",
+      "status": "covered",
+      "ours": "plan background_filling + timeline bg-blur",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.MixMode",
+      "module": "video_segment",
+      "name": "MixMode",
+      "status": "covered",
+      "ours": "plan mix_mode + timeline composite（原地更新）",
+      "evidence": "tests/timeline_cli_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.VideoSegment",
+      "module": "video_segment",
+      "name": "VideoSegment",
+      "status": "covered",
+      "ours": "plan video 段 + 全部视觉命令",
+      "evidence": "tests/path_equivalence.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "add_animation",
+          "status": "covered"
+        },
+        {
+          "name": "add_effect",
+          "status": "covered"
+        },
+        {
+          "name": "add_fade",
+          "status": "covered"
+        },
+        {
+          "name": "add_filter",
+          "status": "covered"
+        },
+        {
+          "name": "set_mix_mode",
+          "status": "covered"
+        },
+        {
+          "name": "add_mask",
+          "status": "covered"
+        },
+        {
+          "name": "add_transition",
+          "status": "covered"
+        },
+        {
+          "name": "add_background_filling",
+          "status": "covered"
+        },
+        {
+          "name": "add_chroma",
+          "status": "covered"
+        },
+        {
+          "name": "export_json",
+          "status": "covered"
+        }
+      ]
+    },
+    {
+      "class": "video_segment.StickerSegment",
+      "module": "video_segment",
+      "name": "StickerSegment",
+      "status": "covered",
+      "ours": "plan sticker 段 + media add-sticker",
+      "evidence": "tests/media_mutation_contract.rs",
+      "note": "",
+      "methods": [
+        {
+          "name": "export_material",
+          "status": "covered"
+        }
+      ]
+    }
+  ]
+}
