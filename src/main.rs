@@ -7,7 +7,7 @@ use clap_complete::Shell;
 use jianying_cli::{
     capabilities, caption_ops, control_catalog, draft, eval_ops, home_folder, interchange,
     job_runner, media_analysis, media_ops, plan, probe, project_ops, render, resource_ops,
-    runtime_acceptance, srt, store, template, tim, timeline_ops,
+    runtime_acceptance, skills, srt, store, template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -2192,6 +2192,19 @@ enum StoreOp {
     },
 }
 
+/// 技能注册表子命令。
+#[derive(Subcommand)]
+enum SkillsOp {
+    /// 列出全部技能及其状态
+    List {
+        /// 只列某个状态：supported / partial / missing
+        #[arg(long)]
+        status: Option<String>,
+    },
+    /// 查看单条技能
+    Show { id: String },
+}
+
 /// 用户资源库子命令。
 #[derive(Subcommand)]
 enum ResourceOp {
@@ -2336,6 +2349,11 @@ enum Command {
     Verify(DraftPathArgs),
     /// 草稿评分：主轨覆盖/连续性/字幕覆盖/音频覆盖 + 结构化问题（只读、确定性）
     Eval(DraftPathArgs),
+    /// 工作流级技能注册表：把"字幕/配音/粗剪/出片"等映射到具体命令（只读）
+    Skills {
+        #[command(subcommand)]
+        op: SkillsOp,
+    },
     /// 评估-修正循环：按问题挑安全修复并重评，直到达标或无修复可做
     Loop {
         draft: PathBuf,
@@ -3901,6 +3919,36 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             run_verify(args, json)?;
         }
         Command::Eval(args) => print_output(eval_ops::evaluate(&args.draft)?, json),
+        Command::Skills { op } => match op {
+            SkillsOp::List { status } => {
+                let registry = skills::registry();
+                let Some(status) = status else {
+                    print_output(registry, json);
+                    return Ok(());
+                };
+                let filtered: Vec<Value> = registry["skills"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter(|skill| skill["status"].as_str() == Some(status.as_str()))
+                    .cloned()
+                    .collect();
+                let total = filtered.len();
+                print_output(
+                    json!({
+                        "schema": "jianying-skills/v1",
+                        "status": status,
+                        "total": total,
+                        "skills": filtered,
+                    }),
+                    json,
+                );
+            }
+            SkillsOp::Show { id } => match skills::find(&id) {
+                Some(skill) => print_output(skill, json),
+                None => bail!("unknown skill {id:?}; list ids with `jianying skills list --json`"),
+            },
+        },
         Command::Loop {
             draft,
             max_rounds,
