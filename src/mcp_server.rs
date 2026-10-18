@@ -143,6 +143,19 @@ impl JianyingMcpServer {
                 let task_id = required_string(&arguments, "task_id")?;
                 job_runner::audit_persisted(task_id, &self.state_root)
             }
+            "jianying_render_frame" => {
+                let draft = required_path(&arguments, "draft")?;
+                let out = required_path(&arguments, "out")?;
+                let at_us = arguments
+                    .get("at_us")
+                    .and_then(Value::as_i64)
+                    .ok_or_else(|| anyhow!("at_us is required"))?;
+                let scale = arguments
+                    .get("scale")
+                    .and_then(Value::as_f64)
+                    .unwrap_or(0.5);
+                crate::render::render_frame(&draft, &out, at_us, scale)
+            }
             "jianying_draft_inspect" => {
                 let draft = required_path(&arguments, "draft")?;
                 crate::draft::inspect(&draft)

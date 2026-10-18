@@ -148,6 +148,28 @@ pub fn render(
     burn_captions: bool,
     crf: i32,
 ) -> Result<Value> {
+    render_impl(draft_dir, out, scale, burn_captions, crf, None)
+}
+
+/// 导出草稿在指定时刻的单帧 PNG，用于"看一眼对不对"。
+///
+/// 复用同一套合成图，只是把输出换成图片：`-ss` 精确到目标时刻取一帧。
+/// 代价是需要从头解码到该时刻，因此适合抽检而不是批量截图。
+pub fn render_frame(draft_dir: &Path, out: &PathBuf, at_us: i64, scale: f64) -> Result<Value> {
+    if at_us < 0 {
+        bail!("frame timestamp must be >= 0");
+    }
+    render_impl(draft_dir, out, scale, false, 23, Some(at_us))
+}
+
+fn render_impl(
+    draft_dir: &Path,
+    out: &PathBuf,
+    scale: f64,
+    burn_captions: bool,
+    crf: i32,
+    frame_at_us: Option<i64>,
+) -> Result<Value> {
     if !scale.is_finite() || scale <= 0.0 || scale > 4.0 {
         bail!("render scale must be finite and within (0, 4]");
     }
@@ -278,7 +300,12 @@ pub fn render(
     vparts.push(format!("{concat_in}concat=n={input_idx}:v=1:a=0[vout]"));
 
     let mut aidx = input_idx;
-    for t in tracks.iter().filter(|t| t["type"] == "audio") {
+    // 单帧模式不建音频链路：ffmpeg 会因 [aout] 未连接而直接失败。
+    let audio_enabled = frame_at_us.is_none();
+    for t in tracks
+        .iter()
+        .filter(|t| audio_enabled && t["type"] == "audio")
+    {
         for s in t["segments"].as_array().unwrap() {
             let mat = tl["materials"]["audios"]
                 .as_array()
@@ -338,7 +365,9 @@ pub fn render(
         }
     }
     // 视频自带的音轨按源窗口切出来，延迟到目标起点后参与混音。
-    for (vidx, src_start, dur, target_start, speed, volume) in &video_audio {
+    for (vidx, src_start, dur, target_start, speed, volume) in
+        video_audio.iter().filter(|_| audio_enabled)
+    {
         let mut chain = format!(
             "[{vidx}:a]atrim=start={}:duration={},asetpts=PTS-STARTPTS,atempo={}",
             us_to_secs(*src_start),
@@ -432,21 +461,26 @@ pub fn render(
         cmd.arg(a).arg(b);
     }
     cmd.args(["-filter_complex", &filter, "-map", vmap]);
-    if has_audio {
-        cmd.args(["-map", "[aout]"]);
-    }
-    cmd.args([
-        "-c:v",
-        "libx264",
-        "-preset",
-        "veryfast",
-        "-crf",
-        &crf.to_string(),
-        "-pix_fmt",
-        "yuv420p",
-    ]);
-    if has_audio {
-        cmd.args(["-c:a", "aac", "-b:a", "128k", "-shortest"]);
+    if let Some(at_us) = frame_at_us {
+        // 单帧：定位到目标时刻，出 PNG，不带音轨。
+        cmd.args(["-ss", &us_to_secs(at_us), "-frames:v", "1", "-c:v", "png"]);
+    } else {
+        if has_audio {
+            cmd.args(["-map", "[aout]"]);
+        }
+        cmd.args([
+            "-c:v",
+            "libx264",
+            "-preset",
+            "veryfast",
+            "-crf",
+            &crf.to_string(),
+            "-pix_fmt",
+            "yuv420p",
+        ]);
+        if has_audio {
+            cmd.args(["-c:a", "aac", "-b:a", "128k", "-shortest"]);
+        }
     }
     cmd.arg(out);
 
@@ -458,7 +492,8 @@ pub fn render(
         );
     }
     Ok(serde_json::json!({
-        "status": "rendered",
+        "status": if frame_at_us.is_some() { "frame" } else { "rendered" },
+        "at_us": frame_at_us,
         "output": out.to_string_lossy(),
         "preview": true,
         "note": "proxy render only — 背景模糊是预览近似，转场/特效/蒙版不在此渲染；权威出口是剪映内导出",

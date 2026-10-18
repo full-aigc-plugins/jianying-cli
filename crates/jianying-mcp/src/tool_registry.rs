@@ -74,6 +74,21 @@ impl ToolRegistry {
                 true,
             ),
             ToolDescriptor::new(
+                "jianying_render_frame",
+                "导出草稿在指定时刻的单帧 PNG（无客户端抽检画面）",
+                serde_json::json!({
+                    "type":"object","required":["draft","at_us","out"],"additionalProperties":false,
+                    "properties":{
+                        "draft":{"type":"string","minLength":1},
+                        "at_us":{"type":"integer","minimum":0},
+                        "out":{"type":"string","minLength":1},
+                        "scale":{"type":"number","default":0.5}
+                    }
+                }),
+                envelope_schema(),
+                false,
+            ),
+            ToolDescriptor::new(
                 "jianying_draft_inspect",
                 "读取草稿摘要（轨道/段数/画布/时长），等价 `project inspect`",
                 serde_json::json!({

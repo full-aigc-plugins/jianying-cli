@@ -88,6 +88,7 @@ GET endpoint event + 独立 POST endpoint）；官方规范建议新实现使用
 - `jianying_timeline_segments`：片段列表，可用 `track` 过滤（video/audio/text/…）。
 - `jianying_media_probe`：探测媒体时长/分辨率/流/是否图片。
 - `jianying_eval`：草稿评分 0–100 + 结构化问题；`deep=true` 时含素材可用性与画音质量检查。
+- `jianying_render_frame`：导出指定时刻的单帧 PNG（`at_us` + `out` + 可选 `scale`），用于出片前抽检画面。
 
 这四个工具解决的是"Agent 要读结果"的问题：不必拼 `command_run` 的参数，也能拿到稳定的结构化回答。
 

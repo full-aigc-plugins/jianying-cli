@@ -1071,6 +1071,20 @@ enum RenderOp {
     Native(RenderNativeArgs),
     /// Drive and audit an already-approved native-export task
     NativeTask(RenderNativeTaskArgs),
+    /// Export a single PNG frame at a timestamp (needs no client, good for spot checks)
+    Frame {
+        /// Draft directory
+        draft: PathBuf,
+        /// Timestamp inside the draft, e.g. `2500ms` or `00:00:02.500`
+        #[arg(long)]
+        at: String,
+        /// Output PNG
+        #[arg(long)]
+        out: PathBuf,
+        /// Output scale relative to the draft canvas
+        #[arg(long, default_value_t = 0.5)]
+        scale: f64,
+    },
     /// Render multiple proxy previews from a manifest
     Batch {
         manifest: PathBuf,
@@ -4159,6 +4173,16 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             burn_captions,
             crf,
         } => match op {
+            Some(RenderOp::Frame {
+                draft,
+                at,
+                out,
+                scale,
+            }) => {
+                let report = render::render_frame(&draft, &out, tim::parse(&at)?, scale)?;
+                print_output(report, json);
+                Ok(())
+            }
             Some(RenderOp::Proxy(args)) => run_render_proxy(args, json),
             Some(RenderOp::Native(args)) => run_render_native(args, json),
             Some(RenderOp::NativeTask(args)) => run_render_native_task(args, json),
