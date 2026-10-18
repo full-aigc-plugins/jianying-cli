@@ -25,6 +25,8 @@ pub struct Penalties {
     pub audio_silent: i64,
     pub audio_mostly_silent: i64,
     pub audio_loudness: i64,
+    pub shot_too_short: i64,
+    pub shot_too_long: i64,
 }
 
 /// 判定阈值；比例一律用千分比，避免浮点比较。
@@ -35,6 +37,10 @@ pub struct Thresholds {
     pub mostly_silent_permille: i64,
     pub loudness_min_lufs: f64,
     pub loudness_max_lufs: f64,
+    /// 单镜头下限：短于此值视为碎切。
+    pub min_shot_us: i64,
+    /// 单镜头上限：长于此值视为闷镜。
+    pub max_shot_us: i64,
 }
 
 /// 一份完整的评估策略。
@@ -63,6 +69,8 @@ impl Default for Policy {
                 audio_silent: 20,
                 audio_mostly_silent: 10,
                 audio_loudness: 10,
+                shot_too_short: 5,
+                shot_too_long: 5,
             },
             thresholds: Thresholds {
                 black_ratio_permille: 800,
@@ -70,6 +78,8 @@ impl Default for Policy {
                 mostly_silent_permille: 800,
                 loudness_min_lufs: -40.0,
                 loudness_max_lufs: -5.0,
+                min_shot_us: 500_000,
+                max_shot_us: 8_000_000,
             },
         }
     }
@@ -121,6 +131,12 @@ impl Policy {
         policy.penalties.audio_loudness = penalties["audio-loudness"]
             .as_i64()
             .unwrap_or(policy.penalties.audio_loudness);
+        policy.penalties.shot_too_short = penalties["shot-too-short"]
+            .as_i64()
+            .unwrap_or(policy.penalties.shot_too_short);
+        policy.penalties.shot_too_long = penalties["shot-too-long"]
+            .as_i64()
+            .unwrap_or(policy.penalties.shot_too_long);
 
         let thresholds = &value["thresholds"];
         policy.thresholds.black_ratio_permille = thresholds["black_ratio_permille"]
@@ -138,6 +154,12 @@ impl Policy {
         policy.thresholds.loudness_max_lufs = thresholds["loudness_max_lufs"]
             .as_f64()
             .unwrap_or(policy.thresholds.loudness_max_lufs);
+        policy.thresholds.min_shot_us = thresholds["min_shot_us"]
+            .as_i64()
+            .unwrap_or(policy.thresholds.min_shot_us);
+        policy.thresholds.max_shot_us = thresholds["max_shot_us"]
+            .as_i64()
+            .unwrap_or(policy.thresholds.max_shot_us);
         policy.validate()?;
         Ok(policy)
     }
@@ -189,6 +211,12 @@ impl Policy {
                 bail!("policy penalties must be within 0..=100");
             }
         }
+        if self.thresholds.min_shot_us <= 0
+            || self.thresholds.max_shot_us <= 0
+            || self.thresholds.min_shot_us >= self.thresholds.max_shot_us
+        {
+            bail!("min_shot_us must be positive and smaller than max_shot_us");
+        }
         if !self.thresholds.loudness_min_lufs.is_finite()
             || !self.thresholds.loudness_max_lufs.is_finite()
             || self.thresholds.loudness_min_lufs >= self.thresholds.loudness_max_lufs
@@ -215,6 +243,8 @@ impl Policy {
                 "audio-silent": self.penalties.audio_silent,
                 "audio-mostly-silent": self.penalties.audio_mostly_silent,
                 "audio-loudness": self.penalties.audio_loudness,
+                "shot-too-short": self.penalties.shot_too_short,
+                "shot-too-long": self.penalties.shot_too_long,
             },
             "thresholds": {
                 "black_ratio_permille": self.thresholds.black_ratio_permille,
@@ -222,6 +252,8 @@ impl Policy {
                 "mostly_silent_permille": self.thresholds.mostly_silent_permille,
                 "loudness_min_lufs": self.thresholds.loudness_min_lufs,
                 "loudness_max_lufs": self.thresholds.loudness_max_lufs,
+                "min_shot_us": self.thresholds.min_shot_us,
+                "max_shot_us": self.thresholds.max_shot_us,
             },
         })
     }

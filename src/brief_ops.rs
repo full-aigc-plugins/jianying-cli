@@ -169,6 +169,34 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
             }
         }
     }
+    // min_shot_us：过短的收尾镜头并入同源的前一个镜头，避免切出碎片；
+    // 上限因此可能被略微突破（下限关乎可用性，上限只是节奏偏好），合并后给出提示。
+    if let Some(min_shot) = brief["min_shot_us"].as_i64().filter(|value| *value > 0) {
+        while segments.len() >= 2 {
+            let last_duration = segments
+                .last()
+                .and_then(|segment| segment["duration_us"].as_i64())
+                .unwrap_or(0);
+            if last_duration >= min_shot {
+                break;
+            }
+            let last = segments.pop().expect("segments is not empty");
+            let previous = segments.last_mut().expect("segments keeps at least one");
+            if previous["source"] != last["source"] {
+                segments.push(last);
+                break;
+            }
+            let merged = previous["duration_us"].as_i64().unwrap_or(0) + last_duration;
+            previous["duration_us"] = json!(merged);
+            if let Some(max_shot) = max_shot_us {
+                if merged > max_shot {
+                    warnings.push(format!(
+                        "merged-short-tail: a shot was extended to {merged}us to honour min_shot_us (max_shot_us is {max_shot})"
+                    ));
+                }
+            }
+        }
+    }
     if segments.is_empty() {
         bail!("could not build any shot from the given media");
     }

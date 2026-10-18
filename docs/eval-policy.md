@@ -19,14 +19,17 @@ MCP 的 `jianying_eval` 也接受 `policy` 参数，Agent 可以按平台切换�
   "weights":  { "main": 40, "continuity": 20, "caption": 20, "audio": 20 },
   "penalties": {
     "media-missing": 30, "source-exceeds-media": 15, "video-black": 25,
-    "audio-silent": 20, "audio-mostly-silent": 10, "audio-loudness": 10
+    "audio-silent": 20, "audio-mostly-silent": 10, "audio-loudness": 10,
+    "shot-too-short": 5, "shot-too-long": 5
   },
   "thresholds": {
     "black_ratio_permille": 800,
     "silence_ratio_permille": 950,
     "mostly_silent_permille": 800,
     "loudness_min_lufs": -40,
-    "loudness_max_lufs": -5
+    "loudness_max_lufs": -5,
+    "min_shot_us": 500000,
+    "max_shot_us": 8000000
   }
 }
 ```
@@ -42,6 +45,7 @@ MCP 的 `jianying_eval` 也接受 `policy` 参数，Agent 可以按平台切换�
 | `silence_ratio_permille >= mostly_silent_permille` | 否则"全静音"比"大部分静音"更容易触发，语义颠倒 |
 | `penalties` 落在 `0..=100` | 单条问题扣分超过满分没有意义 |
 | `loudness_min_lufs < loudness_max_lufs` 且均为有限值 | 否则区间为空 |
+| `0 < min_shot_us < max_shot_us` | 镜头上下限必须构成有效区间 |
 
 ## 报告里会回显生效策略
 
@@ -57,3 +61,15 @@ MCP 的 `jianying_eval` 也接受 `policy` 参数，Agent 可以按平台切换�
 - `policies/default.json`：与代码默认值一致，可作为改写起点。
 - `policies/douyin.json`：竖屏短视频，允许更短的黑场但要求更响（`loudness_min_lufs: -38`）。
 - `policies/strict.json`：成片交付前的严格自检（黑帧 100‰、静音 800‰）。
+
+## 镜头时长指标
+
+`eval` 会统计主轨每个镜头的时长（`shot_stats`：count/min/max/mean），并给出两类结构问题：
+
+| 问题 | 判据 | 扣分（默认） |
+|---|---|---|
+| `shot-too-short` | 镜头时长 < `min_shot_us` | 每处 5 分 |
+| `shot-too-long` | 镜头时长 > `max_shot_us` | 每处 5 分 |
+
+这两项**不依赖素材探测**，因此在浅评估里也会扣分（单维最多扣 30），
+而黑帧/静音/响度仍只在 `--deep` 下检查。

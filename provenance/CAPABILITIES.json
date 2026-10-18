@@ -714,6 +714,11 @@
       "evidence": "tests/eval_policy_contract.rs: weights, penalties and thresholds load from a jianying-eval-policy/v1 file, are validated before use, and the report echoes the policy that produced the score"
     },
     {
+      "id": "eval.shot_length",
+      "status": "supported",
+      "evidence": "tests/eval_policy_contract.rs: shot_stats plus shot-too-short/shot-too-long structural issues, penalised in base scoring and tunable through the policy"
+    },
+    {
       "id": "eval.quality",
       "status": "supported",
       "evidence": "tests/eval_loop_contract.rs: content-level checks on the source window - video-black (blackdetect, >=80%), audio-silent (>=95%), audio-mostly-silent (>=80%), audio-loudness (<-40 or >-5 LUFS) - with media_checked vs media_analysed reported separately"
@@ -772,6 +777,11 @@
       "id": "generate.shot_split",
       "status": "supported",
       "evidence": "tests/brief_generate_contract.rs: max_shot_us cuts one clip into consecutive shots with source windows advancing by the shot length"
+    },
+    {
+      "id": "generate.min_shot",
+      "status": "supported",
+      "evidence": "tests/brief_generate_contract.rs: a tail shot shorter than min_shot_us merges into the previous same-source shot, preserving total duration and reporting merged-short-tail"
     },
     {
       "id": "generate.not_creative",

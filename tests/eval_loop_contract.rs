@@ -642,7 +642,13 @@ fn loop_trims_a_black_lead_in_and_keeps_the_shot_in_place() {
     ]);
 
     let before = run_ok(&["eval", &dir.to_string_lossy(), "--deep", "--json"]);
-    assert_eq!(before["score"], json!(75), "80% 黑帧 -25");
+    // 10s 单镜头同时触发黑帧(-25)与闷镜(-5)
+    assert_eq!(before["score"], json!(70), "80% 黑帧 -25，10s 长镜 -5");
+    assert!(before["issues"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|issue| issue["code"] == "shot-too-long"));
 
     let outcome = run_ok(&[
         "loop",

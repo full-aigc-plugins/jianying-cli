@@ -274,3 +274,87 @@ fn mcp_eval_accepts_a_policy_file() {
     assert_eq!(envelope["data"]["score"], json!(100));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn shot_length_issues_are_structural_and_policy_tunable() {
+    if Command::new("ffmpeg").arg("-version").output().is_err()
+        || Command::new("ffprobe").arg("-version").output().is_err()
+    {
+        return;
+    }
+    let root = temp_root("shots");
+    let clip = root.join("long.mp4");
+    let status = Command::new("ffmpeg")
+        .args([
+            "-hide_banner",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "testsrc=s=320x180:d=10",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-y",
+        ])
+        .arg(&clip)
+        .status()
+        .unwrap();
+    assert!(status.success());
+    // 0.2s 碎切 + 9.8s 闷镜
+    let plan = json!({
+        "schema":"jianying-cli-plan/v1","name":"shots",
+        "canvas":{"width":320,"height":180,"fps":30},
+        "tracks":[{"type":"video","segments":[
+            {"start_us":0,"duration_us":200_000,"source":"long.mp4","source_start_us":0},
+            {"start_us":200_000,"duration_us":9_800_000,"source":"long.mp4","source_start_us":200_000}
+        ]}]
+    });
+    let plan_path = root.join("plan.json");
+    fs::write(&plan_path, serde_json::to_string(&plan).unwrap()).unwrap();
+    let draft = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &plan_path.to_string_lossy(),
+        "--out",
+        &draft.to_string_lossy(),
+        "--json",
+    ]);
+
+    let report = run_ok(&["eval", &draft.to_string_lossy(), "--json"]);
+    let codes: Vec<&str> = report["issues"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|issue| issue["code"].as_str().unwrap())
+        .collect();
+    assert!(codes.contains(&"shot-too-short"), "issues={codes:?}");
+    assert!(codes.contains(&"shot-too-long"), "issues={codes:?}");
+    assert_eq!(report["score"], json!(90), "两个镜头问题各扣 5");
+    assert_eq!(report["shot_stats"]["count"], json!(2));
+    assert_eq!(report["shot_stats"]["min_us"], json!(200_000));
+
+    let loose = root.join("loose.json");
+    fs::write(
+        &loose,
+        serde_json::to_string(&json!({
+            "schema":"jianying-eval-policy/v1","name":"loose",
+            "thresholds":{"min_shot_us":100_000,"max_shot_us":20_000_000}
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    let tuned = run_ok(&[
+        "eval",
+        &draft.to_string_lossy(),
+        "--policy",
+        &loose.to_string_lossy(),
+        "--json",
+    ]);
+    assert_eq!(tuned["score"], json!(100));
+    assert!(tuned["issues"].as_array().unwrap().is_empty());
+    let _ = fs::remove_dir_all(root);
+}

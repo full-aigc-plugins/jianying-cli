@@ -109,6 +109,42 @@ pub fn evaluate_with(draft: &Path, policy: &crate::eval_policy::Policy) -> Resul
     let audio_coverage = track_coverage(&timeline, "audio", duration);
 
     // 只有存在的维度才参与评分，缺失维度不用 0 分惩罚。
+    // 镜头时长分布：碎切与闷镜是观感问题，结构评分看不见。
+    let mut shot_lengths: Vec<i64> = main_segments.iter().map(|(s, e)| (e - s).max(0)).collect();
+    shot_lengths.sort_unstable();
+    let too_short = shot_lengths
+        .iter()
+        .filter(|length| **length < policy.thresholds.min_shot_us)
+        .count();
+    let too_long = shot_lengths
+        .iter()
+        .filter(|length| **length > policy.thresholds.max_shot_us)
+        .count();
+    if too_short > 0 {
+        issues.push(json!({
+            "code": "shot-too-short",
+            "count": too_short,
+            "min_shot_us": policy.thresholds.min_shot_us,
+        }));
+    }
+    if too_long > 0 {
+        issues.push(json!({
+            "code": "shot-too-long",
+            "count": too_long,
+            "max_shot_us": policy.thresholds.max_shot_us,
+        }));
+    }
+    let shot_stats = if shot_lengths.is_empty() {
+        Value::Null
+    } else {
+        json!({
+            "count": shot_lengths.len(),
+            "min_us": shot_lengths.first().copied().unwrap_or(0),
+            "max_us": shot_lengths.last().copied().unwrap_or(0),
+            "mean_us": shot_lengths.iter().sum::<i64>() / shot_lengths.len() as i64,
+        })
+    };
+
     let mut total_weight = policy.weights.main + policy.weights.continuity;
     let mut score = main_coverage * policy.weights.main + continuity * policy.weights.continuity;
     if let Some(value) = caption_permille {
@@ -124,7 +160,12 @@ pub fn evaluate_with(draft: &Path, policy: &crate::eval_policy::Policy) -> Resul
     } else {
         0.0
     };
-    let score = score as i64;
+    // 镜头时长是结构问题，不依赖素材探测，因此在基础评分里就扣分；
+    // 单维最多扣 30，避免碎切多到一定程度就把其它维度全部淹没。
+    let shot_penalty = ((too_short as i64 * policy.penalties.shot_too_short)
+        + (too_long as i64 * policy.penalties.shot_too_long))
+        .min(30);
+    let score = (score as i64 - shot_penalty).max(0);
 
     Ok(json!({
         "draft": draft.to_string_lossy(),
@@ -139,6 +180,7 @@ pub fn evaluate_with(draft: &Path, policy: &crate::eval_policy::Policy) -> Resul
             ),
             "gap_us": gap_total
         },
+        "shot_stats": shot_stats,
         "caption_coverage_permille": caption_permille,
         "audio_coverage_permille": audio_coverage.map(|value| (value * 1000.0).round() as i64),
         "score": score,
@@ -397,6 +439,8 @@ pub fn evaluate_deep_with(draft: &Path, policy: &crate::eval_policy::Policy) -> 
             Some("audio-silent") => policy.penalties.audio_silent,
             Some("audio-mostly-silent") => policy.penalties.audio_mostly_silent,
             Some("audio-loudness") => policy.penalties.audio_loudness,
+            Some("shot-too-short") => policy.penalties.shot_too_short,
+            Some("shot-too-long") => policy.penalties.shot_too_long,
             _ => 0,
         };
         penalty += delta;

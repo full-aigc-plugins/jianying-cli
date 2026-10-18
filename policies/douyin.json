@@ -13,12 +13,16 @@
     "video-black": 25,
     "audio-silent": 20,
     "audio-mostly-silent": 10,
-    "audio-loudness": 10
+    "audio-loudness": 10,
+    "shot-too-short": 5,
+    "shot-too-long": 5
   },
   "thresholds": {
     "black_ratio_permille": 600,
     "mostly_silent_permille": 800,
     "loudness_min_lufs": -38,
-    "loudness_max_lufs": -5
+    "loudness_max_lufs": -5,
+    "min_shot_us": 400000,
+    "max_shot_us": 4000000
   }
 }

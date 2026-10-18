@@ -262,3 +262,57 @@ fn max_shot_us_splits_one_clip_into_consecutive_shots() {
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn min_shot_us_merges_a_short_tail_and_says_so() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("min-shot");
+    clip(&root.join("long.mp4"), 6);
+    let brief_path = brief(
+        &root,
+        json!({
+            "schema":"jianying-brief/v1","name":"min-shot","platform":"bilibili",
+            "target_duration_us":5_000_000,"max_shot_us":1_500_000,
+            "min_shot_us":1_000_000,"media":["long.mp4"]
+        }),
+    );
+    let out = root.join("plan.json");
+    let report = run_ok(&[
+        "generate",
+        &brief_path.to_string_lossy(),
+        "--out",
+        &out.to_string_lossy(),
+        "--json",
+    ]);
+    assert_eq!(
+        report["duration_us"],
+        json!(5_000_000),
+        "合并不得改变总时长"
+    );
+    assert_eq!(report["shots"], json!(3), "0.5s 的尾巴应并入前一段");
+
+    let plan: Value = serde_json::from_str(&fs::read_to_string(&out).unwrap()).unwrap();
+    let durations: Vec<i64> = plan["tracks"][0]["segments"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|segment| segment["duration_us"].as_i64().unwrap())
+        .collect();
+    assert_eq!(durations, vec![1_500_000, 1_500_000, 2_000_000]);
+
+    let warnings: Vec<&str> = report["warnings"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|warning| warning.as_str().unwrap())
+        .collect();
+    assert!(
+        warnings
+            .iter()
+            .any(|warning| warning.starts_with("merged-short-tail")),
+        "突破上限必须给出提示: {warnings:?}"
+    );
+    let _ = fs::remove_dir_all(root);
+}
