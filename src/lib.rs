@@ -1,5 +1,6 @@
 //! jianying-cli library: plan schema, capability catalogs, draft assembly,
 //! probing, store handling, template mode, SRT and proxy rendering.
+pub mod brief_ops;
 pub mod capabilities;
 pub mod caption_ops;
 pub mod catalogs;

@@ -5,9 +5,10 @@ use anyhow::{bail, Context, Result};
 use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
-    capabilities, caption_ops, control_catalog, draft, eval_ops, home_folder, interchange,
-    job_runner, media_analysis, media_ops, pipeline_ops, plan, plan_ops, probe, project_ops,
-    render, resource_ops, runtime_acceptance, skills, srt, store, template, tim, timeline_ops,
+    brief_ops, capabilities, caption_ops, control_catalog, draft, eval_ops, home_folder,
+    interchange, job_runner, media_analysis, media_ops, pipeline_ops, plan, plan_ops, probe,
+    project_ops, render, resource_ops, runtime_acceptance, skills, srt, store, template, tim,
+    timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -2403,6 +2404,17 @@ enum Command {
         #[command(subcommand)]
         op: PlanOp,
     },
+    /// 简报驱动的初稿生成：素材 + 目标时长 + 平台 → 计划
+    Generate {
+        /// jianying-brief/v1 简报文件
+        brief: PathBuf,
+        /// 输出计划路径
+        #[arg(long)]
+        out: PathBuf,
+        /// 覆盖已存在的输出
+        #[arg(long)]
+        force: bool,
+    },
     /// 批量流水线：目录内每份计划 → 构建 → 评分 → 渲染（无客户端）
     Pipeline {
         /// 存放 *.json 计划的目录
@@ -4038,6 +4050,9 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 None => bail!("unknown skill {id:?}; list ids with `jianying skills list --json`"),
             },
         },
+        Command::Generate { brief, out, force } => {
+            print_output(brief_ops::generate(&brief, &out, force)?, json)
+        }
         Command::Plan { op } => match op {
             PlanOp::Compose {
                 out,

@@ -63,7 +63,7 @@ ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -o
 | 支柱 | 现状 | 证据 |
 |---|---|---|
 | V1 pyJYD 替代 | 🟡 核心达成：55/55 parity、单一 writer、**API 面 68/68 已逐类登记且类级 `uncovered=0`**（3 类 partial 共 4 个方法、6 类 L3 out_of_scope）；剩余：这 4 个方法与更多 op 迁移 | `provenance/PYJYD_API_COVERAGE.json`、`tests/pyjyd_api_coverage_contract.rs` |
-| V2 dream-loop 闭环 | 🟢 内容质量已闭环：`eval --deep` 检出素材缺失/源窗口越界/黑帧/静音/响度异常，`loop --deep` 能 clamp 冻结尾、裁掉首尾黑帧与静音；**缺**生成式改写与中段缺陷的自动化 | `src/eval_ops.rs`、`tests/eval_loop_contract.rs` |
+| V2 dream-loop 闭环 | 🟢 闭环两端都有：`generate` 从简报确定性生成初稿，`eval --deep` + `loop --deep` 评估并修正（结构/素材/画音质量）；**缺**创作级生成（选镜、卡点、脚本） | `src/brief_ops.rs`、`src/eval_ops.rs`、`tests/brief_generate_contract.rs` |
 | V3 hypit 计划层 | 🟢 计划可编排：`plan compose/append` 确定性拼接（画布一致、主轨优先、按累计时长偏移），每次写入留快照，`plan history/revert` 逐字节回滚 | `src/plan_ops.rs`、`tests/plan_composition_contract.rs` |
 | V4 editor-skill 整合 | 🟡 已建**技能注册表**：14 条工作流技能带状态/意图/命令/缺口，且合同测试校验引用命令真实存在；缺口以 `partial`/`missing` 显式登记 | `src/skills.rs`、`tests/skills_contract.rs`、`jianying skills list` |
 | V5 headless 能力 | 🟢 批量流水线已通：`pipeline <计划目录>` 一次完成 构建→评分→渲染，失败按条隔离，`--fail-under` 作 CI 门禁；**渲染仍是预览级** | `src/pipeline_ops.rs`、`tests/pipeline_contract.rs` |

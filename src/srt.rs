@@ -28,6 +28,9 @@ fn parse_ts(s: &str) -> Result<i64> {
 /// Parse SRT subtitle text into cues. Blank lines separate blocks; a block is
 /// `index`, `start --> end`, then one or more text lines.
 pub fn parse(srt: &str) -> Result<Vec<Cue>> {
+    // Windows 记事本/PowerShell 写的 SRT 常带 UTF-8 BOM；不剥掉的话首行序号
+    // 会躲过下面的"纯数字"过滤，直接混进字幕正文。
+    let srt = srt.trim_start_matches('\u{feff}');
     let mut cues = Vec::new();
     for block in srt.replace("\r\n", "\n").split("\n\n") {
         let lines: Vec<&str> = block.lines().filter(|l| !l.trim().is_empty()).collect();
@@ -110,5 +113,17 @@ pub fn cues_to_text_track(cues: Vec<Cue>, opts: &SrtOptions) -> crate::plan::Tra
                 s
             })
             .collect(),
+    }
+}
+
+#[cfg(test)]
+mod bom_tests {
+    use super::parse;
+
+    #[test]
+    fn parse_strips_a_utf8_bom_before_reading_the_index() {
+        let cues = parse("\u{feff}1\n00:00:00,000 --> 00:00:01,000\n第一句\n").unwrap();
+        assert_eq!(cues.len(), 1);
+        assert_eq!(cues[0].text, "第一句");
     }
 }
