@@ -134,6 +134,51 @@ fn normalized(dir: &Path) -> Value {
         .normalized_core()
 }
 
+/// 抽取关键帧通道，抹掉随机 id/materal_id，按通道名与时间排序，数值统一成 f64。
+///
+/// `normalized_core()` 不含 `common_keyframes`，关键帧必须单独比对。
+fn keyframe_channels(dir: &Path) -> Value {
+    let content: Value =
+        serde_json::from_str(&fs::read_to_string(dir.join("draft_content.json")).unwrap()).unwrap();
+    let mut segments = Vec::new();
+    for track in content["tracks"].as_array().into_iter().flatten() {
+        for segment in track["segments"].as_array().into_iter().flatten() {
+            let mut channels: Vec<Value> = segment["common_keyframes"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .map(|channel| {
+                    let mut points: Vec<Value> = channel["keyframe_list"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .map(|point| {
+                            json!({
+                                "time_offset": point["time_offset"].as_i64().unwrap_or(0),
+                                "values": point["values"].as_array().into_iter().flatten()
+                                    .map(|value| value.as_f64().unwrap_or(0.0))
+                                    .collect::<Vec<_>>(),
+                            })
+                        })
+                        .collect();
+                    points.sort_by_key(|point| point["time_offset"].as_i64().unwrap_or(0));
+                    json!({
+                        "property_type": channel["property_type"].as_str().unwrap_or(""),
+                        "points": points,
+                    })
+                })
+                .collect();
+            channels.sort_by(|left, right| {
+                left["property_type"]
+                    .as_str()
+                    .cmp(&right["property_type"].as_str())
+            });
+            segments.push(json!(channels));
+        }
+    }
+    json!(segments)
+}
+
 fn video_plan(duration_us: i64, extra: Value) -> Value {
     let mut segment = json!({
         "start_us": 0,
@@ -327,6 +372,111 @@ fn opacity_is_identical_whether_authored_or_applied_afterwards() {
         normalized(&authored),
         normalized(&edited),
         "计划内 opacity 与事后 timeline opacity 必须写出同一份 wire"
+    );
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn keyframes_are_identical_whether_authored_or_applied_afterwards() {
+    let root = temp_root("keyframes");
+    fs::write(root.join("clip.mp4"), b"fixture").unwrap();
+
+    let authored = build(
+        &root,
+        "authored",
+        video_plan(
+            2_000_000,
+            json!({"keyframes": {"x": [
+                {"at_us": 0, "value": 0.0},
+                {"at_us": 1_000_000, "value": 0.5}
+            ]}}),
+        ),
+        &video_probe,
+    );
+    let edited = build(
+        &root,
+        "edited",
+        video_plan(2_000_000, json!({})),
+        &video_probe,
+    );
+    let id = first_segment_id(&edited, "video");
+    run_ok(&[
+        "timeline",
+        "keyframe",
+        &edited.to_string_lossy(),
+        &id,
+        "x",
+        "0us",
+        "0",
+        "--json",
+    ]);
+    run_ok(&[
+        "timeline",
+        "keyframe",
+        &edited.to_string_lossy(),
+        &id,
+        "x",
+        "1000000us",
+        "0.5",
+        "--json",
+    ]);
+
+    assert_eq!(
+        keyframe_channels(&authored),
+        keyframe_channels(&edited),
+        "计划内 keyframes 与事后 timeline keyframe 必须写出同一组通道"
+    );
+    let _ = fs::remove_dir_all(root);
+}
+#[test]
+fn scale_keyframe_alias_is_identical_whether_authored_or_applied_afterwards() {
+    let root = temp_root("scale-kf");
+    fs::write(root.join("clip.mp4"), b"fixture").unwrap();
+
+    let authored = build(
+        &root,
+        "authored",
+        video_plan(
+            2_000_000,
+            json!({"keyframes": {"scale": [
+                {"at_us": 0, "value": 1.0},
+                {"at_us": 1_000_000, "value": 2.0}
+            ]}}),
+        ),
+        &video_probe,
+    );
+    let edited = build(
+        &root,
+        "edited",
+        video_plan(2_000_000, json!({})),
+        &video_probe,
+    );
+    let id = first_segment_id(&edited, "video");
+    run_ok(&[
+        "timeline",
+        "keyframe",
+        &edited.to_string_lossy(),
+        &id,
+        "scale",
+        "0us",
+        "1.0",
+        "--json",
+    ]);
+    run_ok(&[
+        "timeline",
+        "keyframe",
+        &edited.to_string_lossy(),
+        &id,
+        "scale",
+        "1000000us",
+        "2.0",
+        "--json",
+    ]);
+
+    assert_eq!(
+        keyframe_channels(&authored),
+        keyframe_channels(&edited),
+        "同一个 scale 别名在两条路径上必须落到同一通道"
     );
     let _ = fs::remove_dir_all(root);
 }

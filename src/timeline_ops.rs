@@ -41,9 +41,14 @@ const KEYFRAME_PROPERTIES: &[(&str, &str)] = &[
 ];
 
 /// 解析关键帧属性别名和值表示。
+///
+/// 别名与 plan schema 必须同义：`scale` 在计划里由
+/// `parity_reference.py` 映射到 `KeyframeProperty.scale_x`（即 `KFTypeScaleX`），
+/// 因此命令行这里的同名别名也必须落到 `scale_x`，否则同一个词会在两条写入
+/// 路径上写出不同的通道。等比缩放请显式写 `uniform_scale`。
 pub fn parse_keyframe_value(property: &str, raw: &str) -> Result<(String, f64)> {
     let property = match property.trim() {
-        "scale" => "uniform_scale",
+        "scale" => "scale_x",
         "x" => "position_x",
         "y" => "position_y",
         "opacity" => "alpha",

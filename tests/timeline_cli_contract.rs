@@ -1494,20 +1494,37 @@ fn keyframe_supports_aliases_easing_and_batch_updates() {
         "keyframe",
         &draft_dir.to_string_lossy(),
         &id[..8],
-        "uniform_scale",
+        "scale_x",
         "5s",
         "1.3",
         "--easing",
         "ease-out",
         "--json",
     ]);
+    // `scale` 与 plan schema 同义，落到 scale_x（KFTypeScaleX）；
+    // 等比缩放必须显式写 uniform_scale，是另一条通道。
     assert_eq!(
         second["lists"][0],
-        serde_json::json!({"property":"uniform_scale","count":2})
+        serde_json::json!({"property":"scale_x","count":2})
     );
     let timeline = draft::load_timeline(&draft_dir).unwrap();
     let list = &timeline["tracks"][0]["segments"][0]["common_keyframes"][0];
-    assert_eq!(list["property_type"], "UNIFORM_SCALE");
+    assert_eq!(list["property_type"], "KFTypeScaleX");
+    let uniform = run_ok(&[
+        "timeline",
+        "keyframe",
+        &draft_dir.to_string_lossy(),
+        &id[..8],
+        "uniform_scale",
+        "0s",
+        "1.0",
+        "--json",
+    ]);
+    assert_eq!(
+        uniform["lists"].as_array().unwrap().len(),
+        2,
+        "uniform_scale 必须是独立通道: {uniform}"
+    );
     assert_eq!(
         list["keyframe_list"][0]["right_control"],
         serde_json::json!({"x":1600000,"y":0.282})
