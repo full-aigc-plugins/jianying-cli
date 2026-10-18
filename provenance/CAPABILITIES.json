@@ -726,7 +726,12 @@
     {
       "id": "loop.quality_repair",
       "status": "supported",
-      "evidence": "tests/eval_loop_contract.rs: trim-quality-edges removes black lead-in/tail and silent edges while keeping the shot at its timeline position; middle-of-shot defects are reported but never auto-cut"
+      "evidence": "tests/eval_loop_contract.rs: trim-quality-edges removes black lead-in/tail and silent edges; split-long-shots divides a shot longer than max_shot_us without adding or losing any footage; middle-of-shot defects and cross-source merges are reported but never auto-cut"
+    },
+    {
+      "id": "loop.split_long_shots",
+      "status": "supported",
+      "evidence": "tests/eval_loop_contract.rs: a 10s shot is split into two 5s shots in one round (95 -> 100) with contiguous source windows and an unchanged total duration"
     },
     {
       "id": "loop.track_coherence",

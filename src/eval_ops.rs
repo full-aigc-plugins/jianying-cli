@@ -257,16 +257,33 @@ pub fn next_repair(report: &Value) -> Option<&'static str> {
     }) {
         return Some("trim-quality-edges");
     }
+    // 长镜头可以等分：不增删画面，只改切点。碎切无法安全合并（可能跨素材），
+    // 因此不自动修，交给人工。
+    if issues.iter().any(|issue| issue["code"] == "shot-too-long") {
+        return Some("split-long-shots");
+    }
     None
 }
 
 /// 执行一个具名修复。所有修复都经过事务（快照 → 校验 → 原子提交）。
 pub fn repair(draft: &Path, kind: &str) -> Result<Value> {
+    repair_with_policy(draft, kind, &crate::eval_policy::Policy::default())
+}
+
+/// 按策略阈值执行修复（镜头类修复需要策略里的上下限）。
+pub fn repair_with_policy(
+    draft: &Path,
+    kind: &str,
+    policy: &crate::eval_policy::Policy,
+) -> Result<Value> {
     match kind {
         "close-main-track-gaps" => crate::timeline_ops::close_main_track_gaps(draft),
         "drop-empty-tracks" => crate::timeline_ops::drop_empty_tracks(draft),
         "clamp-source-window" => crate::timeline_ops::clamp_source_windows(draft),
         "trim-quality-edges" => crate::timeline_ops::trim_quality_edges(draft),
+        "split-long-shots" => {
+            crate::timeline_ops::split_long_shots(draft, policy.thresholds.max_shot_us)
+        }
         other => anyhow::bail!("unknown repair {other:?}"),
     }
 }

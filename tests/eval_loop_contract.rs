@@ -675,3 +675,83 @@ fn loop_trims_a_black_lead_in_and_keeps_the_shot_in_place() {
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn loop_splits_a_long_shot_without_changing_the_footage() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("split-long");
+    let clip = root.join("long.mp4");
+    ffmpeg_out(&[
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc=s=320x180:d=10",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        "-y",
+        &clip.to_string_lossy(),
+    ]);
+    let plan = json!({
+        "schema":"jianying-cli-plan/v1","name":"split-long",
+        "canvas":{"width":320,"height":180,"fps":30},
+        "tracks":[{"type":"video","segments":[
+            {"start_us":0,"duration_us":10_000_000,"source":"long.mp4"}
+        ]}]
+    });
+    let plan_path = root.join("plan.json");
+    fs::write(&plan_path, serde_json::to_string(&plan).unwrap()).unwrap();
+    let dir = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &plan_path.to_string_lossy(),
+        "--out",
+        &dir.to_string_lossy(),
+        "--json",
+    ]);
+
+    let before = run_ok(&["eval", &dir.to_string_lossy(), "--json"]);
+    assert_eq!(before["score"], json!(95), "单个 10s 镜头命中闷镜 -5");
+    assert_eq!(before["shot_stats"]["count"], json!(1));
+
+    let outcome = run_ok(&[
+        "loop",
+        &dir.to_string_lossy(),
+        "--max-rounds",
+        "3",
+        "--min-score",
+        "100",
+        "--json",
+    ]);
+    assert_eq!(outcome["rounds"].as_array().unwrap().len(), 1);
+    assert_eq!(outcome["rounds"][0]["repair"], json!("split-long-shots"));
+    assert_eq!(outcome["final"]["score"], json!(100));
+    assert_eq!(
+        outcome["final"]["duration_us"],
+        json!(10_000_000),
+        "总时长不得变化"
+    );
+    assert_eq!(outcome["final"]["shot_stats"]["count"], json!(2));
+
+    // 切分只改切点：源窗口必须连续，画面不增不减
+    let timeline: Value =
+        serde_json::from_str(&fs::read_to_string(dir.join("draft_content.json")).unwrap()).unwrap();
+    let segments = timeline["tracks"][0]["segments"].as_array().unwrap();
+    assert_eq!(segments.len(), 2);
+    assert_eq!(segments[0]["source_timerange"]["start"], json!(0));
+    assert_eq!(
+        segments[0]["source_timerange"]["duration"],
+        json!(5_000_000)
+    );
+    assert_eq!(segments[1]["source_timerange"]["start"], json!(5_000_000));
+    assert_eq!(segments[1]["target_timerange"]["start"], json!(5_000_000));
+    assert_eq!(
+        run_ok(&["project", "verify", &dir.to_string_lossy(), "--json"])["ok"],
+        json!(true)
+    );
+    let _ = fs::remove_dir_all(root);
+}

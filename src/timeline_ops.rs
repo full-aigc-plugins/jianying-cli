@@ -3339,3 +3339,79 @@ pub fn trim_quality_edges(draft: &Path) -> Result<Value> {
         }))
     })
 }
+
+/// 修复：把超过上限的长镜头等分成多个镜头（不改内容，只改切点）。
+///
+/// 用于 `shot-too-long`：长镜头是节奏问题，等分不会引入或丢失任何画面，
+/// 源窗口按等分长度连续前移，因此总时长与画面内容完全不变。
+pub fn split_long_shots(draft: &Path, max_shot_us: i64) -> Result<Value> {
+    if max_shot_us <= 0 {
+        bail!("max_shot_us must be positive");
+    }
+    mutate(draft, |timeline| {
+        let mut split = 0_usize;
+        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            if track["type"] != "video" {
+                continue;
+            }
+            let segments = track["segments"]
+                .as_array_mut()
+                .context("segments must be an array")?;
+            let mut index = 0_usize;
+            while index < segments.len() {
+                let duration = segments[index]["target_timerange"]["duration"]
+                    .as_i64()
+                    .unwrap_or(0);
+                if duration <= max_shot_us {
+                    index += 1;
+                    continue;
+                }
+                let parts = ((duration as f64 / max_shot_us as f64).ceil() as i64).max(2);
+                let parts_len = duration / parts;
+                if parts_len <= 0 {
+                    index += 1;
+                    continue;
+                }
+                let speed = segments[index]["speed"].as_f64().unwrap_or(1.0);
+                let source_start = segments[index]["source_timerange"]["start"]
+                    .as_i64()
+                    .unwrap_or(0);
+                let mut cursor_source = source_start;
+                let mut cursor_target = segments[index]["target_timerange"]["start"]
+                    .as_i64()
+                    .unwrap_or(0);
+                let mut clones: Vec<Value> = Vec::new();
+                for part in 0..parts {
+                    // 最后一段吃掉余数，保证总时长不变。
+                    let length = if part == parts - 1 {
+                        duration - parts_len * (parts - 1)
+                    } else {
+                        parts_len
+                    };
+                    let source_length = (length as f64 * speed).round() as i64;
+                    let mut piece = segments[index].clone();
+                    if part > 0 {
+                        piece["id"] = json!(uuid::Uuid::new_v4().simple().to_string());
+                    }
+                    piece["target_timerange"]["start"] = json!(cursor_target);
+                    piece["target_timerange"]["duration"] = json!(length);
+                    piece["source_timerange"]["start"] = json!(cursor_source);
+                    piece["source_timerange"]["duration"] = json!(source_length);
+                    cursor_target += length;
+                    cursor_source += source_length;
+                    if part == 0 {
+                        segments[index] = piece;
+                    } else {
+                        clones.push(piece);
+                    }
+                }
+                split += clones.len();
+                for (offset, piece) in clones.into_iter().enumerate() {
+                    segments.insert(index + 1 + offset, piece);
+                }
+                index += parts as usize;
+            }
+        }
+        Ok(json!({"ok": true, "repair": "split-long-shots", "new_segments": split}))
+    })
+}
