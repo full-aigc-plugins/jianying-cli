@@ -125,7 +125,13 @@
     {"id":"mcp.stdio","status":"supported","evidence":"tests/mcp_contract.rs: stdio initialize/notification/tools lifecycle"},
     {"id":"mcp.streamable_http","status":"supported","evidence":"tests/mcp_contract.rs: official rmcp Streamable HTTP handshake and authorization"},
     {"id":"mcp.sse_response","status":"supported","evidence":"tests/mcp_contract.rs: Streamable HTTP text/event-stream response profile"},
-    {"id":"mcp.job_lifecycle","status":"supported","evidence":"tests/mcp_contract.rs: stdio list/show/cancel/audit lifecycle through the shared SQLite JobStore"}
+    {"id":"mcp.job_lifecycle","status":"supported","evidence":"tests/mcp_contract.rs: stdio list/show/cancel/audit lifecycle through the shared SQLite JobStore"},
+    {"id":"resource.mine","status":"supported","evidence":"tests/resource_cli_contract.rs: plain drafts aggregate, Timelines mirrors skipped, draft-id de-duplication, BOM tolerated, encrypted drafts counted as drafts_encrypted"},
+    {"id":"resource.list","status":"supported","evidence":"tests/resource_cli_contract.rs: merged cross-source view with kind/query filters and limit"},
+    {"id":"resource.resolve","status":"supported","evidence":"tests/resource_cli_contract.rs: name/id substring resolution to effect_id/resource_id"},
+    {"id":"resource.import","status":"supported","evidence":"tests/resource_cli_contract.rs: external bundle merged as its own source"},
+    {"id":"resource.export","status":"supported","evidence":"tests/resource_cli_contract.rs: merged view written as jianying-resource-library/v1"},
+    {"id":"resource.no_network_fetch","status":"external_dependency","evidence":"docs/resource-library.md: JianYing material catalogs sit behind signed APIs; this CLI deliberately neither signs requests nor reads the runtime agent token"}
   ],
   "truth_rule": "Only status=supported may be advertised as available; partial and external_dependency remain blocked for automatic routing."
 }
