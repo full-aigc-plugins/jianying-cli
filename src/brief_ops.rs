@@ -22,6 +22,7 @@ struct Media {
     path: PathBuf,
     duration_us: i64,
     is_image: bool,
+    has_audio: bool,
 }
 
 /// 按简报生成一份计划，返回报告。
@@ -102,6 +103,7 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
                 path,
                 duration_us: if info.is_image { 0 } else { info.duration_us },
                 is_image: info.is_image,
+                has_audio: info.has_audio,
             }),
             Ok(_) => warnings.push(format!("skipped {}: no video stream", path.display())),
             Err(error) => warnings.push(format!("skipped {}: {error:#}", path.display())),
@@ -113,6 +115,8 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
 
     // 装配：按顺序取素材，直到达到目标时长；最后一段按剩余时长裁剪。
     let mut segments: Vec<Value> = Vec::new();
+    let mut original_audio: Vec<Value> = Vec::new();
+    let keep_original_audio = brief["keep_original_audio"].as_bool().unwrap_or(true);
     let mut cursor = 0_i64;
     for item in &media {
         if cursor >= target_us {
@@ -137,6 +141,14 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
             segment["photo"] = json!(true);
         }
         segments.push(segment);
+        if keep_original_audio && item.has_audio && !item.is_image {
+            original_audio.push(json!({
+                "start_us": cursor,
+                "duration_us": take,
+                "source": relative_or_absolute(base, &item.path),
+                "source_start_us": 0,
+            }));
+        }
         cursor += take;
     }
     if segments.is_empty() {
@@ -150,6 +162,10 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
     }
 
     let mut tracks = vec![json!({"type": "video", "name": "main", "segments": segments})];
+    if !original_audio.is_empty() {
+        // 代理渲染只混 `audio` 轨；把画面自带的原声显式落成音轨，预览才有声音。
+        tracks.push(json!({"type": "audio", "name": "original", "segments": original_audio}));
+    }
 
     // 背景音乐：从 0 起铺到成片时长（可短于成片）。
     if let Some(music) = brief["music"].as_str() {

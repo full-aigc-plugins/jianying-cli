@@ -2757,38 +2757,80 @@ where
 /// 保持片段相对顺序与时长，只改 `target_timerange.start`；空洞与重叠都会被吃掉。
 pub fn close_main_track_gaps(draft: &Path) -> Result<Value> {
     mutate(draft, |timeline| {
-        let mut moved = 0_usize;
-        let mut shift = 0_i64;
-        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
-            if track["type"] != "video" {
-                continue;
-            }
-            let segments = track["segments"]
+        // 先按主轨算出「旧起点 → 新起点」映射，再把同一套位移应用到所有轨道，
+        // 否则字幕/原声会和画面对不齐。
+        let mut mapping: Vec<(i64, i64, i64)> = Vec::new(); // (old_start, old_end, new_start)
+        {
+            let Some(main) = timeline["tracks"]
+                .as_array_mut()
+                .into_iter()
+                .flatten()
+                .find(|track| track["type"] == "video")
+            else {
+                return Ok(
+                    json!({"ok": true, "repair": "close-main-track-gaps", "moved_segments": 0, "shifted_us": 0}),
+                );
+            };
+            let segments = main["segments"]
                 .as_array_mut()
                 .context("track segments must be an array")?;
             segments
                 .sort_by_key(|segment| segment["target_timerange"]["start"].as_i64().unwrap_or(0));
             let mut cursor = 0_i64;
-            for segment in segments.iter_mut() {
+            for segment in segments.iter() {
                 let start = segment["target_timerange"]["start"].as_i64().unwrap_or(0);
                 let length = segment["target_timerange"]["duration"]
                     .as_i64()
                     .unwrap_or(0)
                     .max(0);
-                if start != cursor {
-                    shift += start - cursor;
-                    segment["target_timerange"]["start"] = json!(cursor);
-                    moved += 1;
-                }
+                mapping.push((start, start + length, cursor));
                 cursor += length;
             }
-            break;
+            for segment in segments.iter_mut() {
+                let start = segment["target_timerange"]["start"].as_i64().unwrap_or(0);
+                let new_start = shift_for(&mapping, start);
+                segment["target_timerange"]["start"] = json!(new_start);
+            }
         }
+        let mut moved = 0_usize;
+        let mut shift = 0_i64;
+        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            if track["type"] == "video" {
+                continue;
+            }
+            for segment in track["segments"].as_array_mut().into_iter().flatten() {
+                let start = segment["target_timerange"]["start"].as_i64().unwrap_or(0);
+                let new_start = shift_for(&mapping, start);
+                if new_start != start {
+                    shift += (start - new_start).abs();
+                    segment["target_timerange"]["start"] = json!(new_start);
+                    moved += 1;
+                }
+            }
+        }
+        // 主轨自己也可能被移动，计入计数。
+        let main_moved = mapping.iter().filter(|(old, _, new)| old != new).count();
         Ok(json!({
             "ok": true, "repair": "close-main-track-gaps",
-            "moved_segments": moved, "shifted_us": shift
+            "moved_segments": moved + main_moved, "shifted_us": shift
         }))
     })
+}
+
+/// 把某个旧时间点映射到新时间点：落在某段区间内用该段位移，否则沿用前一段的位移。
+fn shift_for(mapping: &[(i64, i64, i64)], position: i64) -> i64 {
+    let mut delta = 0_i64;
+    for (old_start, old_end, new_start) in mapping {
+        let segment_delta = new_start - old_start;
+        if position < *old_start {
+            break;
+        }
+        if position >= *old_start && position < *old_end {
+            return new_start + (position - old_start);
+        }
+        delta = segment_delta;
+    }
+    position + delta
 }
 
 /// 修复：删除没有任何片段的空轨道。
@@ -3208,7 +3250,13 @@ pub fn trim_quality_edges(draft: &Path) -> Result<Value> {
     mutate(draft, |timeline| {
         let mut trimmed = 0_usize;
         let mut skipped = 0_usize;
+        // 先裁画面并记录「同素材同源窗口」的裁剪量，再让音轨跟着裁，
+        // 否则画面变短而原声没动，两者会错位。
+        let mut applied: Vec<(String, i64, i64, i64, i64)> = Vec::new();
         for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            if track["type"] != "video" {
+                continue;
+            }
             for segment in track["segments"].as_array_mut().into_iter().flatten() {
                 let Some(material_id) = segment["material_id"].as_str().map(str::to_owned) else {
                     continue;
@@ -3249,14 +3297,40 @@ pub fn trim_quality_edges(draft: &Path) -> Result<Value> {
                     continue;
                 }
                 let speed = segment["speed"].as_f64().unwrap_or(1.0).max(0.01);
-                // 头部裁掉后片段仍留在原时间位置（trime in 语义），因此不移动 target.start，
-                // 避免制造新的空洞再让 gap 修复兜一圈。
                 segment["source_timerange"]["start"] = json!(head);
                 segment["source_timerange"]["duration"] = json!(tail - head);
                 segment["target_timerange"]["duration"] = json!(
                     crate::writer::scaled_source_duration(tail - head, 1.0 / speed)
                 );
+                applied.push((path.clone(), start, length, head, tail));
                 trimmed += 1;
+            }
+        }
+        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            if track["type"] == "video" {
+                continue;
+            }
+            for segment in track["segments"].as_array_mut().into_iter().flatten() {
+                let Some(material_id) = segment["material_id"].as_str().map(str::to_owned) else {
+                    continue;
+                };
+                let Some((path, _)) = paths.get(&material_id) else {
+                    continue;
+                };
+                let start = segment["source_timerange"]["start"].as_i64().unwrap_or(0);
+                let length = segment["source_timerange"]["duration"]
+                    .as_i64()
+                    .unwrap_or(0);
+                for (trimmed_path, old_start, old_len, head, tail) in &applied {
+                    if trimmed_path != path || *old_start != start || *old_len != length {
+                        continue;
+                    }
+                    segment["source_timerange"]["start"] = json!(head);
+                    segment["source_timerange"]["duration"] = json!(tail - head);
+                    segment["target_timerange"]["duration"] = json!(tail - head);
+                    trimmed += 1;
+                    break;
+                }
             }
         }
         Ok(json!({

@@ -4097,7 +4097,15 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                     break;
                 }
                 let Some(repair) = eval_ops::next_repair(&report) else {
-                    stopped = "no-safe-repair";
+                    stopped = if report["issues"]
+                        .as_array()
+                        .map(Vec::is_empty)
+                        .unwrap_or(false)
+                    {
+                        "below-target"
+                    } else {
+                        "no-safe-repair"
+                    };
                     break;
                 };
                 let before = report.clone();
