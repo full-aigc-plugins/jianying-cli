@@ -8,14 +8,13 @@ use anyhow::{Context, Result};
 use serde_json::{json, Map, Value};
 use std::path::Path;
 
-/// 评分权重：主轨覆盖 40、连续性 20、字幕覆盖 20、音频覆盖 20。
-const W_MAIN: f64 = 40.0;
-const W_CONTINUITY: f64 = 20.0;
-const W_CAPTION: f64 = 20.0;
-const W_AUDIO: f64 = 20.0;
-
 /// 评估一份草稿，返回指标、问题与 0–100 分。
 pub fn evaluate(draft: &Path) -> Result<Value> {
+    evaluate_with(draft, &crate::eval_policy::Policy::default())
+}
+
+/// 按给定策略评估（不传策略时的行为与 `evaluate` 完全一致）。
+pub fn evaluate_with(draft: &Path, policy: &crate::eval_policy::Policy) -> Result<Value> {
     let timeline = crate::draft::load_timeline(draft)
         .with_context(|| format!("cannot read draft {}", draft.display()))?;
     let duration = timeline["duration"].as_i64().unwrap_or(0);
@@ -110,15 +109,15 @@ pub fn evaluate(draft: &Path) -> Result<Value> {
     let audio_coverage = track_coverage(&timeline, "audio", duration);
 
     // 只有存在的维度才参与评分，缺失维度不用 0 分惩罚。
-    let mut total_weight = W_MAIN + W_CONTINUITY;
-    let mut score = main_coverage * W_MAIN + continuity * W_CONTINUITY;
+    let mut total_weight = policy.weights.main + policy.weights.continuity;
+    let mut score = main_coverage * policy.weights.main + continuity * policy.weights.continuity;
     if let Some(value) = caption_permille {
-        total_weight += W_CAPTION;
-        score += (value as f64 / 1000.0) * W_CAPTION;
+        total_weight += policy.weights.caption;
+        score += (value as f64 / 1000.0) * policy.weights.caption;
     }
     if let Some(value) = audio_coverage {
-        total_weight += W_AUDIO;
-        score += value * W_AUDIO;
+        total_weight += policy.weights.audio;
+        score += value * policy.weights.audio;
     }
     let score = if total_weight > 0.0 {
         (score / total_weight * 100.0).round().clamp(0.0, 100.0)
@@ -144,6 +143,7 @@ pub fn evaluate(draft: &Path) -> Result<Value> {
         "audio_coverage_permille": audio_coverage.map(|value| (value * 1000.0).round() as i64),
         "score": score,
         "issues": issues,
+        "policy": policy.to_json(),
     }))
 }
 
@@ -237,6 +237,11 @@ pub fn repair(draft: &Path, kind: &str) -> Result<Value> {
 ///
 /// 每个问题按固定分值扣分，扣分项写进报告的 `penalties`，便于审计。
 pub fn evaluate_deep(draft: &Path) -> Result<Value> {
+    evaluate_deep_with(draft, &crate::eval_policy::Policy::default())
+}
+
+/// 按给定策略做深度评估。
+pub fn evaluate_deep_with(draft: &Path, policy: &crate::eval_policy::Policy) -> Result<Value> {
     let mut report = evaluate(draft)?;
     let timeline = crate::draft::load_timeline(draft)?;
     let mut paths: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
@@ -324,7 +329,7 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
                     if let Some(spans) = spans {
                         analysed += 1;
                         let ratio = coverage_ratio(&spans, source_start, window_end);
-                        if ratio >= 0.8 {
+                        if (ratio * 1000.0) >= policy.thresholds.black_ratio_permille as f64 {
                             media_issues.push(json!({
                                 "code": "video-black",
                                 "material_id": material_id,
@@ -339,7 +344,9 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
                         .or_insert_with(|| integrated_lufs(std::path::Path::new(path)))
                         .to_owned();
                     if let Some(lufs) = lufs {
-                        if lufs < -40.0 || lufs > -5.0 {
+                        if lufs < policy.thresholds.loudness_min_lufs
+                            || lufs > policy.thresholds.loudness_max_lufs
+                        {
                             media_issues.push(json!({
                                 "code": "audio-loudness",
                                 "material_id": material_id,
@@ -356,14 +363,16 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
                         analysed += 1;
                         let ratio = coverage_ratio(&spans, source_start, window_end);
                         let permille = (ratio * 1000.0).round() as i64;
-                        if ratio >= 0.95 {
+                        if (ratio * 1000.0) >= policy.thresholds.silence_ratio_permille as f64 {
                             media_issues.push(json!({
                                 "code": "audio-silent",
                                 "material_id": material_id,
                                 "path": path,
                                 "silence_ratio_permille": permille
                             }));
-                        } else if ratio >= 0.8 {
+                        } else if (ratio * 1000.0)
+                            >= policy.thresholds.mostly_silent_permille as f64
+                        {
                             media_issues.push(json!({
                                 "code": "audio-mostly-silent",
                                 "material_id": material_id,
@@ -382,12 +391,12 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
     let mut penalties: Vec<Value> = Vec::new();
     for issue in &media_issues {
         let delta = match issue["code"].as_str() {
-            Some("media-missing") => 30,
-            Some("source-exceeds-media") => 15,
-            Some("video-black") => 25,
-            Some("audio-silent") => 20,
-            Some("audio-mostly-silent") => 10,
-            Some("audio-loudness") => 10,
+            Some("media-missing") => policy.penalties.media_missing,
+            Some("source-exceeds-media") => policy.penalties.source_exceeds_media,
+            Some("video-black") => policy.penalties.video_black,
+            Some("audio-silent") => policy.penalties.audio_silent,
+            Some("audio-mostly-silent") => policy.penalties.audio_mostly_silent,
+            Some("audio-loudness") => policy.penalties.audio_loudness,
             _ => 0,
         };
         penalty += delta;
@@ -399,6 +408,7 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
         list.extend(media_issues.iter().cloned());
     }
     report["score"] = json!(score);
+    report["policy"] = policy.to_json();
     report["deep"] = json!(true);
     report["media_checked"] = json!(checked);
     report["media_analysed"] = json!(analysed);

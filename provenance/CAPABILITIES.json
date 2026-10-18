@@ -704,6 +704,11 @@
       "evidence": "tests/eval_loop_contract.rs: opt-in media checks (media-missing, source-exceeds-media) with fixed penalties written into the report; shallow eval stays filesystem-free"
     },
     {
+      "id": "eval.policy",
+      "status": "supported",
+      "evidence": "tests/eval_policy_contract.rs: weights, penalties and thresholds load from a jianying-eval-policy/v1 file, are validated before use, and the report echoes the policy that produced the score"
+    },
+    {
       "id": "eval.quality",
       "status": "supported",
       "evidence": "tests/eval_loop_contract.rs: content-level checks on the source window - video-black (blackdetect, >=80%), audio-silent (>=95%), audio-mostly-silent (>=80%), audio-loudness (<-40 or >-5 LUFS) - with media_checked vs media_analysed reported separately"

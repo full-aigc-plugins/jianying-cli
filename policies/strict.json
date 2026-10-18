@@ -1,0 +1,25 @@
+{
+  "schema": "jianying-eval-policy/v1",
+  "name": "strict",
+  "weights": {
+    "main": 40,
+    "continuity": 20,
+    "caption": 20,
+    "audio": 20
+  },
+  "penalties": {
+    "media-missing": 30,
+    "source-exceeds-media": 15,
+    "video-black": 25,
+    "audio-silent": 20,
+    "audio-mostly-silent": 10,
+    "audio-loudness": 10
+  },
+  "thresholds": {
+    "black_ratio_permille": 100,
+    "silence_ratio_permille": 800,
+    "mostly_silent_permille": 500,
+    "loudness_min_lufs": -40,
+    "loudness_max_lufs": -5
+  }
+}

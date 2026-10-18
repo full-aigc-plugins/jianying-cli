@@ -11,6 +11,7 @@ pub mod draft;
 pub mod edit_op;
 pub mod error_contract;
 pub mod eval_ops;
+pub mod eval_policy;
 pub mod extend_mode;
 pub mod fixture_ops;
 pub mod home_folder;

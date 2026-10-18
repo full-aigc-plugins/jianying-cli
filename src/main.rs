@@ -5,9 +5,9 @@ use anyhow::{bail, Context, Result};
 use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
-    brief_ops, capabilities, caption_ops, control_catalog, draft, eval_ops, home_folder,
-    interchange, job_runner, media_analysis, media_ops, pipeline_ops, plan, plan_ops, probe,
-    project_ops, release_ops, render, resource_ops, runtime_acceptance, skills, srt, store,
+    brief_ops, capabilities, caption_ops, control_catalog, draft, eval_ops, eval_policy,
+    home_folder, interchange, job_runner, media_analysis, media_ops, pipeline_ops, plan, plan_ops,
+    probe, project_ops, release_ops, render, resource_ops, runtime_acceptance, skills, srt, store,
     template, tim, timeline_ops,
 };
 use jianying_media::{
@@ -2431,6 +2431,9 @@ enum Command {
         /// 额外检查素材是否存在、源窗口是否超出素材时长（会调用 ffprobe）
         #[arg(long)]
         deep: bool,
+        /// 评估策略文件（jianying-eval-policy/v1）；省略则用默认策略
+        #[arg(long)]
+        policy: Option<PathBuf>,
     },
     /// 工作流级技能注册表：把"字幕/配音/粗剪/出片"等映射到具体命令（只读）
     Skills {
@@ -2486,6 +2489,9 @@ enum Command {
         /// 每轮都用深度评估（含素材可用性检查）
         #[arg(long)]
         deep: bool,
+        /// 评估策略文件（jianying-eval-policy/v1）；省略则用默认策略
+        #[arg(long)]
+        policy: Option<PathBuf>,
     },
     /// 草稿摘要：轨道/段数/画布/平台（只读）
     Inspect(DraftPathArgs),
@@ -4041,11 +4047,19 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             deprecated_alias("jianying verify", "jianying project verify");
             run_verify(args, json)?;
         }
-        Command::Eval { draft, deep } => {
+        Command::Eval {
+            draft,
+            deep,
+            policy,
+        } => {
+            let policy = match policy {
+                Some(path) => eval_policy::Policy::load(&path)?,
+                None => eval_policy::Policy::default(),
+            };
             let report = if deep {
-                eval_ops::evaluate_deep(&draft)?
+                eval_ops::evaluate_deep_with(&draft, &policy)?
             } else {
-                eval_ops::evaluate(&draft)?
+                eval_ops::evaluate_with(&draft, &policy)?
             };
             print_output(report, json);
         }
@@ -4122,12 +4136,17 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             max_rounds,
             min_score,
             deep,
+            policy,
         } => {
+            let policy = match policy {
+                Some(path) => eval_policy::Policy::load(&path)?,
+                None => eval_policy::Policy::default(),
+            };
             let evaluate = |path: &Path| -> Result<Value> {
                 if deep {
-                    eval_ops::evaluate_deep(path)
+                    eval_ops::evaluate_deep_with(path, &policy)
                 } else {
-                    eval_ops::evaluate(path)
+                    eval_ops::evaluate_with(path, &policy)
                 }
             };
             let mut report = evaluate(&draft)?;
