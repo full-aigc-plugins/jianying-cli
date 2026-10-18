@@ -1,0 +1,43 @@
+{
+  "id": "import-srt",
+  "title": "tests/test_import_srt.py：导入 SRT 到新建文本轨",
+  "upstream": {
+    "file": "tests/test_import_srt.py",
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+  },
+  "category": "draft",
+  "build_mode": "empty",
+  "srt": "1\n00:00:00,000 --> 00:00:01,000\n第一行\n\n2\n00:00:01,500 --> 00:00:02,000\n第二行\n",
+  "reference": "cases/import-srt/ref.py",
+  "post_build": [
+    [
+      "captions",
+      "import-srt",
+      "{ours}",
+      "{srt}",
+      "--track",
+      "captions",
+      "--json"
+    ]
+  ],
+  "policy": {
+    "approved_extra_kinds": [
+      "placeholders",
+      "sound_channel_mappings",
+      "vocal_separations"
+    ],
+    "approved_missing_kinds": [
+      "dangling"
+    ],
+    "approved_value_differences": [
+      "text.source_duration"
+    ],
+    "rationale": {
+      "placeholders": "剪映自身写出的占位素材，pyJianYingDraft 省略",
+      "sound_channel_mappings": "声道映射占位素材，同上",
+      "vocal_separations": "人声分离占位素材，同上",
+      "dangling": "pyJianYingDraft 的文本段会引用不存在于任何 materials 桶的 id；我们不复制这个缺陷",
+      "text.source_duration": "我们的文本段写 source_timerange=target；pyJYD 省略，草稿变更路径需要该字段"
+    }
+  }
+}

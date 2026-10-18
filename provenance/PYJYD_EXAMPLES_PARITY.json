@@ -5,17 +5,67 @@
   },
   "binary": "target\\release\\jianying.exe",
   "summary": {
-    "total": 1,
-    "passed": 1,
+    "total": 6,
+    "passed": 6,
     "differs": 0,
     "failed": 0
   },
   "cases": [
     {
+      "id": "audio-effect",
+      "title": "tests/test_audio_effect_export.py：音色特效最小导出形状",
+      "upstream": {
+        "file": "tests/test_audio_effect_export.py",
+        "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+      },
+      "status": "passed",
+      "differences": []
+    },
+    {
+      "id": "chroma",
+      "title": "tests/test_video_chroma_export.py：色度抠图导出",
+      "upstream": {
+        "file": "tests/test_video_chroma_export.py",
+        "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+      },
+      "status": "passed",
+      "differences": []
+    },
+    {
       "id": "demo-tutorial",
       "title": "demo.py：音视频 + GIF 贴纸 + 转场 + 气泡花字文本",
       "upstream": {
         "file": "demo.py",
+        "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+      },
+      "status": "passed",
+      "differences": []
+    },
+    {
+      "id": "import-srt",
+      "title": "tests/test_import_srt.py：导入 SRT 到新建文本轨",
+      "upstream": {
+        "file": "tests/test_import_srt.py",
+        "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+      },
+      "status": "passed",
+      "differences": []
+    },
+    {
+      "id": "mix-mode",
+      "title": "tests/test_video_mix_mode_export.py：重复设置混合同模式只保留最后一次",
+      "upstream": {
+        "file": "tests/test_video_mix_mode_export.py",
+        "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+      },
+      "status": "passed",
+      "differences": []
+    },
+    {
+      "id": "scriptfile-building",
+      "title": "tests/test_scriptfile_building.py：片段自动登记素材与效果引用",
+      "upstream": {
+        "file": "tests/test_scriptfile_building.py",
         "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
       },
       "status": "passed",

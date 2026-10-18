@@ -1,6 +1,7 @@
 //! pyJianYingDraft 示例对照合同。
 //!
 //! 上游每个示例都必须被登记、复制与对账：清单漏一项就失败，而不是静默少覆盖。
+//! 覆盖三类来源：demo.py、tests/test_*.py、README 代码片段。
 
 use serde_json::{json, Value};
 use std::collections::BTreeSet;
@@ -11,10 +12,17 @@ fn root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 }
 
+fn read_json(relative: &str) -> Value {
+    let path = root().join(relative);
+    serde_json::from_str(
+        &fs::read_to_string(&path)
+            .unwrap_or_else(|error| panic!("{} is missing or unreadable: {error}", path.display())),
+    )
+    .unwrap_or_else(|error| panic!("{} is invalid JSON: {error}", path.display()))
+}
+
 fn manifest() -> Value {
-    let path = root().join("examples/pyjyd/CASES.json");
-    serde_json::from_str(&fs::read_to_string(&path).expect("CASES.json exists"))
-        .expect("CASES.json is valid JSON")
+    read_json("examples/pyjyd/CASES.json")
 }
 
 fn upstream_test_functions(path: &Path) -> Vec<String> {
@@ -71,70 +79,88 @@ fn every_upstream_example_is_copied_and_registered() {
 }
 
 #[test]
-fn draft_cases_have_a_reference_builder_and_a_plan() {
+fn draft_cases_have_a_reference_builder_and_are_compared() {
     let manifest = manifest();
+    let parity = read_json("provenance/PYJYD_EXAMPLES_PARITY.json");
+    let compared: BTreeSet<String> = parity["cases"]
+        .as_array()
+        .expect("parity cases")
+        .iter()
+        .filter(|case| case["status"] == json!("passed"))
+        .map(|case| case["id"].as_str().unwrap().to_owned())
+        .collect();
+
+    let mut draft_cases = 0;
     for case in manifest["cases"].as_array().unwrap() {
         if case["category"] != json!("draft") {
             continue;
         }
+        draft_cases += 1;
         let id = case["id"].as_str().unwrap();
-        let status = case["status"].as_str().expect("status");
-        if status == "pending" {
-            // 待补的用例必须写清楚为什么还没对比，不允许默默缺席
-            assert!(
-                case["pending_reason"]
-                    .as_str()
-                    .map(|reason| !reason.is_empty())
-                    .unwrap_or(false),
-                "{id}: pending 用例必须写 pending_reason"
-            );
-            continue;
-        }
-        assert_eq!(status, "compared", "{id}: 未知 status");
-        let ours = &case["ours"];
-        let plan = root()
-            .join("examples/pyjyd")
-            .join(ours["plan"].as_str().unwrap());
-        let runner = root()
-            .join("examples/pyjyd")
-            .join(ours["runner"].as_str().unwrap());
-        assert!(plan.is_file(), "{id}: 缺少等价 plan {}", plan.display());
-        assert!(
-            runner.is_file(),
-            "{id}: 缺少参照构建器 {}",
-            runner.display()
-        );
-
-        let plan: Value = serde_json::from_str(&fs::read_to_string(&plan).unwrap()).unwrap();
         assert_eq!(
-            plan["schema"],
-            json!("jianying-cli-plan/v1"),
-            "{id}: plan schema"
+            case["status"],
+            json!("compared"),
+            "{id}: 草稿型用例必须已对照"
         );
 
-        // 每个草稿型用例都要有明确的比对策略（已批准差异必须写理由）
         let case_path = root()
-            .join("examples/pyjyd/cases")
-            .join(id.trim_start_matches("test_").replace('_', "-"))
-            .join("case.json");
-        if case_path.is_file() {
-            let case_json: Value =
-                serde_json::from_str(&fs::read_to_string(&case_path).unwrap()).unwrap();
-            if let Some(policy) = case_json.get("policy") {
-                let rationale = policy["rationale"].as_object().expect("policy.rationale");
-                for kind in ["approved_extra_kinds", "approved_missing_kinds"]
-                    .iter()
-                    .flat_map(|key| policy[*key].as_array().cloned().unwrap_or_default())
-                {
-                    let name = kind.as_str().unwrap();
-                    assert!(
-                        rationale.contains_key(name),
-                        "{id}: 已批准差异 {name} 没有写理由"
-                    );
-                }
+            .join("examples/pyjyd")
+            .join(case["case"].as_str().expect("case path"));
+        let spec: Value = serde_json::from_str(
+            &fs::read_to_string(&case_path)
+                .unwrap_or_else(|error| panic!("{id}: 缺少 case.json ({error})")),
+        )
+        .unwrap();
+
+        let reference = root()
+            .join("examples/pyjyd")
+            .join(spec["reference"].as_str().expect("reference"));
+        assert!(
+            reference.is_file(),
+            "{id}: 缺少参照构建器 {}",
+            reference.display()
+        );
+
+        // plan 驱动或 post_build 驱动，二者必须择一
+        let has_plan = spec.get("plan").is_some();
+        let has_post = spec
+            .get("post_build")
+            .and_then(|value| value.as_array())
+            .map(|commands| !commands.is_empty())
+            .unwrap_or(false);
+        assert!(has_plan || has_post, "{id}: 既没有 plan 也没有 post_build");
+        if let Some(plan) = spec.get("plan").and_then(|value| value.as_str()) {
+            let plan_path = root().join("examples/pyjyd").join(plan);
+            let plan: Value =
+                serde_json::from_str(&fs::read_to_string(&plan_path).unwrap()).unwrap();
+            assert_eq!(
+                plan["schema"],
+                json!("jianying-cli-plan/v1"),
+                "{id}: plan schema"
+            );
+        }
+
+        // 每个已批准差异都必须写理由，不能只留一个标签
+        if let Some(policy) = spec.get("policy") {
+            let rationale = policy["rationale"].as_object().expect("policy.rationale");
+            for name in ["approved_extra_kinds", "approved_missing_kinds"]
+                .iter()
+                .flat_map(|key| policy[*key].as_array().cloned().unwrap_or_default())
+            {
+                let name = name.as_str().unwrap();
+                assert!(
+                    rationale.contains_key(name),
+                    "{id}: 已批准差异 {name} 没有写理由"
+                );
             }
         }
+
+        assert!(
+            compared.contains(id),
+            "{id}: provenance/PYJYD_EXAMPLES_PARITY.json 里没有通过的对照结论"
+        );
     }
+    assert_eq!(draft_cases, 6, "草稿型用例数量变了就要更新期望");
 }
 
 #[test]
@@ -157,6 +183,47 @@ fn behaviour_cases_point_at_real_evidence() {
                 .map(|text| !text.is_empty())
                 .unwrap_or(false),
             "{id}: 必须说明比对口径"
+        );
+    }
+}
+
+#[test]
+fn every_readme_snippet_is_classified() {
+    let manifest = manifest();
+    let snippets = read_json("examples/pyjyd/README_SNIPPETS.json");
+    let reference = manifest["readme_snippets"]
+        .as_str()
+        .expect("manifest 指向 README 片段索引");
+    assert!(root().join(reference).is_file());
+
+    let entries = snippets["snippets"].as_array().expect("snippets");
+    assert_eq!(
+        entries.len() as u64,
+        snippets["total"].as_u64().unwrap(),
+        "total 与逐条清点不一致"
+    );
+    assert!(entries.len() >= 32, "上游 README 片段被漏掉");
+
+    // 每段都要有分类；out_of_scope 还必须有理由
+    let reasons = snippets["out_of_scope_reasons"]
+        .as_object()
+        .expect("out_of_scope_reasons");
+    for entry in entries {
+        let mapped = entry["maps_to"].as_str().expect("maps_to");
+        assert_ne!(
+            mapped, "unmapped",
+            "{}#{} 未分类",
+            entry["file"], entry["index"]
+        );
+        if let Some(key) = mapped.strip_prefix("out_of_scope:") {
+            assert!(reasons.contains_key(key), "out_of_scope {key} 缺少理由");
+        }
+        assert_eq!(
+            entry["sha256"].as_str().map(str::len),
+            Some(64),
+            "{}#{} 缺少 sha256",
+            entry["file"],
+            entry["index"]
         );
     }
 }

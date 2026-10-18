@@ -26,53 +26,42 @@ UPSTREAM = ROOT / "examples" / "pyjyd" / "upstream"
 MODULES = {
     "demo.py": {
         "category": "draft",
-        "status": "compared",
-        "ours": {"plan": "cases/demo-tutorial/plan.json", "runner": "cases/demo-tutorial/ref.py"},
+        "case": "cases/demo-tutorial/case.json",
         "command": "jianying project build cases/demo-tutorial/plan.json --out draft",
         "evidence": ["examples/pyjyd/cases/demo-tutorial/case.json", "tests/pyjyd_examples_contract.rs"],
         "compare": "语义比对：轨道/片段时长、源窗口、音量、速度、关键帧通道、素材引用种类",
     },
     "tests/test_scriptfile_building.py": {
         "category": "draft",
-        "status": "pending",
-        "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-        "ours": {"plan": "cases/scriptfile-building/plan.json", "runner": "cases/scriptfile-building/ref.py"},
+        "case": "cases/scriptfile-building/case.json",
         "command": "jianying project build cases/scriptfile-building/plan.json --out draft",
         "evidence": ["tests/plan_validation.rs", "src/plan.rs"],
         "compare": "轨道顺序、片段总时长、素材自动登记、轨道排序",
     },
     "tests/test_import_srt.py": {
         "category": "draft",
-        "status": "pending",
-        "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-        "ours": {"plan": "cases/import-srt/plan.json", "runner": "cases/import-srt/ref.py"},
-        "command": "jianying captions import-srt <draft> <file.srt>",
+        "case": "cases/import-srt/case.json",
+        "command": "jianying captions import-srt <draft> <file.srt> --track captions",
         "evidence": ["tests/captions_cli_contract.rs"],
         "compare": "SRT 解析、时间偏移、样式引用、新轨插入位置",
     },
     "tests/test_audio_effect_export.py": {
         "category": "draft",
-        "status": "pending",
-        "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-        "ours": {"plan": "cases/audio-effect/plan.json", "runner": "cases/audio-effect/ref.py"},
-        "command": "jianying timeline audio-effect <draft> <id> <slug>",
+        "case": "cases/audio-effect/case.json",
+        "command": "jianying project build cases/audio-effect/plan.json --out draft",
         "evidence": ["tests/timeline_cli_contract.rs"],
         "compare": "音频特效素材字段：type/sub_type/time_range/resource_id",
     },
     "tests/test_video_chroma_export.py": {
         "category": "draft",
-        "status": "pending",
-        "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-        "ours": {"plan": "cases/chroma/plan.json", "runner": "cases/chroma/ref.py"},
-        "command": "jianying timeline chroma <draft> <id> --color ...",
+        "case": "cases/chroma/case.json",
+        "command": "jianying project build cases/chroma/plan.json --out draft",
         "evidence": ["tests/timeline_cli_contract.rs"],
         "compare": "色度抠图素材：color/intensity/edge_smooth/shadow/spill 与 version",
     },
     "tests/test_video_mix_mode_export.py": {
         "category": "draft",
-        "status": "pending",
-        "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-        "ours": {"plan": "cases/mix-mode/plan.json", "runner": "cases/mix-mode/ref.py"},
+        "case": "cases/mix-mode/case.json",
         "command": "jianying project build cases/mix-mode/plan.json --out draft",
         "evidence": ["src/plan.rs"],
         "compare": "重复设置混合同模式时只保留最后一次",
@@ -80,35 +69,35 @@ MODULES = {
     "tests/test_template_loading.py": {
         "category": "behavior",
         "status": "mapped",
-        "ours": {"command": "jianying template list|import-track|replace-text|replace-material"},
+        "command": "jianying template list|import-track|replace-text|replace-material",
         "evidence": ["tests/template_cli_contract.rs", "tests/template_semantics_contract.rs"],
         "compare": "模板加载容错、导入轨道顺序、类型过滤、显式插入位置",
     },
     "tests/test_track_append_api.py": {
         "category": "behavior",
         "status": "mapped",
-        "ours": {"command": "jianying timeline add-track <draft> <type> --name <name>"},
+        "command": "jianying timeline add-track <draft> <type> --name <name>",
         "evidence": ["tests/timeline_cli_contract.rs"],
         "compare": "追加轨道返回引用、同类型第二轨必须命名、片段必须属于本草稿",
     },
     "tests/test_track_insert_api.py": {
         "category": "behavior",
         "status": "mapped",
-        "ours": {"command": "jianying timeline add-track <draft> <type> --index <n>"},
+        "command": "jianying timeline add-track <draft> <type> --index <n>",
         "evidence": ["tests/timeline_cli_contract.rs"],
         "compare": "按参考轨道/索引插入、拒绝多重定位、越界索引",
     },
     "tests/test_track_basics.py": {
         "category": "behavior",
         "status": "mapped",
-        "ours": {"command": "jianying project build（计划校验：重叠即拒绝）"},
+        "command": "jianying project build（计划校验：重叠即拒绝）",
         "evidence": ["tests/plan_validation.rs"],
         "compare": "重叠拒绝（含 1µs 边界）、类型匹配、秒级节拍对齐、轨道结束时间",
     },
     "tests/test_time_util.py": {
         "category": "behavior",
         "status": "mapped",
-        "ours": {"command": "所有时间参数（0s / 1500ms / 1000000us）"},
+        "command": "所有时间参数（0s / 1500ms / 1000000us）",
         "evidence": ["tests/ops_behavior.rs"],
         "compare": "tim/trange 解析与取整：负数偏移、duration 语义、绝对边界四舍五入",
     },
@@ -138,8 +127,13 @@ def main() -> int:
             print(f"missing copied upstream file: {source}", file=sys.stderr)
             return 1
         tests = test_functions(upstream_path)
+        spec = dict(spec)
+        if spec.get("category") == "draft":
+            spec["status"] = "compared"
+        # 用例 id 取 case.json 所在目录名，与 provenance 产物里的 id 保持一致
+        case_id = Path(spec["case"]).parent.name if spec.get("case") else Path(source).stem
         case = {
-            "id": Path(source).stem,
+            "id": case_id,
             "source": source,
             "upstream_tests": tests,
             **spec,
@@ -155,6 +149,7 @@ def main() -> int:
             "copied_to": "examples/pyjyd/upstream/",
         },
         "total_tests": sum(len(case["upstream_tests"]) for case in cases),
+        "readme_snippets": "examples/pyjyd/README_SNIPPETS.json",
         "cases": cases,
     }
 

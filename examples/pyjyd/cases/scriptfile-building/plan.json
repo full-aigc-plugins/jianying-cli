@@ -1,0 +1,29 @@
+{
+  "schema": "jianying-cli-plan/v1",
+  "name": "scriptfile-building",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "tracks": [
+    {
+      "type": "video",
+      "name": "video",
+      "segments": [
+        {
+          "start_us": 0,
+          "duration_us": 2000000,
+          "source": "clip.mp4",
+          "fade": {
+            "in_us": 200000,
+            "out_us": 300000
+          },
+          "animation_in": {
+            "name": "斜切"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+{
+  "schema": "jianying-pyjyd-readme-snippets/v1",
+  "upstream": {
+    "repository": "GuanYixuan/pyJianYingDraft",
+    "files": [
+      "README.md",
+      "pypi_readme.md"
+    ]
+  },
+  "total": 32,
+  "snippets": [
+    {
+      "file": "README.md",
+      "index": 0,
+      "lang": "text",
+      "line": 99,
+      "lines": 1,
+      "sha256": "ce2b6292ba196861b315a473581075c57984b257c7f97fcd257d44759dc7f26f",
+      "first_line": "pip install pyJianYingDraft",
+      "maps_to": "meta:install"
+    },
+    {
+      "file": "README.md",
+      "index": 1,
+      "lang": "python",
+      "line": 143,
+      "lines": 8,
+      "sha256": "e2c8e6be2ef2446acac74b3fb3d3452b67f750e4399d7c8a449c49e0be477ea4",
+      "first_line": "import pyJianYingDraft as draft",
+      "maps_to": "case:demo-tutorial"
+    },
+    {
+      "file": "README.md",
+      "index": 2,
+      "lang": "python",
+      "line": 156,
+      "lines": 4,
+      "sha256": "75876125df9c4356b0ecdf16352c3af0f3daa1760ade3703a369f0a6a0004aa5",
+      "first_line": "draft_folder = draft.DraftFolder(",
+      "maps_to": "case:demo-tutorial"
+    },
+    {
+      "file": "README.md",
+      "index": 3,
+      "lang": "python",
+      "line": 174,
+      "lines": 8,
+      "sha256": "4019bfe98c6ed5343e2b0f7b71910cdb96d8f118a2b32a57dc90aaed65a0a314",
+      "first_line": "import pyJianYingDraft as draft",
+      "maps_to": "behavior:template"
+    },
+    {
+      "file": "README.md",
+      "index": 4,
+      "lang": "text",
+      "line": 187,
+      "lines": 9,
+      "sha256": "c6516fd6cb153688fb6affda93b856403d47405ddd0415fa9ff98eafeaf27067",
+      "first_line": "贴纸素材:",
+      "maps_to": "reference:resource-ids"
+    },
+    {
+      "file": "README.md",
+      "index": 5,
+      "lang": "python",
+      "line": 209,
+      "lines": 2,
+      "sha256": "73b84b9f7b9c2fc76b7e1375f4a3bb1750d2dfcbac82debb43ba520b10617a01",
+      "first_line": "new_material = draft.AudioMaterial(\"<新的音频素材路径>\")",
+      "maps_to": "behavior:template"
+    },
+    {
+      "file": "README.md",
+      "index": 6,
+      "lang": "python",
+      "line": 222,
+      "lines": 15,
+      "sha256": "fd685744ad1d06d262b944881304362a9e0178399146a6d60adeb0587ce8c616",
+      "first_line": "from pyJianYingDraft import trange_seconds, ShrinkMode, ExtendMode",
+      "maps_to": "behavior:template"
+    },
+    {
+      "file": "README.md",
+      "index": 7,
+      "lang": "python",
+      "line": 256,
+      "lines": 4,
+      "sha256": "aac6878f348bd4875079ff8699c5373bd45dca0fc06f002ff4944e4551bba8fe",
+      "first_line": "script.replace_text(",
+      "maps_to": "behavior:template"
+    },
+    {
+      "file": "README.md",
+      "index": 8,
+      "lang": "python",
+      "line": 272,
+      "lines": 16,
+      "sha256": "b43e3fd45853c48f0c0e8d1000a6078d44471e2b2a62df770c26e1e0023edd60",
+      "first_line": "source_script = draft_folder.load_template(\"<模板草稿名称>\")     # 加载模板草稿",
+      "maps_to": "behavior:template"
+    },
+    {
+      "file": "README.md",
+      "index": 9,
+      "lang": "python",
+      "line": 308,
+      "lines": 13,
+      "sha256": "75db3935f3110a498eb9b6f780f82e02ee8bf4e5d8a0081c18ea903a6bcacd83",
+      "first_line": "import pyJianYingDraft as draft",
+      "maps_to": "out_of_scope:controller-export"
+    },
+    {
+      "file": "README.md",
+      "index": 10,
+      "lang": "python",
+      "line": 325,
+      "lines": 4,
+      "sha256": "ff081251e4b9b942d807e08239554bc0398cebfea27cde960a94220717c1dd99",
+      "first_line": "draft_names = ...",
+      "maps_to": "out_of_scope:controller-export"
+    },
+    {
+      "file": "README.md",
+      "index": 11,
+      "lang": "python",
+      "line": 348,
+      "lines": 15,
+      "sha256": "ba6961a858c2746c0d73da3e405257c6bb3684a2cc112482a568243eba6e0e16",
+      "first_line": "import pyJianYingDraft as draft",
+      "maps_to": "behavior:time"
+    },
+    {
+      "file": "README.md",
+      "index": 12,
+      "lang": "python",
+      "line": 374,
+      "lines": 49,
+      "sha256": "2676d317403731c87a606d852cef46b247a38a4480de25de05cb916b623f94b4",
+      "first_line": "import os",
+      "maps_to": "case:scriptfile-building"
+    },
+    {
+      "file": "README.md",
+      "index": 13,
+      "lang": "python",
+      "line": 433,
+      "lines": 5,
+      "sha256": "f69fabc71e6f408105db7b8df8a804ba48ccb7ee11ae307c6a39d44ea1739f9f",
+      "first_line": "background_ref = script.append_track(draft.TrackSpec(draft.TrackType.video, \"背景\"",
+      "maps_to": "case:scriptfile-building"
+    },
+    {
+      "file": "README.md",
+      "index": 14,
+      "lang": "python",
+      "line": 450,
+      "lines": 1,
+      "sha256": "fb48f46913a258c405299e9dc679fdf960a0d3933856343b47623e1a7fd94355",
+      "first_line": "script.add_segment(video_segment, \"背景\")",
+      "maps_to": "case:scriptfile-building"
+    },
+    {
+      "file": "README.md",
+      "index": 15,
+      "lang": "python",
+      "line": 459,
+      "lines": 6,
+      "sha256": "92ba4a3c00d484f11cf364277ac693e037f19f26c79d4543f9f86d43f5f7dca9",
+      "first_line": "from pyJianYingDraft import ClipSettings",
+      "maps_to": "behavior:visual"
+    },
+    {
+      "file": "README.md",
+      "index": 16,
+      "lang": "python",
+      "line": 475,
+      "lines": 22,
+      "sha256": "f3c82b06ed447d5877191eba47a73fd7af099855980317ffca01b8ee31c3f0f2",
+      "first_line": "import os",
+      "maps_to": "behavior:audio-keyframe"
+    },
+    {
+      "file": "README.md",
+      "index": 17,
+      "lang": "python",
+      "line": 504,
+      "lines": 2,
+      "sha256": "4dc9da8237613c2f15b5f84767154c7c8db20b94a3c727ad343c1931ebe061bc",
+      "first_line": "audio_segment: draft.AudioSegment",
+      "maps_to": "behavior:audio-keyframe"
+    },
+    {
+      "file": "README.md",
+      "index": 18,
+      "lang": "python",
+      "line": 512,
+      "lines": 10,
+      "sha256": "6109a20bf86ee291f70772fed4027b13e94dfb8888da188ecad53b2b28214217",
+      "first_line": "import pyJianYingDraft as draft",
+      "maps_to": "behavior:time"
+    },
+    {
+      "file": "README.md",
+      "index": 19,
+      "lang": "python",
+      "line": 532,
+      "lines": 6,
+      "sha256": "de6506ede272b6eec080ccb851a1a6415a8f9b77f498687d718a2da146424918",
+      "first_line": "from pyJianYingDraft import MaskType",
+      "maps_to": "behavior:mask"
+    },
+    {
+      "file": "README.md",
+      "index": 20,
+      "lang": "python",
+      "line": 550,
+      "lines": 7,
+      "sha256": "0cdf99abe7e97bb81c0f9dc7da72ab2b62e52f23ee0b2a63d6b23c2b0c402fdb",
+      "first_line": "video_segment.add_chroma(",
+      "maps_to": "case:chroma"
+    },
+    {
+      "file": "README.md",
+      "index": 21,
+      "lang": "python",
+      "line": 574,
+      "lines": 16,
+      "sha256": "a4419fbb4866eb1feba5bdbfdbf9018535e826809ba1783dcd0cd86c0ca8ba57",
+      "first_line": "from pyJianYingDraft import MixModeType, trange_seconds",
+      "maps_to": "case:mix-mode"
+    },
+    {
+      "file": "README.md",
+      "index": 22,
+      "lang": "python",
+      "line": 616,
+      "lines": 1,
+      "sha256": "c264ce36df7fbafdf8b0d8b074492c4a6ecec6d0b37fd45a412901d1a2b68ed0",
+      "first_line": "assert VideoSceneEffectType.from_name(\"__全息 扫描__\") == VideoSceneEffectType.全息扫描",
+      "maps_to": "behavior:effect-filter"
+    },
+    {
+      "file": "README.md",
+      "index": 23,
+      "lang": "python",
+      "line": 624,
+      "lines": 4,
+      "sha256": "8aabd5cee2caf41881424cb02d57e54b7e1a1023791a6be7b15be71d63f701bb",
+      "first_line": "from pyJianYingDraft import VideoSceneEffectType",
+      "maps_to": "case:audio-effect"
+    },
+    {
+      "file": "README.md",
+      "index": 24,
+      "lang": "python",
+      "line": 641,
+      "lines": 4,
+      "sha256": "0090df1f0c0f7d64a301c3fb8eae6faa7deb099e98d40ce1b1fed820fe664ff0",
+      "first_line": "from pyJianYingDraft import FilterType",
+      "maps_to": "behavior:effect-filter"
+    },
+    {
+      "file": "README.md",
+      "index": 25,
+      "lang": "python",
+      "line": 652,
+      "lines": 4,
+      "sha256": "334599f0a020b318c3c80e4f52e346a9f3f518586c92ab2b18726b20a46654ee",
+      "first_line": "script.append_tracks([",
+      "maps_to": "case:scriptfile-building"
+    },
+    {
+      "file": "README.md",
+      "index": 26,
+      "lang": "python",
+      "line": 660,
+      "lines": 12,
+      "sha256": "d4d068f72bacab1e3eae374cb0e8931ea6b56a17963436a63ea8225e6af4f0e8",
+      "first_line": "from pyJianYingDraft import VideoSceneEffectType, FilterType, trange, trange_sec",
+      "maps_to": "case:audio-effect"
+    },
+    {
+      "file": "README.md",
+      "index": 27,
+      "lang": "python",
+      "line": 681,
+      "lines": 4,
+      "sha256": "a02311c59f255f1335d3e3dac6c2f68d3143681dd5ce49bbcc19465c690926e4",
+      "first_line": "from pyJianYingDraft import TextIntro, TextOutro, TextLoopAnim",
+      "maps_to": "behavior:text"
+    },
+    {
+      "file": "README.md",
+      "index": 28,
+      "lang": "python",
+      "line": 694,
+      "lines": 8,
+      "sha256": "0b138c90d359462c05fdfdc7cf1cf831cbf95d30addb5b6a70ccb81429d51d2f",
+      "first_line": "import pyJianYingDraft as draft",
+      "maps_to": "behavior:visual"
+    },
+    {
+      "file": "README.md",
+      "index": 29,
+      "lang": "python",
+      "line": 710,
+      "lines": 7,
+      "sha256": "bb1e0e408539efc2d40e528148255173fb483c3259dcda74c47ed068ce8f31f9",
+      "first_line": "# 启用自动换行，设置最大行宽为屏幕宽度的70%",
+      "maps_to": "behavior:text"
+    },
+    {
+      "file": "README.md",
+      "index": 30,
+      "lang": "python",
+      "line": 727,
+      "lines": 19,
+      "sha256": "37841cdcad2e0e066c2fa42314c221cf33150f40db89f6f78751708a423af03c",
+      "first_line": "import pyJianYingDraft as draft",
+      "maps_to": "case:import-srt"
+    },
+    {
+      "file": "pypi_readme.md",
+      "index": 0,
+      "lang": "text",
+      "line": 100,
+      "lines": 1,
+      "sha256": "ce2b6292ba196861b315a473581075c57984b257c7f97fcd257d44759dc7f26f",
+      "first_line": "pip install pyJianYingDraft",
+      "maps_to": "meta:install"
+    }
+  ],
+  "out_of_scope_reasons": {
+    "controller-export": "JianyingController 驱动剪映客户端 UI 导出，需要客户端常驻；与本仓库“无客户端”目标直接冲突（见 docs/adr/ADR-003）"
+  }
+}

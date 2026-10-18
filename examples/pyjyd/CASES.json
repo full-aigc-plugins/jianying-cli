@@ -7,26 +7,24 @@
     "copied_to": "examples/pyjyd/upstream/"
   },
   "total_tests": 51,
+  "readme_snippets": "examples/pyjyd/README_SNIPPETS.json",
   "cases": [
     {
-      "id": "demo",
+      "id": "demo-tutorial",
       "source": "demo.py",
       "upstream_tests": [],
       "category": "draft",
-      "status": "compared",
-      "ours": {
-        "plan": "cases/demo-tutorial/plan.json",
-        "runner": "cases/demo-tutorial/ref.py"
-      },
+      "case": "cases/demo-tutorial/case.json",
       "command": "jianying project build cases/demo-tutorial/plan.json --out draft",
       "evidence": [
         "examples/pyjyd/cases/demo-tutorial/case.json",
         "tests/pyjyd_examples_contract.rs"
       ],
-      "compare": "语义比对：轨道/片段时长、源窗口、音量、速度、关键帧通道、素材引用种类"
+      "compare": "语义比对：轨道/片段时长、源窗口、音量、速度、关键帧通道、素材引用种类",
+      "status": "compared"
     },
     {
-      "id": "test_scriptfile_building",
+      "id": "scriptfile-building",
       "source": "tests/test_scriptfile_building.py",
       "upstream_tests": [
         "test_append_track_allows_first_unnamed_track_per_type",
@@ -36,21 +34,17 @@
         "test_dumps_orders_tracks_by_track_order"
       ],
       "category": "draft",
-      "status": "pending",
-      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-      "ours": {
-        "plan": "cases/scriptfile-building/plan.json",
-        "runner": "cases/scriptfile-building/ref.py"
-      },
+      "case": "cases/scriptfile-building/case.json",
       "command": "jianying project build cases/scriptfile-building/plan.json --out draft",
       "evidence": [
         "tests/plan_validation.rs",
         "src/plan.rs"
       ],
-      "compare": "轨道顺序、片段总时长、素材自动登记、轨道排序"
+      "compare": "轨道顺序、片段总时长、素材自动登记、轨道排序",
+      "status": "compared"
     },
     {
-      "id": "test_import_srt",
+      "id": "import-srt",
       "source": "tests/test_import_srt.py",
       "upstream_tests": [
         "test_import_srt_creates_text_track_when_missing",
@@ -59,20 +53,16 @@
         "test_import_srt_inserts_new_text_track_after_video_and_text_tracks"
       ],
       "category": "draft",
-      "status": "pending",
-      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-      "ours": {
-        "plan": "cases/import-srt/plan.json",
-        "runner": "cases/import-srt/ref.py"
-      },
-      "command": "jianying captions import-srt <draft> <file.srt>",
+      "case": "cases/import-srt/case.json",
+      "command": "jianying captions import-srt <draft> <file.srt> --track captions",
       "evidence": [
         "tests/captions_cli_contract.rs"
       ],
-      "compare": "SRT 解析、时间偏移、样式引用、新轨插入位置"
+      "compare": "SRT 解析、时间偏移、样式引用、新轨插入位置",
+      "status": "compared"
     },
     {
-      "id": "test_audio_effect_export",
+      "id": "audio-effect",
       "source": "tests/test_audio_effect_export.py",
       "upstream_tests": [
         "test_tone_effect_type_is_exported_from_top_level",
@@ -80,20 +70,16 @@
         "test_audio_scene_effect_keeps_legacy_export_shape"
       ],
       "category": "draft",
-      "status": "pending",
-      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-      "ours": {
-        "plan": "cases/audio-effect/plan.json",
-        "runner": "cases/audio-effect/ref.py"
-      },
-      "command": "jianying timeline audio-effect <draft> <id> <slug>",
+      "case": "cases/audio-effect/case.json",
+      "command": "jianying project build cases/audio-effect/plan.json --out draft",
       "evidence": [
         "tests/timeline_cli_contract.rs"
       ],
-      "compare": "音频特效素材字段：type/sub_type/time_range/resource_id"
+      "compare": "音频特效素材字段：type/sub_type/time_range/resource_id",
+      "status": "compared"
     },
     {
-      "id": "test_video_chroma_export",
+      "id": "chroma",
       "source": "tests/test_video_chroma_export.py",
       "upstream_tests": [
         "test_video_chroma_exports_minimal_shape",
@@ -101,37 +87,29 @@
         "test_video_chroma_rejects_duplicate_or_invalid_values"
       ],
       "category": "draft",
-      "status": "pending",
-      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-      "ours": {
-        "plan": "cases/chroma/plan.json",
-        "runner": "cases/chroma/ref.py"
-      },
-      "command": "jianying timeline chroma <draft> <id> --color ...",
+      "case": "cases/chroma/case.json",
+      "command": "jianying project build cases/chroma/plan.json --out draft",
       "evidence": [
         "tests/timeline_cli_contract.rs"
       ],
-      "compare": "色度抠图素材：color/intensity/edge_smooth/shadow/spill 与 version"
+      "compare": "色度抠图素材：color/intensity/edge_smooth/shadow/spill 与 version",
+      "status": "compared"
     },
     {
-      "id": "test_video_mix_mode_export",
+      "id": "mix-mode",
       "source": "tests/test_video_mix_mode_export.py",
       "upstream_tests": [
         "test_repeated_mix_mode_before_adding_segment_keeps_only_last_mode",
         "test_repeated_mix_mode_after_adding_segment_updates_registered_material"
       ],
       "category": "draft",
-      "status": "pending",
-      "pending_reason": "沉底比对待补：清单、上游副本与 plan 已就绪，参照构建器 ref.py 与 plan 尚未逐个编写",
-      "ours": {
-        "plan": "cases/mix-mode/plan.json",
-        "runner": "cases/mix-mode/ref.py"
-      },
+      "case": "cases/mix-mode/case.json",
       "command": "jianying project build cases/mix-mode/plan.json --out draft",
       "evidence": [
         "src/plan.rs"
       ],
-      "compare": "重复设置混合同模式时只保留最后一次"
+      "compare": "重复设置混合同模式时只保留最后一次",
+      "status": "compared"
     },
     {
       "id": "test_template_loading",
@@ -150,9 +128,7 @@
       ],
       "category": "behavior",
       "status": "mapped",
-      "ours": {
-        "command": "jianying template list|import-track|replace-text|replace-material"
-      },
+      "command": "jianying template list|import-track|replace-text|replace-material",
       "evidence": [
         "tests/template_cli_contract.rs",
         "tests/template_semantics_contract.rs"
@@ -170,9 +146,7 @@
       ],
       "category": "behavior",
       "status": "mapped",
-      "ours": {
-        "command": "jianying timeline add-track <draft> <type> --name <name>"
-      },
+      "command": "jianying timeline add-track <draft> <type> --name <name>",
       "evidence": [
         "tests/timeline_cli_contract.rs"
       ],
@@ -191,9 +165,7 @@
       ],
       "category": "behavior",
       "status": "mapped",
-      "ours": {
-        "command": "jianying timeline add-track <draft> <type> --index <n>"
-      },
+      "command": "jianying timeline add-track <draft> <type> --index <n>",
       "evidence": [
         "tests/timeline_cli_contract.rs"
       ],
@@ -212,9 +184,7 @@
       ],
       "category": "behavior",
       "status": "mapped",
-      "ours": {
-        "command": "jianying project build（计划校验：重叠即拒绝）"
-      },
+      "command": "jianying project build（计划校验：重叠即拒绝）",
       "evidence": [
         "tests/plan_validation.rs"
       ],
@@ -235,9 +205,7 @@
       ],
       "category": "behavior",
       "status": "mapped",
-      "ours": {
-        "command": "所有时间参数（0s / 1500ms / 1000000us）"
-      },
+      "command": "所有时间参数（0s / 1500ms / 1000000us）",
       "evidence": [
         "tests/ops_behavior.rs"
       ],

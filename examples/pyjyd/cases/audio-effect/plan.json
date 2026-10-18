@@ -1,0 +1,30 @@
+{
+  "schema": "jianying-cli-plan/v1",
+  "name": "audio-effect",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "tracks": [
+    {
+      "type": "audio",
+      "name": "audio",
+      "segments": [
+        {
+          "start_us": 0,
+          "duration_us": 2000000,
+          "source": "audio.mp3",
+          "audio_effects": [
+            {
+              "name": "机器人",
+              "params": {
+                "强弱": 100
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

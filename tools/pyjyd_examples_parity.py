@@ -148,6 +148,9 @@ def prepare_media(case: dict, target: Path) -> None:
     for media in case.get("media", []):
         output = target / media["name"]
         run(["ffmpeg", "-hide_banner", "-v", "error", *media["gen"], "-y", str(output)])
+    # 参照实现也要读这份字幕，因此在准备素材阶段就写入
+    if case.get("srt"):
+        (target / "captions.srt").write_text(case["srt"], encoding="utf-8")
 
 
 def build_reference(case: dict, case_dir: Path, media_dir: Path, out: Path, pyjyd_src: Path, env: dict) -> None:
@@ -166,17 +169,29 @@ def text_segment_id(binary: Path, draft: Path, env: dict) -> str:
     )
     segments = payload.get("data") or []
     if not segments:
-        raise RuntimeError("case needs a text segment but the draft has none")
+        # 空草稿时没有文本段；占位符不会被用到，返回空串即可
+        return ""
     return segments[0]["id"]
 
 
 def build_ours(case: dict, case_dir: Path, media_dir: Path, out: Path, binary: Path, env: dict) -> None:
-    plan = case_dir / "plan.json"
-    shutil.copyfile(plan, media_dir / "plan.json")
-    run([str(binary), "project", "build", str(media_dir / "plan.json"), "--out", str(out), "--json"], env=env)
+    mode = case.get("build_mode", "plan")
+    if mode == "plan":
+        plan = case_dir / "plan.json"
+        shutil.copyfile(plan, media_dir / "plan.json")
+        run([str(binary), "project", "build", str(media_dir / "plan.json"), "--out", str(out), "--json"], env=env)
+    elif mode == "empty":
+        run([str(binary), "project", "init", case["id"], "--out", str(out),
+             "--width", "1920", "--height", "1080", "--json"], env=env)
+    else:
+        raise RuntimeError(f"unknown build_mode: {mode}")
+    srt = media_dir / "captions.srt"
     for command in case.get("post_build", []):
         argv = [str(binary), *command]
-        argv = [part.format(ours=str(out), text_id=text_segment_id(binary, out, env)) for part in argv]
+        argv = [
+            part.format(ours=str(out), srt=str(srt), text_id=text_segment_id(binary, out, env))
+            for part in argv
+        ]
         run(argv, env=env)
 
 

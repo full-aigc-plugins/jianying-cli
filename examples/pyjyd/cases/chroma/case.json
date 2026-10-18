@@ -1,0 +1,43 @@
+{
+  "id": "chroma",
+  "title": "tests/test_video_chroma_export.py：色度抠图导出",
+  "upstream": {
+    "file": "tests/test_video_chroma_export.py",
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+  },
+  "category": "draft",
+  "media": [
+    {
+      "name": "clip.mp4",
+      "gen": [
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc=s=640x360:d=4",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p"
+      ]
+    }
+  ],
+  "plan": "cases/chroma/plan.json",
+  "reference": "cases/chroma/ref.py",
+  "policy": {
+    "approved_extra_kinds": [
+      "placeholders",
+      "sound_channel_mappings",
+      "vocal_separations"
+    ],
+    "approved_missing_kinds": [
+      "dangling"
+    ],
+    "approved_value_differences": [],
+    "rationale": {
+      "placeholders": "剪映自身写出的占位素材，pyJianYingDraft 省略",
+      "sound_channel_mappings": "声道映射占位素材，同上",
+      "vocal_separations": "人声分离占位素材，同上",
+      "dangling": "pyJianYingDraft 的某些段会引用不存在于任何 materials 桶的 id；我们不复制这个缺陷"
+    }
+  }
+}

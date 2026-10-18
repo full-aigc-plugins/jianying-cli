@@ -1,0 +1,39 @@
+{
+  "id": "audio-effect",
+  "title": "tests/test_audio_effect_export.py：音色特效最小导出形状",
+  "upstream": {
+    "file": "tests/test_audio_effect_export.py",
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+  },
+  "category": "draft",
+  "media": [
+    {
+      "name": "audio.mp3",
+      "gen": [
+        "-f",
+        "lavfi",
+        "-i",
+        "sine=frequency=440:duration=4"
+      ]
+    }
+  ],
+  "plan": "cases/audio-effect/plan.json",
+  "reference": "cases/audio-effect/ref.py",
+  "policy": {
+    "approved_extra_kinds": [
+      "placeholders",
+      "sound_channel_mappings",
+      "vocal_separations"
+    ],
+    "approved_missing_kinds": [
+      "dangling"
+    ],
+    "approved_value_differences": [],
+    "rationale": {
+      "placeholders": "剪映自身写出的占位素材，pyJianYingDraft 省略",
+      "sound_channel_mappings": "声道映射占位素材，同上",
+      "vocal_separations": "人声分离占位素材，同上",
+      "dangling": "pyJianYingDraft 的某些段会引用不存在于任何 materials 桶的 id；我们不复制这个缺陷"
+    }
+  }
+}

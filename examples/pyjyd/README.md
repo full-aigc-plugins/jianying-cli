@@ -2,8 +2,9 @@
 
 上游 `GuanYixuan/pyJianYingDraft`（Apache-2.0，commit `6bb2d06`）**没有** `examples/` 目录，
 可运行的示例是 `demo.py` 与 `tests/test_*.py`。这些文件已**逐字复制**到
-[`upstream/`](upstream/)，作为对照的事实来源；我们这边的等价物与比对方式登记在
-[`CASES.json`](CASES.json)。
+[`upstream/`](upstream/)（含 README 与 pypi_readme 的用法片段索引），作为对照的事实来源；
+我们这边的等价物与比对方式登记在 [`CASES.json`](CASES.json) 与
+[`README_SNIPPETS.json`](README_SNIPPETS.json)。
 
 ## 目录
 
@@ -17,13 +18,16 @@ examples/pyjyd/
     ref.py                  用 pyJianYingDraft 复刻上游示例的参照构建器
     plan.json               等价的 jianying-cli-plan/v1
   CASES.json                11 个用例 / 51 个上游测试函数的清点与映射
+  README_SNIPPETS.json      32 段 README 代码片段的编号、sha256 与去向
 ```
 
 ## 怎么跑
 
 ```bash
-# 1) 清单与上游对账（上游新增用例时会失败，逼你登记）
+# 1) 清单与上游对账（上游新增用例/片段时会失败，逼你登记）
 python tools/pyjyd_examples_manifest.py \
+  --pyjyd-src <pyJianYingDraft 检出> --check
+python tools/pyjyd_readme_snippets.py \
   --pyjyd-src <pyJianYingDraft 检出> --check
 
 # 2) 参照构建 + 我们的构建 + 语义比对
@@ -59,6 +63,21 @@ python tools/pyjyd_examples_parity.py \
 
 修复后 `demo-tutorial` 通过；随后 55 个 pyJYJ 场景差分仍为 55/55，
 `provenance/PARITY_RUN.json` 逐字节未变。
+
+## README 用法片段
+
+上游 `README.md` 有 31 段代码块、`pypi_readme.md` 有 1 段，全部编号登记在
+`README_SNIPPETS.json`：每段带行号、行数、sha256 与 `maps_to`。分类口径：
+
+| 去向 | 数量 | 说明 |
+|---|---|---|
+| `case:*` | 12 | 直接对应某个草稿对照用例 |
+| `behavior:*` | 16 | 绑定到 CLI 命令与测试文件的行为规则 |
+| `reference:resource-ids` | 1 | 素材 id 清单（贴纸/气泡/花字） |
+| `meta:install` | 2 | `pip install`，Python 侧安装说明 |
+| `out_of_scope:controller-export` | 2 | `JianyingController` 导出，需客户端常驻 |
+
+出现 `unmapped` 时门禁失败；`out_of_scope` 必须带理由（见 `out_of_scope_reasons`）。
 
 ## 未覆盖的用例
 
