@@ -75,9 +75,11 @@ fn every_class_records_its_mapping_and_gaps() {
             other => panic!("{key} 状态非法: {other}"),
         }
     }
+    // 生成器在某个状态计数为 0 时会省略该键，这里按 0 处理。
     let summary = &report["summary"]["by_status"];
-    assert_eq!(summary["covered"], serde_json::json!(covered));
-    assert_eq!(summary["partial"], serde_json::json!(partial));
-    assert_eq!(summary["out_of_scope"], serde_json::json!(out_of_scope));
+    let count = |key: &str| summary[key].as_u64().unwrap_or(0);
+    assert_eq!(count("covered"), covered as u64);
+    assert_eq!(count("partial"), partial as u64);
+    assert_eq!(count("out_of_scope"), out_of_scope as u64);
     assert_eq!(covered + partial + out_of_scope, classes.len());
 }

@@ -1300,6 +1300,20 @@ enum TemplateOp {
         /// Draft directory
         draft: PathBuf,
     },
+    /// create_from_template parity: clone a text segment's style into a new segment
+    CloneText {
+        /// Draft directory
+        draft: PathBuf,
+        /// Template text segment id (prefix is enough)
+        #[arg(long)]
+        from_segment: String,
+        /// Text for the new segment
+        #[arg(long)]
+        text: String,
+        /// Start of the new segment, e.g. `2000ms`
+        #[arg(long)]
+        start: String,
+    },
     /// duplicate_as_template parity: copy under a new name and restamp
     Duplicate {
         /// Source draft directory
@@ -4254,6 +4268,16 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             }
             TemplateOp::Inspect { draft } => {
                 print_output(template::inspect_materials(&draft)?, json)
+            }
+            TemplateOp::CloneText {
+                draft,
+                from_segment,
+                text,
+                start,
+            } => {
+                let report =
+                    template::clone_text(&draft, &from_segment, &text, tim::parse(&start)?)?;
+                print_output(report, json)
             }
             TemplateOp::Duplicate {
                 draft,

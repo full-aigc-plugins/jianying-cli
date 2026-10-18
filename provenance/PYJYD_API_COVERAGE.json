@@ -13,15 +13,13 @@
   "summary": {
     "classes": 68,
     "by_status": {
-      "covered": 59,
-      "partial": 3,
+      "covered": 62,
       "out_of_scope": 6
     },
     "uncovered_classes": [],
     "methods": 90,
     "methods_by_status": {
-      "covered": 81,
-      "uncovered": 4,
+      "covered": 85,
       "out_of_scope": 5
     }
   },
@@ -130,10 +128,10 @@
       "class": "draft_folder.DraftFolder",
       "module": "draft_folder",
       "name": "DraftFolder",
-      "status": "partial",
-      "ours": "store list/has/remove/publish + template duplicate",
-      "evidence": "tests/store_cli_contract.rs",
-      "note": "素材清单走 `media materials`，不是同名 API",
+      "status": "covered",
+      "ours": "store list/has/remove/publish + template duplicate + template inspect + media material",
+      "evidence": "tests/pyjyd_parity_contract.rs",
+      "note": "",
       "methods": [
         {
           "name": "list_drafts",
@@ -153,7 +151,7 @@
         },
         {
           "name": "inspect_material",
-          "status": "uncovered"
+          "status": "covered"
         },
         {
           "name": "load_template",
@@ -694,18 +692,18 @@
       "class": "template_mode.ImportedMediaTrack",
       "module": "template_mode",
       "name": "ImportedMediaTrack",
-      "status": "partial",
-      "ours": "template import-track",
-      "evidence": "tests/template_cli_contract.rs",
-      "note": "导入时不做材料类型校验与时间窗重算",
+      "status": "covered",
+      "ours": "template import-track（含 check_material_type 与 process_timerange）",
+      "evidence": "tests/pyjyd_parity_contract.rs",
+      "note": "",
       "methods": [
         {
           "name": "check_material_type",
-          "status": "uncovered"
+          "status": "covered"
         },
         {
           "name": "process_timerange",
-          "status": "uncovered"
+          "status": "covered"
         }
       ]
     },
@@ -798,14 +796,14 @@
       "class": "text_segment.TextSegment",
       "module": "text_segment",
       "name": "TextSegment",
-      "status": "partial",
-      "ours": "plan text 段全字段 + template replace-text",
-      "evidence": "tests/path_equivalence.rs",
-      "note": "没有从模板直接新建文本段的同形 API",
+      "status": "covered",
+      "ours": "plan text 段全字段 + template replace-text + template clone-text",
+      "evidence": "tests/pyjyd_parity_contract.rs",
+      "note": "",
       "methods": [
         {
           "name": "create_from_template",
-          "status": "uncovered"
+          "status": "covered"
         },
         {
           "name": "add_animation",

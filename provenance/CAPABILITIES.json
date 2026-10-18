@@ -6,158 +6,778 @@
   "release_ref": null,
   "source_commit": null,
   "capabilities": [
-    {"id":"doctor","status":"supported","evidence":"tests/agent_contract.rs"},
-    {"id":"capabilities","status":"supported","evidence":"src/capabilities.rs + tests/agent_contract.rs"},
-    {"id":"schema.job_v2","status":"supported","evidence":"schemas/jianying-job-v2.schema.json + tests/job_v2_contract.rs + tests/job_cli_contract.rs"},
-    {"id":"schema.plan_v1_compat","status":"supported","evidence":"55 frozen scenarios in tests/job_v2_contract.rs + black-box equivalence in tests/job_cli_contract.rs"},
-    {"id":"schema.compile_v1_compat","status":"supported","evidence":"schemas/jianying-job-v2.schema.json + tests/compile_contract.rs"},
-    {"id":"protocol.pyjyd_wire","status":"supported","evidence":"provenance/PROTOCOL_DIFFERENTIALS.json + provenance/PARITY_RUN.json (55/55) + crates/jianying-draft/tests/edge_fixtures.rs"},
-    {"id":"project.create","status":"supported","evidence":"tests/agent_contract.rs"},
-    {"id":"project.edit_isolated","status":"supported","evidence":"tests/job_cli_contract.rs: all eight Job v2 edit operations run on a new output copy with source-unchanged and failure-cleanup proof"},
-    {"id":"project.inspect","status":"supported","evidence":"tests/agent_contract.rs"},
-    {"id":"project.diagnose","status":"supported","evidence":"diagnose_contract + CAPCUT_UTILITY_DIFFERENTIALS canonical/divergence/bundle"},
-    {"id":"project.fixture","status":"supported","evidence":"fixture_contract + CAPCUT_UTILITY_DIFFERENTIALS sanitize/check/failure"},
-    {"id":"project.compile","status":"supported","evidence":"compile_contract + CAPCUT_UTILITY_DIFFERENTIALS preflight/nine-operations/jsonl/fail-fast"},
-    {"id":"project.export_timeline","status":"supported","evidence":"tests/interchange_contract.rs + provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json"},
-    {"id":"project.import_timeline","status":"supported","evidence":"tests/interchange_contract.rs + provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json"},
-    {"id":"project.prune","status":"supported","evidence":"tests/timeline_cli_contract.rs + provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"},
-    {"id":"project.cover","status":"supported","evidence":"tests/timeline_cli_contract.rs + provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"},
-    {"id":"project.cut","status":"supported","evidence":"tests/timeline_cli_contract.rs + provenance/CAPCUT_PROJECT_DIFFERENTIALS.json fixed-upstream exact timeline"},
-    {"id":"project.verify","status":"supported","evidence":"tests/integration.rs"},
-    {"id":"job.run","status":"supported","evidence":"tests/job_cli_contract.rs: single-document success/failure envelopes plus real create and isolated edit execution"},
-    {"id":"job.edit.replace_text","status":"supported","evidence":"tests/job_cli_contract.rs: typed replace_text operation through root job run handler"},
-    {"id":"job.edit.move_segment","status":"supported","evidence":"tests/job_cli_contract.rs: typed exact-range move_segment operation through root job run handler"},
-    {"id":"job.edit.remove_segment","status":"supported","evidence":"tests/job_cli_contract.rs: typed remove_segment operation through root job run handler"},
-    {"id":"job.edit.add_material","status":"supported","evidence":"tests/job_cli_contract.rs: local video/audio/image declarations resolve from the Job directory and fail atomically when missing, duplicated or unconsumed"},
-    {"id":"job.edit.add_segment","status":"supported","evidence":"tests/job_cli_contract.rs: full typed video segment compiles through DraftProject with copied primary/companion resource closure and declared ID preservation"},
-    {"id":"job.edit.add_track","status":"supported","evidence":"tests/job_v2_contract.rs + tests/job_cli_contract.rs: closed schema, stable ID, typed placement and isolated execution"},
-    {"id":"job.edit.remove_track","status":"supported","evidence":"tests/job_v2_contract.rs + tests/job_cli_contract.rs: closed schema, orphan pruning and isolated execution"},
-    {"id":"job.edit.reorder_track","status":"supported","evidence":"tests/job_v2_contract.rs + tests/job_cli_contract.rs: closed schema and absolute-index isolated execution"},
-    {"id":"job.lifecycle","status":"supported","evidence":"crates/jianying-jobs/tests/backend_comparison.rs + tests/job_cli_contract.rs"},
-    {"id":"job.show","status":"supported","evidence":"tests/job_cli_contract.rs"},
-    {"id":"job.retry","status":"supported","evidence":"tests/job_cli_contract.rs"},
-    {"id":"job.audit","status":"supported","evidence":"tests/job_cli_contract.rs"},
-    {"id":"job.batch","status":"supported","evidence":"tests/job_cli_contract.rs: atomic staged create batch"},
-    {"id":"job.serve","status":"supported","evidence":"tests/job_cli_contract.rs: JSON Lines stdio handler"},
-    {"id":"media.probe","status":"supported","evidence":"tests/agent_contract.rs"},
-    {"id":"media.catalogue","status":"supported","evidence":"tests/catalogs_guard.rs"},
-    {"id":"media.enums","status":"supported","evidence":"agent_contract + CAPCUT_UTILITY_DIFFERENTIALS 28 namespace/category cases"},
-    {"id":"media.harvest_enums","status":"supported","evidence":"harvest_enums_contract + CAPCUT_UTILITY_DIFFERENTIALS scan/add/sync plan/apply"},
-    {"id":"media.materials","status":"supported","evidence":"tests/material_discovery_contract.rs + provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json"},
-    {"id":"media.material","status":"supported","evidence":"tests/material_discovery_contract.rs + provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json"},
-    {"id":"media.add","status":"supported","evidence":"CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"},
-    {"id":"media.replace","status":"supported","evidence":"CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"},
-    {"id":"media.relink","status":"supported","evidence":"CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"},
-    {"id":"media.audio","status":"supported","evidence":"tests/media_mutation_contract.rs: probed add-audio, replace and relink transactions; tests/timeline_cli_contract.rs: volume and audio-fade"},
-    {"id":"media.analysis","status":"supported","evidence":"CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS + media_analysis_contract"},
-    {"id":"media.quality_evidence","status":"supported","evidence":"tests/media_evidence_contract.rs: content-bound keyframe, silence, loudness and peak black-box evidence"},
-    {"id":"media.tts_local","status":"supported","evidence":"media_mutation_contract: local-command/local-process/system Provider transaction plus non-loopback rejection; jianying-media local-http/EdgeTTS contracts"},
-    {"id":"media.tts_provider","status":"partial","evidence":"seven provider-specific HTTPS execution routes plus approval, ledger, atomic artifact, draft transaction, reuse, definite-failure and ambiguous loopback black-box tests; Volcengine uses the current V3 unidirectional SSE protocol with X-Api headers, ordered audio-frame concatenation and terminal-frame gating; authorized real-provider canaries remain pending"},
-    {"id":"media.sfx","status":"supported","evidence":"CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"},
-    {"id":"media.sticker","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream track/transform/material/companion differential"},
-    {"id":"media.official_resource","status":"supported","evidence":"tests/edition_cli_contract.rs + tests/entitlement_schema_contract.rs + crates/jianying-runtime/tests/edition_entitlements.rs: typed receipt verification, immutable identity, usage/edition gates, atomic register/list/show and multi-resource Job preflight"},
-    {"id":"media.official_resource_apply","status":"partial","evidence":"receipt and entitlement preflight implemented; version-bound JianYing acquisition/apply Adapter and real host canary pending"},
-    {"id":"captions.list","status":"supported","evidence":"tests/captions_cli_contract.rs"},
-    {"id":"captions.get","status":"supported","evidence":"tests/captions_cli_contract.rs"},
-    {"id":"captions.edit","status":"supported","evidence":"tests/captions_cli_contract.rs: transactional add/set and UTF-16 range preservation"},
-    {"id":"captions.import","status":"supported","evidence":"tests/parity/scenarios/53-srt-options.json + tests/captions_cli_contract.rs: SRT and ASS"},
-    {"id":"captions.export","status":"supported","evidence":"tests/captions_cli_contract.rs: deterministic SRT and ASS"},
-    {"id":"captions.style","status":"supported","evidence":"tests/captions_cli_contract.rs: transactional base-style update"},
-    {"id":"captions.style_ranges","status":"supported","evidence":"captions_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream UTF-16/sort/gap/content differential"},
-    {"id":"captions.bubble","status":"supported","evidence":"captions_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream catalogue/raw/replacement differential"},
-    {"id":"captions.animation","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream dual-catalogue/duration/anchor/container differential"},
-    {"id":"captions.translate","status":"supported","evidence":"tests/captions_cli_contract.rs: offline mapping and no-shell structured provider"},
-    {"id":"captions.verify","status":"partial","evidence":"structural verification only"},
-    {"id":"template.library","status":"supported","evidence":"tests/template_cli_contract.rs: save/list/apply independent bundles"},
-    {"id":"template.preset","status":"supported","evidence":"tests/template_cli_contract.rs: schema validation and transactional application"},
-    {"id":"template.duplicate","status":"supported","evidence":"tests/template_cli_contract.rs + tests/ops_behavior.rs"},
-    {"id":"template.replace_text","status":"supported","evidence":"provenance/PYJYD_TEMPLATE_DIFFERENTIALS.json + tests/template_semantics_contract.rs: proportional UTF-16 style-range recalculation with explicit upstream difference"},
-    {"id":"template.replace_material","status":"supported","evidence":"provenance/PYJYD_TEMPLATE_DIFFERENTIALS.json + tests/template_cli_contract.rs: ordered shrink/extend policies, shared-material isolation and atomic failure"},
-    {"id":"template.import_track","status":"supported","evidence":"tests/template_cli_contract.rs + tests/ops_behavior.rs: recursive ID/reference closure remap, local asset ownership and source-deletion independence"},
-    {"id":"timeline.edit","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS"},
-    {"id":"timeline.show","status":"supported","evidence":"CAPCUT_TIMELINE_DIFFERENTIALS exact black-box"},
-    {"id":"timeline.duplicate","status":"supported","evidence":"CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream deep-clone differential"},
-    {"id":"timeline.remove","status":"supported","evidence":"CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream orphan-sweep differential"},
-    {"id":"timeline.matting","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream enable/disable differential"},
-    {"id":"timeline.chroma","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream material/reference differential"},
-    {"id":"timeline.mask","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream resource/geometry/field differential"},
-    {"id":"timeline.background_blur","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream canvas/reference differential"},
-    {"id":"timeline.volume","status":"supported","evidence":"exact black-box differential + transactional CLI"},
-    {"id":"timeline.track_mute","status":"partial","evidence":"tests/timeline_cli_contract.rs exact-track mute-bit mutation and draft readback; immutable v1.6.25 binary synthetic-draft 0→1→0 canary passed; native-editor playback canary pending"},
-    {"id":"timeline.audio_fade","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream prefix/conversion/replacement differential"},
-    {"id":"timeline.filter","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream catalogue/raw/full-range differential"},
-    {"id":"timeline.effect","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream catalogue/raw/params/bind/full-range differential"},
-    {"id":"timeline.crop","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream read/ratio/rect/reset/dry-run differential"},
-    {"id":"timeline.keyframe","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream alias/batch/easing/hold wire differential"},
-    {"id":"timeline.animation","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream starter/full dual-catalogue and intro/outro/combo wire differential"},
-    {"id":"timeline.quantization_report","status":"supported","evidence":"tests/domain_model_contract.rs + tests/timeline_cli_contract.rs: rational FPS, outward quantization, exact drift report and maximum-drift rejection"},
-    {"id":"timeline.transition","status":"supported","evidence":"timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream CapCut/JianYing catalogue/wire/reference differential"},
-    {"id":"render.proxy","status":"supported","evidence":"tests/render_batch_contract.rs + tests/ops_behavior.rs"},
-    {"id":"render.batch_proxy","status":"supported","evidence":"tests/render_batch_contract.rs: manifest preflight, containment and real ffmpeg outputs"},
-    {"id":"render.native","status":"external_dependency","evidence":"authorized persistent native-export task contract implemented; real JianYing adapter and host canary pending"},
-    {"id":"render.native_task","status":"partial","evidence":"crates/jianying-jobs/tests/native_export_task.rs + tests/runtime_cli_contract.rs approval-plan, queued/running/progress/verifying/succeeded CLI lifecycle and artifact drift rejection; real JianYing adapter pending"},
-    {"id":"runtime.status","status":"partial","evidence":"persistent profile/PID/start-time/SHA-256 owned-process CLI lifecycle + doctor process probe; live JianYing control pending"},
-    {"id":"runtime.discovery","status":"supported","evidence":"crates/jianying-runtime/tests/runtime_discovery.rs + tests/runtime_cli_contract.rs prove known-install scanning, executable identity, version extraction, orphan draft roots and automatic_routing=false"},
-    {"id":"runtime.entitlement_verify","status":"supported","evidence":"tests/edition_cli_contract.rs + schemas/jianying-entitlement-v1.schema.json: explicit edition, expiry, capability and no-secret evidence contract"},
-    {"id":"runtime.controls","status":"partial","evidence":"provenance/TIMELINE_CONTROLS.json + tests/runtime_cli_contract.rs: list/get/set/invoke, exact version matching, operation contracts and fail-closed state readback; native execution and exact-version host canary pending"},
-    {"id":"timeline.track_rename","status":"partial","evidence":"tests/timeline_cli_contract.rs transactional exact-id rename and dual-mirror readback; immutable v1.6.26 release binary synthetic-draft canary passed; native-editor canary pending"},
-    {"id":"runtime.acceptance_verify","status":"supported","evidence":"tests/runtime_acceptance_cli_contract.rs: released CLI/editor/draft/approval/source binding plus native output SHA-256, size, contact sheet, video/audio stream, duration and frame-rate recomputation; human review remains an explicit optional gate"},
-    {"id":"runtime.control_catalog","status":"supported","evidence":"provenance/TIMELINE_CONTROLS.json + provenance/TIMELINE_SURFACE_INVENTORY.json + tests/runtime_cli_contract.rs: stable semantic ids, 50 version-bound button/gesture surfaces, region counts, unresolved preservation, direct-route preference, filtering and coordinate exclusion"},
-    {"id":"runtime.profile","status":"partial","evidence":"jianying-runtime discovery plus profile/probe/identity fail-closed tests; live supported-profile canary pending"},
-    {"id":"runtime.profile.windows","status":"external_dependency","platform":"windows","availability":"unsupported","evidence":"no legally available validated Windows host/profile; automatic routing remains disabled"},
-    {"id":"runtime.edit_isolated","status":"partial","evidence":"jianying-runtime full-tree synthetic source/copy differential; live draft canary pending"},
-    {"id":"media.asr_provider","status":"partial","evidence":"concrete local whisper.cpp adapter, persistent ledger and CLI black-box are implemented; real reviewed-model/audio canary, cloud adapters and subtitle writeback remain pending"},
-    {"id":"media.asr_whisper_cpp","status":"supported","evidence":"crates/jianying-media/tests/whisper_cpp_asr_provider.rs + tests/asr_cli_contract.rs + provenance/ASR_PROTOCOL_SOURCES.json prove structured argv, executable/model identity, atomic output, plan zero-execution, reuse and explicit retry without bundling runtime or weights"},
-    {"id":"media.asr_ledger","status":"supported","evidence":"jianying-jobs/tests/asr_ledger.rs content/executor idempotency, approval, ambiguity and concurrency gates"},
-    {"id":"store.list","status":"supported","evidence":"tests/store_cli_contract.rs + tests/ops_behavior.rs"},
-    {"id":"store.register","status":"supported","evidence":"tests/store_cli_contract.rs + tests/integration.rs"},
-    {"id":"store.rename","status":"supported","evidence":"tests/store_cli_contract.rs: bundle and root registration remain aligned"},
-    {"id":"store.sync","status":"supported","evidence":"tests/store_cli_contract.rs: plan/apply, backup and newer-mirror guard"},
-    {"id":"store.backup","status":"supported","evidence":"tests/store_cli_contract.rs: independent validated bundle"},
-    {"id":"store.restore","status":"supported","evidence":"tests/store_cli_contract.rs + tests/agent_contract.rs: MutationPlan restore"},
-    {"id":"store.decrypt_detection","status":"supported","evidence":"tests/store_cli_contract.rs: plaintext/encrypted/corrupted classification; no decryptor"},
-    {"id":"store.directories","status":"supported","evidence":"tests/store_cli_contract.rs"},
-    {"id":"home.folder_lifecycle","status":"supported","evidence":"provenance/HOME_FOLDER_LIFECYCLE_ACCEPTANCE.json + tests/home_folder_cli_contract.rs: immutable v1.6.23 released binary passed exact-id list, running-editor byte-identical refusal, empty-leaf recycle/readback, two real JianYing 11.6.0-beta3 cold reopens, exact recycle-id restore and final-state readback; non-empty/child/mapped folders remain explicit fail-closed inputs"},
-    {"id":"home.folder_rename","status":"partial","evidence":"tests/home_folder_cli_contract.rs exact-id transaction, relationship preservation and post-commit readback; immutable release binary and real JianYing cold-reopen canary pending"},
-    {"id":"approvals","status":"supported","evidence":"crates/jianying-jobs/tests/approval_store.rs + tests/job_cli_contract.rs"},
-    {"id":"config","status":"supported","evidence":"crates/jianying-config/tests/config_store.rs + tests/config_cli_contract.rs"},
-    {"id":"mcp.serve","status":"supported","evidence":"tests/mcp_contract.rs: shared tools/list and tools/call handler semantics"},
-    {"id":"mcp.stdio","status":"supported","evidence":"tests/mcp_contract.rs: stdio initialize/notification/tools lifecycle"},
-    {"id":"mcp.streamable_http","status":"supported","evidence":"tests/mcp_contract.rs: official rmcp Streamable HTTP handshake and authorization"},
-    {"id":"mcp.sse_response","status":"supported","evidence":"tests/mcp_contract.rs: Streamable HTTP text/event-stream response profile"},
-    {"id":"mcp.job_lifecycle","status":"supported","evidence":"tests/mcp_contract.rs: stdio list/show/cancel/audit lifecycle through the shared SQLite JobStore"},
-    {"id":"mcp.command_list","status":"supported","evidence":"tests/mcp_command_bridge_contract.rs: tools/call returns the full command catalog (schema/total/commands) matching `jianying commands --json`"},
-    {"id":"mcp.command_run","status":"supported","evidence":"tests/mcp_command_bridge_contract.rs: arbitrary catalog path executed over stdio with the CLI envelope returned; unknown paths and nested `mcp *` refused"},
-    {"id":"mcp.command_batch","status":"supported","evidence":"tests/mcp_command_bridge_contract.rs: ordered steps with per-step results and stop_on_error"},
-    {"id":"mcp.inspect_tools","status":"supported","evidence":"tests/mcp_command_bridge_contract.rs: read-only jianying_draft_inspect / jianying_timeline_segments / jianying_media_probe / jianying_eval answered directly from library functions (no subprocess)"},
-    {"id":"resource.mine","status":"supported","evidence":"tests/resource_cli_contract.rs: plain drafts aggregate, Timelines mirrors skipped, draft-id de-duplication, BOM tolerated, encrypted drafts counted as drafts_encrypted"},
-    {"id":"resource.list","status":"supported","evidence":"tests/resource_cli_contract.rs: merged cross-source view with kind/query filters and limit"},
-    {"id":"resource.resolve","status":"supported","evidence":"tests/resource_cli_contract.rs: name/id substring resolution to effect_id/resource_id"},
-    {"id":"resource.import","status":"supported","evidence":"tests/resource_cli_contract.rs: external bundle merged as its own source"},
-    {"id":"resource.export","status":"supported","evidence":"tests/resource_cli_contract.rs: merged view written as jianying-resource-library/v1"},
-    {"id":"resource.apply","status":"supported","evidence":"tests/resource_cli_contract.rs: idempotent attach of text_shape/sticker/video_effect/audio_effect, ambiguous names rejected, filter/transition redirected to timeline commands"},
-    {"id":"timeline.audio_effect","status":"supported","evidence":"tests/timeline_cli_contract.rs: catalog audio effect attach onto audio segments, idempotent re-apply, unknown names rejected"},
-    {"id":"resource.no_network_fetch","status":"external_dependency","evidence":"docs/resource-library.md: JianYing material catalogs sit behind signed APIs; this CLI deliberately neither signs requests nor reads the runtime agent token"},
-    {"id":"eval","status":"supported","evidence":"tests/eval_loop_contract.rs: deterministic 0-100 score from draft JSON only (main coverage, continuity, caption/audio coverage) plus structured issues; eval is read-only"},
-    {"id":"loop","status":"supported","evidence":"tests/eval_loop_contract.rs: evaluate-repair-re-evaluate with a fixed safe-repair set (close-main-track-gaps, drop-empty-tracks, clamp-source-window, trim-quality-edges), max-rounds bound and explicit stopped reason"},
-    {"id":"loop.safe_repairs_only","status":"partial","evidence":"docs/vision/offline-intelligent-editing.md: repairs are limited to structural fixes that cannot change creative intent; content-level generation is not implemented"},
-    {"id":"eval.deep","status":"supported","evidence":"tests/eval_loop_contract.rs: opt-in media checks (media-missing, source-exceeds-media) with fixed penalties written into the report; shallow eval stays filesystem-free"},
-    {"id":"eval.quality","status":"supported","evidence":"tests/eval_loop_contract.rs: content-level checks on the source window - video-black (blackdetect, >=80%), audio-silent (>=95%), audio-mostly-silent (>=80%), audio-loudness (<-40 or >-5 LUFS) - with media_checked vs media_analysed reported separately"},
-    {"id":"loop.quality_repair","status":"supported","evidence":"tests/eval_loop_contract.rs: trim-quality-edges removes black lead-in/tail and silent edges while keeping the shot at its timeline position; middle-of-shot defects are reported but never auto-cut"},
-    {"id":"loop.track_coherence","status":"supported","evidence":"src/timeline_ops.rs: gap and quality repairs shift/trim every track by the same mapping, so subtitles and original audio stay aligned with the picture"},
-    {"id":"render.embedded_audio","status":"supported","evidence":"tests/render_audio_contract.rs: audio embedded in video materials is trimmed to the source window and mixed into the preview; silent video produces no audio stream"},
-    {"id":"render.frame","status":"supported","evidence":"tests/render_frame_contract.rs: render frame --at <tim> writes a real PNG at the draft canvas scale, also exposed as the MCP tool jianying_render_frame"},
-    {"id":"eval.embedded_audio","status":"supported","evidence":"src/eval_ops.rs: deep evaluation reports embedded_audio_segments so a silent-looking plan can be distinguished from a genuinely silent result"},
-    {"id":"skills","status":"supported","evidence":"tests/skills_contract.rs: 14 workflow skills with status/intent/commands/gap; every referenced command is checked against the live command catalog so the registry cannot drift"},
-    {"id":"skills.partial_and_missing","status":"partial","evidence":"src/skills.rs: platform-adapt and speaker-cut are partial, beat-sync and content-generation are missing with the gap recorded in-band"},
-    {"id":"plan.compose","status":"supported","evidence":"tests/plan_composition_contract.rs: deterministic sequential composition with canvas equality, video-first track ordering, duration sum and a build+verify round trip"},
-    {"id":"plan.append_revert","status":"supported","evidence":"tests/plan_composition_contract.rs: append shifts by the base duration, every write leaves a snapshot, revert restores the previous bytes exactly, and no output is written on failure"},
-    {"id":"generate","status":"supported","evidence":"tests/brief_generate_contract.rs: jianying-brief/v1 -> plan/v1 by deterministic assembly (platform canvas, target-duration cut, music track, BOM-tolerant SRT), short-of-target reported instead of padded"},
-    {"id":"generate.not_creative","status":"partial","evidence":"docs/vision/offline-intelligent-editing.md: generation is deterministic assembly from given media; shot selection, beat matching and script writing are not implemented"},
-    {"id":"pipeline","status":"supported","evidence":"tests/pipeline_contract.rs: per-plan build+eval+render with failure isolation, --fail-under CI gate and exit code 1 on any failed item"},
-    {"id":"pipeline.render_scope","status":"partial","evidence":"docs/vision/offline-intelligent-editing.md: pipeline renders through the ffmpeg proxy path, so transitions/effects/masks are not baked in"},
-    {"id":"pyjyd.api_coverage","status":"supported","evidence":"provenance/PYJYD_API_COVERAGE.json + tests/pyjyd_api_coverage_contract.rs: 68/68 classes accounted for, class-level uncovered=0, generated from the upstream ast inventory at the pinned commit"},
-    {"id":"pyjyd.api_gaps","status":"partial","evidence":"provenance/PYJYD_API_COVERAGE.json: 3 partial classes with 4 uncovered methods (DraftFolder.inspect_material, TextSegment.create_from_template, ImportedMediaTrack.check_material_type/process_timerange) and 6 out-of-scope controller classes"}
+    {
+      "id": "doctor",
+      "status": "supported",
+      "evidence": "tests/agent_contract.rs"
+    },
+    {
+      "id": "capabilities",
+      "status": "supported",
+      "evidence": "src/capabilities.rs + tests/agent_contract.rs"
+    },
+    {
+      "id": "schema.job_v2",
+      "status": "supported",
+      "evidence": "schemas/jianying-job-v2.schema.json + tests/job_v2_contract.rs + tests/job_cli_contract.rs"
+    },
+    {
+      "id": "schema.plan_v1_compat",
+      "status": "supported",
+      "evidence": "55 frozen scenarios in tests/job_v2_contract.rs + black-box equivalence in tests/job_cli_contract.rs"
+    },
+    {
+      "id": "schema.compile_v1_compat",
+      "status": "supported",
+      "evidence": "schemas/jianying-job-v2.schema.json + tests/compile_contract.rs"
+    },
+    {
+      "id": "protocol.pyjyd_wire",
+      "status": "supported",
+      "evidence": "provenance/PROTOCOL_DIFFERENTIALS.json + provenance/PARITY_RUN.json (55/55) + crates/jianying-draft/tests/edge_fixtures.rs"
+    },
+    {
+      "id": "project.create",
+      "status": "supported",
+      "evidence": "tests/agent_contract.rs"
+    },
+    {
+      "id": "project.edit_isolated",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: all eight Job v2 edit operations run on a new output copy with source-unchanged and failure-cleanup proof"
+    },
+    {
+      "id": "project.inspect",
+      "status": "supported",
+      "evidence": "tests/agent_contract.rs"
+    },
+    {
+      "id": "project.diagnose",
+      "status": "supported",
+      "evidence": "diagnose_contract + CAPCUT_UTILITY_DIFFERENTIALS canonical/divergence/bundle"
+    },
+    {
+      "id": "project.fixture",
+      "status": "supported",
+      "evidence": "fixture_contract + CAPCUT_UTILITY_DIFFERENTIALS sanitize/check/failure"
+    },
+    {
+      "id": "project.compile",
+      "status": "supported",
+      "evidence": "compile_contract + CAPCUT_UTILITY_DIFFERENTIALS preflight/nine-operations/jsonl/fail-fast"
+    },
+    {
+      "id": "project.export_timeline",
+      "status": "supported",
+      "evidence": "tests/interchange_contract.rs + provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json"
+    },
+    {
+      "id": "project.import_timeline",
+      "status": "supported",
+      "evidence": "tests/interchange_contract.rs + provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json"
+    },
+    {
+      "id": "project.prune",
+      "status": "supported",
+      "evidence": "tests/timeline_cli_contract.rs + provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "id": "project.cover",
+      "status": "supported",
+      "evidence": "tests/timeline_cli_contract.rs + provenance/CAPCUT_PROJECT_DIFFERENTIALS.json"
+    },
+    {
+      "id": "project.cut",
+      "status": "supported",
+      "evidence": "tests/timeline_cli_contract.rs + provenance/CAPCUT_PROJECT_DIFFERENTIALS.json fixed-upstream exact timeline"
+    },
+    {
+      "id": "project.verify",
+      "status": "supported",
+      "evidence": "tests/integration.rs"
+    },
+    {
+      "id": "job.run",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: single-document success/failure envelopes plus real create and isolated edit execution"
+    },
+    {
+      "id": "job.edit.replace_text",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: typed replace_text operation through root job run handler"
+    },
+    {
+      "id": "job.edit.move_segment",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: typed exact-range move_segment operation through root job run handler"
+    },
+    {
+      "id": "job.edit.remove_segment",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: typed remove_segment operation through root job run handler"
+    },
+    {
+      "id": "job.edit.add_material",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: local video/audio/image declarations resolve from the Job directory and fail atomically when missing, duplicated or unconsumed"
+    },
+    {
+      "id": "job.edit.add_segment",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: full typed video segment compiles through DraftProject with copied primary/companion resource closure and declared ID preservation"
+    },
+    {
+      "id": "job.edit.add_track",
+      "status": "supported",
+      "evidence": "tests/job_v2_contract.rs + tests/job_cli_contract.rs: closed schema, stable ID, typed placement and isolated execution"
+    },
+    {
+      "id": "job.edit.remove_track",
+      "status": "supported",
+      "evidence": "tests/job_v2_contract.rs + tests/job_cli_contract.rs: closed schema, orphan pruning and isolated execution"
+    },
+    {
+      "id": "job.edit.reorder_track",
+      "status": "supported",
+      "evidence": "tests/job_v2_contract.rs + tests/job_cli_contract.rs: closed schema and absolute-index isolated execution"
+    },
+    {
+      "id": "job.lifecycle",
+      "status": "supported",
+      "evidence": "crates/jianying-jobs/tests/backend_comparison.rs + tests/job_cli_contract.rs"
+    },
+    {
+      "id": "job.show",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs"
+    },
+    {
+      "id": "job.retry",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs"
+    },
+    {
+      "id": "job.audit",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs"
+    },
+    {
+      "id": "job.batch",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: atomic staged create batch"
+    },
+    {
+      "id": "job.serve",
+      "status": "supported",
+      "evidence": "tests/job_cli_contract.rs: JSON Lines stdio handler"
+    },
+    {
+      "id": "media.probe",
+      "status": "supported",
+      "evidence": "tests/agent_contract.rs"
+    },
+    {
+      "id": "media.catalogue",
+      "status": "supported",
+      "evidence": "tests/catalogs_guard.rs"
+    },
+    {
+      "id": "media.enums",
+      "status": "supported",
+      "evidence": "agent_contract + CAPCUT_UTILITY_DIFFERENTIALS 28 namespace/category cases"
+    },
+    {
+      "id": "media.harvest_enums",
+      "status": "supported",
+      "evidence": "harvest_enums_contract + CAPCUT_UTILITY_DIFFERENTIALS scan/add/sync plan/apply"
+    },
+    {
+      "id": "media.materials",
+      "status": "supported",
+      "evidence": "tests/material_discovery_contract.rs + provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json"
+    },
+    {
+      "id": "media.material",
+      "status": "supported",
+      "evidence": "tests/material_discovery_contract.rs + provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json"
+    },
+    {
+      "id": "media.add",
+      "status": "supported",
+      "evidence": "CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"
+    },
+    {
+      "id": "media.replace",
+      "status": "supported",
+      "evidence": "CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"
+    },
+    {
+      "id": "media.relink",
+      "status": "supported",
+      "evidence": "CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"
+    },
+    {
+      "id": "media.audio",
+      "status": "supported",
+      "evidence": "tests/media_mutation_contract.rs: probed add-audio, replace and relink transactions; tests/timeline_cli_contract.rs: volume and audio-fade"
+    },
+    {
+      "id": "media.analysis",
+      "status": "supported",
+      "evidence": "CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS + media_analysis_contract"
+    },
+    {
+      "id": "media.quality_evidence",
+      "status": "supported",
+      "evidence": "tests/media_evidence_contract.rs: content-bound keyframe, silence, loudness and peak black-box evidence"
+    },
+    {
+      "id": "media.tts_local",
+      "status": "supported",
+      "evidence": "media_mutation_contract: local-command/local-process/system Provider transaction plus non-loopback rejection; jianying-media local-http/EdgeTTS contracts"
+    },
+    {
+      "id": "media.tts_provider",
+      "status": "partial",
+      "evidence": "seven provider-specific HTTPS execution routes plus approval, ledger, atomic artifact, draft transaction, reuse, definite-failure and ambiguous loopback black-box tests; Volcengine uses the current V3 unidirectional SSE protocol with X-Api headers, ordered audio-frame concatenation and terminal-frame gating; authorized real-provider canaries remain pending"
+    },
+    {
+      "id": "media.sfx",
+      "status": "supported",
+      "evidence": "CAPCUT_MEDIA_MUTATION_DIFFERENTIALS + media_mutation_contract"
+    },
+    {
+      "id": "media.sticker",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream track/transform/material/companion differential"
+    },
+    {
+      "id": "media.official_resource",
+      "status": "supported",
+      "evidence": "tests/edition_cli_contract.rs + tests/entitlement_schema_contract.rs + crates/jianying-runtime/tests/edition_entitlements.rs: typed receipt verification, immutable identity, usage/edition gates, atomic register/list/show and multi-resource Job preflight"
+    },
+    {
+      "id": "media.official_resource_apply",
+      "status": "partial",
+      "evidence": "receipt and entitlement preflight implemented; version-bound JianYing acquisition/apply Adapter and real host canary pending"
+    },
+    {
+      "id": "captions.list",
+      "status": "supported",
+      "evidence": "tests/captions_cli_contract.rs"
+    },
+    {
+      "id": "captions.get",
+      "status": "supported",
+      "evidence": "tests/captions_cli_contract.rs"
+    },
+    {
+      "id": "captions.edit",
+      "status": "supported",
+      "evidence": "tests/captions_cli_contract.rs: transactional add/set and UTF-16 range preservation"
+    },
+    {
+      "id": "captions.import",
+      "status": "supported",
+      "evidence": "tests/parity/scenarios/53-srt-options.json + tests/captions_cli_contract.rs: SRT and ASS"
+    },
+    {
+      "id": "captions.export",
+      "status": "supported",
+      "evidence": "tests/captions_cli_contract.rs: deterministic SRT and ASS"
+    },
+    {
+      "id": "captions.style",
+      "status": "supported",
+      "evidence": "tests/captions_cli_contract.rs: transactional base-style update"
+    },
+    {
+      "id": "captions.style_ranges",
+      "status": "supported",
+      "evidence": "captions_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream UTF-16/sort/gap/content differential"
+    },
+    {
+      "id": "captions.bubble",
+      "status": "supported",
+      "evidence": "captions_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream catalogue/raw/replacement differential"
+    },
+    {
+      "id": "captions.animation",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream dual-catalogue/duration/anchor/container differential"
+    },
+    {
+      "id": "captions.translate",
+      "status": "supported",
+      "evidence": "tests/captions_cli_contract.rs: offline mapping and no-shell structured provider"
+    },
+    {
+      "id": "captions.verify",
+      "status": "partial",
+      "evidence": "structural verification only"
+    },
+    {
+      "id": "template.library",
+      "status": "supported",
+      "evidence": "tests/template_cli_contract.rs: save/list/apply independent bundles"
+    },
+    {
+      "id": "template.preset",
+      "status": "supported",
+      "evidence": "tests/template_cli_contract.rs: schema validation and transactional application"
+    },
+    {
+      "id": "template.duplicate",
+      "status": "supported",
+      "evidence": "tests/template_cli_contract.rs + tests/ops_behavior.rs"
+    },
+    {
+      "id": "template.replace_text",
+      "status": "supported",
+      "evidence": "provenance/PYJYD_TEMPLATE_DIFFERENTIALS.json + tests/template_semantics_contract.rs: proportional UTF-16 style-range recalculation with explicit upstream difference"
+    },
+    {
+      "id": "template.replace_material",
+      "status": "supported",
+      "evidence": "provenance/PYJYD_TEMPLATE_DIFFERENTIALS.json + tests/template_cli_contract.rs: ordered shrink/extend policies, shared-material isolation and atomic failure"
+    },
+    {
+      "id": "template.import_track",
+      "status": "supported",
+      "evidence": "tests/template_cli_contract.rs + tests/ops_behavior.rs: recursive ID/reference closure remap, local asset ownership and source-deletion independence"
+    },
+    {
+      "id": "template.clone_text",
+      "status": "supported",
+      "evidence": "tests/pyjyd_parity_contract.rs: clone-text copies a text segment's style into a new segment, recalculating UTF-16 style ranges so the draft stays valid"
+    },
+    {
+      "id": "template.import_track_guards",
+      "status": "supported",
+      "evidence": "tests/pyjyd_parity_contract.rs: import-track rejects a material that does not belong on the target track type and clamps a window that exceeds the real media duration"
+    },
+    {
+      "id": "timeline.edit",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS"
+    },
+    {
+      "id": "timeline.show",
+      "status": "supported",
+      "evidence": "CAPCUT_TIMELINE_DIFFERENTIALS exact black-box"
+    },
+    {
+      "id": "timeline.duplicate",
+      "status": "supported",
+      "evidence": "CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream deep-clone differential"
+    },
+    {
+      "id": "timeline.remove",
+      "status": "supported",
+      "evidence": "CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream orphan-sweep differential"
+    },
+    {
+      "id": "timeline.matting",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream enable/disable differential"
+    },
+    {
+      "id": "timeline.chroma",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream material/reference differential"
+    },
+    {
+      "id": "timeline.mask",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream resource/geometry/field differential"
+    },
+    {
+      "id": "timeline.background_blur",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream canvas/reference differential"
+    },
+    {
+      "id": "timeline.volume",
+      "status": "supported",
+      "evidence": "exact black-box differential + transactional CLI"
+    },
+    {
+      "id": "timeline.track_mute",
+      "status": "partial",
+      "evidence": "tests/timeline_cli_contract.rs exact-track mute-bit mutation and draft readback; immutable v1.6.25 binary synthetic-draft 0→1→0 canary passed; native-editor playback canary pending"
+    },
+    {
+      "id": "timeline.audio_fade",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream prefix/conversion/replacement differential"
+    },
+    {
+      "id": "timeline.filter",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream catalogue/raw/full-range differential"
+    },
+    {
+      "id": "timeline.effect",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream catalogue/raw/params/bind/full-range differential"
+    },
+    {
+      "id": "timeline.crop",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream read/ratio/rect/reset/dry-run differential"
+    },
+    {
+      "id": "timeline.keyframe",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream alias/batch/easing/hold wire differential"
+    },
+    {
+      "id": "timeline.animation",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream starter/full dual-catalogue and intro/outro/combo wire differential"
+    },
+    {
+      "id": "timeline.quantization_report",
+      "status": "supported",
+      "evidence": "tests/domain_model_contract.rs + tests/timeline_cli_contract.rs: rational FPS, outward quantization, exact drift report and maximum-drift rejection"
+    },
+    {
+      "id": "timeline.transition",
+      "status": "supported",
+      "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS fixed-upstream CapCut/JianYing catalogue/wire/reference differential"
+    },
+    {
+      "id": "render.proxy",
+      "status": "supported",
+      "evidence": "tests/render_batch_contract.rs + tests/ops_behavior.rs"
+    },
+    {
+      "id": "render.batch_proxy",
+      "status": "supported",
+      "evidence": "tests/render_batch_contract.rs: manifest preflight, containment and real ffmpeg outputs"
+    },
+    {
+      "id": "render.native",
+      "status": "external_dependency",
+      "evidence": "authorized persistent native-export task contract implemented; real JianYing adapter and host canary pending"
+    },
+    {
+      "id": "render.native_task",
+      "status": "partial",
+      "evidence": "crates/jianying-jobs/tests/native_export_task.rs + tests/runtime_cli_contract.rs approval-plan, queued/running/progress/verifying/succeeded CLI lifecycle and artifact drift rejection; real JianYing adapter pending"
+    },
+    {
+      "id": "runtime.status",
+      "status": "partial",
+      "evidence": "persistent profile/PID/start-time/SHA-256 owned-process CLI lifecycle + doctor process probe; live JianYing control pending"
+    },
+    {
+      "id": "runtime.discovery",
+      "status": "supported",
+      "evidence": "crates/jianying-runtime/tests/runtime_discovery.rs + tests/runtime_cli_contract.rs prove known-install scanning, executable identity, version extraction, orphan draft roots and automatic_routing=false"
+    },
+    {
+      "id": "runtime.entitlement_verify",
+      "status": "supported",
+      "evidence": "tests/edition_cli_contract.rs + schemas/jianying-entitlement-v1.schema.json: explicit edition, expiry, capability and no-secret evidence contract"
+    },
+    {
+      "id": "runtime.controls",
+      "status": "partial",
+      "evidence": "provenance/TIMELINE_CONTROLS.json + tests/runtime_cli_contract.rs: list/get/set/invoke, exact version matching, operation contracts and fail-closed state readback; native execution and exact-version host canary pending"
+    },
+    {
+      "id": "timeline.track_rename",
+      "status": "partial",
+      "evidence": "tests/timeline_cli_contract.rs transactional exact-id rename and dual-mirror readback; immutable v1.6.26 release binary synthetic-draft canary passed; native-editor canary pending"
+    },
+    {
+      "id": "runtime.acceptance_verify",
+      "status": "supported",
+      "evidence": "tests/runtime_acceptance_cli_contract.rs: released CLI/editor/draft/approval/source binding plus native output SHA-256, size, contact sheet, video/audio stream, duration and frame-rate recomputation; human review remains an explicit optional gate"
+    },
+    {
+      "id": "runtime.control_catalog",
+      "status": "supported",
+      "evidence": "provenance/TIMELINE_CONTROLS.json + provenance/TIMELINE_SURFACE_INVENTORY.json + tests/runtime_cli_contract.rs: stable semantic ids, 50 version-bound button/gesture surfaces, region counts, unresolved preservation, direct-route preference, filtering and coordinate exclusion"
+    },
+    {
+      "id": "runtime.profile",
+      "status": "partial",
+      "evidence": "jianying-runtime discovery plus profile/probe/identity fail-closed tests; live supported-profile canary pending"
+    },
+    {
+      "id": "runtime.profile.windows",
+      "status": "external_dependency",
+      "platform": "windows",
+      "availability": "unsupported",
+      "evidence": "no legally available validated Windows host/profile; automatic routing remains disabled"
+    },
+    {
+      "id": "runtime.edit_isolated",
+      "status": "partial",
+      "evidence": "jianying-runtime full-tree synthetic source/copy differential; live draft canary pending"
+    },
+    {
+      "id": "media.asr_provider",
+      "status": "partial",
+      "evidence": "concrete local whisper.cpp adapter, persistent ledger and CLI black-box are implemented; real reviewed-model/audio canary, cloud adapters and subtitle writeback remain pending"
+    },
+    {
+      "id": "media.asr_whisper_cpp",
+      "status": "supported",
+      "evidence": "crates/jianying-media/tests/whisper_cpp_asr_provider.rs + tests/asr_cli_contract.rs + provenance/ASR_PROTOCOL_SOURCES.json prove structured argv, executable/model identity, atomic output, plan zero-execution, reuse and explicit retry without bundling runtime or weights"
+    },
+    {
+      "id": "media.asr_ledger",
+      "status": "supported",
+      "evidence": "jianying-jobs/tests/asr_ledger.rs content/executor idempotency, approval, ambiguity and concurrency gates"
+    },
+    {
+      "id": "store.list",
+      "status": "supported",
+      "evidence": "tests/store_cli_contract.rs + tests/ops_behavior.rs"
+    },
+    {
+      "id": "store.register",
+      "status": "supported",
+      "evidence": "tests/store_cli_contract.rs + tests/integration.rs"
+    },
+    {
+      "id": "store.rename",
+      "status": "supported",
+      "evidence": "tests/store_cli_contract.rs: bundle and root registration remain aligned"
+    },
+    {
+      "id": "store.sync",
+      "status": "supported",
+      "evidence": "tests/store_cli_contract.rs: plan/apply, backup and newer-mirror guard"
+    },
+    {
+      "id": "store.backup",
+      "status": "supported",
+      "evidence": "tests/store_cli_contract.rs: independent validated bundle"
+    },
+    {
+      "id": "store.restore",
+      "status": "supported",
+      "evidence": "tests/store_cli_contract.rs + tests/agent_contract.rs: MutationPlan restore"
+    },
+    {
+      "id": "store.decrypt_detection",
+      "status": "supported",
+      "evidence": "tests/store_cli_contract.rs: plaintext/encrypted/corrupted classification; no decryptor"
+    },
+    {
+      "id": "store.directories",
+      "status": "supported",
+      "evidence": "tests/store_cli_contract.rs"
+    },
+    {
+      "id": "home.folder_lifecycle",
+      "status": "supported",
+      "evidence": "provenance/HOME_FOLDER_LIFECYCLE_ACCEPTANCE.json + tests/home_folder_cli_contract.rs: immutable v1.6.23 released binary passed exact-id list, running-editor byte-identical refusal, empty-leaf recycle/readback, two real JianYing 11.6.0-beta3 cold reopens, exact recycle-id restore and final-state readback; non-empty/child/mapped folders remain explicit fail-closed inputs"
+    },
+    {
+      "id": "home.folder_rename",
+      "status": "partial",
+      "evidence": "tests/home_folder_cli_contract.rs exact-id transaction, relationship preservation and post-commit readback; immutable release binary and real JianYing cold-reopen canary pending"
+    },
+    {
+      "id": "approvals",
+      "status": "supported",
+      "evidence": "crates/jianying-jobs/tests/approval_store.rs + tests/job_cli_contract.rs"
+    },
+    {
+      "id": "config",
+      "status": "supported",
+      "evidence": "crates/jianying-config/tests/config_store.rs + tests/config_cli_contract.rs"
+    },
+    {
+      "id": "mcp.serve",
+      "status": "supported",
+      "evidence": "tests/mcp_contract.rs: shared tools/list and tools/call handler semantics"
+    },
+    {
+      "id": "mcp.stdio",
+      "status": "supported",
+      "evidence": "tests/mcp_contract.rs: stdio initialize/notification/tools lifecycle"
+    },
+    {
+      "id": "mcp.streamable_http",
+      "status": "supported",
+      "evidence": "tests/mcp_contract.rs: official rmcp Streamable HTTP handshake and authorization"
+    },
+    {
+      "id": "mcp.sse_response",
+      "status": "supported",
+      "evidence": "tests/mcp_contract.rs: Streamable HTTP text/event-stream response profile"
+    },
+    {
+      "id": "mcp.job_lifecycle",
+      "status": "supported",
+      "evidence": "tests/mcp_contract.rs: stdio list/show/cancel/audit lifecycle through the shared SQLite JobStore"
+    },
+    {
+      "id": "mcp.command_list",
+      "status": "supported",
+      "evidence": "tests/mcp_command_bridge_contract.rs: tools/call returns the full command catalog (schema/total/commands) matching `jianying commands --json`"
+    },
+    {
+      "id": "mcp.command_run",
+      "status": "supported",
+      "evidence": "tests/mcp_command_bridge_contract.rs: arbitrary catalog path executed over stdio with the CLI envelope returned; unknown paths and nested `mcp *` refused"
+    },
+    {
+      "id": "mcp.command_batch",
+      "status": "supported",
+      "evidence": "tests/mcp_command_bridge_contract.rs: ordered steps with per-step results and stop_on_error"
+    },
+    {
+      "id": "mcp.inspect_tools",
+      "status": "supported",
+      "evidence": "tests/mcp_command_bridge_contract.rs: read-only jianying_draft_inspect / jianying_timeline_segments / jianying_media_probe / jianying_eval answered directly from library functions (no subprocess)"
+    },
+    {
+      "id": "resource.mine",
+      "status": "supported",
+      "evidence": "tests/resource_cli_contract.rs: plain drafts aggregate, Timelines mirrors skipped, draft-id de-duplication, BOM tolerated, encrypted drafts counted as drafts_encrypted"
+    },
+    {
+      "id": "resource.list",
+      "status": "supported",
+      "evidence": "tests/resource_cli_contract.rs: merged cross-source view with kind/query filters and limit"
+    },
+    {
+      "id": "resource.resolve",
+      "status": "supported",
+      "evidence": "tests/resource_cli_contract.rs: name/id substring resolution to effect_id/resource_id"
+    },
+    {
+      "id": "resource.import",
+      "status": "supported",
+      "evidence": "tests/resource_cli_contract.rs: external bundle merged as its own source"
+    },
+    {
+      "id": "resource.export",
+      "status": "supported",
+      "evidence": "tests/resource_cli_contract.rs: merged view written as jianying-resource-library/v1"
+    },
+    {
+      "id": "resource.apply",
+      "status": "supported",
+      "evidence": "tests/resource_cli_contract.rs: idempotent attach of text_shape/sticker/video_effect/audio_effect, ambiguous names rejected, filter/transition redirected to timeline commands"
+    },
+    {
+      "id": "timeline.audio_effect",
+      "status": "supported",
+      "evidence": "tests/timeline_cli_contract.rs: catalog audio effect attach onto audio segments, idempotent re-apply, unknown names rejected"
+    },
+    {
+      "id": "resource.no_network_fetch",
+      "status": "external_dependency",
+      "evidence": "docs/resource-library.md: JianYing material catalogs sit behind signed APIs; this CLI deliberately neither signs requests nor reads the runtime agent token"
+    },
+    {
+      "id": "eval",
+      "status": "supported",
+      "evidence": "tests/eval_loop_contract.rs: deterministic 0-100 score from draft JSON only (main coverage, continuity, caption/audio coverage) plus structured issues; eval is read-only"
+    },
+    {
+      "id": "loop",
+      "status": "supported",
+      "evidence": "tests/eval_loop_contract.rs: evaluate-repair-re-evaluate with a fixed safe-repair set (close-main-track-gaps, drop-empty-tracks, clamp-source-window, trim-quality-edges), max-rounds bound and explicit stopped reason"
+    },
+    {
+      "id": "loop.safe_repairs_only",
+      "status": "partial",
+      "evidence": "docs/vision/offline-intelligent-editing.md: repairs are limited to structural fixes that cannot change creative intent; content-level generation is not implemented"
+    },
+    {
+      "id": "eval.deep",
+      "status": "supported",
+      "evidence": "tests/eval_loop_contract.rs: opt-in media checks (media-missing, source-exceeds-media) with fixed penalties written into the report; shallow eval stays filesystem-free"
+    },
+    {
+      "id": "eval.quality",
+      "status": "supported",
+      "evidence": "tests/eval_loop_contract.rs: content-level checks on the source window - video-black (blackdetect, >=80%), audio-silent (>=95%), audio-mostly-silent (>=80%), audio-loudness (<-40 or >-5 LUFS) - with media_checked vs media_analysed reported separately"
+    },
+    {
+      "id": "loop.quality_repair",
+      "status": "supported",
+      "evidence": "tests/eval_loop_contract.rs: trim-quality-edges removes black lead-in/tail and silent edges while keeping the shot at its timeline position; middle-of-shot defects are reported but never auto-cut"
+    },
+    {
+      "id": "loop.track_coherence",
+      "status": "supported",
+      "evidence": "src/timeline_ops.rs: gap and quality repairs shift/trim every track by the same mapping, so subtitles and original audio stay aligned with the picture"
+    },
+    {
+      "id": "render.embedded_audio",
+      "status": "supported",
+      "evidence": "tests/render_audio_contract.rs: audio embedded in video materials is trimmed to the source window and mixed into the preview; silent video produces no audio stream"
+    },
+    {
+      "id": "render.frame",
+      "status": "supported",
+      "evidence": "tests/render_frame_contract.rs: render frame --at <tim> writes a real PNG at the draft canvas scale, also exposed as the MCP tool jianying_render_frame"
+    },
+    {
+      "id": "eval.embedded_audio",
+      "status": "supported",
+      "evidence": "src/eval_ops.rs: deep evaluation reports embedded_audio_segments so a silent-looking plan can be distinguished from a genuinely silent result"
+    },
+    {
+      "id": "skills",
+      "status": "supported",
+      "evidence": "tests/skills_contract.rs: 14 workflow skills with status/intent/commands/gap; every referenced command is checked against the live command catalog so the registry cannot drift"
+    },
+    {
+      "id": "skills.partial_and_missing",
+      "status": "partial",
+      "evidence": "src/skills.rs: platform-adapt and speaker-cut are partial, beat-sync and content-generation are missing with the gap recorded in-band"
+    },
+    {
+      "id": "plan.compose",
+      "status": "supported",
+      "evidence": "tests/plan_composition_contract.rs: deterministic sequential composition with canvas equality, video-first track ordering, duration sum and a build+verify round trip"
+    },
+    {
+      "id": "plan.append_revert",
+      "status": "supported",
+      "evidence": "tests/plan_composition_contract.rs: append shifts by the base duration, every write leaves a snapshot, revert restores the previous bytes exactly, and no output is written on failure"
+    },
+    {
+      "id": "generate",
+      "status": "supported",
+      "evidence": "tests/brief_generate_contract.rs: jianying-brief/v1 -> plan/v1 by deterministic assembly (platform canvas, target-duration cut, music track, BOM-tolerant SRT), short-of-target reported instead of padded"
+    },
+    {
+      "id": "generate.not_creative",
+      "status": "partial",
+      "evidence": "docs/vision/offline-intelligent-editing.md: generation is deterministic assembly from given media; shot selection, beat matching and script writing are not implemented"
+    },
+    {
+      "id": "pipeline",
+      "status": "supported",
+      "evidence": "tests/pipeline_contract.rs: per-plan build+eval+render with failure isolation, --fail-under CI gate and exit code 1 on any failed item"
+    },
+    {
+      "id": "pipeline.render_scope",
+      "status": "partial",
+      "evidence": "docs/vision/offline-intelligent-editing.md: pipeline renders through the ffmpeg proxy path, so transitions/effects/masks are not baked in"
+    },
+    {
+      "id": "pyjyd.api_coverage",
+      "status": "supported",
+      "evidence": "provenance/PYJYD_API_COVERAGE.json + tests/pyjyd_api_coverage_contract.rs: 68/68 classes accounted for, class-level uncovered=0, generated from the upstream ast inventory at the pinned commit"
+    },
+    {
+      "id": "pyjyd.api_gaps",
+      "status": "partial",
+      "evidence": "provenance/PYJYD_API_COVERAGE.json: 3 partial classes with 4 uncovered methods (DraftFolder.inspect_material, TextSegment.create_from_template, ImportedMediaTrack.check_material_type/process_timerange) and 6 out-of-scope controller classes"
+    }
   ],
   "truth_rule": "Only status=supported may be advertised as available; partial and external_dependency remain blocked for automatic routing."
 }

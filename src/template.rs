@@ -767,6 +767,62 @@ pub fn import_track_at(
         let new_track_id = hex_id();
         new_track["id"] = json!(&new_track_id);
         remap_known_ids(&mut new_track, &id_map)?;
+        // check_material_type：素材类型必须能落在目标轨道上，否则拒绝导入，
+        // 而不是产出一条剪映打不开的轨道。
+        let track_kind = new_track["type"].as_str().unwrap_or_default().to_owned();
+        let allowed: &[&str] = match track_kind.as_str() {
+            "video" => &["videos"],
+            "audio" => &["audios"],
+            "text" => &["texts"],
+            "sticker" => &["stickers"],
+            "filter" => &["filters"],
+            "effect" => &["effects"],
+            _ => &[],
+        };
+        // 片段里的 material_id 已经过 id_map 重映射，查源素材要先翻回旧 id。
+        let reverse: std::collections::BTreeMap<&String, &String> =
+            id_map.iter().map(|(old, new)| (new, old)).collect();
+        for segment in new_track["segments"].as_array_mut().context("segments")? {
+            let material_id = segment["material_id"]
+                .as_str()
+                .unwrap_or_default()
+                .to_owned();
+            let Some(old_id) = reverse.get(&material_id) else {
+                continue;
+            };
+            let Some((bucket, material)) = source_materials.get(*old_id) else {
+                continue;
+            };
+            if !allowed.is_empty() && !allowed.contains(&bucket.as_str()) {
+                bail!(
+                    "material {material_id} is a {bucket} material and cannot be imported onto a {track_kind} track"
+                );
+            }
+            // process_timerange：把不可能的源窗口收窄到素材真实时长，
+            // 目标时长按速度换算，避免导入后播放到不存在的画面。
+            if let Some(material_duration) = material["duration"].as_i64().filter(|d| *d > 0) {
+                let start = segment["source_timerange"]["start"]
+                    .as_i64()
+                    .unwrap_or(0)
+                    .max(0);
+                let length = segment["source_timerange"]["duration"]
+                    .as_i64()
+                    .unwrap_or(0);
+                if start + length > material_duration {
+                    let available = (material_duration - start).max(0);
+                    if available <= 0 {
+                        bail!(
+                            "segment on {track_kind} track starts past the end of material {material_id}"
+                        );
+                    }
+                    let speed = segment["speed"].as_f64().unwrap_or(1.0).max(0.01);
+                    segment["source_timerange"]["duration"] = json!(available);
+                    segment["target_timerange"]["duration"] = json!(
+                        crate::writer::scaled_source_duration(available, 1.0 / speed)
+                    );
+                }
+            }
+        }
         for segment in new_track["segments"].as_array_mut().context("segments")? {
             segment["id"] = json!(hex_id());
             if segment.get("raw_segment_id").is_some() {
@@ -998,4 +1054,96 @@ pub fn build_on_template(
         .unwrap_or(0);
     base["duration"] = json!(duration);
     Ok(())
+}
+
+/// create_from_template 等价：以某个已有文本段为模板，克隆样式并新建一段文本。
+///
+/// 只复制文本素材（样式）与片段位置；`extra_material_refs`（花字/动画等）
+/// 保持引用同一批样式素材，符合剪映复用语义。
+pub fn clone_text(draft_dir: &Path, segment_id: &str, text: &str, start_us: i64) -> Result<Value> {
+    if start_us < 0 {
+        bail!("start must be >= 0");
+    }
+    crate::timeline_ops::mutate_with_path(draft_dir, |draft, _work, _identity| {
+        // 先只做只读定位，避免同时持有 tracks 的可变借用。
+        let (track_index, segment_index, track_name) = draft["tracks"]
+            .as_array()
+            .context("tracks must be an array")?
+            .iter()
+            .enumerate()
+            .find_map(|(ti, track)| {
+                if track["type"] != "text" {
+                    return None;
+                }
+                let si = track["segments"].as_array()?.iter().position(|segment| {
+                    segment["id"]
+                        .as_str()
+                        .map(|id| id.starts_with(segment_id))
+                        .unwrap_or(false)
+                })?;
+                Some((ti, si, track["name"].clone()))
+            })
+            .ok_or_else(|| anyhow::anyhow!("text segment {segment_id} not found"))?;
+
+        let template = draft["tracks"][track_index]["segments"][segment_index].clone();
+        let template_material_id = template["material_id"]
+            .as_str()
+            .ok_or_else(|| anyhow::anyhow!("template segment has no material_id"))?
+            .to_owned();
+        let duration = template["target_timerange"]["duration"]
+            .as_i64()
+            .unwrap_or(0);
+
+        let template_material = draft["materials"]["texts"]
+            .as_array()
+            .context("materials.texts must be an array")?
+            .iter()
+            .find(|material| material["id"] == json!(&template_material_id))
+            .ok_or_else(|| anyhow::anyhow!("text material {template_material_id} not found"))?
+            .clone();
+
+        let mut material = template_material;
+        let new_material_id = hex_id();
+        material["id"] = json!(&new_material_id);
+        // content 是内嵌 JSON 字符串：换掉 text，保留全部样式
+        if let Some(raw) = material["content"].as_str() {
+            let mut content: Value = serde_json::from_str(raw).with_context(|| {
+                format!("text material {template_material_id} content is not JSON")
+            })?;
+            // 样式 range 是按旧文本的 UTF-16 长度算的；换字后必须按比例重算，
+            // 否则草稿会带着越界 range 被一致性校验拒绝（pyJYD 同样会重算）。
+            let old_text = content["text"].as_str().unwrap_or_default().to_owned();
+            if let Some(styles) = content["styles"].as_array_mut() {
+                crate::text_style_range::recalculate_style_ranges(styles, &old_text, text)?;
+            }
+            content["text"] = json!(text);
+            material["content"] = json!(content.to_string());
+        }
+        draft["materials"]["texts"]
+            .as_array_mut()
+            .context("materials.texts must be an array")?
+            .push(material);
+
+        let mut segment = template;
+        let new_segment_id = hex_id();
+        segment["id"] = json!(&new_segment_id);
+        segment["material_id"] = json!(&new_material_id);
+        segment["target_timerange"]["start"] = json!(start_us);
+        let segments = draft["tracks"][track_index]["segments"]
+            .as_array_mut()
+            .context("segments must be an array")?;
+        segments.push(segment);
+        segments.sort_by_key(|segment| segment["target_timerange"]["start"].as_i64().unwrap_or(0));
+
+        Ok(json!({
+            "ok": true,
+            "segment_id": new_segment_id,
+            "material_id": new_material_id,
+            "template_segment": segment_id,
+            "text": text,
+            "start_us": start_us,
+            "duration_us": duration,
+            "track": track_name,
+        }))
+    })
 }
