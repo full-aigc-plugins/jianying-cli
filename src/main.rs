@@ -2224,11 +2224,16 @@ enum StoreOp {
 /// 发布包操作子命令。
 #[derive(Subcommand)]
 enum ReleaseOp {
-    /// 校验发布包目录：逐文件复核 sha256 与大小
+    /// 校验发布包目录：逐文件复核 sha256 与大小，并比对能力契约
     Verify {
-        /// 发布包目录（含 release-manifest.json）
+        /// 发布包目录（含 manifest.json）
         bundle: PathBuf,
+        /// 指定用于自报能力的二进制；省略时用包内的 jianying(.exe)
+        #[arg(long)]
+        binary: Option<PathBuf>,
     },
+    /// 打印单个文件的 sha256 与大小（核对制品用）
+    Hash { file: PathBuf },
 }
 
 /// 计划编排子命令。
@@ -4108,7 +4113,10 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             },
         },
         Command::Release { op } => match op {
-            ReleaseOp::Verify { bundle } => print_output(release_ops::verify(&bundle)?, json),
+            ReleaseOp::Verify { bundle, binary } => {
+                print_output(release_ops::verify(&bundle, binary.as_deref())?, json)
+            }
+            ReleaseOp::Hash { file } => print_output(release_ops::hash_file(&file)?, json),
         },
         Command::Generate { brief, out, force } => {
             print_output(brief_ops::generate(&brief, &out, force)?, json)

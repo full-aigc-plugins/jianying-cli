@@ -98,3 +98,109 @@ fn verify_reports_a_missing_file_and_rejects_unknown_manifest_schema() {
     assert!(String::from_utf8_lossy(&bad.stdout).contains("unsupported manifest schema"));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn hash_matches_the_known_empty_file_vector() {
+    let root = temp_bundle("hash");
+    fs::write(root.join("empty.bin"), "").unwrap();
+    let report = run_ok(&[
+        "release",
+        "hash",
+        &root.join("empty.bin").to_string_lossy(),
+        "--json",
+    ]);
+    assert_eq!(report["sha256"], json!(EMPTY_SHA256));
+    assert_eq!(report["size"], json!(0));
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn capability_drift_between_the_binary_and_the_bundle_is_detected() {
+    let root = temp_bundle("caps");
+    let binary = std::path::PathBuf::from(env!("CARGO_BIN_EXE_jianying"));
+    let caps_dir = root.join("provenance");
+    fs::create_dir_all(&caps_dir).unwrap();
+
+    // 用二进制自报能力生成包内清单，二者此时应当一致
+    let output = Command::new(&binary)
+        .args(["capabilities", "--json"])
+        .output()
+        .unwrap();
+    let envelope: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let mut declared = envelope["data"].clone();
+    fs::write(
+        caps_dir.join("CAPABILITIES.json"),
+        serde_json::to_string_pretty(&declared).unwrap(),
+    )
+    .unwrap();
+
+    let write_manifest = |declared: &Value| {
+        let hash = run_ok(&[
+            "release",
+            "hash",
+            &caps_dir.join("CAPABILITIES.json").to_string_lossy(),
+            "--json",
+        ]);
+        let manifest = json!({
+            "schema": "jianying-cli-release/v1",
+            "version": "9.9.9",
+            "platform": "win32-x64",
+            "files": [
+                {"path": "provenance/CAPABILITIES.json",
+                 "sha256": hash["sha256"], "size": hash["size"]}
+            ]
+        });
+        let _ = declared;
+        fs::write(
+            root.join("manifest.json"),
+            serde_json::to_string_pretty(&manifest).unwrap(),
+        )
+        .unwrap();
+    };
+
+    write_manifest(&declared);
+    let report = run_ok(&[
+        "release",
+        "verify",
+        &root.to_string_lossy(),
+        "--binary",
+        &binary.to_string_lossy(),
+        "--json",
+    ]);
+    assert_eq!(report["ok"], json!(true), "{report}");
+    assert_eq!(report["capabilities"]["ok"], json!(true));
+    assert_eq!(
+        report["capabilities"]["declared_entries"],
+        report["capabilities"]["embedded_entries"]
+    );
+
+    // 改一个能力状态：哈希重算后文件本身是"完整"的，但契约漂移必须被发现
+    let caps = declared["capabilities"].as_array_mut().unwrap();
+    let target = caps
+        .iter_mut()
+        .find(|item| item["status"] == json!("supported"))
+        .expect("至少有一个 supported 能力");
+    target["status"] = json!("partial");
+    fs::write(
+        caps_dir.join("CAPABILITIES.json"),
+        serde_json::to_string_pretty(&declared).unwrap(),
+    )
+    .unwrap();
+    write_manifest(&declared);
+    let output = run(&[
+        "release",
+        "verify",
+        &root.to_string_lossy(),
+        "--binary",
+        &binary.to_string_lossy(),
+        "--json",
+    ]);
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["data"]["ok"], json!(false), "契约漂移必须判失败");
+    assert_eq!(report["data"]["capabilities"]["ok"], json!(false));
+    assert!(!report["data"]["capabilities"]["mismatches"]
+        .as_array()
+        .unwrap()
+        .is_empty());
+    let _ = fs::remove_dir_all(root);
+}

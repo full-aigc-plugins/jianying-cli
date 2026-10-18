@@ -8,8 +8,125 @@ use anyhow::{bail, Context, Result};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
+/// 计算单个文件的 sha256 与大小，供人工核对或测试构造清单。
+pub fn hash_file(path: &Path) -> Result<Value> {
+    let bytes = std::fs::read(path).with_context(|| format!("cannot read {}", path.display()))?;
+    Ok(json!({
+        "path": path.to_string_lossy(),
+        "sha256": sha256_hex(&bytes),
+        "size": bytes.len(),
+    }))
+}
+
+/// 比对包内能力清单与二进制自报能力，防止二者漂移。
+///
+/// 二进制缺失或无法执行时返回 `ok: null`（不判失败，兼容旧包）；一旦能读出来，
+/// 就必须完全一致：schema、版本、身份三元组与逐项能力状态。
+fn capability_check(bundle_dir: &Path, binary: Option<&Path>) -> Value {
+    let declared_path = bundle_dir.join("provenance").join("CAPABILITIES.json");
+    let declared = match std::fs::read_to_string(&declared_path)
+        .ok()
+        .and_then(|raw| serde_json::from_str::<Value>(raw.trim_start_matches('\u{feff}')).ok())
+    {
+        Some(value) => value,
+        None => return json!({"ok": null, "reason": "capabilities-manifest-missing"}),
+    };
+    let binary = match binary {
+        Some(path) if path.is_file() => path.to_path_buf(),
+        _ => {
+            let exe = if cfg!(windows) {
+                "jianying.exe"
+            } else {
+                "jianying"
+            };
+            let candidate = bundle_dir.join(exe);
+            if candidate.is_file() {
+                candidate
+            } else {
+                return json!({"ok": null, "reason": "binary-missing"});
+            }
+        }
+    };
+    let output = match std::process::Command::new(&binary)
+        .args(["capabilities", "--json"])
+        .output()
+    {
+        Ok(output) if output.status.success() => output,
+        _ => return json!({"ok": null, "reason": "binary-did-not-answer"}),
+    };
+    let embedded = match serde_json::from_slice::<Value>(&output.stdout)
+        .ok()
+        .and_then(|envelope| envelope.get("data").cloned())
+    {
+        Some(data) => data,
+        None => return json!({"ok": null, "reason": "binary-capabilities-unparsable"}),
+    };
+
+    let mut mismatches: Vec<Value> = Vec::new();
+    for field in [
+        "schema",
+        "cli_version",
+        "contract_state",
+        "release_ref",
+        "source_commit",
+    ] {
+        if declared.get(field) != embedded.get(field) {
+            mismatches.push(json!({
+                "field": field,
+                "declared": declared.get(field),
+                "embedded": embedded.get(field),
+            }));
+        }
+    }
+    fn status_of(list: &[Value]) -> std::collections::BTreeMap<String, String> {
+        list.iter()
+            .filter_map(|item| {
+                Some((
+                    item["id"].as_str()?.to_owned(),
+                    item["status"].as_str().unwrap_or("?").to_owned(),
+                ))
+            })
+            .collect()
+    }
+    let declared_status = status_of(
+        declared["capabilities"]
+            .as_array()
+            .map(Vec::as_slice)
+            .unwrap_or(&[]),
+    );
+    let embedded_status = status_of(
+        embedded["capabilities"]
+            .as_array()
+            .map(Vec::as_slice)
+            .unwrap_or(&[]),
+    );
+    for (id, status) in &declared_status {
+        match embedded_status.get(id) {
+            Some(other) if other == status => {}
+            Some(other) => mismatches.push(json!({
+                "capability": id, "declared": status, "embedded": other
+            })),
+            None => {
+                mismatches.push(json!({"capability": id, "declared": status, "embedded": null}))
+            }
+        }
+    }
+    for (id, status) in &embedded_status {
+        if !declared_status.contains_key(id) {
+            mismatches.push(json!({"capability": id, "declared": null, "embedded": status}));
+        }
+    }
+    json!({
+        "ok": mismatches.is_empty(),
+        "binary": binary.to_string_lossy(),
+        "declared_entries": declared_status.len(),
+        "embedded_entries": embedded_status.len(),
+        "mismatches": mismatches,
+    })
+}
+
 /// 校验发布包目录，返回逐文件结果。
-pub fn verify(bundle_dir: &Path) -> Result<Value> {
+pub fn verify(bundle_dir: &Path, binary: Option<&Path>) -> Result<Value> {
     let manifest_path = bundle_dir.join("manifest.json");
     let raw = std::fs::read_to_string(&manifest_path)
         .with_context(|| format!("cannot read {}", manifest_path.display()))?;
@@ -65,8 +182,10 @@ pub fn verify(bundle_dir: &Path) -> Result<Value> {
         .iter()
         .filter(|item| item["ok"] != json!(true))
         .collect();
+    let capabilities = capability_check(bundle_dir, binary);
     Ok(json!({
-        "ok": failed.is_empty(),
+        "ok": failed.is_empty() && capabilities["ok"] != json!(false),
+        "capabilities": capabilities,
         "bundle": bundle_dir.to_string_lossy(),
         "version": manifest["version"].clone(),
         "platform": manifest["platform"].clone(),

@@ -61,6 +61,11 @@ jianying release verify <bundle-dir> --json
 Rust 实现，逐文件复核 `manifest.json` 里的 sha256 与大小；任何改动都会被报出来
 （`files_failed > 0`，退出码 1）。这也是给最终用户的自检通道。
 
+它还会比对**能力契约**：用包内二进制执行 `capabilities --json`，把自报能力与
+`provenance/CAPABILITIES.json` 逐项对照（schema、版本、身份三元组、每个能力的
+status）。任何漂移都会让 `ok=false` 并在 `capabilities.mismatches` 里给出具体项。
+二进制缺失时该项为 `ok:null`（不判失败，兼容不含二进制的旧包）。
+
 ## 5. 发布（需要显式授权）
 
 以下动作**必须**由人确认后才执行：

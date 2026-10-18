@@ -359,7 +359,7 @@
     {
       "id": "release.verify",
       "status": "supported",
-      "evidence": "tests/release_verify_contract.rs: offline manifest verification (sha256 + size per file) using a Rust SHA-256, so a shipped binary can audit its own release bundle without Python"
+      "evidence": "tests/release_verify_contract.rs: offline manifest verification (sha256 + size per file) with an in-tree SHA-256, plus a capability-contract comparison against the shipped binary's self-reported capabilities so the bundle and binary cannot drift"
     },
     {
       "id": "timeline.edit",
