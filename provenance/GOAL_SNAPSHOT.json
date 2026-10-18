@@ -1,0 +1,92 @@
+{
+  "schema": "jianying-goal-snapshot/v1",
+  "generated_at": "2026-10-18T12:37:02+00:00",
+  "git": {
+    "commit": "0f35682313c42ba661c388d24c1a43d4a11cfa55",
+    "branch": "feature/REQ-20261017-jianying-coverage-300",
+    "dirty": false
+  },
+  "selftest": {
+    "ok": true,
+    "summary": {
+      "total": 7,
+      "pass": 7,
+      "fail": 0,
+      "skip": 0
+    },
+    "checks": [
+      {
+        "id": "capabilities",
+        "status": "pass",
+        "elapsed_ms": 11
+      },
+      {
+        "id": "skills",
+        "status": "pass",
+        "elapsed_ms": 3
+      },
+      {
+        "id": "mcp",
+        "status": "pass",
+        "elapsed_ms": 1
+      },
+      {
+        "id": "plan",
+        "status": "pass",
+        "elapsed_ms": 48
+      },
+      {
+        "id": "draft",
+        "status": "pass",
+        "elapsed_ms": 17
+      },
+      {
+        "id": "media",
+        "status": "pass",
+        "elapsed_ms": 443
+      },
+      {
+        "id": "render",
+        "status": "pass",
+        "elapsed_ms": 396
+      }
+    ]
+  },
+  "surface": {
+    "commands": 203,
+    "capabilities": 170,
+    "capabilities_supported": 150,
+    "skills": 14
+  },
+  "coverage": {
+    "pyjyd": {
+      "classes": 68,
+      "by_status": {
+        "covered": 62,
+        "out_of_scope": 6
+      },
+      "uncovered_classes": [],
+      "methods": 90,
+      "methods_by_status": {
+        "covered": 85,
+        "out_of_scope": 5
+      }
+    },
+    "editor_skill": {
+      "methods": 13,
+      "scripts": 14,
+      "by_status": {
+        "covered": 17,
+        "out_of_scope": 8,
+        "partial": 3
+      }
+    }
+  },
+  "claims": {
+    "no_client_editing": "selftest covers draft build, deep eval and ffmpeg render without the JianYing client",
+    "dream_loop": "eval/loop share one policy-driven implementation (CLI + MCP)",
+    "hypit_plan": "plan compose/append/history/revert with byte-exact rollback",
+    "pyjyd_replacement": "runtime has no Python dependency; API surface is mapped in provenance/PYJYD_API_COVERAGE.json",
+    "editor_skill": "provenance/EDITOR_SKILL_COVERAGE.json maps every advertised API/script"
+  }
+}
