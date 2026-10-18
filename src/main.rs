@@ -5859,9 +5859,11 @@ fn machine_command_catalog() -> Result<serde_json::Value> {
             .unwrap_or_default()
             .cmp(right["path"].as_str().unwrap_or_default())
     });
+    let total = commands.len();
     Ok(serde_json::json!({
         "schema": "jianying-command-catalog/v1",
         "cli_version": env!("CARGO_PKG_VERSION"),
+        "total": total,
         "global_options": {
             "type": "object",
             "additionalProperties": false,

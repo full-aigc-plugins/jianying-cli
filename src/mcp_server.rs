@@ -143,6 +143,9 @@ impl JianyingMcpServer {
                 let task_id = required_string(&arguments, "task_id")?;
                 job_runner::audit_persisted(task_id, &self.state_root)
             }
+            "jianying_command_list" => command_list(),
+            "jianying_command_run" => command_run(&arguments),
+            "jianying_command_batch" => command_batch(&arguments),
             _ => Err(anyhow!("unknown tool {name}")),
         }
     }
@@ -295,6 +298,149 @@ fn rmcp_tools() -> Vec<Tool> {
         .filter_map(|descriptor| serde_json::to_value(descriptor).ok())
         .filter_map(|value| serde_json::from_value(value).ok())
         .collect()
+}
+
+/// 当前 CLI 可执行文件；`command_*` 工具通过它复用同一套 handler。
+fn cli_binary() -> Result<PathBuf> {
+    std::env::current_exe().map_err(|error| anyhow!("cannot resolve current executable: {error}"))
+}
+
+/// 机器可读命令目录里的全部路径，进程内缓存一次。
+fn catalog_paths() -> Result<&'static std::collections::BTreeSet<String>> {
+    static PATHS: std::sync::OnceLock<std::collections::BTreeSet<String>> =
+        std::sync::OnceLock::new();
+    if let Some(paths) = PATHS.get() {
+        return Ok(paths);
+    }
+    let output = std::process::Command::new(cli_binary()?)
+        .args(["commands", "--json"])
+        .output()
+        .map_err(|error| anyhow!("cannot run `commands --json`: {error}"))?;
+    if !output.status.success() {
+        bail!("`commands --json` failed with {}", output.status);
+    }
+    let envelope: Value = serde_json::from_slice(&output.stdout)
+        .map_err(|error| anyhow!("`commands --json` is not JSON: {error}"))?;
+    let paths = envelope["data"]["commands"]
+        .as_array()
+        .ok_or_else(|| anyhow!("command catalog is missing data.commands"))?
+        .iter()
+        .filter_map(|entry| entry["path"].as_str().map(str::to_owned))
+        .collect();
+    Ok(PATHS.get_or_init(|| paths))
+}
+
+fn command_list() -> Result<Value> {
+    let output = std::process::Command::new(cli_binary()?)
+        .args(["commands", "--json"])
+        .output()
+        .map_err(|error| anyhow!("cannot run `commands --json`: {error}"))?;
+    if !output.status.success() {
+        bail!("`commands --json` failed with {}", output.status);
+    }
+    let envelope: Value = serde_json::from_slice(&output.stdout)?;
+    Ok(envelope["data"].clone())
+}
+
+/// 执行一条 CLI 命令。只接受命令目录里存在的路径，避免把 MCP 变成任意进程通道。
+fn command_run(arguments: &Value) -> Result<Value> {
+    let path = arguments
+        .get("path")
+        .and_then(Value::as_str)
+        .ok_or_else(|| anyhow!("path is required"))?;
+    let extra: Vec<String> = arguments
+        .get("args")
+        .and_then(Value::as_array)
+        .map(|items| {
+            items
+                .iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default();
+    run_one(path, &extra)
+}
+
+fn run_one(path: &str, extra: &[String]) -> Result<Value> {
+    let paths = catalog_paths()?;
+    if !paths.contains(path) {
+        bail!("unknown command path {path:?}; call jianying_command_list to discover paths");
+    }
+    if path == "mcp serve" || path.starts_with("mcp ") {
+        bail!("refusing to nest an MCP server inside command_run");
+    }
+    let mut command = std::process::Command::new(cli_binary()?);
+    command.args(path.split_whitespace());
+    command.args(extra);
+    if !extra.iter().any(|arg| arg == "--json") {
+        command.arg("--json");
+    }
+    let output = command
+        .output()
+        .map_err(|error| anyhow!("cannot run {path}: {error}"))?;
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let response: Value = serde_json::from_str(&stdout).unwrap_or(Value::Null);
+    Ok(serde_json::json!({
+        "ok": output.status.success(),
+        "path": path,
+        "args": extra,
+        "exit_code": output.status.code(),
+        "response": response,
+        "stderr": String::from_utf8_lossy(&output.stderr).trim(),
+    }))
+}
+
+fn command_batch(arguments: &Value) -> Result<Value> {
+    let steps = arguments
+        .get("steps")
+        .and_then(Value::as_array)
+        .ok_or_else(|| anyhow!("steps is required"))?;
+    if steps.is_empty() {
+        bail!("steps must not be empty");
+    }
+    let stop_on_error = arguments
+        .get("stop_on_error")
+        .and_then(Value::as_bool)
+        .unwrap_or(true);
+    let mut results = Vec::new();
+    let mut succeeded = 0_u64;
+    let mut failed = 0_u64;
+    for (index, step) in steps.iter().enumerate() {
+        let path = step
+            .get("path")
+            .and_then(Value::as_str)
+            .ok_or_else(|| anyhow!("steps[{index}].path is required"))?;
+        let extra: Vec<String> = step
+            .get("args")
+            .and_then(Value::as_array)
+            .map(|items| {
+                items
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_owned)
+                    .collect()
+            })
+            .unwrap_or_default();
+        let result = run_one(path, &extra)?;
+        let ok = result["ok"].as_bool().unwrap_or(false);
+        if ok {
+            succeeded += 1;
+        } else {
+            failed += 1;
+        }
+        results.push(result);
+        if !ok && stop_on_error {
+            break;
+        }
+    }
+    Ok(serde_json::json!({
+        "ok": failed == 0,
+        "total": steps.len(),
+        "succeeded": succeeded,
+        "failed": failed,
+        "steps": results,
+    }))
 }
 
 fn required_path(arguments: &Value, field: &str) -> Result<PathBuf> {

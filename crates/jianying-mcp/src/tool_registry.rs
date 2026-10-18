@@ -73,6 +73,62 @@ impl ToolRegistry {
                 envelope_schema(),
                 true,
             ),
+            ToolDescriptor::new(
+                "jianying_command_list",
+                "列出全部 CLI 命令路径与参数（与 `jianying commands --json` 同源），用于在 MCP 内发现能力",
+                serde_json::json!({"type":"object","additionalProperties":false}),
+                serde_json::json!({
+                    "type":"object","required":["schema","total","commands"],
+                    "properties":{"schema":{"type":"string"},"total":{"type":"integer"},"commands":{"type":"array"}}
+                }),
+                true,
+            ),
+            ToolDescriptor::new(
+                "jianying_command_run",
+                "按命令路径执行任意 jianying CLI 命令并返回其 JSON envelope（覆盖全部剪映功能）",
+                serde_json::json!({
+                    "type":"object","required":["path"],"additionalProperties":false,
+                    "properties":{
+                        "path":{"type":"string","minLength":1,"description":"命令路径，例如 `project build`"},
+                        "args":{"type":"array","items":{"type":"string"},"description":"附加参数（不含 --json）"}
+                    }
+                }),
+                serde_json::json!({
+                    "type":"object","required":["ok","path","exit_code","response"],
+                    "properties":{
+                        "ok":{"type":"boolean"},"path":{"type":"string"},
+                        "args":{"type":"array"},"exit_code":{"type":["integer","null"]},
+                        "response":{},"stderr":{"type":"string"}
+                    }
+                }),
+                false,
+            ),
+            ToolDescriptor::new(
+                "jianying_command_batch",
+                "按顺序执行多条命令，逐条返回结果；默认遇错即停",
+                serde_json::json!({
+                    "type":"object","required":["steps"],"additionalProperties":false,
+                    "properties":{
+                        "steps":{"type":"array","minItems":1,"items":{
+                            "type":"object","required":["path"],"additionalProperties":false,
+                            "properties":{
+                                "path":{"type":"string","minLength":1},
+                                "args":{"type":"array","items":{"type":"string"}}
+                            }
+                        }},
+                        "stop_on_error":{"type":"boolean","default":true}
+                    }
+                }),
+                serde_json::json!({
+                    "type":"object","required":["ok","total","succeeded","failed","steps"],
+                    "properties":{
+                        "ok":{"type":"boolean"},"total":{"type":"integer"},
+                        "succeeded":{"type":"integer"},"failed":{"type":"integer"},
+                        "steps":{"type":"array"}
+                    }
+                }),
+                false,
+            ),
         ];
         let tools = descriptors
             .into_iter()
