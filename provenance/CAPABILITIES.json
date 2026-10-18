@@ -789,6 +789,11 @@
       "evidence": "tests/brief_generate_contract.rs: a tail shot shorter than min_shot_us merges into the previous same-source shot, preserving total duration and reporting merged-short-tail"
     },
     {
+      "id": "generate.round_robin",
+      "status": "supported",
+      "evidence": "tests/brief_generate_contract.rs: shot_order=round-robin rotates through sources (a,b,c,a,b,c) while the default keeps the flat sequential order (a,a,a,b,b,b)"
+    },
+    {
       "id": "generate.not_creative",
       "status": "partial",
       "evidence": "docs/vision/offline-intelligent-editing.md: generation is deterministic assembly from given media; shot selection, beat matching and script writing are not implemented"

@@ -316,3 +316,66 @@ fn min_shot_us_merges_a_short_tail_and_says_so() {
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn round_robin_shot_order_rotates_sources() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("round-robin");
+    for name in ["a", "b", "c"] {
+        clip(&root.join(format!("{name}.mp4")), 3);
+    }
+    let build = |order: Value| -> (Value, Vec<String>) {
+        let brief_path = brief(
+            &root,
+            json!({
+                "schema":"jianying-brief/v1","name":"rr","platform":"bilibili",
+                "target_duration_us":6_000_000,"max_shot_us":1_000_000,
+                "shot_order": order, "media":["a.mp4","b.mp4","c.mp4"]
+            }),
+        );
+        let out = root.join(format!(
+            "plan-{}.json",
+            order.as_str().unwrap_or("sequential")
+        ));
+        let report = run_ok(&[
+            "generate",
+            &brief_path.to_string_lossy(),
+            "--out",
+            &out.to_string_lossy(),
+            "--json",
+        ]);
+        let plan: Value = serde_json::from_str(&fs::read_to_string(&out).unwrap()).unwrap();
+        let sources = plan["tracks"][0]["segments"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|segment| {
+                Path::new(segment["source"].as_str().unwrap())
+                    .file_stem()
+                    .unwrap()
+                    .to_string_lossy()
+                    .into_owned()
+            })
+            .collect();
+        (report, sources)
+    };
+
+    let (sequential_report, sequential) = build(json!("sequential"));
+    assert_eq!(sequential_report["shots"], json!(6));
+    assert_eq!(
+        sequential,
+        vec!["a", "a", "a", "b", "b", "b"],
+        "默认按列表吃到饱"
+    );
+
+    let (round_robin_report, round_robin) = build(json!("round-robin"));
+    assert_eq!(round_robin_report["shots"], json!(6));
+    assert_eq!(
+        round_robin,
+        vec!["a", "b", "c", "a", "b", "c"],
+        "轮换应逐个素材取用"
+    );
+    let _ = fs::remove_dir_all(root);
+}

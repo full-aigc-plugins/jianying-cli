@@ -22,7 +22,6 @@ struct Media {
     path: PathBuf,
     duration_us: i64,
     is_image: bool,
-    has_audio: bool,
 }
 
 /// 按简报生成一份计划，返回报告。
@@ -103,7 +102,6 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
                 path,
                 duration_us: if info.is_image { 0 } else { info.duration_us },
                 is_image: info.is_image,
-                has_audio: info.has_audio,
             }),
             Ok(_) => warnings.push(format!("skipped {}: no video stream", path.display())),
             Err(error) => warnings.push(format!("skipped {}: {error:#}", path.display())),
@@ -115,59 +113,99 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
 
     // 装配：按顺序取素材，直到达到目标时长；最后一段按剩余时长裁剪。
     let mut segments: Vec<Value> = Vec::new();
-    let mut original_audio: Vec<Value> = Vec::new();
-    let keep_original_audio = brief["keep_original_audio"].as_bool().unwrap_or(true);
-    // `max_shot_us` 给了就把同一段素材切成多个镜头（源窗口连续前移），
-    // 这是"整段素材铺满"与"真的剪辑"之间最小的一步。
     let max_shot_us = brief["max_shot_us"].as_i64().filter(|value| *value > 0);
-    let mut cursor = 0_i64;
-    for item in &media {
-        if cursor >= target_us {
-            break;
-        }
-        let mut available = if item.is_image {
-            target_us - cursor
-        } else {
-            item.duration_us.max(0)
-        };
-        let mut source_offset = 0_i64;
-        while available > 0 && cursor < target_us {
-            let remaining = target_us - cursor;
-            let mut take = available.min(remaining);
-            if let Some(limit) = max_shot_us {
-                take = take.min(limit);
+    // 取用顺序：sequential 按列表吃到饱；round-robin 逐个素材轮流取，
+    // 避免"第一个素材占满全片"这种一眼假的装配结果。
+    let round_robin = brief["shot_order"].as_str() == Some("round-robin");
+    let mut plan: Vec<(usize, i64, i64)> = Vec::new(); // (素材下标, 源偏移, 取用时长)
+    if round_robin {
+        let mut cursors: Vec<(i64, i64)> = media
+            .iter()
+            .map(|item| {
+                let available = if item.is_image {
+                    target_us
+                } else {
+                    item.duration_us.max(0)
+                };
+                (0, available)
+            })
+            .collect();
+        let mut cursor = 0_i64;
+        let mut progressed = true;
+        while cursor < target_us && progressed {
+            progressed = false;
+            for (index, item) in media.iter().enumerate() {
+                if cursor >= target_us {
+                    break;
+                }
+                let (source_offset, available) = cursors[index];
+                if available <= 0 {
+                    continue;
+                }
+                let remaining = target_us - cursor;
+                let mut take = available.min(remaining);
+                if let Some(limit) = max_shot_us {
+                    take = take.min(limit);
+                }
+                if take <= 0 {
+                    continue;
+                }
+                plan.push((index, source_offset, take));
+                // 图片没有剩余素材，用一张就耗尽。
+                let consumed = if item.is_image { available } else { take };
+                cursors[index] = (source_offset + take, available - consumed);
+                cursor += take;
+                progressed = true;
             }
-            if take <= 0 {
+        }
+    } else {
+        let mut cursor = 0_i64;
+        for (index, item) in media.iter().enumerate() {
+            if cursor >= target_us {
                 break;
             }
-            let mut segment = json!({
-                "start_us": cursor,
-                "duration_us": take,
-                "source": relative_or_absolute(base, &item.path),
-            });
-            if source_offset > 0 {
-                segment["source_start_us"] = json!(source_offset);
-            }
-            if item.is_image {
-                segment["photo"] = json!(true);
-            }
-            segments.push(segment);
-            if keep_original_audio && item.has_audio && !item.is_image {
-                original_audio.push(json!({
-                    "start_us": cursor,
-                    "duration_us": take,
-                    "source": relative_or_absolute(base, &item.path),
-                    "source_start_us": source_offset,
-                }));
-            }
-            cursor += take;
-            source_offset += take;
-            available -= take;
-            if item.is_image {
-                // 图片没有"剩余素材"，切完一段即可。
-                available = 0;
+            let mut available = if item.is_image {
+                target_us - cursor
+            } else {
+                item.duration_us.max(0)
+            };
+            let mut source_offset = 0_i64;
+            while available > 0 && cursor < target_us {
+                let remaining = target_us - cursor;
+                let mut take = available.min(remaining);
+                if let Some(limit) = max_shot_us {
+                    take = take.min(limit);
+                }
+                if take <= 0 {
+                    break;
+                }
+                plan.push((index, source_offset, take));
+                cursor += take;
+                source_offset += take;
+                available -= take;
+                if item.is_image {
+                    available = 0;
+                }
             }
         }
+    }
+
+    let mut cursor = 0_i64;
+    for (index, source_offset, take) in &plan {
+        let item = &media[*index];
+        let mut segment = json!({
+            "start_us": cursor,
+            "duration_us": take,
+            "source": relative_or_absolute(base, &item.path),
+        });
+        if *source_offset > 0 {
+            segment["source_start_us"] = json!(source_offset);
+        }
+        if item.is_image {
+            segment["photo"] = json!(true);
+        }
+        segments.push(segment);
+        cursor += take;
     }
     // min_shot_us：过短的收尾镜头并入同源的前一个镜头，避免切出碎片；
     // 上限因此可能被略微突破（下限关乎可用性，上限只是节奏偏好），合并后给出提示。
@@ -210,7 +248,6 @@ pub fn generate(brief_path: &Path, out: &Path, force: bool) -> Result<Value> {
     let mut tracks = vec![json!({"type": "video", "name": "main", "segments": segments})];
     // 画面自带的音轨由代理渲染直接混入，这里不再重复落一条 audio 轨，
     // 避免同一段声音被混两遍、也避免计划里出现与画面重复的时间线。
-    let _ = &original_audio;
 
     // 背景音乐：从 0 起铺到成片时长（可短于成片）。
     if let Some(music) = brief["music"].as_str() {

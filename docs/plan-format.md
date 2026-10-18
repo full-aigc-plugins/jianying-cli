@@ -51,3 +51,19 @@
 与 `max_shot_us` 配对使用：收尾镜头若短于 `min_shot_us`，会被并入**同一素材**的前一个镜头
 （总时长不变）。合并可能让该镜头略超 `max_shot_us`，此时报告里会出现
 `merged-short-tail` 提示——下限关乎可用性，上限只是节奏偏好。
+
+### `shot_order`
+
+| 值 | 行为 |
+|---|---|
+| `sequential`（默认） | 按 `media` 顺序，前一个素材吃到饱再换下一个 |
+| `round-robin` | 每个镜头换下一个素材，轮流取用 |
+
+三段 3s 素材、目标 6s、单镜头上限 1s：
+
+```
+sequential  : a,a,a,b,b,b
+round-robin : a,b,c,a,b,c
+```
+
+单一素材的长片容易"一眼假"，多素材简报建议用 `round-robin`。
