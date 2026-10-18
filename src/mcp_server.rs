@@ -143,6 +143,32 @@ impl JianyingMcpServer {
                 let task_id = required_string(&arguments, "task_id")?;
                 job_runner::audit_persisted(task_id, &self.state_root)
             }
+            "jianying_draft_inspect" => {
+                let draft = required_path(&arguments, "draft")?;
+                crate::draft::inspect(&draft)
+            }
+            "jianying_timeline_segments" => {
+                let draft = required_path(&arguments, "draft")?;
+                let track = arguments.get("track").and_then(Value::as_str);
+                crate::timeline_ops::segments(&draft, track)
+            }
+            "jianying_media_probe" => {
+                let path = required_path(&arguments, "path")?;
+                let info = crate::probe::probe(&path)?;
+                serde_json::to_value(info).map_err(Into::into)
+            }
+            "jianying_eval" => {
+                let draft = required_path(&arguments, "draft")?;
+                let deep = arguments
+                    .get("deep")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false);
+                if deep {
+                    crate::eval_ops::evaluate_deep(&draft)
+                } else {
+                    crate::eval_ops::evaluate(&draft)
+                }
+            }
             "jianying_command_list" => command_list(),
             "jianying_command_run" => command_run(&arguments),
             "jianying_command_batch" => command_batch(&arguments),

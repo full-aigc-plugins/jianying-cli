@@ -74,6 +74,52 @@ impl ToolRegistry {
                 true,
             ),
             ToolDescriptor::new(
+                "jianying_draft_inspect",
+                "读取草稿摘要（轨道/段数/画布/时长），等价 `project inspect`",
+                serde_json::json!({
+                    "type":"object","required":["draft"],"additionalProperties":false,
+                    "properties":{"draft":{"type":"string","minLength":1}}
+                }),
+                envelope_schema(),
+                true,
+            ),
+            ToolDescriptor::new(
+                "jianying_timeline_segments",
+                "列出草稿片段，可按轨道类型过滤，等价 `timeline segments`",
+                serde_json::json!({
+                    "type":"object","required":["draft"],"additionalProperties":false,
+                    "properties":{
+                        "draft":{"type":"string","minLength":1},
+                        "track":{"type":"string","description":"video/audio/text/sticker/filter/effect"}
+                    }
+                }),
+                envelope_schema(),
+                true,
+            ),
+            ToolDescriptor::new(
+                "jianying_media_probe",
+                "探测媒体时长/分辨率/流/是否图片，等价 `media probe`",
+                serde_json::json!({
+                    "type":"object","required":["path"],"additionalProperties":false,
+                    "properties":{"path":{"type":"string","minLength":1}}
+                }),
+                envelope_schema(),
+                true,
+            ),
+            ToolDescriptor::new(
+                "jianying_eval",
+                "给草稿打分（0-100）并列出结构化问题，deep=true 时检查素材与画音质量",
+                serde_json::json!({
+                    "type":"object","required":["draft"],"additionalProperties":false,
+                    "properties":{
+                        "draft":{"type":"string","minLength":1},
+                        "deep":{"type":"boolean","default":false}
+                    }
+                }),
+                envelope_schema(),
+                true,
+            ),
+            ToolDescriptor::new(
                 "jianying_command_list",
                 "列出全部 CLI 命令路径与参数（与 `jianying commands --json` 同源），用于在 MCP 内发现能力",
                 serde_json::json!({"type":"object","additionalProperties":false}),

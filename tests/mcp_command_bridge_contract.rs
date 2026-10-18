@@ -189,3 +189,86 @@ fn command_list_matches_the_cli_catalog() {
     assert!(total >= 40, "命令目录过小: {total}");
     assert_eq!(data["commands"].as_array().unwrap().len() as i64, total);
 }
+
+#[test]
+fn inspect_tools_answer_read_only_questions_about_a_draft() {
+    let root = temp_root("inspect");
+    let plan = plan_file(&root);
+    let draft = root.join("draft");
+    // 先用命令桥建出草稿，再用检视工具读它
+    session(&[
+        initialize(),
+        call(
+            2,
+            "jianying_command_run",
+            json!({"path":"project build","args":[plan.to_string_lossy(), "--out", draft.to_string_lossy()]}),
+        ),
+    ]);
+
+    let responses = session(&[
+        initialize(),
+        json!({"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}),
+        call(
+            3,
+            "jianying_draft_inspect",
+            json!({"draft": draft.to_string_lossy()}),
+        ),
+        call(
+            4,
+            "jianying_timeline_segments",
+            json!({"draft": draft.to_string_lossy(), "track":"text"}),
+        ),
+        call(
+            5,
+            "jianying_eval",
+            json!({"draft": draft.to_string_lossy()}),
+        ),
+    ]);
+
+    let tools: Vec<String> = responses
+        .iter()
+        .find(|response| response["id"] == json!(2))
+        .unwrap()["result"]["tools"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|tool| tool["name"].as_str().unwrap().to_owned())
+        .collect();
+    for expected in [
+        "jianying_draft_inspect",
+        "jianying_timeline_segments",
+        "jianying_media_probe",
+        "jianying_eval",
+    ] {
+        assert!(tools.contains(&expected.to_owned()), "缺少工具 {expected}");
+    }
+
+    let inspect = tool_data(
+        responses
+            .iter()
+            .find(|response| response["id"] == json!(3))
+            .unwrap(),
+    );
+    assert_eq!(inspect["name"], json!("mcp-bridge"));
+    assert_eq!(inspect["duration_us"], json!(1_000_000));
+
+    let segments = tool_data(
+        responses
+            .iter()
+            .find(|response| response["id"] == json!(4))
+            .unwrap(),
+    );
+    assert_eq!(segments.as_array().unwrap().len(), 1);
+    assert_eq!(segments[0]["type"], json!("text"));
+    assert_eq!(segments[0]["duration_us"], json!(1_000_000));
+
+    let score = tool_data(
+        responses
+            .iter()
+            .find(|response| response["id"] == json!(5))
+            .unwrap(),
+    );
+    assert!(score["score"].as_i64().unwrap() >= 0);
+    assert!(score["issues"].is_array());
+    let _ = std::fs::remove_dir_all(root);
+}

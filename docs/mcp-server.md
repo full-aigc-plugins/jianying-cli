@@ -82,6 +82,15 @@ GET endpoint event + 独立 POST endpoint）；官方规范建议新实现使用
   这是覆盖"剪映全部功能"的主通道。
 - `jianying_command_batch`：顺序执行多条命令，逐条返回结果，默认遇错即停。
 
+只读检视工具（直接调用库函数，不起子进程）：
+
+- `jianying_draft_inspect`：草稿摘要（名称/时长/画布/fps/平台），等价 `project inspect`。
+- `jianying_timeline_segments`：片段列表，可用 `track` 过滤（video/audio/text/…）。
+- `jianying_media_probe`：探测媒体时长/分辨率/流/是否图片。
+- `jianying_eval`：草稿评分 0–100 + 结构化问题；`deep=true` 时含素材可用性与画音质量检查。
+
+这四个工具解决的是"Agent 要读结果"的问题：不必拼 `command_run` 的参数，也能拿到稳定的结构化回答。
+
 ## 命令桥（`jianying_command_run` / `_batch` / `_list`）
 
 ```jsonc
