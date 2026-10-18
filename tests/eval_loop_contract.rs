@@ -217,3 +217,31 @@ fn empty_tracks_are_dropped_by_the_loop_and_loop_stops_when_nothing_is_safe() {
     assert_eq!(again["stopped"], json!("clean"));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn caption_and_audio_coverage_participate_in_the_score() {
+    let root = temp_root("coverage");
+    let plan: Plan = serde_json::from_value(json!({
+        "schema":"jianying-cli-plan/v1","name":"coverage",
+        "canvas":{"width":320,"height":180,"fps":30},
+        "tracks":[
+            {"type":"video","segments":[
+                {"start_us":0,"duration_us":2000000,"source":"clip.mp4"}
+            ]},
+            {"type":"text","segments":[
+                {"start_us":0,"duration_us":1000000,"text":"半程字幕"}
+            ]}
+        ]
+    }))
+    .unwrap();
+    let dir = root.join("draft");
+    draft::build(&plan, &root, &dir, None, &probe_stub).unwrap();
+
+    let report = run_ok(&["eval", &dir.to_string_lossy(), "--json"]);
+    // 字幕只覆盖一半时长：出现该维度，且拉低总分
+    assert_eq!(report["caption_coverage_permille"], json!(500));
+    assert!(report["score"].as_i64().unwrap() < 100, "report={report}");
+    // 没有音轨时不参与评分，不应因此扣分
+    assert_eq!(report["audio_coverage_permille"], Value::Null);
+    let _ = fs::remove_dir_all(root);
+}
