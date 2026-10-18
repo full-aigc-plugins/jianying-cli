@@ -208,6 +208,13 @@ pub fn next_repair(report: &Value) -> Option<&'static str> {
     {
         return Some("clamp-source-window");
     }
+    if issues.iter().any(|issue| {
+        issue["code"] == "video-black"
+            || issue["code"] == "audio-silent"
+            || issue["code"] == "audio-mostly-silent"
+    }) {
+        return Some("trim-quality-edges");
+    }
     None
 }
 
@@ -217,6 +224,7 @@ pub fn repair(draft: &Path, kind: &str) -> Result<Value> {
         "close-main-track-gaps" => crate::timeline_ops::close_main_track_gaps(draft),
         "drop-empty-tracks" => crate::timeline_ops::drop_empty_tracks(draft),
         "clamp-source-window" => crate::timeline_ops::clamp_source_windows(draft),
+        "trim-quality-edges" => crate::timeline_ops::trim_quality_edges(draft),
         other => anyhow::bail!("unknown repair {other:?}"),
     }
 }
@@ -252,6 +260,8 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
     let mut black_cache: std::collections::BTreeMap<String, Option<Vec<(i64, i64)>>> =
         std::collections::BTreeMap::new();
     let mut silence_cache: std::collections::BTreeMap<String, Option<Vec<(i64, i64)>>> =
+        std::collections::BTreeMap::new();
+    let mut loudness_cache: std::collections::BTreeMap<String, Option<f64>> =
         std::collections::BTreeMap::new();
     let mut analysed = 0_usize;
     let mut checked = 0_usize;
@@ -317,6 +327,20 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
                         }
                     }
                 } else if track_kind == "audio" {
+                    let lufs = loudness_cache
+                        .entry(path.clone())
+                        .or_insert_with(|| integrated_lufs(std::path::Path::new(path)))
+                        .to_owned();
+                    if let Some(lufs) = lufs {
+                        if lufs < -40.0 || lufs > -5.0 {
+                            media_issues.push(json!({
+                                "code": "audio-loudness",
+                                "material_id": material_id,
+                                "path": path,
+                                "integrated_lufs": lufs
+                            }));
+                        }
+                    }
                     let spans = silence_cache
                         .entry(path.clone())
                         .or_insert_with(|| silence_spans_us(std::path::Path::new(path)))
@@ -356,6 +380,7 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
             Some("video-black") => 25,
             Some("audio-silent") => 20,
             Some("audio-mostly-silent") => 10,
+            Some("audio-loudness") => 10,
             _ => 0,
         };
         penalty += delta;
@@ -376,7 +401,7 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
 }
 
 /// 素材内的黑帧区间（微秒），失败时返回 None（不把"分析不了"当成"没问题"以外的东西）。
-fn black_spans_us(media: &Path) -> Option<Vec<(i64, i64)>> {
+pub(crate) fn black_spans_us(media: &Path) -> Option<Vec<(i64, i64)>> {
     let ffmpeg = crate::probe::ffmpeg_path()?;
     let output = std::process::Command::new(ffmpeg)
         .args(["-hide_banner", "-nostats", "-i"])
@@ -407,7 +432,7 @@ fn black_spans_us(media: &Path) -> Option<Vec<(i64, i64)>> {
 }
 
 /// 素材内的静音区间（微秒）。
-fn silence_spans_us(media: &Path) -> Option<Vec<(i64, i64)>> {
+pub(crate) fn silence_spans_us(media: &Path) -> Option<Vec<(i64, i64)>> {
     let report = crate::media_analysis::silence(media, -35.0, 0.5, 0.0, None, None).ok()?;
     let mut spans = Vec::new();
     for span in report["silences"].as_array().into_iter().flatten() {
@@ -428,6 +453,33 @@ fn coverage_ratio(spans: &[(i64, i64)], start: i64, end: i64) -> f64 {
         .map(|(a, b)| ((*b).min(end) - (*a).max(start)).max(0))
         .sum();
     (covered as f64 / (end - start) as f64).clamp(0.0, 1.0)
+}
+
+/// 素材的整合响度（LUFS），失败时 None。
+fn integrated_lufs(media: &Path) -> Option<f64> {
+    let ffmpeg = crate::probe::ffmpeg_path()?;
+    let output = std::process::Command::new(ffmpeg)
+        .args(["-hide_banner", "-nostats", "-i"])
+        .arg(media)
+        .args(["-af", "ebur128=peak=true", "-f", "null", "-"])
+        .output()
+        .ok()?;
+    let text = String::from_utf8_lossy(&output.stderr);
+    let mut last = None;
+    for line in text.lines() {
+        if let Some(index) = line.find("I:") {
+            let rest = &line[index + 2..];
+            let number: String = rest
+                .trim_start()
+                .chars()
+                .take_while(|c| c.is_ascii_digit() || *c == '-' || *c == '.')
+                .collect();
+            if let Ok(value) = number.parse::<f64>() {
+                last = Some(value);
+            }
+        }
+    }
+    last
 }
 
 #[cfg(test)]

@@ -522,11 +522,150 @@ fn deep_eval_flags_black_video_and_fully_silent_audio() {
     );
     let report = run_ok(&["eval", &silent_draft.to_string_lossy(), "--deep", "--json"]);
     assert_eq!(report["score_before_media"], json!(100));
-    assert_eq!(report["score"], json!(80), "全静音 -20");
+    // 全静音同时命中静音(-20)与响度(-10)：100 - 30
+    assert_eq!(report["score"], json!(70), "全静音 -30");
     assert!(report["issues"]
         .as_array()
         .unwrap()
         .iter()
         .any(|issue| issue["code"] == "audio-silent"));
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn deep_eval_flags_unusable_loudness() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("loudness");
+    let video = root.join("good.mp4");
+    let quiet = root.join("quiet.m4a");
+    ffmpeg_out(&[
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc=s=320x180:d=2",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        "-y",
+        &video.to_string_lossy(),
+    ]);
+    ffmpeg_out(&[
+        "-f",
+        "lavfi",
+        "-i",
+        "sine=frequency=440:duration=2",
+        "-af",
+        "volume=0.008",
+        "-c:a",
+        "aac",
+        "-y",
+        &quiet.to_string_lossy(),
+    ]);
+    let plan = json!({
+        "schema":"jianying-cli-plan/v1","name":"loudness",
+        "canvas":{"width":320,"height":180,"fps":30},
+        "tracks":[
+            {"type":"video","segments":[{"start_us":0,"duration_us":2000000,"source":"good.mp4"}]},
+            {"type":"audio","segments":[{"start_us":0,"duration_us":2000000,"source":"quiet.m4a"}]}
+        ]
+    });
+    let plan_path = root.join("plan.json");
+    fs::write(&plan_path, serde_json::to_string(&plan).unwrap()).unwrap();
+    let dir = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &plan_path.to_string_lossy(),
+        "--out",
+        &dir.to_string_lossy(),
+        "--json",
+    ]);
+
+    let report = run_ok(&["eval", &dir.to_string_lossy(), "--deep", "--json"]);
+    let codes: Vec<&str> = report["issues"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|issue| issue["code"].as_str().unwrap())
+        .collect();
+    assert!(codes.contains(&"audio-loudness"), "issues={codes:?}");
+    // 过轻的音频同时触发静音与响度两个问题：100 - 20 - 10
+    assert_eq!(report["score"], json!(70), "report={report}");
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn loop_trims_a_black_lead_in_and_keeps_the_shot_in_place() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("black-lead");
+    let clip = root.join("black8.mp4");
+    ffmpeg_out(&[
+        "-f",
+        "lavfi",
+        "-i",
+        "color=c=black:s=320x180:d=8",
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc=s=320x180:d=2",
+        "-filter_complex",
+        "[0:v][1:v]concat=n=2:v=1:a=0",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        "-y",
+        &clip.to_string_lossy(),
+    ]);
+    let plan = json!({
+        "schema":"jianying-cli-plan/v1","name":"black-lead",
+        "canvas":{"width":320,"height":180,"fps":30},
+        "tracks":[{"type":"video","segments":[
+            {"start_us":0,"duration_us":10000000,"source":"black8.mp4"}
+        ]}]
+    });
+    let plan_path = root.join("plan.json");
+    fs::write(&plan_path, serde_json::to_string(&plan).unwrap()).unwrap();
+    let dir = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &plan_path.to_string_lossy(),
+        "--out",
+        &dir.to_string_lossy(),
+        "--json",
+    ]);
+
+    let before = run_ok(&["eval", &dir.to_string_lossy(), "--deep", "--json"]);
+    assert_eq!(before["score"], json!(75), "80% 黑帧 -25");
+
+    let outcome = run_ok(&[
+        "loop",
+        &dir.to_string_lossy(),
+        "--deep",
+        "--max-rounds",
+        "3",
+        "--min-score",
+        "100",
+        "--json",
+    ]);
+    assert_eq!(
+        outcome["rounds"].as_array().unwrap().len(),
+        1,
+        "一轮即可修好"
+    );
+    assert_eq!(outcome["rounds"][0]["repair"], json!("trim-quality-edges"));
+    assert_eq!(outcome["final"]["score"], json!(100));
+    assert_eq!(outcome["final"]["duration_us"], json!(2000000));
+    assert_eq!(
+        outcome["final"]["main_track"]["gap_us"],
+        json!(0),
+        "不应制造空洞"
+    );
     let _ = fs::remove_dir_all(root);
 }

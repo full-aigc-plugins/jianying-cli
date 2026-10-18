@@ -3169,3 +3169,99 @@ pub fn clamp_source_windows(draft: &Path) -> Result<Value> {
         }))
     })
 }
+
+/// 修复：裁掉片段**首尾**的黑帧与静音，保留中段（中段属于创作内容，不动）。
+///
+/// 只处理与源窗口头/尾相交的区间；裁完剩余长度不足 0.5s 时放弃该片段。
+/// 源窗口与目标窗口同步收缩，目标起点按裁掉的头部时长前移。
+pub fn trim_quality_edges(draft: &Path) -> Result<Value> {
+    let timeline = crate::draft::load_timeline(draft)?;
+    let mut paths: std::collections::BTreeMap<String, (String, String)> =
+        std::collections::BTreeMap::new();
+    for bucket in ["videos", "audios"] {
+        for material in timeline["materials"][bucket]
+            .as_array()
+            .into_iter()
+            .flatten()
+        {
+            if let (Some(id), Some(path)) = (
+                material["id"].as_str(),
+                material["path"].as_str().filter(|path| !path.is_empty()),
+            ) {
+                paths.insert(id.to_owned(), (path.to_owned(), bucket.to_owned()));
+            }
+        }
+    }
+    let mut spans: std::collections::BTreeMap<String, Vec<(i64, i64)>> =
+        std::collections::BTreeMap::new();
+    for (path, (bucket, _)) in paths.values().map(|(p, b)| (p.clone(), (b.clone(), ()))) {
+        let detected = if bucket == "videos" {
+            crate::eval_ops::black_spans_us(std::path::Path::new(&path))
+        } else {
+            crate::eval_ops::silence_spans_us(std::path::Path::new(&path))
+        };
+        if let Some(list) = detected {
+            spans.insert(path, list);
+        }
+    }
+
+    mutate(draft, |timeline| {
+        let mut trimmed = 0_usize;
+        let mut skipped = 0_usize;
+        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            for segment in track["segments"].as_array_mut().into_iter().flatten() {
+                let Some(material_id) = segment["material_id"].as_str().map(str::to_owned) else {
+                    continue;
+                };
+                let Some((path, _)) = paths.get(&material_id) else {
+                    continue;
+                };
+                let Some(list) = spans.get(path) else {
+                    continue;
+                };
+                let start = segment["source_timerange"]["start"].as_i64().unwrap_or(0);
+                let length = segment["source_timerange"]["duration"]
+                    .as_i64()
+                    .unwrap_or(0);
+                if length <= 0 {
+                    continue;
+                }
+                let mut head = start;
+                let mut tail = start + length;
+                let mut progressed = true;
+                while progressed {
+                    progressed = false;
+                    for (a, b) in list {
+                        if *a <= head && head < *b {
+                            head = *b;
+                            progressed = true;
+                        } else if *a < tail && tail <= *b {
+                            tail = *a;
+                            progressed = true;
+                        }
+                    }
+                }
+                if head == start && tail == start + length {
+                    continue;
+                }
+                if tail - head < 500_000 {
+                    skipped += 1;
+                    continue;
+                }
+                let speed = segment["speed"].as_f64().unwrap_or(1.0).max(0.01);
+                // 头部裁掉后片段仍留在原时间位置（trime in 语义），因此不移动 target.start，
+                // 避免制造新的空洞再让 gap 修复兜一圈。
+                segment["source_timerange"]["start"] = json!(head);
+                segment["source_timerange"]["duration"] = json!(tail - head);
+                segment["target_timerange"]["duration"] = json!(
+                    crate::writer::scaled_source_duration(tail - head, 1.0 / speed)
+                );
+                trimmed += 1;
+            }
+        }
+        Ok(json!({
+            "ok": true, "repair": "trim-quality-edges",
+            "trimmed_segments": trimmed, "skipped_segments": skipped
+        }))
+    })
+}
