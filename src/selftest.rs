@@ -63,7 +63,8 @@ pub fn run(workdir: &Path) -> Result<Value> {
 
     // 1) 能力清单：入口面存在且规模合理
     let started = Instant::now();
-    match crate::capabilities::manifest() {
+    // manifest_for ??????? applies_to ??????????????
+    match crate::capabilities::manifest_for(None) {
         Ok(manifest) => {
             let entries = manifest["capabilities"]
                 .as_array()

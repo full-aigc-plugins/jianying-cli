@@ -17,6 +17,11 @@
       "evidence": "src/capabilities.rs + tests/agent_contract.rs"
     },
     {
+      "id": "capabilities.applies_to",
+      "status": "supported",
+      "evidence": "tests/capabilities_applies_contract.rs: capabilities may declare a draft-schema/app-version range; --draft-schema annotates applicability and invalid declarations fail before use"
+    },
+    {
       "id": "schema.job_v2",
       "status": "supported",
       "evidence": "schemas/jianying-job-v2.schema.json + tests/job_v2_contract.rs + tests/job_cli_contract.rs"
@@ -34,7 +39,12 @@
     {
       "id": "protocol.pyjyd_wire",
       "status": "supported",
-      "evidence": "provenance/PROTOCOL_DIFFERENTIALS.json + provenance/PARITY_RUN.json (55/55) + crates/jianying-draft/tests/edge_fixtures.rs"
+      "evidence": "provenance/PROTOCOL_DIFFERENTIALS.json + provenance/PARITY_RUN.json (55/55) + crates/jianying-draft/tests/edge_fixtures.rs",
+      "applies_to": {
+        "draft_schema": "draft_info.json",
+        "app_since": "5.9.0",
+        "source": "pyJianYingDraft 文档：v5.9+ 使用 draft_info.json"
+      }
     },
     {
       "id": "project.create",
@@ -576,7 +586,12 @@
     {
       "id": "store.decrypt_detection",
       "status": "supported",
-      "evidence": "tests/store_cli_contract.rs: plaintext/encrypted/corrupted classification; no decryptor"
+      "evidence": "tests/store_cli_contract.rs: plaintext/encrypted/corrupted classification; no decryptor",
+      "applies_to": {
+        "draft_schema": "*",
+        "app_since": "11.6.0",
+        "source": "docs/reference/jianying-11.6-feature-map.md 的实测记录"
+      }
     },
     {
       "id": "store.directories",

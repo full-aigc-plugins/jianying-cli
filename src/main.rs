@@ -2429,7 +2429,11 @@ enum Command {
     /// Generate shell completion without installing or modifying shell files
     Completion { shell: Shell },
     /// Print the embedded schema and capability manifest (read-only)
-    Capabilities,
+    Capabilities {
+        /// Annotate each capability with whether it applies to this draft schema
+        #[arg(long)]
+        draft_schema: Option<String>,
+    },
     /// Print the live machine-readable command catalogue
     Commands,
     /// 实测媒体（时长/分辨率/流/是否图片）；所有计划时长应以它为准
@@ -4107,8 +4111,8 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             state_root,
         } => run_audit(task_id.as_deref(), state_root, json)?,
         Command::Completion { shell } => run_completion(shell, json)?,
-        Command::Capabilities => {
-            let mut manifest = capabilities::manifest()?;
+        Command::Capabilities { draft_schema } => {
+            let mut manifest = capabilities::manifest_for(draft_schema.as_deref())?;
             manifest["command_catalog"] = machine_command_catalog()?;
             print_output(manifest, json)
         }

@@ -1,5 +1,28 @@
 # jianying 智能体接口契约（Agent Interface）
 
+## 能力适用性（`applies_to`）
+
+能力条目可以声明它适用于哪条草稿线格式：
+
+```jsonc
+"applies_to": {
+  "draft_schema": ["draft_info.json"],   // 或 "*"，表示都适用
+  "app_since": "5.9.0",                  // 可选，点分版本
+  "app_until": null                      // 可选，必须 >= app_since
+}
+```
+
+未声明 `applies_to` 的能力视为**普遍适用**。用 `--draft-schema` 可以按目标格式过滤：
+
+```bash
+jianying capabilities --draft-schema draft_info.json --json
+# data.applicability = {applicable, not_applicable, unspecified, known_draft_schemas}
+# 每条能力带 applicable: true/false
+```
+
+校验在**使用前**发生：未知 `draft_schema`、非法版本号、`app_until < app_since`
+都会让命令直接失败，而不是带着坏数据继续跑。`jianying selftest` 也会校验一次。
+
 本文件是智能体调用 `jianying` 的**规范事实源**。命令面不精简、行为不隐含——
 每条命令、每个字段、每个退出码都在此定义。变更需同步本文件与 `--help`。
 
