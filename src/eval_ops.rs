@@ -249,9 +249,15 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
 
     let mut probed: std::collections::BTreeMap<String, Option<i64>> =
         std::collections::BTreeMap::new();
+    let mut black_cache: std::collections::BTreeMap<String, Option<Vec<(i64, i64)>>> =
+        std::collections::BTreeMap::new();
+    let mut silence_cache: std::collections::BTreeMap<String, Option<Vec<(i64, i64)>>> =
+        std::collections::BTreeMap::new();
+    let mut analysed = 0_usize;
     let mut checked = 0_usize;
     let mut media_issues: Vec<Value> = Vec::new();
     for track in timeline["tracks"].as_array().into_iter().flatten() {
+        let track_kind = track["type"].as_str().unwrap_or("");
         for segment in track["segments"].as_array().into_iter().flatten() {
             let Some(material_id) = segment["material_id"].as_str() else {
                 continue;
@@ -290,6 +296,53 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
                     "media_duration_us": duration
                 }));
             }
+            // 内容级检查：整段黑帧 / 整段静音。窗口按源区间计。
+            let window_end = source_start + source_length;
+            if window_end > source_start {
+                if track_kind == "video" {
+                    let spans = black_cache
+                        .entry(path.clone())
+                        .or_insert_with(|| black_spans_us(std::path::Path::new(path)))
+                        .clone();
+                    if let Some(spans) = spans {
+                        analysed += 1;
+                        let ratio = coverage_ratio(&spans, source_start, window_end);
+                        if ratio >= 0.8 {
+                            media_issues.push(json!({
+                                "code": "video-black",
+                                "material_id": material_id,
+                                "path": path,
+                                "black_ratio_permille": (ratio * 1000.0).round() as i64
+                            }));
+                        }
+                    }
+                } else if track_kind == "audio" {
+                    let spans = silence_cache
+                        .entry(path.clone())
+                        .or_insert_with(|| silence_spans_us(std::path::Path::new(path)))
+                        .clone();
+                    if let Some(spans) = spans {
+                        analysed += 1;
+                        let ratio = coverage_ratio(&spans, source_start, window_end);
+                        let permille = (ratio * 1000.0).round() as i64;
+                        if ratio >= 0.95 {
+                            media_issues.push(json!({
+                                "code": "audio-silent",
+                                "material_id": material_id,
+                                "path": path,
+                                "silence_ratio_permille": permille
+                            }));
+                        } else if ratio >= 0.8 {
+                            media_issues.push(json!({
+                                "code": "audio-mostly-silent",
+                                "material_id": material_id,
+                                "path": path,
+                                "silence_ratio_permille": permille
+                            }));
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -300,6 +353,9 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
         let delta = match issue["code"].as_str() {
             Some("media-missing") => 30,
             Some("source-exceeds-media") => 15,
+            Some("video-black") => 25,
+            Some("audio-silent") => 20,
+            Some("audio-mostly-silent") => 10,
             _ => 0,
         };
         penalty += delta;
@@ -313,9 +369,65 @@ pub fn evaluate_deep(draft: &Path) -> Result<Value> {
     report["score"] = json!(score);
     report["deep"] = json!(true);
     report["media_checked"] = json!(checked);
+    report["media_analysed"] = json!(analysed);
     report["penalties"] = json!(penalties);
     report["score_before_media"] = json!(base);
     Ok(report)
+}
+
+/// 素材内的黑帧区间（微秒），失败时返回 None（不把"分析不了"当成"没问题"以外的东西）。
+fn black_spans_us(media: &Path) -> Option<Vec<(i64, i64)>> {
+    let ffmpeg = crate::probe::ffmpeg_path()?;
+    let output = std::process::Command::new(ffmpeg)
+        .args(["-hide_banner", "-nostats", "-i"])
+        .arg(media)
+        .args([
+            "-vf",
+            "blackdetect=d=0.2:pix_th=0.10",
+            "-an",
+            "-f",
+            "null",
+            "-",
+        ])
+        .output()
+        .ok()?;
+    let text = String::from_utf8_lossy(&output.stderr);
+    let mut spans = Vec::new();
+    let mut start: Option<f64> = None;
+    for token in text.split_whitespace() {
+        if let Some(value) = token.strip_prefix("black_start:") {
+            start = value.parse::<f64>().ok();
+        } else if let Some(value) = token.strip_prefix("black_end:") {
+            if let (Some(begin), Ok(end)) = (start.take(), value.parse::<f64>()) {
+                spans.push(((begin * 1e6) as i64, (end * 1e6) as i64));
+            }
+        }
+    }
+    Some(spans)
+}
+
+/// 素材内的静音区间（微秒）。
+fn silence_spans_us(media: &Path) -> Option<Vec<(i64, i64)>> {
+    let report = crate::media_analysis::silence(media, -35.0, 0.5, 0.0, None, None).ok()?;
+    let mut spans = Vec::new();
+    for span in report["silences"].as_array().into_iter().flatten() {
+        let start = span["start"].as_f64()?;
+        let end = span["end"].as_f64()?;
+        spans.push(((start * 1e6) as i64, (end * 1e6) as i64));
+    }
+    Some(spans)
+}
+
+/// 区间 [start,end) 被 spans 覆盖的比例。
+fn coverage_ratio(spans: &[(i64, i64)], start: i64, end: i64) -> f64 {
+    if end <= start {
+        return 0.0;
+    }
+    let covered: i64 = spans
+        .iter()
+        .map(|(a, b)| ((*b).min(end) - (*a).max(start)).max(0))
+        .sum();
+    (covered as f64 / (end - start) as f64).clamp(0.0, 1.0)
 }
 
 #[cfg(test)]
