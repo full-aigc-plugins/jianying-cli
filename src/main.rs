@@ -6,8 +6,8 @@ use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
     capabilities, caption_ops, control_catalog, draft, home_folder, interchange, job_runner,
-    media_analysis, media_ops, plan, probe, project_ops, render, runtime_acceptance, srt, store,
-    template, tim, timeline_ops,
+    media_analysis, media_ops, plan, probe, project_ops, render, resource_ops, runtime_acceptance,
+    srt, store, template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -17,6 +17,7 @@ use jianying_media::{
     TtsAudioFormat, TtsInputKind, TtsProvider, TtsRequest, VolcengineTtsAdapter,
     WhisperCppAsrProvider, WindowsSystemTtsProvider, XiaomiMimoTtsAdapter, ZhipuGlmTtsAdapter,
 };
+use serde_json::{json, Value};
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -2177,6 +2178,60 @@ enum StoreOp {
     },
 }
 
+/// 用户资源库子命令。
+#[derive(Subcommand)]
+enum ResourceOp {
+    /// 扫描草稿目录树，聚合素材使用情况（只读，除非带 --write）
+    Mine {
+        /// 草稿根目录（递归查找 draft_content.json）
+        root: PathBuf,
+        /// 资源库文件，默认 $JIANYING_CLI_HOME/resources.json
+        #[arg(long)]
+        catalog: Option<PathBuf>,
+        /// 把扫描结果写回资源库（按来源幂等覆盖）
+        #[arg(long)]
+        write: bool,
+    },
+    /// 列出资源库条目（跨来源合并）
+    List {
+        #[arg(long)]
+        catalog: Option<PathBuf>,
+        /// 按素材种类过滤，例如 filter/transition/text_shape/video_effect
+        #[arg(long)]
+        kind: Option<String>,
+        /// 按名称/effect_id/resource_id 子串检索
+        #[arg(long)]
+        query: Option<String>,
+        /// 最多输出条目数
+        #[arg(long, default_value_t = 50)]
+        limit: usize,
+    },
+    /// 把外部 bundle（{entries:[...]} 或完整目录）并进资源库
+    Import {
+        /// bundle 或目录文件
+        bundle: PathBuf,
+        #[arg(long)]
+        catalog: Option<PathBuf>,
+    },
+    /// 导出资源库（合并视图）
+    Export {
+        #[arg(long)]
+        catalog: Option<PathBuf>,
+        /// 输出文件；省略则打印到 stdout
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// 按名称解析到可落盘的资源标识
+    Resolve {
+        /// 名称或 id 片段
+        needle: String,
+        #[arg(long)]
+        catalog: Option<PathBuf>,
+        #[arg(long)]
+        kind: Option<String>,
+    },
+}
+
 #[derive(Subcommand)]
 enum Command {
     /// Project lifecycle and draft-level operations
@@ -2240,6 +2295,11 @@ enum Command {
     Store {
         #[command(subcommand)]
         op: StoreOp,
+    },
+    /// 用户资源库：从草稿反演素材、导入导出、按名字检索
+    Resource {
+        #[command(subcommand)]
+        op: ResourceOp,
     },
     /// JianYing start-page state managed through versioned local protocols
     Home {
@@ -3627,6 +3687,128 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             CaptionsOp::Status => print_domain_status("captions", json)?,
         },
         Command::Runtime { op } => run_runtime(op, json)?,
+        Command::Resource { op } => match op {
+            ResourceOp::Mine {
+                root,
+                catalog,
+                write,
+            } => {
+                let mined = resource_ops::mine(&root)?;
+                if write {
+                    let path = catalog.unwrap_or_else(resource_ops::default_catalog_path);
+                    let mut library = resource_ops::load(&path)?;
+                    let source_id = std::fs::canonicalize(&root)
+                        .unwrap_or_else(|_| root.clone())
+                        .to_string_lossy()
+                        .into_owned();
+                    resource_ops::put_source(&mut library, &source_id, &mined, now_secs())?;
+                    resource_ops::save(&path, &library)?;
+                    let mut out = mined.clone();
+                    out["catalog"] = json!(path.to_string_lossy());
+                    out["source_id"] = json!(source_id);
+                    print_output(out, json);
+                } else {
+                    print_output(mined, json);
+                }
+            }
+            ResourceOp::List {
+                catalog,
+                kind,
+                query,
+                limit,
+            } => {
+                let path = catalog.unwrap_or_else(resource_ops::default_catalog_path);
+                let library = resource_ops::load(&path)?;
+                let merged = resource_ops::merged_entries(&library);
+                let filtered = resource_ops::filter(&merged, kind.as_deref(), query.as_deref());
+                let total = filtered.len();
+                let entries: Vec<Value> = filtered.into_iter().take(limit).cloned().collect();
+                print_output(
+                    json!({
+                        "catalog": path.to_string_lossy(),
+                        "total": total,
+                        "returned": entries.len(),
+                        "entries": entries,
+                        "summary": resource_ops::summarize(&library),
+                    }),
+                    json,
+                );
+            }
+            ResourceOp::Import { bundle, catalog } => {
+                let path = catalog.unwrap_or_else(resource_ops::default_catalog_path);
+                let raw = std::fs::read_to_string(&bundle).map_err(|error| {
+                    anyhow::anyhow!("cannot read {}: {error}", bundle.display())
+                })?;
+                let parsed: Value = serde_json::from_str(&raw).map_err(|error| {
+                    anyhow::anyhow!("{} is not JSON: {error}", bundle.display())
+                })?;
+                let mut library = resource_ops::load(&path)?;
+                let source_id = format!("import:{}", bundle.display());
+                let count =
+                    resource_ops::import_bundle(&mut library, &parsed, &source_id, now_secs())?;
+                resource_ops::save(&path, &library)?;
+                print_output(
+                    json!({
+                        "ok": true,
+                        "catalog": path.to_string_lossy(),
+                        "source_id": source_id,
+                        "entries": count,
+                        "summary": resource_ops::summarize(&library),
+                    }),
+                    json,
+                );
+            }
+            ResourceOp::Export { catalog, out } => {
+                let path = catalog.unwrap_or_else(resource_ops::default_catalog_path);
+                let library = resource_ops::load(&path)?;
+                let entries = resource_ops::merged_entries(&library);
+                let payload = json!({
+                    "schema": resource_ops::SCHEMA,
+                    "exported_at": now_secs(),
+                    "entries": entries,
+                });
+                match out {
+                    Some(out) => {
+                        if let Some(parent) = out.parent() {
+                            std::fs::create_dir_all(parent)?;
+                        }
+                        let mut text = serde_json::to_string_pretty(&payload)?;
+                        text.push('\n');
+                        std::fs::write(&out, text)?;
+                        print_output(
+                            json!({
+                                "ok": true,
+                                "catalog": path.to_string_lossy(),
+                                "out": out.to_string_lossy(),
+                                "entries": payload["entries"].as_array().map(Vec::len).unwrap_or(0),
+                            }),
+                            json,
+                        );
+                    }
+                    None => print_output(payload, json),
+                }
+            }
+            ResourceOp::Resolve {
+                needle,
+                catalog,
+                kind,
+            } => {
+                let path = catalog.unwrap_or_else(resource_ops::default_catalog_path);
+                let library = resource_ops::load(&path)?;
+                let merged = resource_ops::merged_entries(&library);
+                let matched = resource_ops::filter(&merged, kind.as_deref(), Some(needle.as_str()));
+                if matched.is_empty() {
+                    bail!("no resource matches {needle:?} in {}", path.display());
+                }
+                print_output(
+                    json!({
+                        "query": needle,
+                        "matches": matched.into_iter().cloned().collect::<Vec<_>>(),
+                    }),
+                    json,
+                );
+            }
+        },
         Command::Doctor => print_output(redact_diagnostics(store::doctor()?), json),
         Command::Status { state_root } => run_status(state_root, json)?,
         Command::Audit {
@@ -6248,6 +6430,14 @@ fn catalog_query(
         json,
     );
     Ok(())
+}
+
+/// 当前 Unix 秒；资源库扫描时间戳用。
+fn now_secs() -> i64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|elapsed| elapsed.as_secs() as i64)
+        .unwrap_or(0)
 }
 
 fn print_output(value: serde_json::Value, json: bool) {

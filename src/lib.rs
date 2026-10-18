@@ -22,6 +22,7 @@ pub mod probe;
 pub mod project_ops;
 pub mod render;
 pub mod replacement_timing;
+pub mod resource_ops;
 pub mod runtime_acceptance;
 pub mod shrink_mode;
 pub mod srt;
