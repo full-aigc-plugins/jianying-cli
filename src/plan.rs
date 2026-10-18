@@ -132,6 +132,24 @@ pub struct Segment {
     pub underline: Option<bool>,
     #[serde(default)]
     pub alignment: Option<u8>,
+    /// 竖排文本；映射到文本素材的 `typesetting`（pyJianYingDraft 同名字段）。
+    #[serde(default)]
+    pub vertical: Option<bool>,
+    /// 字符间距，定义与剪映一致（wire 值 = 本值 × 0.05）。
+    #[serde(default)]
+    pub letter_spacing: Option<i64>,
+    /// 行间距，定义与剪映一致（wire 值 = 0.02 + 本值 × 0.05）。
+    #[serde(default)]
+    pub line_spacing: Option<i64>,
+    /// 自动换行；开启后文本素材类型写为 `subtitle`（pyJianYingDraft 同语义）。
+    #[serde(default)]
+    pub auto_wrapping: Option<bool>,
+    /// 每行最大行宽占屏宽比例，取值 [0, 1]，默认 0.82。
+    #[serde(default)]
+    pub max_line_width: Option<f64>,
+    /// 文本整体不透明度，映射到 `global_alpha`，取值 [0, 1]。
+    #[serde(default)]
+    pub text_alpha: Option<f64>,
     #[serde(default)]
     pub font: Option<String>,
     #[serde(default)]
@@ -495,6 +513,42 @@ impl Plan {
         let speed = seg.speed.unwrap_or(1.0);
         check_range(speed, 0.1, 8.0, "speed")?;
         check_range(seg.volume.unwrap_or(1.0), 0.0, 4.0, "volume")?;
+
+        // 文本排版字段只属于 text 轨道；先统一拦掉，再按字段校验区间。
+        let typography = [
+            seg.vertical.is_some().then_some("vertical"),
+            seg.letter_spacing.is_some().then_some("letter_spacing"),
+            seg.line_spacing.is_some().then_some("line_spacing"),
+            seg.auto_wrapping.is_some().then_some("auto_wrapping"),
+            seg.max_line_width.is_some().then_some("max_line_width"),
+            seg.text_alpha.is_some().then_some("text_alpha"),
+        ]
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>();
+        if track.kind != "text" && !typography.is_empty() {
+            bail!(
+                "{}-track segments cannot carry text typography fields ({})",
+                track.kind,
+                typography.join(", ")
+            );
+        }
+        if let Some(width) = seg.max_line_width {
+            check_range(width, 0.0, 1.0, "max_line_width")?;
+        }
+        if let Some(alpha) = seg.text_alpha {
+            check_range(alpha, 0.0, 1.0, "text_alpha")?;
+        }
+        for (name, value) in [
+            ("letter_spacing", seg.letter_spacing),
+            ("line_spacing", seg.line_spacing),
+        ] {
+            if let Some(value) = value {
+                if !(-100..=100).contains(&value) {
+                    bail!("{name} must be an integer in [-100, 100], got {value}");
+                }
+            }
+        }
 
         match track.kind.as_str() {
             "video" | "audio" => {

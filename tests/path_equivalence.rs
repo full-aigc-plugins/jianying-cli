@@ -534,3 +534,71 @@ fn plan_expresses_every_keyframe_channel_the_cli_supports() {
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn text_typography_fields_follow_the_reference_conversion() {
+    let root = temp_root("typography");
+    let plan = json!({
+        "schema": "jianying-cli-plan/v1",
+        "name": "typography",
+        "canvas": {"width": 1920, "height": 1080, "fps": 30},
+        "tracks": [{"type": "text", "segments": [{
+            "start_us": 0,
+            "duration_us": 2_000_000,
+            "text": "排版",
+            "vertical": true,
+            "letter_spacing": 4,
+            "line_spacing": 6,
+            "auto_wrapping": true,
+            "max_line_width": 0.6,
+            "text_alpha": 0.8
+        }]}]
+    });
+    let dir = build(&root, "draft", plan, &video_probe);
+    let content: Value =
+        serde_json::from_str(&fs::read_to_string(dir.join("draft_content.json")).unwrap()).unwrap();
+    let material = &content["materials"]["texts"][0];
+    // pyJianYingDraft: typesetting=int(vertical)、letter_spacing=值×0.05、
+    // line_spacing=0.02+值×0.05、type 由 auto_wrapping 决定。
+    assert_eq!(material["typesetting"], json!(1));
+    // 与 Python 同样的 IEEE754 运算顺序，浮点尾数也一致。
+    assert_eq!(material["letter_spacing"].as_f64().unwrap(), 4.0 * 0.05);
+    assert_eq!(
+        material["line_spacing"].as_f64().unwrap(),
+        0.02 + 6.0 * 0.05
+    );
+    assert_eq!(material["line_max_width"], json!(0.6));
+    assert_eq!(material["global_alpha"], json!(0.8));
+    assert_eq!(material["type"], json!("subtitle"));
+    assert_eq!(
+        run_ok(&["project", "verify", &dir.to_string_lossy(), "--json"])["ok"],
+        true
+    );
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn text_typography_defaults_stay_byte_identical() {
+    let root = temp_root("typography-default");
+    let plan = json!({
+        "schema": "jianying-cli-plan/v1",
+        "name": "typography-default",
+        "canvas": {"width": 1920, "height": 1080, "fps": 30},
+        "tracks": [{"type": "text", "segments": [{
+            "start_us": 0,
+            "duration_us": 2_000_000,
+            "text": "默认"
+        }]}]
+    });
+    let dir = build(&root, "draft", plan, &video_probe);
+    let content: Value =
+        serde_json::from_str(&fs::read_to_string(dir.join("draft_content.json")).unwrap()).unwrap();
+    let material = &content["materials"]["texts"][0];
+    assert_eq!(material["typesetting"], json!(0));
+    assert_eq!(material["letter_spacing"], json!(0));
+    assert_eq!(material["line_spacing"], json!(0.02));
+    assert_eq!(material["line_max_width"], json!(0.82));
+    assert_eq!(material["global_alpha"], json!(1.0));
+    assert_eq!(material["type"], json!("text"));
+    let _ = fs::remove_dir_all(root);
+}

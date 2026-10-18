@@ -943,6 +943,27 @@ pub fn build(
                         "global_alpha": 1.0,
                         "fixed_width": -1, "fixed_height": -1
                     });
+                    // 排版字段按 pyJianYingDraft 的换算写入；未显式设置时保持上面的
+                    // 默认字面量，既有计划与 parity 基线因此逐字节不变。
+                    if let Some(vertical) = seg.vertical {
+                        text_material["typesetting"] = json!(i64::from(vertical));
+                    }
+                    if let Some(spacing) = seg.letter_spacing {
+                        text_material["letter_spacing"] = json!(spacing as f64 * 0.05);
+                    }
+                    if let Some(spacing) = seg.line_spacing {
+                        text_material["line_spacing"] = json!(0.02 + spacing as f64 * 0.05);
+                    }
+                    if let Some(width) = seg.max_line_width {
+                        text_material["line_max_width"] = json!(width);
+                    }
+                    if let Some(alpha) = seg.text_alpha {
+                        text_material["global_alpha"] = json!(alpha);
+                    }
+                    if seg.auto_wrapping == Some(true) {
+                        // pyJianYingDraft: auto_wrapping 的文本素材类型为 subtitle
+                        text_material["type"] = json!("subtitle");
+                    }
                     if border > 0.0 {
                         text_material["has_border"] = json!(true);
                         text_material["border_color"] = json!(seg
