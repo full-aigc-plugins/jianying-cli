@@ -712,6 +712,13 @@ enum TimelineOp {
         id: String,
         alpha: f64,
     },
+    /// Attach a catalog audio effect to one audio segment (idempotent)
+    AudioEffect {
+        draft: PathBuf,
+        id: String,
+        /// Catalog name (场景音效 / 音色 / 声音成曲)
+        name: String,
+    },
     /// Add an empty track
     AddTrack {
         draft: PathBuf,
@@ -2612,6 +2619,9 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             ),
             TimelineOp::Opacity { draft, id, alpha } => {
                 print_output(timeline_ops::opacity(&draft, &id, alpha)?, json)
+            }
+            TimelineOp::AudioEffect { draft, id, name } => {
+                print_output(timeline_ops::audio_effect(&draft, &id, &name)?, json)
             }
             TimelineOp::AddTrack { draft, kind, name } => {
                 print_output(timeline_ops::add_track(&draft, &kind, &name)?, json)

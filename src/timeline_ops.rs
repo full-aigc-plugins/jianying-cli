@@ -2832,6 +2832,101 @@ pub fn apply_resource(draft: &Path, id: &str, entry: &Value) -> Result<Value> {
     })
 }
 
+/// 为音频片段挂一个音效（场景音效 / 音色 / 声音成曲）。
+///
+/// 与计划路径写出的结构保持一致；同一资源重复挂载是幂等的。
+pub fn audio_effect(draft: &Path, id: &str, name: &str) -> Result<Value> {
+    let (entry, category_id, category_name) = {
+        let scene = crate::catalogs::find(crate::catalogs::audio_scene_effects(), name);
+        let tone = crate::catalogs::find(crate::catalogs::tone_effects(), name);
+        let song = crate::catalogs::find(crate::catalogs::speech_to_songs(), name);
+        match (scene, tone, song) {
+            (Some(entry), _, _) => (entry, "sound_effect", "场景音"),
+            (_, Some(entry), _) => (entry, "timbre", "音色"),
+            (_, _, Some(entry)) => (entry, "song", "声音成曲"),
+            _ => bail!(
+                "unknown audio effect {name:?}; list names with `jianying catalog audio-scene-effects|tone-effects|speech-to-songs`"
+            ),
+        }
+    };
+    let resolved_name = entry["name"].as_str().unwrap_or(name).to_owned();
+    let resource_id = crate::catalogs::resource_id(entry);
+    let params = crate::catalogs::adjust_params(entry, None);
+    mutate(draft, |timeline| {
+        let track_kind = timeline["tracks"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|track| {
+                track["segments"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .any(|segment| segment["id"].as_str() == Some(id))
+            })
+            .and_then(|track| track["type"].as_str())
+            .unwrap_or("")
+            .to_owned();
+        if track_kind != "audio" {
+            bail!(
+                "audio effects only attach to audio segments; segment {id} is on a {track_kind:?} track"
+            );
+        }
+        let refs: Vec<String> = {
+            let segment = find_segment_mut(timeline, id)?;
+            segment["extra_material_refs"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        };
+        let existing = timeline["materials"]["audio_effects"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|item| {
+                item["resource_id"].as_str().unwrap_or("") == resource_id
+                    && item["id"]
+                        .as_str()
+                        .is_some_and(|mid| refs.iter().any(|known| known == mid))
+            })
+            .and_then(|item| item["id"].as_str())
+            .map(str::to_owned);
+        if let Some(material_id) = existing {
+            return Ok(json!({
+                "ok": true, "id": id, "name": resolved_name,
+                "material_id": material_id, "applied": false,
+                "reason": "already-applied"
+            }));
+        }
+        let material_id = uuid::Uuid::new_v4().simple().to_string();
+        timeline["materials"]["audio_effects"]
+            .as_array_mut()
+            .context("materials.audio_effects must be an array")?
+            .push(json!({
+                "audio_adjust_params": params,
+                "id": material_id, "name": resolved_name,
+                "resource_id": resource_id,
+                "type": "audio_effect",
+                "category_id": category_id, "category_name": category_name,
+                "sub_type": 1, "time_range": {"duration": 0, "start": 0},
+                "is_ugc": false, "production_path": "", "speaker_id": ""
+            }));
+        let segment = find_segment_mut(timeline, id)?;
+        segment["extra_material_refs"]
+            .as_array_mut()
+            .context("extra_material_refs must be an array")?
+            .push(json!(material_id));
+        Ok(json!({
+            "ok": true, "id": id, "name": resolved_name,
+            "material_id": material_id, "applied": true,
+            "category_id": category_id
+        }))
+    })
+}
+
 fn find_segment_mut<'a>(timeline: &'a mut Value, id: &str) -> Result<&'a mut Value> {
     for track in timeline["tracks"]
         .as_array_mut()

@@ -1879,3 +1879,80 @@ fn sticker_add_reuses_named_tracks_and_writes_companion_materials() {
     );
     let _ = std::fs::remove_dir_all(root);
 }
+
+#[test]
+fn audio_effect_attaches_from_the_catalog_and_is_idempotent() {
+    let root = std::env::temp_dir().join(format!("jianying-audio-effect-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    std::fs::create_dir_all(&root).unwrap();
+    std::fs::write(root.join("voice.mp3"), b"fixture").unwrap();
+    let plan: Plan = serde_json::from_value(serde_json::json!({
+        "schema":"jianying-cli-plan/v1","name":"audio-effect",
+        "canvas":{"width":1920,"height":1080,"fps":30},
+        "tracks":[{"type":"audio","segments":[{
+            "start_us":0,"duration_us":2000000,"source":"voice.mp3"
+        }]}]
+    }))
+    .unwrap();
+    let draft = root.join("draft");
+    draft::build(&plan, &root, &draft, None, &audio_probe_stub).unwrap();
+    let id = run_ok(&[
+        "timeline",
+        "segments",
+        &draft.to_string_lossy(),
+        "--track",
+        "audio",
+        "--json",
+    ])[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    let first = run_ok(&[
+        "timeline",
+        "audio-effect",
+        &draft.to_string_lossy(),
+        &id,
+        "8bit",
+        "--json",
+    ]);
+    assert_eq!(first["applied"], true);
+    assert_eq!(first["category_id"], "sound_effect");
+    let material_id = first["material_id"].as_str().unwrap().to_owned();
+
+    // 同一资源重复挂载必须幂等
+    let again = run_ok(&[
+        "timeline",
+        "audio-effect",
+        &draft.to_string_lossy(),
+        &id,
+        "8bit",
+        "--json",
+    ]);
+    assert_eq!(again["applied"], false);
+    assert_eq!(again["reason"], "already-applied");
+    assert_eq!(again["material_id"], serde_json::json!(material_id));
+
+    let content = draft::load_timeline(&draft).unwrap();
+    let effects = content["materials"]["audio_effects"].as_array().unwrap();
+    assert_eq!(effects.len(), 1, "幂等挂载不能产生重复音效素材");
+    assert_eq!(effects[0]["type"], "audio_effect");
+    assert_eq!(effects[0]["name"], "8bit");
+    assert_eq!(
+        run_ok(&["project", "verify", &draft.to_string_lossy(), "--json"])["ok"],
+        true
+    );
+
+    // 未知音效名必须给出可操作错误
+    let unknown = run(&[
+        "timeline",
+        "audio-effect",
+        &draft.to_string_lossy(),
+        &id,
+        "不存在的音效",
+        "--json",
+    ]);
+    assert_eq!(unknown.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&unknown.stdout).contains("unknown audio effect"));
+    let _ = std::fs::remove_dir_all(root);
+}
