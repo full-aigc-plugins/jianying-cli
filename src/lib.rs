@@ -20,6 +20,7 @@ pub mod media_analysis;
 pub mod media_ops;
 pub mod pipeline_ops;
 pub mod plan;
+pub mod plan_ops;
 pub mod probe;
 pub mod project_ops;
 pub mod render;

@@ -6,8 +6,8 @@ use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use jianying_cli::{
     capabilities, caption_ops, control_catalog, draft, eval_ops, home_folder, interchange,
-    job_runner, media_analysis, media_ops, pipeline_ops, plan, probe, project_ops, render,
-    resource_ops, runtime_acceptance, skills, srt, store, template, tim, timeline_ops,
+    job_runner, media_analysis, media_ops, pipeline_ops, plan, plan_ops, probe, project_ops,
+    render, resource_ops, runtime_acceptance, skills, srt, store, template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -2192,6 +2192,45 @@ enum StoreOp {
     },
 }
 
+/// 计划编排子命令。
+#[derive(Subcommand)]
+enum PlanOp {
+    /// 把多份计划按顺序组合成一份
+    Compose {
+        /// 输出计划文件
+        #[arg(long)]
+        out: PathBuf,
+        /// 输入计划（按给出的顺序拼接）
+        #[arg(long = "from", required = true, num_args = 1..)]
+        parts: Vec<PathBuf>,
+        /// 组合后计划的名称
+        #[arg(long)]
+        name: Option<String>,
+        /// 覆盖已存在的输出（会先留快照）
+        #[arg(long)]
+        force: bool,
+    },
+    /// 在已有计划末尾追加一份计划（原地写回并留快照）
+    Append {
+        /// 目标计划
+        plan: PathBuf,
+        /// 追加的计划
+        #[arg(long)]
+        from: PathBuf,
+        #[arg(long)]
+        name: Option<String>,
+    },
+    /// 列出计划的快照
+    History { plan: PathBuf },
+    /// 恢复快照（省略则恢复最近一份）
+    Revert {
+        plan: PathBuf,
+        /// 指定快照文件
+        #[arg(long)]
+        snapshot: Option<PathBuf>,
+    },
+}
+
 /// 技能注册表子命令。
 #[derive(Subcommand)]
 enum SkillsOp {
@@ -2358,6 +2397,11 @@ enum Command {
     Skills {
         #[command(subcommand)]
         op: SkillsOp,
+    },
+    /// 计划级编排：组合、增量追加、历史与回滚
+    Plan {
+        #[command(subcommand)]
+        op: PlanOp,
     },
     /// 批量流水线：目录内每份计划 → 构建 → 评分 → 渲染（无客户端）
     Pipeline {
@@ -3993,6 +4037,24 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 Some(skill) => print_output(skill, json),
                 None => bail!("unknown skill {id:?}; list ids with `jianying skills list --json`"),
             },
+        },
+        Command::Plan { op } => match op {
+            PlanOp::Compose {
+                out,
+                parts,
+                name,
+                force,
+            } => print_output(
+                plan_ops::compose(&out, &parts, name.as_deref(), force)?,
+                json,
+            ),
+            PlanOp::Append { plan, from, name } => {
+                print_output(plan_ops::append(&plan, &from, name.as_deref())?, json)
+            }
+            PlanOp::History { plan } => print_output(plan_ops::history(&plan)?, json),
+            PlanOp::Revert { plan, snapshot } => {
+                print_output(plan_ops::revert(&plan, snapshot.as_deref())?, json)
+            }
         },
         Command::Loop {
             draft,
