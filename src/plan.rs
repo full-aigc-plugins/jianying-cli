@@ -24,6 +24,10 @@ pub struct Plan {
     /// Assert the user's own membership entitlement for VIP catalog entries.
     #[serde(default)]
     pub allow_vip: bool,
+    /// 主轨吸附（主轨磁吸），写入 `content.config.maintrack_adsorb`；
+    /// 省略时沿用模板默认值（true），与 pyJianYingDraft 的默认一致。
+    #[serde(default)]
+    pub maintrack_adsorb: Option<bool>,
     /// Directory of the plan file, set by `Plan::load`; relative sources
     /// resolve against it.
     #[serde(skip)]

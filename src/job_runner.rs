@@ -909,6 +909,7 @@ pub fn plan_from_project(project: &DraftProject) -> Result<Plan> {
         },
         tracks,
         allow_vip: false,
+        maintrack_adsorb: None,
         parent: None,
     })
 }

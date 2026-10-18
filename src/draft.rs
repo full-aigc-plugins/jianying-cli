@@ -589,6 +589,10 @@ pub fn build(
     content["platform"]["os"] = json!(host_os());
     content["last_modified_platform"]["os"] = json!(host_os());
     content["extra_info"] = json!({"created_via": "jianying-cli"});
+    // 主轨吸附：模板默认 true；计划显式给出时覆盖（pyJianYingDraft 同字段同位置）。
+    if let Some(maintrack_adsorb) = plan.maintrack_adsorb {
+        content["config"]["maintrack_adsorb"] = json!(maintrack_adsorb);
+    }
     let seed_donor = donor_root.and_then(|r| seed_from_donor(r, &mut content));
 
     let materials = &mut content["materials"];

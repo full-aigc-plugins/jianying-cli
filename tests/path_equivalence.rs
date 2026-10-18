@@ -602,3 +602,30 @@ fn text_typography_defaults_stay_byte_identical() {
     assert_eq!(material["type"], json!("text"));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn maintrack_adsorb_is_carried_from_the_plan_and_defaults_to_true() {
+    let root = temp_root("maintrack");
+    let base = json!({
+        "schema": "jianying-cli-plan/v1",
+        "name": "maintrack",
+        "canvas": {"width": 1920, "height": 1080, "fps": 30},
+        "tracks": [{"type": "text", "segments": [{
+            "start_us": 0, "duration_us": 1_000_000, "text": "吸附"
+        }]}]
+    });
+    let default_dir = build(&root, "default", base.clone(), &video_probe);
+    let default_content: Value =
+        serde_json::from_str(&fs::read_to_string(default_dir.join("draft_content.json")).unwrap())
+            .unwrap();
+    assert_eq!(default_content["config"]["maintrack_adsorb"], json!(true));
+
+    let mut off = base;
+    off["maintrack_adsorb"] = json!(false);
+    let off_dir = build(&root, "off", off, &video_probe);
+    let off_content: Value =
+        serde_json::from_str(&fs::read_to_string(off_dir.join("draft_content.json")).unwrap())
+            .unwrap();
+    assert_eq!(off_content["config"]["maintrack_adsorb"], json!(false));
+    let _ = fs::remove_dir_all(root);
+}

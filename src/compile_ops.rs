@@ -989,6 +989,7 @@ fn to_plan(
         },
         tracks,
         allow_vip: false,
+        maintrack_adsorb: None,
         parent: Some(base.to_path_buf()),
     })
 }
