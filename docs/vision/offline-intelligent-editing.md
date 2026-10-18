@@ -129,3 +129,13 @@ timeline move 第二段 +2.5s      → eval              → score 62, issues [m
 
 技能注册表里 `beat-sync` 由 `missing` 升为 `partial`：检测可用，
 "自动对齐重排"仍需在计划层指定切点。
+
+## 10. 收口（第 27 轮）
+
+- **目标证据快照**：`provenance/GOAL_SNAPSHOT.json`（`tools/goal_snapshot.py` 生成），
+  记录 commit、自检矩阵、命令/能力/技能数量与两份覆盖摘要；`tests/goal_snapshot_contract.rs` 校验其结构。
+- **P3 官方协议**：以 [ADR-003](../adr/ADR-003-official-protocol-out-of-scope.md) 正式排除，
+  原因是需要 `JIANYING_AGENT_RUNTIME_TOKEN`（鉴权红线），不再作为缺口追踪。
+- **P4 能力适用性**：`applies_to` 已落地（`capabilities --draft-schema`），
+  清单可按草稿线格式过滤，非法声明在使用前失败。
+- **唯一未完成项**：发布（tag 构建 + 插件 lock 更新与发版），需要用户授权。

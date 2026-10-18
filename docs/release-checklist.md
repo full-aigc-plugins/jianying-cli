@@ -100,3 +100,14 @@ status）。任何漂移都会让 `ok=false` 并在 `capabilities.mismatches` �
 > 注意：`contentState=committed_unreleased`。插件侧 lock 只应接受真正的
 > `released` 产物（tag 构建），因此现在**还不是**可以写进
 > `runtime/jianying-cli.lock.json` 的东西。
+
+## 附：发布前的最后一道证据
+
+```bash
+python tools/goal_snapshot.py --binary target/debug/jianying.exe
+cargo test --workspace --locked -j 2
+python tools/check_provenance.py
+```
+
+快照写入 `provenance/GOAL_SNAPSHOT.json`，其中的 `git.dirty` 必须为 `false`——
+脏树生成的快照不能作为发布证据（发布身份同样要求干净树）。

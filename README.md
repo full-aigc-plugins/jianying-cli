@@ -67,6 +67,17 @@ Agent 既可以用 `jianying_command_run` 调任意 CLI 命令，也可以用
 `jianying_loop` / `jianying_render_frame` 做结构化读写。
 详见 [`docs/mcp-server.md`](docs/mcp-server.md)。
 
+## 目标达成证据
+
+`provenance/GOAL_SNAPSHOT.json` 是按需重新生成的机器快照（commit、自检矩阵、
+命令/能力/技能数量、两份覆盖摘要）。重新生成：
+
+```bash
+python tools/goal_snapshot.py --binary target/debug/jianying.exe
+```
+
+官方客户端协议为何不实现：见 [`docs/adr/ADR-003-official-protocol-out-of-scope.md`](docs/adr/ADR-003-official-protocol-out-of-scope.md)。
+
 ## 一条命令自检
 
 拿到二进制后先跑自检：它按目标的六条验收线逐项检查，缺依赖的项如实标 SKIP。
