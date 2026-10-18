@@ -35,6 +35,44 @@ jianying store publish d1 [--root DIR] [--force]           # 发布进草稿库�
 jianying render proxy d1 --burn-captions                   # ffmpeg 代理预览（非成片）
 ```
 
+## 四种建草稿的方式（命令式优先）
+
+计划文件**不是必选项**。只做一次剪辑时，直接敲命令即可，这也是最接近
+pyJianYingDraft 逐句 API 调用的用法：
+
+```bash
+# ① 命令式：建成空草稿，再逐条加内容（推荐作为默认路径）
+jianying project init "我的片子" --out draft --width 1080 --height 1920
+jianying media add-video draft ./clip.mp4 0s 4s          # 加视频（带音频会自动混入）
+jianying captions add draft "第一句字幕" 0s 2s            # 加字幕
+jianying timeline speed draft <segment_id> 1.2            # 改已有片段
+jianying project verify draft && jianying render proxy draft --out film.mp4
+
+# ② 一条命令：把素材/字幕直接变成草稿
+jianying project quickstart "快速" --out draft --video ./clip.mp4 --audio ./bgm.mp3
+
+# ③ 声明式：从计划文件构建（需要版本化、可回滚、可组合时）
+jianying project build plan.json --out draft
+
+# ④ 兼容 capcut-cli 的完整规格
+jianying project compile spec.json --out draft
+```
+
+没有任何一步需要剪映客户端；`ffmpeg` 只在探测、渲染、深度评估时用到。
+
+## 什么时候才需要"计划"
+
+| 场景 | 用命令式 | 用计划 |
+|---|---|---|
+| 手工剪一段、改一个片段 | ✅ | 没必要 |
+| 同一套结构批量出多条 | 命令会很长 | ✅ 模板化 + `generate` |
+| 需要 diff / 回滚 / 组合 | 难追踪 | ✅ `plan compose/append/history/revert` |
+| 交给 Agent 生成整条时间线 | 工具调用爆炸 | ✅ 一份 JSON 描述全片 |
+| 需要跑评估-修复闭环 | 可以跑但不便于复现 | ✅ `eval` / `loop` 直接吃计划产物 |
+
+计划的代价是多了一层模型；收益是可 diff、可回滚、可组合、可批量生成。
+如果你的目标是"用 CLI 剪一段"，请直接用 ① 或 ②。
+
 ## 无客户端智能剪辑流水线
 
 从素材到成片预览，全流程不需要剪映客户端：
