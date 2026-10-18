@@ -63,7 +63,7 @@ ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -o
 | 支柱 | 现状 | 证据 |
 |---|---|---|
 | V1 pyJYD 替代 | 🟡 核心达成：55/55 parity、单一 writer、**API 面 68/68 已逐类登记且类级 `uncovered=0`**（3 类 partial 共 4 个方法、6 类 L3 out_of_scope）；剩余：这 4 个方法与更多 op 迁移 | `provenance/PYJYD_API_COVERAGE.json`、`tests/pyjyd_api_coverage_contract.rs` |
-| V2 dream-loop 闭环 | 🟡 闭环已可运行：`eval` 给 0–100 确定性评分 + 结构化问题，`loop` 按问题挑安全修复并重评（最大轮数、显式停止原因）；**缺**内容级生成与更丰富的修复集 | `src/eval_ops.rs`、`tests/eval_loop_contract.rs` |
+| V2 dream-loop 闭环 | 🟡 闭环可运行且能修**内容级缺陷**：`eval --deep` 检出素材缺失/源窗口越界，`loop --deep` 用 clamp 修复冻结尾；**缺**画面质量（黑帧/响度）与生成式改写 | `src/eval_ops.rs`、`tests/eval_loop_contract.rs` |
 | V3 hypit 计划层 | 🟡 `plan/v1` 可程序化生成/改写，`timeline` 33 条命令可增量修改；缺"计划级组合与回滚语义" | `docs/plan-format.md`、`src/plan.rs` |
 | V4 editor-skill 整合 | 🟡 已建**技能注册表**：14 条工作流技能带状态/意图/命令/缺口，且合同测试校验引用命令真实存在；缺口以 `partial`/`missing` 显式登记 | `src/skills.rs`、`tests/skills_contract.rs`、`jianying skills list` |
 | V5 headless 能力 | 🟢 批量流水线已通：`pipeline <计划目录>` 一次完成 构建→评分→渲染，失败按条隔离，`--fail-under` 作 CI 门禁；**渲染仍是预览级** | `src/pipeline_ops.rs`、`tests/pipeline_contract.rs` |

@@ -3098,3 +3098,74 @@ fn timeline_duration(timeline: &Value) -> i64 {
         .max()
         .unwrap_or(0)
 }
+
+/// 修复：把超出素材真实时长的源窗口收窄到可用范围。
+///
+/// 只处理"源起点仍在素材内、但窗口尾部越界"的情况；整段都越界时不做猜测，
+/// 交给调用方换素材。目标时长按速度换算，避免破坏变速语义。
+pub fn clamp_source_windows(draft: &Path) -> Result<Value> {
+    let timeline = crate::draft::load_timeline(draft)?;
+    let mut paths: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    for bucket in ["videos", "audios"] {
+        for material in timeline["materials"][bucket]
+            .as_array()
+            .into_iter()
+            .flatten()
+        {
+            if let (Some(id), Some(path)) = (
+                material["id"].as_str(),
+                material["path"].as_str().filter(|path| !path.is_empty()),
+            ) {
+                paths.insert(id.to_owned(), path.to_owned());
+            }
+        }
+    }
+    let mut durations: std::collections::BTreeMap<String, i64> = std::collections::BTreeMap::new();
+    for path in paths.values() {
+        if let Ok(info) = crate::probe::probe(std::path::Path::new(path)) {
+            if info.duration_us > 0 {
+                durations.insert(path.clone(), info.duration_us);
+            }
+        }
+    }
+
+    mutate(draft, |timeline| {
+        let mut clamped = 0_usize;
+        let mut skipped = 0_usize;
+        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            for segment in track["segments"].as_array_mut().into_iter().flatten() {
+                let Some(material_id) = segment["material_id"].as_str().map(str::to_owned) else {
+                    continue;
+                };
+                let Some(path) = paths.get(&material_id) else {
+                    continue;
+                };
+                let Some(duration) = durations.get(path).copied() else {
+                    continue;
+                };
+                let start = segment["source_timerange"]["start"].as_i64().unwrap_or(0);
+                let length = segment["source_timerange"]["duration"]
+                    .as_i64()
+                    .unwrap_or(0);
+                if start + length <= duration {
+                    continue;
+                }
+                let available = duration - start;
+                if available <= 0 {
+                    skipped += 1;
+                    continue;
+                }
+                let speed = segment["speed"].as_f64().unwrap_or(1.0).max(0.01);
+                segment["source_timerange"]["duration"] = json!(available);
+                segment["target_timerange"]["duration"] = json!(
+                    crate::writer::scaled_source_duration(available, 1.0 / speed)
+                );
+                clamped += 1;
+            }
+        }
+        Ok(json!({
+            "ok": true, "repair": "clamp-source-window",
+            "clamped_segments": clamped, "unfixable_segments": skipped
+        }))
+    })
+}

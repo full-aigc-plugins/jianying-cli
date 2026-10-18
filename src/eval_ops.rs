@@ -202,6 +202,12 @@ pub fn next_repair(report: &Value) -> Option<&'static str> {
     if issues.iter().any(|issue| issue["code"] == "empty-track") {
         return Some("drop-empty-tracks");
     }
+    if issues
+        .iter()
+        .any(|issue| issue["code"] == "source-exceeds-media")
+    {
+        return Some("clamp-source-window");
+    }
     None
 }
 
@@ -210,6 +216,7 @@ pub fn repair(draft: &Path, kind: &str) -> Result<Value> {
     match kind {
         "close-main-track-gaps" => crate::timeline_ops::close_main_track_gaps(draft),
         "drop-empty-tracks" => crate::timeline_ops::drop_empty_tracks(draft),
+        "clamp-source-window" => crate::timeline_ops::clamp_source_windows(draft),
         other => anyhow::bail!("unknown repair {other:?}"),
     }
 }

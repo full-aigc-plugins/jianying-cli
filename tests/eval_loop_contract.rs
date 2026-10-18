@@ -355,3 +355,63 @@ fn media_checks_are_opt_in_and_absent_from_shallow_eval() {
         .all(|issue| issue["code"] != "media-missing"));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn loop_repairs_an_oversized_source_window_by_clamping_it() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("clamp");
+    write_clip(&root.join("clip.mp4"));
+    let plan = json!({
+        "schema":"jianying-cli-plan/v1","name":"clamp",
+        "canvas":{"width":320,"height":180,"fps":30},
+        "tracks":[{"type":"video","segments":[
+            {"start_us":0,"duration_us":5000000,"source":"clip.mp4"}
+        ]}]
+    });
+    let plan_path = root.join("plan.json");
+    fs::write(&plan_path, serde_json::to_string(&plan).unwrap()).unwrap();
+    let dir = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &plan_path.to_string_lossy(),
+        "--out",
+        &dir.to_string_lossy(),
+        "--json",
+    ]);
+
+    let before = run_ok(&["eval", &dir.to_string_lossy(), "--deep", "--json"]);
+    assert_eq!(before["score"], json!(85));
+
+    let outcome = run_ok(&[
+        "loop",
+        &dir.to_string_lossy(),
+        "--deep",
+        "--max-rounds",
+        "3",
+        "--min-score",
+        "100",
+        "--json",
+    ]);
+    assert_eq!(outcome["rounds"][0]["repair"], json!("clamp-source-window"));
+    assert_eq!(outcome["final"]["score"], json!(100));
+    assert_eq!(
+        outcome["final"]["duration_us"],
+        json!(2000000),
+        "应收窄到素材实际时长"
+    );
+    let codes: Vec<&str> = outcome["final"]["issues"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|issue| issue["code"].as_str().unwrap())
+        .collect();
+    assert!(!codes.contains(&"source-exceeds-media"), "issues={codes:?}");
+    assert_eq!(
+        run_ok(&["project", "verify", &dir.to_string_lossy(), "--json"])["ok"],
+        true
+    );
+    let _ = fs::remove_dir_all(root);
+}
