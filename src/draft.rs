@@ -172,8 +172,9 @@ fn apply_visuals(seg_v: &mut Value, seg: &Segment, video: bool) {
         "transform": {"x": seg.x.unwrap_or(0.0), "y": seg.y.unwrap_or(0.0)},
         "flip": {"horizontal": false, "vertical": false}
     });
-    // visual segments (video/sticker/text) carry uniform_scale; non-uniform
-    // keyframes turn it off (pyJianYingDraft authority)
+    // visual segments (video/sticker/text) carry uniform_scale; per-axis
+    // keyframes turn it off (pyJianYingDraft authority). On the plan side
+    // `scale` *is* a per-axis channel, so it counts here.
     let has_scale_kf = seg
         .keyframes
         .as_ref()
@@ -223,9 +224,9 @@ fn apply_keyframes(seg_v: &mut Value, seg: &Segment) {
     };
     for (channel, points) in kfs {
         match channel.as_str() {
-            // 短别名：与参考构建器一致，`scale` 即 scale_x
-            // ???????????`scale` ?? uniform_scale????? scale_x/scale_y?
-            "scale" => push("UNIFORM_SCALE", points),
+            // 短别名：计划面跟随 pyJianYingDraft，`scale` 即 scale_x
+            // （pyJYD 的 add_keyframe 会把 uniform_scale 改写成 scale_x）
+            "scale" => push("KFTypeScaleX", points),
             "x" => push("KFTypePositionX", points),
             "y" => push("KFTypePositionY", points),
             "opacity" => push("KFTypeAlpha", points),

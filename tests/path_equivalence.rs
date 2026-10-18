@@ -429,7 +429,7 @@ fn keyframes_are_identical_whether_authored_or_applied_afterwards() {
     let _ = fs::remove_dir_all(root);
 }
 #[test]
-fn scale_keyframe_alias_is_identical_whether_authored_or_applied_afterwards() {
+fn plan_scale_alias_matches_the_explicit_per_axis_cli_channel() {
     let root = temp_root("scale-kf");
     fs::write(root.join("clip.mp4"), b"fixture").unwrap();
 
@@ -452,31 +452,24 @@ fn scale_keyframe_alias_is_identical_whether_authored_or_applied_afterwards() {
         &video_probe,
     );
     let id = first_segment_id(&edited, "video");
-    run_ok(&[
-        "timeline",
-        "keyframe",
-        &edited.to_string_lossy(),
-        &id,
-        "scale",
-        "0us",
-        "1.0",
-        "--json",
-    ]);
-    run_ok(&[
-        "timeline",
-        "keyframe",
-        &edited.to_string_lossy(),
-        &id,
-        "scale",
-        "1000000us",
-        "2.0",
-        "--json",
-    ]);
+    // 计划面的 `scale` 跟随 pyJianYingDraft（scale_x）；命令面的 `scale` 跟随 capcut-cli（uniform_scale），因此这里用显式名对齐同一通道。
+    for (time, value) in [("0us", "1.0"), ("1000000us", "2.0")] {
+        run_ok(&[
+            "timeline",
+            "keyframe",
+            &edited.to_string_lossy(),
+            &id,
+            "scale_x",
+            time,
+            value,
+            "--json",
+        ]);
+    }
 
     assert_eq!(
         keyframe_channels(&authored),
         keyframe_channels(&edited),
-        "同一个 scale 别名在两条路径上必须落到同一通道"
+        "计划 `scale` 与命令 `scale_x` 必须落到同一通道"
     );
     let _ = fs::remove_dir_all(root);
 }

@@ -204,7 +204,7 @@ def main():
                     vs.add_background_filling(bf["type"], blur=bf.get("blur", 0.0625),
                                               color=bf.get("color", "#00000000"))
                 for channel, points in (seg.get("keyframes") or {}).items():
-                    prop = {"scale": draft.KeyframeProperty.uniform_scale,
+                    prop = {"scale": draft.KeyframeProperty.scale_x,
                             "x": draft.KeyframeProperty.position_x,
                             "y": draft.KeyframeProperty.position_y,
                             "rotation": draft.KeyframeProperty.rotation,

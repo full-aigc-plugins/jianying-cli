@@ -2,6 +2,20 @@
 
 时间一律微秒；相对素材路径按计划文件目录解析；坐标半幅（x/y，字幕惯例 y=-0.78）。
 
+
+### 关键帧别名：两个上游参考实现不同
+
+`scale` 这个短别名在两条写入路径上**有意不同**，因为两个上游参考实现给出了不同答案：
+
+| 路径 | 对齐对象 | `scale` 实际写入 | 原因 |
+|---|---|---|---|
+| 计划 `keyframes.scale` | pyJianYingDraft | `KFTypeScaleX` | pyJYD `add_keyframe` 会把 `uniform_scale` 改写成 `scale_x` |
+| 命令 `timeline keyframe ... scale` | capcut-cli | `UNIFORM_SCALE` | 上游命令面这个别名就是等比缩放 |
+
+逐轴缩放请显式写 `scale_x` / `scale_y`；等比缩放在计划面写 `uniform_scale`。
+两侧的对应关系由 `tools/parity_run.py`（pyJYD）与
+`tools/capcut_timeline_differential.py`（capcut-cli）各自验证。
+
 ## 顶层
 
 | 字段 | 说明 |
