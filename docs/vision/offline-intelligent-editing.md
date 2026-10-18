@@ -65,7 +65,7 @@ ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -o
 | V1 pyJYD 替代 | 🟢 API 面 **68/68 类、90/90 方法全部登记**（62 covered + 6 类 L3 out_of_scope，`partial=0`、`uncovered=0`）；55/55 双源差分仍为行为证据 | `provenance/PYJYD_API_COVERAGE.json`、`tests/pyjyd_api_coverage_contract.rs` |
 | V2 dream-loop 闭环 | 🟢 闭环四类问题可检出、三类可自动修：结构（空洞/空轨）、素材（越界收窄/缺失告警）、画音（黑帧/静音/响度）、节奏（长镜等分、碎切告警）；阈值与权重由 `jianying-eval-policy/v1` 外置；CLI 与 MCP 共用同一实现 | `src/eval_ops.rs`、`src/eval_policy.rs`、`tests/eval_loop_contract.rs`、`tests/eval_policy_contract.rs`、`tests/brief_generate_contract.rs` |
 | V3 hypit 计划层 | 🟢 计划可编排：`plan compose/append` 确定性拼接（画布一致、主轨优先、按累计时长偏移），每次写入留快照，`plan history/revert` 逐字节回滚 | `src/plan_ops.rs`、`tests/plan_composition_contract.rs` |
-| V4 editor-skill 整合 | 🟡 CLI 侧完成：14 条技能注册表（合同测试校验引用命令真实存在）、17 个 MCP 工具、发布物可离线自校验；**差最后一步**：tag 构建与插件发版需要授权 | `src/skills.rs`、`src/release_ops.rs`、`docs/release-checklist.md`、`jianying skills list` |
+| V4 editor-skill 整合 | 🟡 CLI 侧完成：上游 27 个公开 API/脚本中 17 covered、3 partial、8 out_of_scope，逐条映射到真实命令并有合同测试；17 个 MCP 工具、发布物可自校验；**差最后一步**：tag 构建与插件发版需要授权 | `docs/integration/editor-skill.md`、`provenance/EDITOR_SKILL_COVERAGE.json`、`tests/editor_skill_coverage_contract.rs` |
 | V5 headless 能力 | 🟢 批量流水线已通：`pipeline <计划目录>` 一次完成 构建→评分→渲染，失败按条隔离，`--fail-under` 作 CI 门禁；**渲染仍是预览级** | `src/pipeline_ops.rs`、`tests/pipeline_contract.rs` |
 | V6 无客户端出片 | 🟢 **预览级已通**（§3 实测）：`generate → build → eval → loop → render proxy / render frame` 全链路可跑；权威导出明确不做 | 本文 §3 |
 

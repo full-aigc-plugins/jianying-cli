@@ -3415,3 +3415,207 @@ pub fn split_long_shots(draft: &Path, max_shot_us: i64) -> Result<Value> {
         Ok(json!({"ok": true, "repair": "split-long-shots", "new_segments": split}))
     })
 }
+
+/// 按静音段剪掉停顿（`smart_rough_cut` 的确定性版本）。
+///
+/// 对目标轨道的每个片段：探测其素材的静音区间，只保留"有声"部分（两侧各留
+/// `keep_pad_us` 余量），其余删除，最后把整条轨道紧凑拼接。
+/// 只处理**同一素材内的停顿**，不做跨素材判断；不改变保留部分的时长。
+pub fn cut_silences(
+    draft: &Path,
+    track_type: &str,
+    min_silence_us: i64,
+    keep_pad_us: i64,
+    threshold_db: f64,
+) -> Result<Value> {
+    if min_silence_us <= 0 {
+        bail!("min-silence must be positive");
+    }
+    if keep_pad_us < 0 {
+        bail!("keep-pad must be >= 0");
+    }
+    let timeline = crate::draft::load_timeline(draft)?;
+    let mut paths: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    for bucket in ["videos", "audios"] {
+        for material in timeline["materials"][bucket]
+            .as_array()
+            .into_iter()
+            .flatten()
+        {
+            if let (Some(id), Some(path)) = (
+                material["id"].as_str(),
+                material["path"].as_str().filter(|path| !path.is_empty()),
+            ) {
+                paths.insert(id.to_owned(), path.to_owned());
+            }
+        }
+    }
+    // 每个素材最多探测一次
+    let mut silences: std::collections::BTreeMap<String, Vec<(i64, i64)>> =
+        std::collections::BTreeMap::new();
+    for path in paths.values() {
+        let report = crate::media_analysis::silence(
+            std::path::Path::new(path),
+            threshold_db,
+            min_silence_us as f64 / 1_000_000.0,
+            0.0,
+            None,
+            None,
+        )?;
+        let spans = report["silences"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|span| Some((span["start_us"].as_i64()?, span["end_us"].as_i64()?)))
+            .collect();
+        silences.insert(path.clone(), spans);
+    }
+
+    let mut removed_us = 0_i64;
+    let mut kept_segments = 0_usize;
+    mutate(draft, |timeline| {
+        // 删除发生在**时间线时间**上；其它轨道必须跟着前移，否则字幕会错位。
+        let mut removals: Vec<(i64, i64)> = Vec::new();
+        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            if track["type"].as_str() != Some(track_type) {
+                continue;
+            }
+            let segments = track["segments"]
+                .as_array_mut()
+                .context("segments must be an array")?;
+            let mut output: Vec<Value> = Vec::new();
+            for segment in segments.iter() {
+                let Some(material_id) = segment["material_id"].as_str() else {
+                    output.push(segment.clone());
+                    continue;
+                };
+                let Some(path) = paths.get(material_id) else {
+                    output.push(segment.clone());
+                    continue;
+                };
+                let spans = silences.get(path).cloned().unwrap_or_default();
+                let window_start = segment["source_timerange"]["start"].as_i64().unwrap_or(0);
+                let window_len = segment["source_timerange"]["duration"]
+                    .as_i64()
+                    .unwrap_or(0);
+                if window_len <= 0 {
+                    output.push(segment.clone());
+                    continue;
+                }
+                let window_end = window_start + window_len;
+                // 覆盖该窗口的静音，向内收 pad（保留气口）
+                let mut cuts: Vec<(i64, i64)> = spans
+                    .iter()
+                    .filter_map(|(start, end)| {
+                        let a = (*start + keep_pad_us).max(window_start);
+                        let b = (*end - keep_pad_us).min(window_end);
+                        (b > a).then_some((a, b))
+                    })
+                    .collect();
+                cuts.sort_unstable();
+                if cuts.is_empty() {
+                    output.push(segment.clone());
+                    continue;
+                }
+                // 补集 = 保留区间
+                let mut keep: Vec<(i64, i64)> = Vec::new();
+                let mut cursor = window_start;
+                for (start, end) in cuts {
+                    if start > cursor {
+                        keep.push((cursor, start));
+                    }
+                    cursor = cursor.max(end);
+                }
+                if cursor < window_end {
+                    keep.push((cursor, window_end));
+                }
+                // 把"被删掉的源区间"换算成时间线区间，供其它轨道 ripple
+                let speed_value = segment["speed"].as_f64().unwrap_or(1.0).max(0.01);
+                let window_target = segment["target_timerange"]["start"].as_i64().unwrap_or(0);
+                {
+                    let mut source_cursor = window_start;
+                    for (keep_start, keep_end) in keep.clone() {
+                        if keep_start > source_cursor {
+                            let offset = crate::writer::scaled_source_duration(
+                                keep_start - source_cursor,
+                                1.0 / speed_value,
+                            );
+                            let length = crate::writer::scaled_source_duration(
+                                keep_start - source_cursor,
+                                1.0 / speed_value,
+                            );
+                            let start = window_target + offset;
+                            removals.push((start, start + length));
+                        }
+                        source_cursor = keep_end;
+                    }
+                    if source_cursor < window_end {
+                        let offset = crate::writer::scaled_source_duration(
+                            source_cursor - window_start,
+                            1.0 / speed_value,
+                        );
+                        let length = crate::writer::scaled_source_duration(
+                            window_end - source_cursor,
+                            1.0 / speed_value,
+                        );
+                        let start = window_target + offset;
+                        removals.push((start, start + length));
+                    }
+                }
+                if keep.is_empty() {
+                    removed_us += window_len;
+                    continue;
+                }
+                let speed = segment["speed"].as_f64().unwrap_or(1.0).max(0.01);
+                let mut target_cursor = segment["target_timerange"]["start"].as_i64().unwrap_or(0);
+                for (start, end) in keep.clone() {
+                    let length = end - start;
+                    let mut piece = segment.clone();
+                    piece["id"] = json!(uuid::Uuid::new_v4().simple().to_string());
+                    piece["source_timerange"]["start"] = json!(start);
+                    piece["source_timerange"]["duration"] = json!(length);
+                    piece["target_timerange"]["start"] = json!(target_cursor);
+                    piece["target_timerange"]["duration"] =
+                        json!(crate::writer::scaled_source_duration(length, 1.0 / speed));
+                    target_cursor +=
+                        crate::writer::scaled_source_duration(length, 1.0 / speed_value);
+                    output.push(piece);
+                    kept_segments += 1;
+                }
+                removed_us += window_len - keep.iter().map(|(a, b)| b - a).sum::<i64>();
+            }
+            *segments = output;
+        }
+        // ripple：其它轨道的片段按"删除量"整体前移；落在删除区内的对齐到删除起点
+        removals.sort_unstable();
+        for track in timeline["tracks"].as_array_mut().into_iter().flatten() {
+            if track["type"].as_str() == Some(track_type) {
+                continue;
+            }
+            for segment in track["segments"].as_array_mut().into_iter().flatten() {
+                let start = segment["target_timerange"]["start"].as_i64().unwrap_or(0);
+                let mut removed_before = 0_i64;
+                let mut snapped: Option<i64> = None;
+                for (a, b) in &removals {
+                    if start >= *b {
+                        removed_before += b - a;
+                    } else if start > *a && start < *b {
+                        snapped = Some(*a - removed_before);
+                        break;
+                    }
+                }
+                let new_start = snapped.unwrap_or(start - removed_before).max(0);
+                if new_start != start {
+                    segment["target_timerange"]["start"] = json!(new_start);
+                }
+            }
+        }
+        Ok(json!({
+            "ok": true,
+            "repair": "cut-silences",
+            "track": track_type,
+            "removed_us": removed_us,
+            "kept_segments": kept_segments,
+        }))
+    })
+}

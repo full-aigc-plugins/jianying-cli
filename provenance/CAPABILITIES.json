@@ -832,6 +832,16 @@
       "id": "docs.commands_match_cli",
       "status": "supported",
       "evidence": "tests/docs_command_contract.rs: every `jianying ...` invocation in README/docs is resolved against the live command catalog, with a parser self-check so the gate cannot pass vacuously"
+    },
+    {
+      "id": "integration.editor_skill",
+      "status": "supported",
+      "evidence": "tests/editor_skill_coverage_contract.rs + provenance/EDITOR_SKILL_COVERAGE.json: every advertised JyProject method and script of jianying-editor-skill is mapped to a real command path, with partial gaps and out-of-scope reasons recorded"
+    },
+    {
+      "id": "timeline.cut_silences",
+      "status": "supported",
+      "evidence": "tests/cut_silences_contract.rs: pauses are cut to their audible parts with keep-pad, the removed span is rippled onto other tracks, and the draft still verifies"
     }
   ],
   "truth_rule": "Only status=supported may be advertised as available; partial and external_dependency remain blocked for automatic routing."

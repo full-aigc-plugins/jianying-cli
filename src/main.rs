@@ -727,6 +727,22 @@ enum TimelineOp {
         /// `on` or `off`
         state: String,
     },
+    /// Cut pauses: keep only the audible parts of a track and repack it
+    CutSilences {
+        draft: PathBuf,
+        /// Track type to process (video/audio)
+        #[arg(long, default_value = "video")]
+        track: String,
+        /// Minimum silence length to cut, e.g. `600ms`
+        #[arg(long, default_value = "600ms")]
+        min_silence: String,
+        /// Keep this much audio around each cut as breathing room
+        #[arg(long, default_value = "100ms")]
+        keep_pad: String,
+        /// Silence threshold in dBFS
+        #[arg(long, default_value_t = -35.0)]
+        threshold_db: f64,
+    },
     /// Add an empty track
     AddTrack {
         draft: PathBuf,
@@ -2846,6 +2862,22 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                     speed,
                     volume,
                     opacity,
+                )?,
+                json,
+            ),
+            TimelineOp::CutSilences {
+                draft,
+                track,
+                min_silence,
+                keep_pad,
+                threshold_db,
+            } => print_output(
+                timeline_ops::cut_silences(
+                    &draft,
+                    &track,
+                    tim::parse(&min_silence)?,
+                    tim::parse(&keep_pad)?,
+                    threshold_db,
                 )?,
                 json,
             ),

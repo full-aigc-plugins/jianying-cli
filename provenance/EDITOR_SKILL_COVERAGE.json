@@ -1,0 +1,203 @@
+{
+  "schema": "jianying-editor-skill-coverage/v1",
+  "upstream": {
+    "project": "jianying-editor-skill",
+    "doc": "docs/api.md",
+    "scripts": "scripts/*.py"
+  },
+  "summary": {
+    "methods": 13,
+    "scripts": 14,
+    "by_status": {
+      "covered": 17,
+      "out_of_scope": 8,
+      "partial": 3
+    }
+  },
+  "problems": [],
+  "rows": [
+    {
+      "kind": "JyProject",
+      "name": "save",
+      "status": "covered",
+      "ours": "project build",
+      "note": "构建即落盘，并自带 verify 门禁"
+    },
+    {
+      "kind": "JyProject",
+      "name": "get_track_duration",
+      "status": "covered",
+      "ours": "timeline tracks"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_media_safe",
+      "status": "covered",
+      "ours": "media add-video"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_audio_safe",
+      "status": "covered",
+      "ours": "media add-audio"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_clip",
+      "status": "covered",
+      "ours": "timeline add-segment"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_cloud_media",
+      "status": "out_of_scope",
+      "note": "云端素材需要账号与签名，属鉴权红线"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_cloud_music",
+      "status": "out_of_scope",
+      "note": "云端曲库同上"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_text_simple",
+      "status": "covered",
+      "ours": "captions add"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_tts_intelligent",
+      "status": "covered",
+      "ours": "media tts"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_narrated_subtitles",
+      "status": "partial",
+      "ours": "media tts + captions import-srt",
+      "missing": [
+        "narration-alignment"
+      ],
+      "note": "TTS 与字幕分别可用，但没有一条命令自动对齐旁白与字幕"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_effect_simple",
+      "status": "covered",
+      "ours": "timeline add-effect"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_transition_simple",
+      "status": "covered",
+      "ours": "timeline transition"
+    },
+    {
+      "kind": "JyProject",
+      "name": "add_web_asset_safe",
+      "status": "out_of_scope",
+      "note": "HTML 转视频需要无头浏览器，超出无客户端剪辑的边界"
+    },
+    {
+      "kind": "JyProject",
+      "name": "constructor",
+      "status": "covered",
+      "ours": "project build",
+      "note": "画布与名称写在计划里"
+    },
+    {
+      "kind": "scripts",
+      "name": "api_validator",
+      "status": "covered",
+      "ours": "project verify + capabilities"
+    },
+    {
+      "kind": "scripts",
+      "name": "asset_search",
+      "status": "covered",
+      "ours": "media catalog + resource list"
+    },
+    {
+      "kind": "scripts",
+      "name": "auto_exporter",
+      "status": "partial",
+      "ours": "render native + job run",
+      "missing": [
+        "native-export"
+      ],
+      "note": "原生导出仍受剪映宿主门禁约束"
+    },
+    {
+      "kind": "scripts",
+      "name": "build_cloud_music_library",
+      "status": "out_of_scope",
+      "note": "云端曲库抓取"
+    },
+    {
+      "kind": "scripts",
+      "name": "build_cloud_text_styles_library",
+      "status": "out_of_scope",
+      "note": "????????"
+    },
+    {
+      "kind": "scripts",
+      "name": "cloud_manager",
+      "status": "out_of_scope",
+      "note": "云端素材库"
+    },
+    {
+      "kind": "scripts",
+      "name": "draft_inspector",
+      "status": "covered",
+      "ours": "store list + project inspect + media material"
+    },
+    {
+      "kind": "scripts",
+      "name": "jy_wrapper",
+      "status": "covered",
+      "ours": "project build",
+      "note": "对应 JyProject 类，逐方法见上"
+    },
+    {
+      "kind": "scripts",
+      "name": "movie_commentary_builder",
+      "status": "partial",
+      "ours": "generate",
+      "missing": [
+        "commentary-script"
+      ],
+      "note": "装配可用，解说文案生成不在范围内"
+    },
+    {
+      "kind": "scripts",
+      "name": "smart_rough_cut",
+      "status": "covered",
+      "ours": "timeline cut-silences"
+    },
+    {
+      "kind": "scripts",
+      "name": "smart_zoomer",
+      "status": "out_of_scope",
+      "note": "录屏变焦需要屏幕录制管线"
+    },
+    {
+      "kind": "scripts",
+      "name": "sync_jy_assets",
+      "status": "covered",
+      "ours": "media harvest-enums sync"
+    },
+    {
+      "kind": "scripts",
+      "name": "universal_tts",
+      "status": "covered",
+      "ours": "media tts"
+    },
+    {
+      "kind": "scripts",
+      "name": "web_recorder",
+      "status": "out_of_scope",
+      "note": "录屏"
+    }
+  ]
+}

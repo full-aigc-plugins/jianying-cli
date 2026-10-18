@@ -1,0 +1,152 @@
+{
+  "schema": "jianying-editor-skill-mapping/v1",
+  "upstream": {
+    "project": "jianying-editor-skill",
+    "doc": "docs/api.md",
+    "scripts": "scripts/*.py"
+  },
+  "note": "ours 只写本仓库真实存在的命令路径；tools/editor_skill_coverage.py 会到命令目录里逐条校验。",
+  "classes": {
+    "JyProject": {
+      "status": "covered",
+      "ours": "project build + project describe + project verify",
+      "evidence": "tests/path_equivalence.rs",
+      "methods": {
+        "constructor": {
+          "status": "covered",
+          "ours": "project build",
+          "note": "画布与名称写在计划里"
+        },
+        "save": {
+          "status": "covered",
+          "ours": "project build",
+          "note": "构建即落盘，并自带 verify 门禁"
+        },
+        "get_track_duration": {
+          "status": "covered",
+          "ours": "timeline tracks"
+        },
+        "add_media_safe": {
+          "status": "covered",
+          "ours": "media add-video"
+        },
+        "add_audio_safe": {
+          "status": "covered",
+          "ours": "media add-audio"
+        },
+        "add_clip": {
+          "status": "covered",
+          "ours": "timeline add-segment"
+        },
+        "add_cloud_media": {
+          "status": "out_of_scope",
+          "note": "云端素材需要账号与签名，属鉴权红线"
+        },
+        "add_cloud_music": {
+          "status": "out_of_scope",
+          "note": "云端曲库同上"
+        },
+        "add_text_simple": {
+          "status": "covered",
+          "ours": "captions add"
+        },
+        "add_tts_intelligent": {
+          "status": "covered",
+          "ours": "media tts"
+        },
+        "add_narrated_subtitles": {
+          "status": "partial",
+          "ours": "media tts + captions import-srt",
+          "missing": [
+            "narration-alignment"
+          ],
+          "note": "TTS 与字幕分别可用，但没有一条命令自动对齐旁白与字幕"
+        },
+        "add_effect_simple": {
+          "status": "covered",
+          "ours": "timeline add-effect"
+        },
+        "add_transition_simple": {
+          "status": "covered",
+          "ours": "timeline transition"
+        },
+        "add_web_asset_safe": {
+          "status": "out_of_scope",
+          "note": "HTML 转视频需要无头浏览器，超出无客户端剪辑的边界"
+        }
+      }
+    },
+    "scripts": {
+      "status": "partial",
+      "ours": "见各条目",
+      "evidence": "docs/integration/plugin-handoff.json",
+      "items": {
+        "api_validator": {
+          "status": "covered",
+          "ours": "project verify + capabilities"
+        },
+        "asset_search": {
+          "status": "covered",
+          "ours": "media catalog + resource list"
+        },
+        "auto_exporter": {
+          "status": "partial",
+          "ours": "render native + job run",
+          "missing": [
+            "native-export"
+          ],
+          "note": "原生导出仍受剪映宿主门禁约束"
+        },
+        "build_cloud_music_library": {
+          "status": "out_of_scope",
+          "note": "云端曲库抓取"
+        },
+        "cloud_manager": {
+          "status": "out_of_scope",
+          "note": "云端素材库"
+        },
+        "draft_inspector": {
+          "status": "covered",
+          "ours": "store list + project inspect + media material"
+        },
+        "jy_wrapper": {
+          "status": "covered",
+          "ours": "project build",
+          "note": "对应 JyProject 类，逐方法见上"
+        },
+        "movie_commentary_builder": {
+          "status": "partial",
+          "ours": "generate",
+          "missing": [
+            "commentary-script"
+          ],
+          "note": "装配可用，解说文案生成不在范围内"
+        },
+        "smart_rough_cut": {
+          "status": "covered",
+          "ours": "timeline cut-silences"
+        },
+        "smart_zoomer": {
+          "status": "out_of_scope",
+          "note": "录屏变焦需要屏幕录制管线"
+        },
+        "sync_jy_assets": {
+          "status": "covered",
+          "ours": "media harvest-enums sync"
+        },
+        "universal_tts": {
+          "status": "covered",
+          "ours": "media tts"
+        },
+        "web_recorder": {
+          "status": "out_of_scope",
+          "note": "录屏"
+        },
+        "build_cloud_text_styles_library": {
+          "status": "out_of_scope",
+          "note": "????????"
+        }
+      }
+    }
+  }
+}

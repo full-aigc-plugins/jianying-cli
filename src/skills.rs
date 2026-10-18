@@ -142,12 +142,12 @@ const SKILLS: &[Skill] = &[
     },
     Skill {
         id: "speaker-cut",
-        name: "智能剪口播",
-        intent: "按语句切分口播，去掉停顿与重复",
+        name: "按说话人切分",
+        intent: "按语音活动去掉停顿与重复",
         status: "partial",
-        commands: &[&["media", "transcribe"], &["timeline", "split"]],
-        evidence: "tests/media_analysis_contract.rs",
-        gap: "只有 ASR 时间戳与手工切分原语，没有去水词/去重复/去卡词的判定逻辑",
+        commands: &[&["timeline", "cut-silences"], &["media", "silence"], &["media", "transcribe"]],
+        evidence: "tests/cut_silences_contract.rs",
+        gap: "去停顿已可用（timeline cut-silences）；去重复与去口误仍需文本判定，未实现",
     },
     Skill {
         id: "beat-sync",
