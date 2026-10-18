@@ -24,6 +24,7 @@ pub mod plan;
 pub mod plan_ops;
 pub mod probe;
 pub mod project_ops;
+pub mod release_ops;
 pub mod render;
 pub mod replacement_timing;
 pub mod resource_ops;

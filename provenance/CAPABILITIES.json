@@ -357,6 +357,11 @@
       "evidence": "tests/pyjyd_parity_contract.rs: import-track rejects a material that does not belong on the target track type and clamps a window that exceeds the real media duration"
     },
     {
+      "id": "release.verify",
+      "status": "supported",
+      "evidence": "tests/release_verify_contract.rs: offline manifest verification (sha256 + size per file) using a Rust SHA-256, so a shipped binary can audit its own release bundle without Python"
+    },
+    {
       "id": "timeline.edit",
       "status": "supported",
       "evidence": "timeline_cli_contract + CAPCUT_TIMELINE_DIFFERENTIALS"

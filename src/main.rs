@@ -7,8 +7,8 @@ use clap_complete::Shell;
 use jianying_cli::{
     brief_ops, capabilities, caption_ops, control_catalog, draft, eval_ops, home_folder,
     interchange, job_runner, media_analysis, media_ops, pipeline_ops, plan, plan_ops, probe,
-    project_ops, render, resource_ops, runtime_acceptance, skills, srt, store, template, tim,
-    timeline_ops,
+    project_ops, release_ops, render, resource_ops, runtime_acceptance, skills, srt, store,
+    template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -2221,6 +2221,16 @@ enum StoreOp {
     },
 }
 
+/// 发布包操作子命令。
+#[derive(Subcommand)]
+enum ReleaseOp {
+    /// 校验发布包目录：逐文件复核 sha256 与大小
+    Verify {
+        /// 发布包目录（含 release-manifest.json）
+        bundle: PathBuf,
+    },
+}
+
 /// 计划编排子命令。
 #[derive(Subcommand)]
 enum PlanOp {
@@ -2431,6 +2441,11 @@ enum Command {
     Plan {
         #[command(subcommand)]
         op: PlanOp,
+    },
+    /// 发布包完整性校验（离线复核 manifest 里的 sha256/大小）
+    Release {
+        #[command(subcommand)]
+        op: ReleaseOp,
     },
     /// 简报驱动的初稿生成：素材 + 目标时长 + 平台 → 计划
     Generate {
@@ -4077,6 +4092,9 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 Some(skill) => print_output(skill, json),
                 None => bail!("unknown skill {id:?}; list ids with `jianying skills list --json`"),
             },
+        },
+        Command::Release { op } => match op {
+            ReleaseOp::Verify { bundle } => print_output(release_ops::verify(&bundle)?, json),
         },
         Command::Generate { brief, out, force } => {
             print_output(brief_ops::generate(&brief, &out, force)?, json)
