@@ -84,7 +84,10 @@ def main() -> int:
         "git": {
             "commit": git("rev-parse", "HEAD"),
             "branch": git("rev-parse", "--abbrev-ref", "HEAD"),
-            "dirty": bool(git("status", "--porcelain")),
+            # ???????????????"?"??????????
+            "dirty": bool(
+                git("status", "--porcelain", "--", ":!provenance/GOAL_SNAPSHOT.json")
+            ),
         },
         "selftest": {
             "ok": selftest.get("ok"),
