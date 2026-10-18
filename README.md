@@ -67,6 +67,25 @@ Agent 既可以用 `jianying_command_run` 调任意 CLI 命令，也可以用
 `jianying_loop` / `jianying_render_frame` 做结构化读写。
 详见 [`docs/mcp-server.md`](docs/mcp-server.md)。
 
+## 一条命令自检
+
+拿到二进制后先跑自检：它按目标的六条验收线逐项检查，缺依赖的项如实标 SKIP。
+
+```bash
+jianying selftest --json
+# {"ok":true,"summary":{"total":7,"pass":7,"fail":0,"skip":0}, ...}
+```
+
+| 检查项 | 验证什么 |
+|---|---|
+| `capabilities` | 能力清单可读、状态合法 |
+| `skills` | 工作流技能注册表（14 条） |
+| `mcp` | MCP 工具面（17 个） |
+| `plan` | 计划组合 + 追加 + 回滚 |
+| `draft` | 草稿构建并通过结构校验 |
+| `media` | 素材探测与深度评估（需 ffmpeg） |
+| `render` | 代理渲染 + 单帧导出（需 ffmpeg） |
+
 ## 发布物自校验
 
 ```bash

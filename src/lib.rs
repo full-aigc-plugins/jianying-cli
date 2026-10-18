@@ -30,6 +30,7 @@ pub mod render;
 pub mod replacement_timing;
 pub mod resource_ops;
 pub mod runtime_acceptance;
+pub mod selftest;
 pub mod shrink_mode;
 pub mod skills;
 pub mod srt;

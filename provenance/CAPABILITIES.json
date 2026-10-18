@@ -842,6 +842,11 @@
       "id": "timeline.cut_silences",
       "status": "supported",
       "evidence": "tests/cut_silences_contract.rs: pauses are cut to their audible parts with keep-pad, the removed span is rippled onto other tracks, and the draft still verifies"
+    },
+    {
+      "id": "selftest",
+      "status": "supported",
+      "evidence": "tests/selftest_contract.rs: `jianying selftest` exercises capabilities/skills/mcp/plan/draft plus ffmpeg-gated media/render checks and reports pass/fail/skip without faking success"
     }
   ],
   "truth_rule": "Only status=supported may be advertised as available; partial and external_dependency remain blocked for automatic routing."

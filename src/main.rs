@@ -7,8 +7,8 @@ use clap_complete::Shell;
 use jianying_cli::{
     brief_ops, capabilities, caption_ops, control_catalog, draft, eval_ops, eval_policy,
     home_folder, interchange, job_runner, media_analysis, media_ops, pipeline_ops, plan, plan_ops,
-    probe, project_ops, release_ops, render, resource_ops, runtime_acceptance, skills, srt, store,
-    template, tim, timeline_ops,
+    probe, project_ops, release_ops, render, resource_ops, runtime_acceptance, selftest, skills,
+    srt, store, template, tim, timeline_ops,
 };
 use jianying_media::{
     AliyunBailianTtsAdapter, AliyunTtsFamily, AsrOutputFormat, AsrProvider, AsrRequest,
@@ -2487,6 +2487,15 @@ enum Command {
         #[command(subcommand)]
         op: ReleaseOp,
     },
+    /// ??????????????????? PASS/FAIL/SKIP ??
+    Selftest {
+        /// ??????????????? jianying-selftest-<pid>?
+        #[arg(long)]
+        workdir: Option<PathBuf>,
+        /// ??????????
+        #[arg(long)]
+        keep: bool,
+    },
     /// 简报驱动的初稿生成：素材 + 目标时长 + 平台 → 计划
     Generate {
         /// jianying-brief/v1 简报文件
@@ -4176,6 +4185,20 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 None => bail!("unknown skill {id:?}; list ids with `jianying skills list --json`"),
             },
         },
+        Command::Selftest { workdir, keep } => {
+            let dir = workdir.unwrap_or_else(|| {
+                std::env::temp_dir().join(format!("jianying-selftest-{}", std::process::id()))
+            });
+            let report = selftest::run(&dir)?;
+            let ok = report["ok"] == json!(true);
+            print_output(report, json);
+            if !keep {
+                let _ = std::fs::remove_dir_all(&dir);
+            }
+            if !ok {
+                std::process::exit(1);
+            }
+        }
         Command::Release { op } => match op {
             ReleaseOp::Verify { bundle, binary } => {
                 print_output(release_ops::verify(&bundle, binary.as_deref())?, json)
