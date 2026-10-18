@@ -224,7 +224,8 @@ fn apply_keyframes(seg_v: &mut Value, seg: &Segment) {
     for (channel, points) in kfs {
         match channel.as_str() {
             // 短别名：与参考构建器一致，`scale` 即 scale_x
-            "scale" => push("KFTypeScaleX", points),
+            // ???????????`scale` ?? uniform_scale????? scale_x/scale_y?
+            "scale" => push("UNIFORM_SCALE", points),
             "x" => push("KFTypePositionX", points),
             "y" => push("KFTypePositionY", points),
             "opacity" => push("KFTypeAlpha", points),
