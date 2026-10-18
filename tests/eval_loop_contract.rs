@@ -245,3 +245,113 @@ fn caption_and_audio_coverage_participate_in_the_score() {
     assert_eq!(report["audio_coverage_permille"], Value::Null);
     let _ = fs::remove_dir_all(root);
 }
+
+fn media_ready() -> bool {
+    Command::new("ffmpeg").arg("-version").output().is_ok()
+        && Command::new("ffprobe").arg("-version").output().is_ok()
+}
+
+fn write_clip(path: &Path) {
+    let status = Command::new("ffmpeg")
+        .args([
+            "-hide_banner",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=0x445566:s=320x180:d=2",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-y",
+        ])
+        .arg(path)
+        .status()
+        .unwrap();
+    assert!(status.success(), "ffmpeg 造素材失败");
+}
+
+#[test]
+fn deep_eval_flags_missing_media_and_oversized_source_windows() {
+    if !media_ready() {
+        return;
+    }
+    let root = temp_root("deep");
+    write_clip(&root.join("clip.mp4"));
+
+    let build = |duration_us: i64, out: &str| -> PathBuf {
+        let value = json!({
+            "schema":"jianying-cli-plan/v1","name":out,
+            "canvas":{"width":320,"height":180,"fps":30},
+            "tracks":[{"type":"video","segments":[
+                {"start_us":0,"duration_us":duration_us,"source":"clip.mp4"}
+            ]}]
+        });
+        let plan_path = root.join(format!("{out}.json"));
+        fs::write(&plan_path, serde_json::to_string(&value).unwrap()).unwrap();
+        let draft_dir = root.join(out);
+        run_ok(&[
+            "project",
+            "build",
+            &plan_path.to_string_lossy(),
+            "--out",
+            &draft_dir.to_string_lossy(),
+            "--json",
+        ]);
+        draft_dir
+    };
+
+    // 干净：素材存在且源窗口不越界
+    let clean = build(2_000_000, "clean");
+    let report = run_ok(&["eval", &clean.to_string_lossy(), "--deep", "--json"]);
+    assert_eq!(report["deep"], json!(true));
+    assert_eq!(report["score"], json!(100));
+    assert_eq!(report["media_checked"], json!(1));
+    assert_eq!(report["issues"].as_array().unwrap().len(), 0);
+
+    // 源窗口超出素材真实时长（2s 素材要 5s）
+    let over = build(5_000_000, "over");
+    let report = run_ok(&["eval", &over.to_string_lossy(), "--deep", "--json"]);
+    let codes: Vec<&str> = report["issues"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|issue| issue["code"].as_str().unwrap())
+        .collect();
+    assert!(codes.contains(&"source-exceeds-media"), "issues={codes:?}");
+    assert_eq!(report["score"], json!(85), "100 - 15");
+
+    // 素材文件缺失（草稿自带的 assets 被删）
+    fs::remove_dir_all(clean.join("assets")).unwrap();
+    let report = run_ok(&["eval", &clean.to_string_lossy(), "--deep", "--json"]);
+    let codes: Vec<&str> = report["issues"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|issue| issue["code"].as_str().unwrap())
+        .collect();
+    assert!(codes.contains(&"media-missing"), "issues={codes:?}");
+    assert_eq!(report["score"], json!(70), "100 - 30");
+    assert_eq!(report["penalties"].as_array().unwrap().len(), 1);
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn media_checks_are_opt_in_and_absent_from_shallow_eval() {
+    let root = temp_root("shallow");
+    let dir = build_contiguous(&root);
+    // 浅评估即便素材全丢也不该碰文件系统
+    fs::remove_dir_all(dir.join("assets")).unwrap();
+    let report = run_ok(&["eval", &dir.to_string_lossy(), "--json"]);
+    assert!(report["deep"].is_null(), "浅评估不应设置 deep");
+    assert!(report["media_checked"].is_null());
+    assert_eq!(report["score"], json!(100));
+    assert!(report["issues"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|issue| issue["code"] != "media-missing"));
+    let _ = fs::remove_dir_all(root);
+}

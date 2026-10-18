@@ -125,6 +125,7 @@ pub fn evaluate(draft: &Path) -> Result<Value> {
     } else {
         0.0
     };
+    let score = score as i64;
 
     Ok(json!({
         "draft": draft.to_string_lossy(),
@@ -141,7 +142,7 @@ pub fn evaluate(draft: &Path) -> Result<Value> {
         },
         "caption_coverage_permille": caption_permille,
         "audio_coverage_permille": audio_coverage.map(|value| (value * 1000.0).round() as i64),
-        "score": score as i64,
+        "score": score,
         "issues": issues,
     }))
 }
@@ -211,6 +212,103 @@ pub fn repair(draft: &Path, kind: &str) -> Result<Value> {
         "drop-empty-tracks" => crate::timeline_ops::drop_empty_tracks(draft),
         other => anyhow::bail!("unknown repair {other:?}"),
     }
+}
+
+/// 深度评估：在结构评分之外，检查每个片段引用的媒体是否真的可用。
+///
+/// 只做两件"错了就一定出问题"的判断，避免把评估变成昂贵的转码：
+/// 1. `media-missing`：素材文件不存在（时间线会黑屏/静音）
+/// 2. `source-exceeds-media`：源窗口超出素材真实时长（末尾会冻结）
+///
+/// 每个问题按固定分值扣分，扣分项写进报告的 `penalties`，便于审计。
+pub fn evaluate_deep(draft: &Path) -> Result<Value> {
+    let mut report = evaluate(draft)?;
+    let timeline = crate::draft::load_timeline(draft)?;
+    let mut paths: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    for bucket in ["videos", "audios"] {
+        for material in timeline["materials"][bucket]
+            .as_array()
+            .into_iter()
+            .flatten()
+        {
+            if let (Some(id), Some(path)) = (
+                material["id"].as_str(),
+                material["path"].as_str().filter(|path| !path.is_empty()),
+            ) {
+                paths.insert(id.to_owned(), path.to_owned());
+            }
+        }
+    }
+
+    let mut probed: std::collections::BTreeMap<String, Option<i64>> =
+        std::collections::BTreeMap::new();
+    let mut checked = 0_usize;
+    let mut media_issues: Vec<Value> = Vec::new();
+    for track in timeline["tracks"].as_array().into_iter().flatten() {
+        for segment in track["segments"].as_array().into_iter().flatten() {
+            let Some(material_id) = segment["material_id"].as_str() else {
+                continue;
+            };
+            let Some(path) = paths.get(material_id) else {
+                continue;
+            };
+            checked += 1;
+            if !std::path::Path::new(path).is_file() {
+                media_issues.push(json!({
+                    "code": "media-missing",
+                    "material_id": material_id,
+                    "path": path
+                }));
+                continue;
+            }
+            let duration = probed
+                .entry(path.clone())
+                .or_insert_with(|| {
+                    crate::probe::probe(std::path::Path::new(path))
+                        .ok()
+                        .map(|info| info.duration_us)
+                })
+                .to_owned();
+            let Some(duration) = duration else { continue };
+            let source_start = segment["source_timerange"]["start"].as_i64().unwrap_or(0);
+            let source_length = segment["source_timerange"]["duration"]
+                .as_i64()
+                .unwrap_or(0);
+            if duration > 0 && source_start + source_length > duration {
+                media_issues.push(json!({
+                    "code": "source-exceeds-media",
+                    "material_id": material_id,
+                    "path": path,
+                    "requested_end_us": source_start + source_length,
+                    "media_duration_us": duration
+                }));
+            }
+        }
+    }
+
+    // 固定扣分：缺失素材 30/处，源窗口越界 15/处。
+    let mut penalty = 0_i64;
+    let mut penalties: Vec<Value> = Vec::new();
+    for issue in &media_issues {
+        let delta = match issue["code"].as_str() {
+            Some("media-missing") => 30,
+            Some("source-exceeds-media") => 15,
+            _ => 0,
+        };
+        penalty += delta;
+        penalties.push(json!({"code": issue["code"], "delta": delta}));
+    }
+    let base = report["score"].as_i64().unwrap_or(0);
+    let score = (base - penalty).max(0);
+    if let Some(list) = report["issues"].as_array_mut() {
+        list.extend(media_issues.iter().cloned());
+    }
+    report["score"] = json!(score);
+    report["deep"] = json!(true);
+    report["media_checked"] = json!(checked);
+    report["penalties"] = json!(penalties);
+    report["score_before_media"] = json!(base);
+    Ok(report)
 }
 
 #[cfg(test)]

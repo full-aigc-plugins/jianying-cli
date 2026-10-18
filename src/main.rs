@@ -2348,7 +2348,12 @@ enum Command {
     /// 结构 lint：引用完整/主轨连续/时长一致（只读）
     Verify(DraftPathArgs),
     /// 草稿评分：主轨覆盖/连续性/字幕覆盖/音频覆盖 + 结构化问题（只读、确定性）
-    Eval(DraftPathArgs),
+    Eval {
+        draft: PathBuf,
+        /// 额外检查素材是否存在、源窗口是否超出素材时长（会调用 ffprobe）
+        #[arg(long)]
+        deep: bool,
+    },
     /// 工作流级技能注册表：把"字幕/配音/粗剪/出片"等映射到具体命令（只读）
     Skills {
         #[command(subcommand)]
@@ -2379,6 +2384,9 @@ enum Command {
         /// 达到该分数即停止
         #[arg(long, default_value_t = 100)]
         min_score: i64,
+        /// 每轮都用深度评估（含素材可用性检查）
+        #[arg(long)]
+        deep: bool,
     },
     /// 草稿摘要：轨道/段数/画布/平台（只读）
     Inspect(DraftPathArgs),
@@ -3934,7 +3942,14 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             deprecated_alias("jianying verify", "jianying project verify");
             run_verify(args, json)?;
         }
-        Command::Eval(args) => print_output(eval_ops::evaluate(&args.draft)?, json),
+        Command::Eval { draft, deep } => {
+            let report = if deep {
+                eval_ops::evaluate_deep(&draft)?
+            } else {
+                eval_ops::evaluate(&draft)?
+            };
+            print_output(report, json);
+        }
         Command::Pipeline {
             input,
             out,
@@ -3983,8 +3998,16 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             draft,
             max_rounds,
             min_score,
+            deep,
         } => {
-            let mut report = eval_ops::evaluate(&draft)?;
+            let evaluate = |path: &Path| -> Result<Value> {
+                if deep {
+                    eval_ops::evaluate_deep(path)
+                } else {
+                    eval_ops::evaluate(path)
+                }
+            };
+            let mut report = evaluate(&draft)?;
             let mut rounds: Vec<Value> = Vec::new();
             let mut stopped = "clean";
             for round in 1..=max_rounds {
@@ -4002,7 +4025,7 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                 };
                 let before = report.clone();
                 let applied = eval_ops::repair(&draft, repair)?;
-                report = eval_ops::evaluate(&draft)?;
+                report = evaluate(&draft)?;
                 rounds.push(json!({
                     "round": round,
                     "repair": repair,
