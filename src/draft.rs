@@ -128,12 +128,14 @@ fn seed_from_donor(root: &Path, content: &mut Value) -> Option<String> {
 
 fn base_segment(material_id: &str, seg: &Segment, render_index: i64) -> Value {
     let speed = seg.speed.unwrap_or(1.0);
-    // pyJianYingDraft 用 Python 的 round()，即银行家舍入（ties-to-even）。
-    // 例如 5µs × 0.5 = 2.5 在参考实现里是 2，Rust 的 f64::round() 会给 3；
-    // 这 1µs 会直接进入 source_timerange，属于 wire 级差异。
+    // 与编辑路径共用 `writer::scaled_source_duration`：两条路径必须同口径，
+    // 否则 ties-to-even 与 f64::round() 会在 .5 边界上差 1µs。
     let src_duration = seg
         .source_duration_us
-        .unwrap_or((seg.duration_us as f64 * speed).round_ties_even() as i64);
+        .unwrap_or(crate::writer::scaled_source_duration(
+            seg.duration_us,
+            speed,
+        ));
     json!({
         "id": hex_id(),
         "material_id": material_id,

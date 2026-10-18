@@ -4,6 +4,8 @@ use anyhow::{bail, Context, Result};
 use serde_json::{json, Value};
 use std::path::Path;
 
+use crate::edit_op::EditOp;
+
 /// 单个关键帧写入请求。
 #[derive(Debug, Clone)]
 pub struct KeyframeInput {
@@ -228,48 +230,58 @@ pub fn move_all(draft: &Path, offset_us: i64, track_type: Option<&str>) -> Resul
 
 /// 设置片段播放速度并同步 speed 素材。
 pub fn speed(draft: &Path, id: &str, speed: f64) -> Result<Value> {
-    if !speed.is_finite() || speed <= 0.0 {
-        bail!("speed must be a positive finite number");
-    }
-    mutate(draft, |timeline| {
-        let (old, refs, target_duration) = {
-            let segment = find_segment_mut(timeline, id)?;
-            let old = segment["speed"].as_f64().unwrap_or(1.0);
-            let target_duration = segment["target_timerange"]["duration"]
-                .as_i64()
-                .unwrap_or(0);
-            let refs = segment["extra_material_refs"]
-                .as_array()
-                .cloned()
-                .unwrap_or_default();
-            segment["speed"] = json!(speed);
-            segment["source_timerange"]["duration"] =
-                json!((target_duration as f64 * speed).round() as i64);
-            (old, refs, target_duration)
-        };
-        for reference in refs {
-            if let Some(material) = timeline["materials"]["speeds"]
-                .as_array_mut()
-                .and_then(|items| items.iter_mut().find(|item| item["id"] == reference))
-            {
-                material["speed"] = json!(speed);
-            }
-        }
-        let _ = target_duration;
-        Ok(json!({"ok":true,"id":id,"old_speed":old,"new_speed":speed}))
+    apply_to_segment(draft, id, EditOp::SetSpeed(speed), true, |report| {
+        json!({
+            "ok":true,"id":id,
+            "old_speed":report["old_speed"],
+            "new_speed":report["new_speed"]
+        })
     })
 }
 
 /// 设置片段音量。
 pub fn volume(draft: &Path, id: &str, level: f64) -> Result<Value> {
-    if !level.is_finite() || level < 0.0 {
-        bail!("volume must be a non-negative finite number");
-    }
+    apply_to_segment(draft, id, EditOp::SetVolume(level), false, |report| {
+        json!({
+            "ok":true,"id":id,
+            "old_volume":report["old_volume"],
+            "new_volume":report["new_volume"]
+        })
+    })
+}
+
+/// 在事务内把一个 [`EditOp`] 应用到指定片段。
+///
+/// 所有片段级写入都应经过这里，使新建路径与编辑路径共享同一份落盘规则。
+/// `with_materials` 为真时把根 `materials` 一并交给 writer（速度需要同步
+/// 伴生素材）；`materials` 在 `timeline` 内被临时取出并在事务结束前放回。
+fn apply_to_segment<F>(
+    draft: &Path,
+    id: &str,
+    op: EditOp,
+    with_materials: bool,
+    response: F,
+) -> Result<Value>
+where
+    F: FnOnce(&Value) -> Value,
+{
+    // 先校验再开事务：非法参数不应留下任何快照/工作副本。
+    op.validate()?;
     mutate(draft, |timeline| {
-        let segment = find_segment_mut(timeline, id)?;
-        let old = segment["volume"].as_f64().unwrap_or(1.0);
-        segment["volume"] = json!(level);
-        Ok(json!({"ok":true,"id":id,"old_volume":old,"new_volume":level}))
+        let mut materials = if with_materials {
+            timeline["materials"].take()
+        } else {
+            Value::Null
+        };
+        let applied = (|| {
+            let segment = find_segment_mut(timeline, id)?;
+            let materials_ref = with_materials.then_some(&mut materials);
+            crate::writer::apply(segment, materials_ref, op)
+        })();
+        if with_materials {
+            timeline["materials"] = materials;
+        }
+        Ok(response(&applied?))
     })
 }
 
@@ -374,17 +386,12 @@ pub fn trim(draft: &Path, id: &str, start_us: i64, duration_us: i64) -> Result<V
 
 /// 设置画面片段不透明度。
 pub fn opacity(draft: &Path, id: &str, alpha: f64) -> Result<Value> {
-    if !alpha.is_finite() || !(0.0..=1.0).contains(&alpha) {
-        bail!("opacity must be between 0 and 1");
-    }
-    mutate(draft, |timeline| {
-        let segment = find_segment_mut(timeline, id)?;
-        if !segment["clip"].is_object() {
-            bail!("segment {id} has no clip");
-        }
-        let old = segment["clip"]["alpha"].as_f64().unwrap_or(1.0);
-        segment["clip"]["alpha"] = json!(alpha);
-        Ok(json!({"ok":true,"id":id,"old_opacity":old,"new_opacity":alpha}))
+    apply_to_segment(draft, id, EditOp::SetOpacity(alpha), false, |report| {
+        json!({
+            "ok":true,"id":id,
+            "old_opacity":report["old_opacity"],
+            "new_opacity":report["new_opacity"]
+        })
     })
 }
 

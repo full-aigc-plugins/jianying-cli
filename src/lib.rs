@@ -7,6 +7,7 @@ pub mod compile_ops;
 pub mod control_catalog;
 pub mod domain_compat;
 pub mod draft;
+pub mod edit_op;
 pub mod error_contract;
 pub mod extend_mode;
 pub mod fixture_ops;
@@ -29,6 +30,7 @@ pub mod template;
 pub mod text_style_range;
 pub mod tim;
 pub mod timeline_ops;
+pub mod writer;
 
 /// CLI 结构化成功和失败响应。
 pub use jianying_cli_contract as cli_contract;
