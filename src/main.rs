@@ -2230,6 +2230,18 @@ enum ResourceOp {
         #[arg(long)]
         kind: Option<String>,
     },
+    /// 把资源库里的一条素材挂到指定片段上（幂等）
+    Apply {
+        draft: PathBuf,
+        /// 目标片段 ID（支持唯一前缀）
+        segment: String,
+        /// 资源名称或 id 片段
+        needle: String,
+        #[arg(long)]
+        catalog: Option<PathBuf>,
+        #[arg(long)]
+        kind: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -3807,6 +3819,23 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
                     }),
                     json,
                 );
+            }
+            ResourceOp::Apply {
+                draft,
+                segment,
+                needle,
+                catalog,
+                kind,
+            } => {
+                let path = catalog.unwrap_or_else(resource_ops::default_catalog_path);
+                let library = resource_ops::load(&path)?;
+                let merged = resource_ops::merged_entries(&library);
+                let entry = resource_ops::resolve_one(&merged, &needle, kind.as_deref())?.clone();
+                let applied = timeline_ops::apply_resource(&draft, &segment, &entry)?;
+                let mut out = applied;
+                out["resource"] = entry;
+                out["catalog"] = json!(path.to_string_lossy());
+                print_output(out, json);
             }
         },
         Command::Doctor => print_output(redact_diagnostics(store::doctor()?), json),

@@ -2752,6 +2752,86 @@ where
     Ok(output)
 }
 
+/// 把用户资源库里的一条素材挂到片段上。
+///
+/// 资源库来自用户自己草稿的反演（见 `resource_ops`），因此这里只做「按记录落盘」：
+/// 写入同 `type`/`effect_id`/`resource_id` 的素材并挂引用，不猜测语义。
+/// 已挂过同一资源时幂等返回，不重复创建素材。
+pub fn apply_resource(draft: &Path, id: &str, entry: &Value) -> Result<Value> {
+    let kind = entry["kind"].as_str().unwrap_or("").to_owned();
+    let effect_id = entry["effect_id"].as_str().unwrap_or("").to_owned();
+    let resource_id = entry["resource_id"].as_str().unwrap_or("").to_owned();
+    if !matches!(
+        kind.as_str(),
+        "text_shape" | "sticker" | "video_effect" | "audio_effect"
+    ) {
+        bail!(
+            "resource kind {kind:?} cannot be attached this way; filters and transitions use \
+             `timeline filter` / `timeline transition` with a catalog name"
+        );
+    }
+    if effect_id.is_empty() && resource_id.is_empty() {
+        bail!("resource entry carries neither effect_id nor resource_id");
+    }
+    mutate(draft, |timeline| {
+        let refs: Vec<String> = {
+            let segment = find_segment_mut(timeline, id)?;
+            segment["extra_material_refs"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        };
+        let existing = timeline["materials"]["effects"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|item| {
+                item["type"].as_str() == Some(kind.as_str())
+                    && item["effect_id"].as_str().unwrap_or("") == effect_id
+                    && item["resource_id"].as_str().unwrap_or("") == resource_id
+                    && item["id"]
+                        .as_str()
+                        .is_some_and(|mid| refs.iter().any(|known| known == mid))
+            })
+            .and_then(|item| item["id"].as_str())
+            .map(str::to_owned);
+        if let Some(material_id) = existing {
+            return Ok(json!({
+                "ok": true, "id": id, "kind": kind,
+                "material_id": material_id, "applied": false,
+                "reason": "already-applied"
+            }));
+        }
+        let material_id = uuid::Uuid::new_v4().simple().to_string();
+        timeline["materials"]["effects"]
+            .as_array_mut()
+            .context("materials.effects must be an array")?
+            .push(json!({
+                "type": kind,
+                "name": entry["name"].as_str().unwrap_or(""),
+                "effect_id": effect_id,
+                "resource_id": resource_id,
+                "md5": entry["md5"].as_str().unwrap_or(""),
+                "value": 1.0, "apply_target_type": 0,
+                "platform": "all", "source_platform": 0,
+                "category_id": "", "category_name": "", "sub_type": "none",
+                "time_range": null, "id": material_id
+            }));
+        let segment = find_segment_mut(timeline, id)?;
+        segment["extra_material_refs"]
+            .as_array_mut()
+            .context("extra_material_refs must be an array")?
+            .push(json!(material_id));
+        Ok(json!({
+            "ok": true, "id": id, "kind": kind,
+            "material_id": material_id, "applied": true
+        }))
+    })
+}
+
 fn find_segment_mut<'a>(timeline: &'a mut Value, id: &str) -> Result<&'a mut Value> {
     for track in timeline["tracks"]
         .as_array_mut()

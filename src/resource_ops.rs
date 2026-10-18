@@ -376,6 +376,36 @@ pub fn filter<'a>(
         .collect()
 }
 
+/// 解析唯一匹配；0 个或多个匹配都报错，并给出可读的候选列表。
+pub fn resolve_one<'a>(
+    entries: &'a [Value],
+    needle: &str,
+    kind: Option<&str>,
+) -> Result<&'a Value> {
+    let found = filter(entries, kind, Some(needle));
+    match found.len() {
+        0 => anyhow::bail!("no resource matches {needle:?}"),
+        1 => Ok(found[0]),
+        count => {
+            let candidates: Vec<String> = found
+                .iter()
+                .take(6)
+                .map(|entry| {
+                    format!(
+                        "{}:{}",
+                        entry["kind"].as_str().unwrap_or("?"),
+                        entry["name"].as_str().unwrap_or("(no name)")
+                    )
+                })
+                .collect();
+            anyhow::bail!(
+                "{needle:?} is ambiguous ({count} matches: {}); narrow it with --kind",
+                candidates.join(", ")
+            )
+        }
+    }
+}
+
 /// 把外部 bundle（`{entries:[...]}` 或完整目录）并进资源库。
 pub fn import_bundle(
     catalog: &mut Value,

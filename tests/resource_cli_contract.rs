@@ -274,3 +274,204 @@ fn import_merges_an_external_bundle_as_its_own_source() {
     assert!(kinds.contains(&"video_effect") && kinds.contains(&"transition"));
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn apply_attaches_a_library_resource_once_and_keeps_the_draft_valid() {
+    let root = temp_root("apply");
+    let catalog = root.join("resources.json");
+    let catalog_arg = catalog.to_string_lossy().into_owned();
+    let bundle = root.join("bundle.json");
+    fs::write(
+        &bundle,
+        serde_json::to_string(&json!({"entries": [
+            {"type":"text_shape","name":"花字-荧光","effect_id":"111","resource_id":"222","md5":"abc"}
+        ]}))
+        .unwrap(),
+    )
+    .unwrap();
+    run_ok(&[
+        "resource",
+        "import",
+        &bundle.to_string_lossy(),
+        "--catalog",
+        &catalog_arg,
+        "--json",
+    ]);
+
+    let plan = root.join("plan.json");
+    fs::write(
+        &plan,
+        serde_json::to_string(&json!({
+            "schema": "jianying-cli-plan/v1",
+            "name": "apply-target",
+            "canvas": {"width": 1920, "height": 1080, "fps": 30},
+            "tracks": [{"type": "text", "segments": [{
+                "start_us": 0, "duration_us": 1_000_000, "text": "目标"
+            }]}]
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    let draft = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &plan.to_string_lossy(),
+        "--out",
+        &draft.to_string_lossy(),
+        "--json",
+    ]);
+    let segment = run_ok(&[
+        "timeline",
+        "segments",
+        &draft.to_string_lossy(),
+        "--track",
+        "text",
+        "--json",
+    ])[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    let applied = run_ok(&[
+        "resource",
+        "apply",
+        &draft.to_string_lossy(),
+        &segment,
+        "荧光",
+        "--catalog",
+        &catalog_arg,
+        "--json",
+    ]);
+    assert_eq!(applied["applied"], json!(true));
+    assert_eq!(applied["kind"], json!("text_shape"));
+    let material_id = applied["material_id"].as_str().unwrap().to_owned();
+    assert_eq!(applied["resource"]["name"], json!("花字-荧光"));
+
+    // 再挂一次必须幂等：不新增素材，返回 already-applied
+    let again = run_ok(&[
+        "resource",
+        "apply",
+        &draft.to_string_lossy(),
+        &segment,
+        "荧光",
+        "--catalog",
+        &catalog_arg,
+        "--json",
+    ]);
+    assert_eq!(again["applied"], json!(false));
+    assert_eq!(again["reason"], json!("already-applied"));
+    assert_eq!(again["material_id"], json!(material_id));
+
+    let content: Value =
+        serde_json::from_str(&fs::read_to_string(draft.join("draft_content.json")).unwrap())
+            .unwrap();
+    let shapes: Vec<&Value> = content["materials"]["effects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|item| item["type"] == "text_shape")
+        .collect();
+    assert_eq!(shapes.len(), 1, "重复 apply 不能产生重复素材");
+    assert_eq!(shapes[0]["effect_id"], json!("111"));
+    assert_eq!(shapes[0]["resource_id"], json!("222"));
+    assert_eq!(
+        run_ok(&["project", "verify", &draft.to_string_lossy(), "--json"])["ok"],
+        true
+    );
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn apply_rejects_resources_it_cannot_attach_and_ambiguous_names() {
+    let root = temp_root("apply-negative");
+    let catalog = root.join("resources.json");
+    let catalog_arg = catalog.to_string_lossy().into_owned();
+    let bundle = root.join("bundle.json");
+    fs::write(
+        &bundle,
+        serde_json::to_string(&json!({"entries": [
+            {"type":"filter","name":"清晰","effect_id":"333","resource_id":"444"},
+            {"type":"text_shape","name":"花字-荧光","effect_id":"111","resource_id":"222"},
+            {"type":"video_effect","name":"花字-荧光","effect_id":"555","resource_id":"666"}
+        ]}))
+        .unwrap(),
+    )
+    .unwrap();
+    run_ok(&[
+        "resource",
+        "import",
+        &bundle.to_string_lossy(),
+        "--catalog",
+        &catalog_arg,
+        "--json",
+    ]);
+
+    let plan = root.join("plan.json");
+    fs::write(
+        &plan,
+        serde_json::to_string(&json!({
+            "schema": "jianying-cli-plan/v1",
+            "name": "apply-negative",
+            "canvas": {"width": 1920, "height": 1080, "fps": 30},
+            "tracks": [{"type": "text", "segments": [{
+                "start_us": 0, "duration_us": 1_000_000, "text": "目标"
+            }]}]
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    let draft = root.join("draft");
+    run_ok(&[
+        "project",
+        "build",
+        &plan.to_string_lossy(),
+        "--out",
+        &draft.to_string_lossy(),
+        "--json",
+    ]);
+    let segment = run_ok(&[
+        "timeline",
+        "segments",
+        &draft.to_string_lossy(),
+        "--track",
+        "text",
+        "--json",
+    ])[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    // filter 不能用 apply 挂载，必须引导到 timeline filter
+    let filter = run(&[
+        "resource",
+        "apply",
+        &draft.to_string_lossy(),
+        &segment,
+        "清晰",
+        "--catalog",
+        &catalog_arg,
+        "--json",
+    ]);
+    assert_eq!(filter.status.code(), Some(1));
+    let filter_err = String::from_utf8_lossy(&filter.stdout);
+    assert!(
+        filter_err.contains("timeline filter"),
+        "错误信息必须指向替代命令: {filter_err}"
+    );
+
+    // 同名跨种类 → 歧义，必须要求 --kind
+    let ambiguous = run(&[
+        "resource",
+        "apply",
+        &draft.to_string_lossy(),
+        &segment,
+        "花字-荧光",
+        "--catalog",
+        &catalog_arg,
+        "--json",
+    ]);
+    assert_eq!(ambiguous.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&ambiguous.stdout).contains("ambiguous"));
+    let _ = fs::remove_dir_all(root);
+}

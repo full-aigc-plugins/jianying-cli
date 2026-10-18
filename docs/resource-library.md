@@ -29,7 +29,15 @@ jianying resource resolve 荧光 --kind text_shape --json
 # 导入外部 bundle（{entries:[...]} 或完整目录）与导出
 jianying resource import bundle.json --json
 jianying resource export --out resources.export.json --json
+
+# 把库里的一条素材挂到片段上（幂等；text_shape/sticker/video_effect/audio_effect）
+jianying resource apply <draft> <segment-id> 荧光 --kind text_shape --json
 ```
+
+`apply` 只落盘「库里记录过的东西」：写入同 `type`/`effect_id`/`resource_id` 的素材并挂
+`extra_material_refs`，不猜测语义。重复挂同一资源返回 `applied: false, reason:
+already-applied`，不会产生重复素材。滤镜/转场不走这条命令（结构不同），会明确报错并
+指向 `timeline filter` / `timeline transition`。
 
 默认库路径：`$JIANYING_CLI_HOME/resources.json`，否则
 Windows 为 `%APPDATA%\jianying-cli\resources.json`，类 Unix 为
