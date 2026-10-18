@@ -701,3 +701,158 @@ fn sequence_similarity(a: &[String], b: &[String]) -> f64 {
 fn cue_side(cue: &crate::srt::Cue) -> Value {
     json!({"text":cue.text,"start":round6(cue.start_us as f64/US),"end":round6(cue.end_us as f64/US),"start_us":cue.start_us,"end_us":cue.end_us})
 }
+
+/// 节拍/能量峰值检测：用 ffmpeg `astats` 的**逐帧 RMS**（约 93ms 一帧）作为能量包络，
+/// 取局部极大值得到能量起点，再由相邻间隔的中位数估计 BPM。
+///
+/// 这是**确定性**的包络峰选，不是音乐理解：对鼓点/点击类素材有效，
+/// 对持续铺底的人声或弦乐会漏检——结果里给出 `confidence`，不假装确定。
+pub fn beats(
+    media: &Path,
+    min_gap_us: i64,
+    threshold_db: f64,
+    min_rise_db: f64,
+    ffmpeg: Option<&Path>,
+) -> Result<Value> {
+    if !media.is_file() {
+        bail!("detect-beats: media not found: {}", media.display());
+    }
+    if min_gap_us <= 0 {
+        bail!("detect-beats: min-gap must be positive");
+    }
+    if !min_rise_db.is_finite() || min_rise_db < 0.0 {
+        bail!("detect-beats: min-rise-db must be a non-negative number");
+    }
+    let command = ffmpeg
+        .map(Path::to_path_buf)
+        .or_else(|| crate::probe::ffmpeg_path().map(Into::into))
+        .context("detect-beats: ffmpeg not found; install ffmpeg or pass --ffmpeg-cmd")?;
+    let output = Command::new(&command)
+        .args(["-hide_banner", "-nostats", "-i"])
+        .arg(media)
+        .args([
+            "-af",
+            "asetnsamples=n=1024,astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level",
+            "-f",
+            "null",
+            "-",
+        ])
+        .output()
+        .with_context(|| format!("running {}", command.display()))?;
+    if !output.status.success() {
+        bail!(
+            "detect-beats: ffmpeg failed: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        );
+    }
+    let stderr = String::from_utf8_lossy(&output.stderr);
+
+    // ametadata 会把 `frame:N pts:.. pts_time:X` 与 `RMS_level=Y` 分成相邻两行
+    let mut envelope: Vec<(f64, f64)> = Vec::new(); // (秒, dB)
+    let mut pending_time: Option<f64> = None;
+    for line in stderr.lines() {
+        if let Some(position) = line.find("pts_time:") {
+            let rest = &line[position + "pts_time:".len()..];
+            let number: String = rest
+                .chars()
+                .take_while(|c| c.is_ascii_digit() || *c == '.' || *c == '-')
+                .collect();
+            pending_time = number.parse::<f64>().ok();
+            continue;
+        }
+        let Some(position) = line.find("RMS_level=") else {
+            continue;
+        };
+        let rest = &line[position + "RMS_level=".len()..];
+        let token: String = rest
+            .chars()
+            .take_while(|c| {
+                c.is_ascii_digit() || *c == '.' || *c == '-' || *c == 'i' || *c == 'n' || *c == 'f'
+            })
+            .collect();
+        let level = token.parse::<f64>().unwrap_or(f64::NEG_INFINITY);
+        if let Some(time) = pending_time.take() {
+            envelope.push((time, level));
+        }
+    }
+    if envelope.len() < 3 {
+        bail!("detect-beats: could not read an RMS envelope from the audio stream");
+    }
+
+    let resolution_ms = if envelope.len() >= 2 {
+        (((envelope[1].0 - envelope[0].0) * 1000.0).round() as i64).max(1)
+    } else {
+        100
+    };
+    let mut onsets: Vec<i64> = Vec::new();
+    for index in 1..envelope.len() - 1 {
+        let (time, level) = envelope[index];
+        if level < threshold_db {
+            continue;
+        }
+        // 比前后都高、且相对上一帧有明显抬升，才算一次起点。
+        // 只判"局部极大"会把恒定铺底的数值抖动也算成节拍。
+        let rise = level - envelope[index - 1].1;
+        if !(level > envelope[index - 1].1 && level >= envelope[index + 1].1 && rise >= min_rise_db)
+        {
+            continue;
+        }
+        let at_us = (time * US).round() as i64;
+        if let Some(last) = onsets.last() {
+            if at_us - last < min_gap_us {
+                continue;
+            }
+        }
+        onsets.push(at_us);
+    }
+
+    let mut gaps: Vec<i64> = onsets.windows(2).map(|pair| pair[1] - pair[0]).collect();
+    gaps.sort_unstable();
+    let median_gap = if gaps.len() >= 3 {
+        Some(gaps[gaps.len() / 2])
+    } else {
+        None
+    };
+    // 主估计用中位间隔：它对"漏检首尾各一拍"不敏感。
+    let bpm = median_gap.map(|gap| 60_000_000.0 / gap as f64);
+    // 跨度为辅：首尾若有漏检会明显偏低，因此只作为参考值输出。
+    let bpm_span = match (onsets.first(), onsets.last()) {
+        (Some(first), Some(last)) if onsets.len() >= 4 && last > first => {
+            let span_s = (*last - *first) as f64 / US;
+            Some((onsets.len() - 1) as f64 * 60.0 / span_s)
+        }
+        _ => None,
+    };
+    let confidence = if gaps.len() < 3 {
+        "insufficient-onsets"
+    } else {
+        let median = gaps[gaps.len() / 2] as f64;
+        let mean = gaps
+            .iter()
+            .map(|gap| (*gap as f64 - median).abs() / median)
+            .sum::<f64>()
+            / gaps.len() as f64;
+        if mean <= 0.15 {
+            "high"
+        } else if mean <= 0.35 {
+            "medium"
+        } else {
+            "low"
+        }
+    };
+
+    Ok(json!({
+        "media": media.to_string_lossy(),
+        "resolution_ms": resolution_ms,
+        "frames": envelope.len(),
+        "threshold_db": threshold_db,
+        "min_rise_db": min_rise_db,
+        "min_gap_us": min_gap_us,
+        "beat_count": onsets.len(),
+        "beats_us": onsets,
+        "beat_seconds": onsets.iter().map(|value| round6(*value as f64 / US)).collect::<Vec<_>>(),
+        "estimated_bpm": bpm.map(round6),
+        "bpm_span": bpm_span.map(round6),
+        "confidence": confidence,
+    }))
+}

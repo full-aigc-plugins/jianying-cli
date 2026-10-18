@@ -1866,6 +1866,22 @@ enum MediaOp {
     },
     /// Probe one local media file
     Probe(ProbeArgs),
+    /// Detect beat onsets and estimate BPM from an audio file
+    Beats {
+        file: PathBuf,
+        /// Minimum spacing between onsets, e.g. `400ms`
+        #[arg(long, default_value = "400ms")]
+        min_gap: String,
+        /// Ignore envelope frames quieter than this (dB RMS)
+        #[arg(long, default_value_t = -40.0)]
+        threshold_db: f64,
+        /// Minimum jump in dB over the previous frame to count as an onset
+        #[arg(long, default_value_t = 3.0)]
+        min_rise_db: f64,
+        /// ffmpeg executable override
+        #[arg(long)]
+        ffmpeg_cmd: Option<PathBuf>,
+    },
     /// Search the embedded resource catalogue
     Catalog(CatalogArgs),
     /// List one fixed CapCut or JianYing enum category
@@ -3169,6 +3185,22 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
         Command::Media { op } => match op {
             MediaOp::Official { op } => run_official_media(op, json)?,
             MediaOp::Probe(args) => run_probe(args, json)?,
+            MediaOp::Beats {
+                file,
+                min_gap,
+                threshold_db,
+                min_rise_db,
+                ffmpeg_cmd,
+            } => print_output(
+                media_analysis::beats(
+                    &file,
+                    tim::parse(&min_gap)?,
+                    threshold_db,
+                    min_rise_db,
+                    ffmpeg_cmd.as_deref(),
+                )?,
+                json,
+            ),
             MediaOp::Catalog(args) => run_catalog(args, json)?,
             MediaOp::Enums(args) => run_enums(args, json)?,
             MediaOp::HarvestEnums { op } => match op {

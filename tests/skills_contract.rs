@@ -99,6 +99,17 @@ fn skills_show_and_status_filter_work() {
         .iter()
         .any(|command| command == "loop"));
 
+    // 节拍检测落地后 beat-sync 从 missing 升级为 partial；content-generation 仍缺
+    let partial = run_ok(&["skills", "list", "--status", "partial", "--json"]);
+    assert_eq!(partial["status"], serde_json::json!("partial"));
+    let partial_ids: Vec<&str> = partial["skills"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|skill| skill["id"].as_str().unwrap())
+        .collect();
+    assert!(partial_ids.contains(&"beat-sync"), "ids={partial_ids:?}");
+
     let missing = run_ok(&["skills", "list", "--status", "missing", "--json"]);
     assert_eq!(missing["status"], serde_json::json!("missing"));
     let ids: Vec<&str> = missing["skills"]
@@ -107,7 +118,8 @@ fn skills_show_and_status_filter_work() {
         .iter()
         .map(|skill| skill["id"].as_str().unwrap())
         .collect();
-    assert!(ids.contains(&"beat-sync"), "ids={ids:?}");
+    assert!(ids.contains(&"content-generation"), "ids={ids:?}");
+    assert!(!ids.contains(&"beat-sync"), "beat-sync 不应再是 missing");
 
     let unknown = run(&["skills", "show", "nope", "--json"]);
     assert_eq!(unknown.status.code(), Some(1));

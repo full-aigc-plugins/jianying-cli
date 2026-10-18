@@ -152,11 +152,11 @@ const SKILLS: &[Skill] = &[
     Skill {
         id: "beat-sync",
         name: "音乐卡点",
-        intent: "按节拍点切分并重排片段",
-        status: "missing",
-        commands: &[],
-        evidence: "docs/reference/jianying-11.6-feature-map.md",
-        gap: "没有节拍检测与对齐算法；media analysis 只给响度/静音段",
+        intent: "按节拍点切分并对齐片段",
+        status: "partial",
+        commands: &[&["media", "beats"], &["generate"], &["timeline", "split"]],
+        evidence: "tests/beats_contract.rs",
+        gap: "节拍检测（23ms 包络峰选 + 中位间隔估 BPM）已可用；片段的自动对齐与重排仍需人工在计划层指定切点",
     },
     Skill {
         id: "content-generation",

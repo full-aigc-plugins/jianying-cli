@@ -222,6 +222,11 @@
       "evidence": "tests/media_mutation_contract.rs: probed add-audio, replace and relink transactions; tests/timeline_cli_contract.rs: volume and audio-fade"
     },
     {
+      "id": "media.beats",
+      "status": "supported",
+      "evidence": "tests/beats_contract.rs: 23ms RMS envelope, rise-gated onset peaks and median-interval BPM; a synthesised 120 BPM click track lands within 12 BPM and a steady sine reports zero beats"
+    },
+    {
       "id": "media.analysis",
       "status": "supported",
       "evidence": "CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS + media_analysis_contract"

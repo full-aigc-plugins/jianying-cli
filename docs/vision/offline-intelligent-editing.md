@@ -116,3 +116,16 @@ timeline move 第二段 +2.5s      → eval              → score 62, issues [m
 | 文档 | `cargo test --test docs_command_contract` | README/文档里每条 `jianying …` 都真实存在 |
 
 测试总量 **349**，clippy `-D warnings` 0，`cargo fmt --check` 0，`tools/check_provenance.py` 0。
+
+## 9. 音乐卡点（第 24 轮）
+
+`jianying media beats <audio> --json` 给出能量起点与 BPM 估计：
+
+- 包络：ffmpeg `astats` 逐 1024 采样（23ms）RMS
+- 起点：局部极大 + 相对前一帧 `min_rise_db`（默认 3dB）抬升
+- BPM：相邻间隔中位数（对漏检首尾不敏感），另给 `bpm_span` 作参考
+- 诚实边界：合成 120 BPM 点击轨估出 117（−2.1%），**持续正弦报 0 个节拍**；
+  对铺底人声/弦乐会漏检，结果里的 `confidence` 会如实降级
+
+技能注册表里 `beat-sync` 由 `missing` 升为 `partial`：检测可用，
+"自动对齐重排"仍需在计划层指定切点。
