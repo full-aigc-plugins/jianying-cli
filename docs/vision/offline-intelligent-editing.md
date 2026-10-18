@@ -62,12 +62,12 @@ ffprobe -v error -show_entries format=duration:stream=codec_name,width,height -o
 
 | 支柱 | 现状 | 证据 |
 |---|---|---|
-| V1 pyJYD 替代 | 🟡 核心达成：55/55 parity、单一 writer、**API 面 68/68 已逐类登记且类级 `uncovered=0`**（3 类 partial 共 4 个方法、6 类 L3 out_of_scope）；剩余：这 4 个方法与更多 op 迁移 | `provenance/PYJYD_API_COVERAGE.json`、`tests/pyjyd_api_coverage_contract.rs` |
-| V2 dream-loop 闭环 | 🟢 闭环两端都有：`generate` 从简报确定性生成初稿，`eval --deep` + `loop --deep` 评估并修正（结构/素材/画音质量）；**缺**创作级生成（选镜、卡点、脚本） | `src/brief_ops.rs`、`src/eval_ops.rs`、`tests/brief_generate_contract.rs` |
+| V1 pyJYD 替代 | 🟢 API 面 **68/68 类、90/90 方法全部登记**（62 covered + 6 类 L3 out_of_scope，`partial=0`、`uncovered=0`）；55/55 双源差分仍为行为证据 | `provenance/PYJYD_API_COVERAGE.json`、`tests/pyjyd_api_coverage_contract.rs` |
+| V2 dream-loop 闭环 | 🟢 闭环四类问题可检出、三类可自动修：结构（空洞/空轨）、素材（越界收窄/缺失告警）、画音（黑帧/静音/响度）、节奏（长镜等分、碎切告警）；阈值与权重由 `jianying-eval-policy/v1` 外置；CLI 与 MCP 共用同一实现 | `src/eval_ops.rs`、`src/eval_policy.rs`、`tests/eval_loop_contract.rs`、`tests/eval_policy_contract.rs`、`tests/brief_generate_contract.rs` |
 | V3 hypit 计划层 | 🟢 计划可编排：`plan compose/append` 确定性拼接（画布一致、主轨优先、按累计时长偏移），每次写入留快照，`plan history/revert` 逐字节回滚 | `src/plan_ops.rs`、`tests/plan_composition_contract.rs` |
-| V4 editor-skill 整合 | 🟡 已建**技能注册表**：14 条工作流技能带状态/意图/命令/缺口，且合同测试校验引用命令真实存在；缺口以 `partial`/`missing` 显式登记 | `src/skills.rs`、`tests/skills_contract.rs`、`jianying skills list` |
+| V4 editor-skill 整合 | 🟡 CLI 侧完成：14 条技能注册表（合同测试校验引用命令真实存在）、17 个 MCP 工具、发布物可离线自校验；**差最后一步**：tag 构建与插件发版需要授权 | `src/skills.rs`、`src/release_ops.rs`、`docs/release-checklist.md`、`jianying skills list` |
 | V5 headless 能力 | 🟢 批量流水线已通：`pipeline <计划目录>` 一次完成 构建→评分→渲染，失败按条隔离，`--fail-under` 作 CI 门禁；**渲染仍是预览级** | `src/pipeline_ops.rs`、`tests/pipeline_contract.rs` |
-| V6 无客户端出片 | 🟢 **预览级已通**（§3 实测）；权威导出明确不做 | 本文 §3 |
+| V6 无客户端出片 | 🟢 **预览级已通**（§3 实测）：`generate → build → eval → loop → render proxy / render frame` 全链路可跑；权威导出明确不做 | 本文 §3 |
 
 图例：🟢 已达成 / 🟡 部分 / 🔴 未开始。
 
@@ -102,3 +102,17 @@ timeline move 第二段 +2.5s      → eval              → score 62, issues [m
 
 `eval` 前后 `draft_content.json` 字节一致（只读）；`loop` 的每次修复都走事务
 （快照 → 校验 → 原子提交），失败不会留下半成品。
+
+## 8. 第 23 轮复验（最终证据）
+
+| 环节 | 命令 | 结果 |
+|---|---|---|
+| 生成 | `generate brief.json --out plan.json` | 平台画布、目标时长、`max_shot_us` 切分、`min_shot_us` 尾段合并、`shot_order=round-robin` 轮换 |
+| 构建 | `project build plan.json --out draft` | 自带 verify 门禁 |
+| 评估 | `eval draft --deep` | 结构 / 素材 / 画音 / 节奏四类，报告回显生效策略 |
+| 修正 | `loop draft --deep --policy policies/strict.json` | 停止原因 `clean / below-target / no-safe-repair / max-rounds-reached` |
+| 出片 | `render proxy` + `render frame` | 2s 预览含音轨；单帧 PNG 可肉眼校验 |
+| 发布物 | `release verify <bundle>` | 11 文件哈希 + 能力契约 156/156 一致 |
+| 文档 | `cargo test --test docs_command_contract` | README/文档里每条 `jianying …` 都真实存在 |
+
+测试总量 **349**，clippy `-D warnings` 0，`cargo fmt --check` 0，`tools/check_provenance.py` 0。

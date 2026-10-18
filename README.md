@@ -35,6 +35,46 @@ jianying store publish d1 [--root DIR] [--force]           # 发布进草稿库�
 jianying render proxy d1 --burn-captions                   # ffmpeg 代理预览（非成片）
 ```
 
+## 无客户端智能剪辑流水线
+
+从素材到成片预览，全流程不需要剪映客户端：
+
+```bash
+# 1) 简报 → 计划（平台画布、目标时长、镜头切分、素材轮换）
+jianying generate brief.json --out plan.json
+# 2) 计划 → 草稿（组合、增量、回滚同样在计划层完成）
+jianying project build plan.json --out draft
+# 3) 评估 → 修复 → 重评（结构/素材/画音/镜头节奏四类问题）
+jianying eval draft --deep --json
+jianying loop draft --deep --policy policies/strict.json --json
+# 4) 出片：代理预览 + 单帧抽检
+jianying render proxy draft --out film.mp4
+jianying render frame draft --at 1500ms --out frame.png
+```
+
+计划可组合与回滚：`jianying plan compose/append/history/revert`。
+评估阈值可按平台调优：`policies/{default,douyin,strict}.json`，见
+[`docs/eval-policy.md`](docs/eval-policy.md)。
+
+## MCP（stdio）
+
+```bash
+jianying mcp serve     # 17 个工具：8 个 job、3 个命令桥、5 个检视/闭环、1 个抽帧
+```
+
+Agent 既可以用 `jianying_command_run` 调任意 CLI 命令，也可以用
+`jianying_draft_inspect` / `jianying_timeline_segments` / `jianying_eval` /
+`jianying_loop` / `jianying_render_frame` 做结构化读写。
+详见 [`docs/mcp-server.md`](docs/mcp-server.md)。
+
+## 发布物自校验
+
+```bash
+jianying release verify <bundle-dir> --json   # 逐文件 sha256/大小 + 能力契约比对
+```
+
+发布流程与授权边界见 [`docs/release-checklist.md`](docs/release-checklist.md)。
+
 计划契约、全部字段与校验规则见 [`docs/plan-format.md`](docs/plan-format.md)。
 计划用 `allow_vip: true` 显式声明后才允许引用 VIP 目录成员（会员权益是
 用户自己的授权，本 CLI 从不代为主张）。
@@ -68,9 +108,9 @@ pyJianYingDraft（参考实现，`tools/parity_reference.py`）与 jianying-cli
 
 ```bash
 cargo build --release
-cargo test                              # 31 unit/contract tests
-python3 tools/parity_run.py          # 55/55 PASS
-python3 tools/gen_catalogs.py <pyJYD检出> --check   # 目录与 pyJYD metadata 一致
+cargo test                                     # 349 unit/contract tests
+python tools/parity_run.py                     # 55/55 PASS
+python tools/gen_catalogs.py <pyJYD检出> --check  # 目录与 pyJYD metadata 一致
 ```
 
 历史上这套测试抓出并修正了：border/阴影的精确数值映射（×0.002、/600）、

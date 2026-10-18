@@ -822,6 +822,11 @@
       "id": "pyjyd.api_gaps",
       "status": "partial",
       "evidence": "provenance/PYJYD_API_COVERAGE.json: 3 partial classes with 4 uncovered methods (DraftFolder.inspect_material, TextSegment.create_from_template, ImportedMediaTrack.check_material_type/process_timerange) and 6 out-of-scope controller classes"
+    },
+    {
+      "id": "docs.commands_match_cli",
+      "status": "supported",
+      "evidence": "tests/docs_command_contract.rs: every `jianying ...` invocation in README/docs is resolved against the live command catalog, with a parser self-check so the gate cannot pass vacuously"
     }
   ],
   "truth_rule": "Only status=supported may be advertised as available; partial and external_dependency remain blocked for automatic routing."
