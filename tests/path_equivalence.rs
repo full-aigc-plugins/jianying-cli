@@ -222,6 +222,51 @@ fn speed_is_identical_whether_authored_or_applied_afterwards() {
 }
 
 #[test]
+fn speed_via_timeline_set_matches_the_authored_wire() {
+    let root = temp_root("set-speed");
+    fs::write(root.join("clip.mp4"), b"fixture").unwrap();
+
+    let authored = build(
+        &root,
+        "authored",
+        video_plan(3_000_001, json!({"speed": 0.5})),
+        &video_probe,
+    );
+    let edited = build(
+        &root,
+        "edited",
+        video_plan(3_000_001, json!({})),
+        &video_probe,
+    );
+    let id = first_segment_id(&edited, "video");
+    run_ok(&[
+        "timeline",
+        "set",
+        &edited.to_string_lossy(),
+        &id,
+        "--speed",
+        "0.5",
+        "--json",
+    ]);
+
+    // 旧实现只改 `speed` 字段，源区间仍停在 3000001；这里同时钉住该修复。
+    let content: Value =
+        serde_json::from_str(&fs::read_to_string(edited.join("draft_content.json")).unwrap())
+            .unwrap();
+    assert_eq!(
+        content["tracks"][0]["segments"][0]["source_timerange"]["duration"],
+        json!(1_500_000),
+        "设置速度必须同步 source_timerange.duration"
+    );
+    assert_eq!(
+        normalized(&authored),
+        normalized(&edited),
+        "timeline set --speed 必须与计划内 speed 写出同一份 wire"
+    );
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
 fn volume_is_identical_whether_authored_or_applied_afterwards() {
     let root = temp_root("volume");
     fs::write(root.join("voice.mp3"), b"fixture").unwrap();

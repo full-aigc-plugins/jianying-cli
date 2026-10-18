@@ -597,33 +597,44 @@ pub fn set_segment(
     volume: Option<f64>,
     opacity: Option<f64>,
 ) -> Result<Value> {
-    if duration_us.is_some_and(|value| value <= 0)
-        || speed.is_some_and(|value| !value.is_finite() || value <= 0.0)
-        || volume.is_some_and(|value| !value.is_finite() || value < 0.0)
-        || opacity.is_some_and(|value| !value.is_finite() || !(0.0..=1.0).contains(&value))
-    {
-        bail!("invalid segment property value");
+    // 先校验再开事务：非法参数不应留下快照或工作副本。
+    if duration_us.is_some_and(|value| value <= 0) {
+        bail!("duration must be a positive number of microseconds");
+    }
+    if let Some(value) = speed {
+        EditOp::SetSpeed(value).validate()?;
+    }
+    if let Some(value) = volume {
+        EditOp::SetVolume(value).validate()?;
+    }
+    if let Some(value) = opacity {
+        EditOp::SetOpacity(value).validate()?;
     }
     mutate(draft, |timeline| {
-        let segment = find_segment_mut(timeline, id)?;
-        if let Some(value) = start_us {
-            segment["target_timerange"]["start"] = json!(value.max(0));
-        }
-        if let Some(value) = duration_us {
-            segment["target_timerange"]["duration"] = json!(value);
-        }
-        if let Some(value) = speed {
-            segment["speed"] = json!(value);
-        }
-        if let Some(value) = volume {
-            segment["volume"] = json!(value);
-        }
-        if let Some(value) = opacity {
-            if !segment["clip"].is_object() {
-                bail!("segment {id} has no clip");
+        // 速度需要同步 materials.speeds，先临时取出根 materials 再放回。
+        let mut materials = timeline["materials"].take();
+        let updated = (|| -> Result<Value> {
+            let segment = find_segment_mut(timeline, id)?;
+            if let Some(value) = start_us {
+                segment["target_timerange"]["start"] = json!(value.max(0));
             }
-            segment["clip"]["alpha"] = json!(value);
-        }
+            if let Some(value) = duration_us {
+                segment["target_timerange"]["duration"] = json!(value);
+            }
+            // 时间字段先落，再让 writer 依据新的 target 时长重算源区间。
+            if let Some(value) = speed {
+                crate::writer::apply(segment, Some(&mut materials), EditOp::SetSpeed(value))?;
+            }
+            if let Some(value) = volume {
+                crate::writer::apply(segment, None, EditOp::SetVolume(value))?;
+            }
+            if let Some(value) = opacity {
+                crate::writer::apply(segment, None, EditOp::SetOpacity(value))?;
+            }
+            Ok(segment.clone())
+        })();
+        timeline["materials"] = materials;
+        let segment = updated?;
         Ok(json!({"ok":true,"id":id,"segment":segment}))
     })
 }
