@@ -68,35 +68,30 @@ MODULES = {
     },
     "tests/test_template_loading.py": {
         "category": "behavior",
-        "status": "mapped",
         "command": "jianying template list|import-track|replace-text|replace-material",
         "evidence": ["tests/template_cli_contract.rs", "tests/template_semantics_contract.rs"],
         "compare": "模板加载容错、导入轨道顺序、类型过滤、显式插入位置",
     },
     "tests/test_track_append_api.py": {
         "category": "behavior",
-        "status": "mapped",
         "command": "jianying timeline add-track <draft> <type> --name <name>",
         "evidence": ["tests/timeline_cli_contract.rs"],
         "compare": "追加轨道返回引用、同类型第二轨必须命名、片段必须属于本草稿",
     },
     "tests/test_track_insert_api.py": {
         "category": "behavior",
-        "status": "mapped",
         "command": "jianying timeline add-track <draft> <type> --index <n>",
         "evidence": ["tests/timeline_cli_contract.rs"],
         "compare": "按参考轨道/索引插入、拒绝多重定位、越界索引",
     },
     "tests/test_track_basics.py": {
         "category": "behavior",
-        "status": "mapped",
         "command": "jianying project build（计划校验：重叠即拒绝）",
         "evidence": ["tests/plan_validation.rs"],
         "compare": "重叠拒绝（含 1µs 边界）、类型匹配、秒级节拍对齐、轨道结束时间",
     },
     "tests/test_time_util.py": {
         "category": "behavior",
-        "status": "mapped",
         "command": "所有时间参数（0s / 1500ms / 1000000us）",
         "evidence": ["tests/ops_behavior.rs"],
         "compare": "tim/trange 解析与取整：负数偏移、duration 语义、绝对边界四舍五入",
@@ -130,6 +125,9 @@ def main() -> int:
         spec = dict(spec)
         if spec.get("category") == "draft":
             spec["status"] = "compared"
+        elif spec.get("category") == "behavior":
+            spec["status"] = "compared"
+            spec["artifact"] = "provenance/PYJYD_BEHAVIOR_PARITY.json"
         # 用例 id 取 case.json 所在目录名，与 provenance 产物里的 id 保持一致
         case_id = Path(spec["case"]).parent.name if spec.get("case") else Path(source).stem
         case = {

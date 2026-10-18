@@ -164,7 +164,7 @@ fn draft_cases_have_a_reference_builder_and_are_compared() {
 }
 
 #[test]
-fn behaviour_cases_point_at_real_evidence() {
+fn behaviour_cases_are_covered_by_the_behaviour_artifact() {
     let manifest = manifest();
     for case in manifest["cases"].as_array().unwrap() {
         if case["category"] != json!("behavior") {
@@ -185,6 +185,65 @@ fn behaviour_cases_point_at_real_evidence() {
             "{id}: 必须说明比对口径"
         );
     }
+}
+
+#[test]
+fn every_behaviour_test_is_executed_against_pyjianyingdraft() {
+    let manifest = manifest();
+    let artifact = read_json("provenance/PYJYD_BEHAVIOR_PARITY.json");
+    assert_eq!(
+        artifact["schema"],
+        json!("jianying-pyjyd-behavior-parity/v1")
+    );
+
+    let executed: BTreeSet<String> = artifact["cases"]
+        .as_array()
+        .expect("cases")
+        .iter()
+        .filter(|case| case["status"] == json!("passed"))
+        .flat_map(|case| {
+            case["covers"]
+                .as_array()
+                .cloned()
+                .unwrap_or_default()
+                .into_iter()
+                .filter_map(|name| name.as_str().map(str::to_owned))
+        })
+        .collect();
+
+    let mut declared: BTreeSet<String> = BTreeSet::new();
+    for case in manifest["cases"].as_array().unwrap() {
+        if case["category"] != json!("behavior") {
+            continue;
+        }
+        let id = case["id"].as_str().unwrap();
+        assert_eq!(
+            case["status"],
+            json!("compared"),
+            "{id}: 行为型用例必须已执行对照"
+        );
+        assert_eq!(
+            case["artifact"],
+            json!("provenance/PYJYD_BEHAVIOR_PARITY.json"),
+            "{id}: 必须指向行为对照产物"
+        );
+        let tests: Vec<String> = case["upstream_tests"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|name| name.as_str().unwrap().to_owned())
+            .collect();
+        assert!(!tests.is_empty(), "{id}: 行为用例必须对应上游测试");
+        for name in &tests {
+            assert!(
+                executed.contains(name),
+                "{name}: 未被任何行为用例实际执行覆盖"
+            );
+        }
+        declared.extend(tests);
+    }
+    assert_eq!(declared, executed, "清单与产物的行为测试集必须一致");
+    assert_eq!(declared.len(), 34, "行为测试数变了就要更新期望");
 }
 
 #[test]

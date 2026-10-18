@@ -30,11 +30,17 @@ python tools/pyjyd_examples_manifest.py \
 python tools/pyjyd_readme_snippets.py \
   --pyjyd-src <pyJianYingDraft 检出> --check
 
-# 2) 参照构建 + 我们的构建 + 语义比对
+# 2) 草稿型示例：参照构建 + 我们的构建 + 语义比对
 python tools/pyjyd_examples_parity.py \
   --pyjyd-src <pyJianYingDraft 检出> \
   --bin target/release/jianying.exe
 # → provenance/PYJYD_EXAMPLES_PARITY.json
+
+# 3) 行为型示例：同一输入喂两边，比较结局
+python tools/pyjyd_behavior_parity.py \
+  --pyjyd-src <pyJianYingDraft 检出> \
+  --bin target/release/jianying.exe
+# → provenance/PYJYD_BEHAVIOR_PARITY.json
 ```
 
 `pyjyd_examples_parity.py` 会用 ffmpeg 按 `case.json` 的 `media` 生成合成素材，
@@ -79,9 +85,20 @@ python tools/pyjyd_examples_parity.py \
 
 出现 `unmapped` 时门禁失败；`out_of_scope` 必须带理由（见 `out_of_scope_reasons`）。
 
-## 未覆盖的用例
+## 行为型示例
 
-`template_loading`、`track_append_api`、`track_insert_api`、`track_basics`、`time_util`
-是**行为型**示例：它们断言的是 API 语义（拒绝重叠、返回引用、时间解析取整），
-不产出可比的草稿整体。它们在 `CASES.json` 里绑定到对应的 CLI 命令与测试文件，
-比对方式是"同一规则在本仓库是否存在且被测试覆盖"。
+`time_util`、`track_basics`、`track_append_api`、`track_insert_api`、`template_loading`
+共 34 个测试函数断言的是 API 语义（时间解析、重叠拒绝、轨道顺序、模板轨道列举），
+不产出整份草稿。它们由 `behavior_cases.py` 的 9 个用例**实际执行**两边后比较结局：
+
+| 用例 | 比较内容 | 结果 |
+|---|---|---|
+| `time-parsing` / `time-rounding` | `tim()` 三个单位、`trange_seconds` 的 duration | 一致 |
+| `time-negative` | `tim("-0.5s")` 与 `timeline move -- -500ms` | 一致（本轮修了 CLI 不接受负号） |
+| `track-overlap` | 重叠与 1µs 边界：双方都拒绝 | 一致 |
+| `track-type` | 视频素材进音频轨 | 已批准差异：我们只取音轨 |
+| `track-end` / `append-order` | 轨道顺序与结束时间 | 已批准差异：主视频轨强制首位 |
+| `insert-order` | `insert_track(over_track=...)` 的块顺序 | 一致 |
+| `template-tracks` | 模板草稿的导入轨道列举 | 一致 |
+
+已批准差异同样写理由，并且只对**指定的比较键**生效（`approved: {key: reason}`）。

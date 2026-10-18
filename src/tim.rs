@@ -19,6 +19,14 @@ pub fn parse(s: &str) -> Result<i64> {
     if s.is_empty() {
         bail!("empty time string");
     }
+    // 签号：`timeline move` 这类带方向的参数需要负值（pyJianYingDraft 的 tim("-1s") 也成立）；
+    // 时长字段在各自的入口处仍然拒绝非正值。
+    if let Some(rest) = s.strip_prefix('-') {
+        return Ok(-parse(rest)?);
+    }
+    if let Some(rest) = s.strip_prefix('+') {
+        return parse(rest);
+    }
     // SRT style: HH:MM:SS,mmm or HH:MM:SS.mmm
     let srt = s.replace(',', ".");
     if let Ok(us) = parse_srt(&srt) {
@@ -108,5 +116,25 @@ pub fn preprocess(v: &mut Value) {
             }
         }
         _ => {}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse;
+
+    #[test]
+    fn parses_units_and_signs() {
+        assert_eq!(parse("1s").unwrap(), 1_000_000);
+        assert_eq!(parse("1.5s").unwrap(), 1_500_000);
+        assert_eq!(parse("250ms").unwrap(), 250_000);
+        assert_eq!(parse("1000000us").unwrap(), 1_000_000);
+        assert_eq!(parse("1h2m3s").unwrap(), 3_723_000_000);
+        // 带符号：与 pyJianYingDraft 的 tim("-0.5s") 一致
+        assert_eq!(parse("-500ms").unwrap(), -500_000);
+        assert_eq!(parse("-1.5s").unwrap(), -1_500_000);
+        assert_eq!(parse("+2s").unwrap(), 2_000_000);
+        assert!(parse("").is_err());
+        assert!(parse("abc").is_err());
     }
 }

@@ -1,0 +1,298 @@
+{
+  "schema": "jianying-pyjyd-behavior-parity/v1",
+  "pyjyd": {
+    "commit": "6bb2d06a713f7b58e1375269daec835a03882086"
+  },
+  "summary": {
+    "total": 9,
+    "passed": 9,
+    "differs": 0,
+    "failed": 0,
+    "covered_tests": [
+      "test_add_segment_accepts_track_ref",
+      "test_add_segment_rejects_foreign_track_ref",
+      "test_append_track_returns_track_ref_and_appends_to_end",
+      "test_append_tracks_preserves_input_order",
+      "test_duplicate_as_template_reuses_fallback_loader",
+      "test_get_imported_track_uses_internal_order_for_indexing",
+      "test_import_track_supports_explicit_insert_position",
+      "test_insert_track_at_index_uses_full_track_order",
+      "test_insert_track_before_imported_track_preserves_overall_order",
+      "test_insert_track_rejects_foreign_imported_track_anchor",
+      "test_insert_track_rejects_multiple_location_hints",
+      "test_insert_track_rejects_out_of_range_index",
+      "test_insert_tracks_over_track_ref_preserves_block_order",
+      "test_list_imported_tracks_preserves_internal_order_and_supports_type_filter",
+      "test_list_imported_tracks_returns_live_references",
+      "test_load_template_accepts_dict_from_fallback_loader",
+      "test_load_template_normalizes_sparse_template_content",
+      "test_load_template_raises_stable_error_for_non_plain_content_without_fallback_loader",
+      "test_load_template_uses_fallback_loader_for_non_plain_content",
+      "test_template_dump_preserves_original_track_array_order",
+      "test_tim_parses_common_duration_strings",
+      "test_tim_supports_negative_offsets",
+      "test_timerange_import_json_defaults_missing_start_to_zero",
+      "test_timerange_overlap_semantics",
+      "test_track_accepts_beat_aligned_segments_in_seconds",
+      "test_track_accepts_matching_segment_type",
+      "test_track_end_time_reflects_last_segment_end",
+      "test_track_rejects_mismatched_segment_type",
+      "test_track_rejects_overlapping_segments",
+      "test_track_still_rejects_one_microsecond_overlap",
+      "test_trange_seconds_accepts_end_or_duration",
+      "test_trange_seconds_requires_numeric_seconds",
+      "test_trange_seconds_rounds_absolute_boundaries",
+      "test_trange_uses_duration_not_end_time"
+    ]
+  },
+  "cases": [
+    {
+      "id": "time-parsing",
+      "module": "tests/test_time_util.py",
+      "covers": [
+        "test_tim_parses_common_duration_strings",
+        "test_trange_uses_duration_not_end_time",
+        "test_trange_seconds_accepts_end_or_duration"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {},
+      "reference": {
+        "outcome": "ok",
+        "values": [
+          1500000,
+          500000,
+          2000000,
+          1500000
+        ]
+      },
+      "ours": {
+        "outcome": "ok",
+        "values": [
+          1500000,
+          500000,
+          2000000,
+          1500000
+        ]
+      }
+    },
+    {
+      "id": "time-negative",
+      "module": "tests/test_time_util.py",
+      "covers": [
+        "test_tim_supports_negative_offsets"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {},
+      "reference": {
+        "outcome": "ok",
+        "value": 500000
+      },
+      "ours": {
+        "outcome": "ok",
+        "value": 500000
+      }
+    },
+    {
+      "id": "time-rounding",
+      "module": "tests/test_time_util.py",
+      "covers": [
+        "test_trange_seconds_rounds_absolute_boundaries",
+        "test_trange_seconds_requires_numeric_seconds",
+        "test_timerange_overlap_semantics",
+        "test_timerange_import_json_defaults_missing_start_to_zero"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {},
+      "reference": {
+        "outcome": "ok",
+        "values": [
+          1500000,
+          500000,
+          2000000,
+          1500000
+        ]
+      },
+      "ours": {
+        "outcome": "ok",
+        "values": [
+          1500000,
+          500000,
+          2000000,
+          1500000
+        ]
+      }
+    },
+    {
+      "id": "track-overlap",
+      "module": "tests/test_track_basics.py",
+      "covers": [
+        "test_track_rejects_overlapping_segments",
+        "test_track_still_rejects_one_microsecond_overlap"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {},
+      "reference": {
+        "outcome": "rejected"
+      },
+      "ours": {
+        "outcome": "rejected"
+      }
+    },
+    {
+      "id": "track-type",
+      "module": "tests/test_track_basics.py",
+      "covers": [
+        "test_track_accepts_matching_segment_type",
+        "test_track_rejects_mismatched_segment_type"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {
+        "outcome": "上游拒绝“视频对象进音频轨”是 Python 对象类型约束；我们面向草稿线格式，音频轨引用视频文件时只取其音轨，剪映同样允许"
+      },
+      "approved_keys": [
+        "outcome"
+      ],
+      "reference": {
+        "outcome": "rejected"
+      },
+      "ours": {
+        "outcome": "accepted"
+      }
+    },
+    {
+      "id": "track-end",
+      "module": "tests/test_track_basics.py",
+      "covers": [
+        "test_track_end_time_reflects_last_segment_end",
+        "test_track_accepts_beat_aligned_segments_in_seconds"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {
+        "names": "上游允许先追加音频轨；我们强制主视频轨为首轨（剪映渲染层级与主轨连续性校验要求），因此顺序被规范化"
+      },
+      "approved_keys": [
+        "names"
+      ],
+      "reference": {
+        "outcome": "ok",
+        "names": [
+          "bgm",
+          "main_video",
+          "caption"
+        ]
+      },
+      "ours": {
+        "outcome": "ok",
+        "names": [
+          "main_video",
+          "bgm",
+          "caption"
+        ]
+      }
+    },
+    {
+      "id": "append-order",
+      "module": "tests/test_track_append_api.py",
+      "covers": [
+        "test_append_track_returns_track_ref_and_appends_to_end",
+        "test_append_tracks_preserves_input_order",
+        "test_add_segment_accepts_track_ref",
+        "test_add_segment_rejects_foreign_track_ref"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {
+        "names": "上游允许先追加音频轨；我们强制主视频轨为首轨（剪映渲染层级与主轨连续性校验要求），因此顺序被规范化"
+      },
+      "approved_keys": [
+        "names"
+      ],
+      "reference": {
+        "outcome": "ok",
+        "names": [
+          "bgm",
+          "main_video",
+          "caption"
+        ]
+      },
+      "ours": {
+        "outcome": "ok",
+        "names": [
+          "main_video",
+          "bgm",
+          "caption"
+        ]
+      }
+    },
+    {
+      "id": "insert-order",
+      "module": "tests/test_track_insert_api.py",
+      "covers": [
+        "test_insert_track_before_imported_track_preserves_overall_order",
+        "test_insert_tracks_over_track_ref_preserves_block_order",
+        "test_insert_track_at_index_uses_full_track_order",
+        "test_insert_track_rejects_multiple_location_hints",
+        "test_insert_track_rejects_foreign_imported_track_anchor",
+        "test_insert_track_rejects_out_of_range_index"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {},
+      "reference": {
+        "outcome": "ok",
+        "names": [
+          "video",
+          "title",
+          "effect"
+        ]
+      },
+      "ours": {
+        "outcome": "ok",
+        "names": [
+          "video",
+          "title",
+          "effect"
+        ]
+      }
+    },
+    {
+      "id": "template-tracks",
+      "module": "tests/test_template_loading.py",
+      "covers": [
+        "test_load_template_raises_stable_error_for_non_plain_content_without_fallback_loader",
+        "test_load_template_uses_fallback_loader_for_non_plain_content",
+        "test_load_template_accepts_dict_from_fallback_loader",
+        "test_duplicate_as_template_reuses_fallback_loader",
+        "test_load_template_normalizes_sparse_template_content",
+        "test_template_dump_preserves_original_track_array_order",
+        "test_list_imported_tracks_preserves_internal_order_and_supports_type_filter",
+        "test_list_imported_tracks_returns_live_references",
+        "test_get_imported_track_uses_internal_order_for_indexing",
+        "test_import_track_supports_explicit_insert_position"
+      ],
+      "status": "passed",
+      "differences": [],
+      "approved_differences": {},
+      "reference": {
+        "outcome": "ok",
+        "names": [
+          "imported",
+          "caption"
+        ]
+      },
+      "ours": {
+        "outcome": "ok",
+        "names": [
+          "imported",
+          "caption"
+        ]
+      }
+    }
+  ]
+}
