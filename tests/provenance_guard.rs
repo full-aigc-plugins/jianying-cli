@@ -17,20 +17,35 @@ fn run_python(args: &[&str]) -> Output {
         candidates.push(name.to_string());
     }
 
-    let mut last: Option<Output> = None;
+    let mut last: Option<(String, Output)> = None;
     for candidate in candidates {
         match Command::new(&candidate).args(args).output() {
             Ok(output) if output.status.success() => return output,
-            Ok(output) => last = Some(output),
+            Ok(output) => {
+                // Microsoft Store 的 `python3.exe` 是个占位别名：它能被启动，但立刻失败并打出
+                // "Python was not found ... Microsoft Store"。继续试下一个候选，最后统一提示怎么修，
+                // 否则测试只会打印一段无上下文的占位提示。
+                last = Some((candidate, output));
+            }
             Err(_) => continue,
         }
     }
-    last.unwrap_or_else(|| {
-        Command::new("python3")
-            .args(args)
-            .output()
-            .expect("a python interpreter must be available")
-    })
+    match last {
+        Some((candidate, output)) => {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            assert!(
+                !(stderr.contains("Microsoft Store") || output.status.code() == Some(9009)),
+                "{candidate} is the Microsoft Store placeholder, not a real interpreter: the \
+                 provenance gates shell out to Python. Set PYTHON to a real python.exe \
+                 (e.g. `$env:PYTHON = (Get-Command python.cmd).Source`) and re-run.\nstderr:\n{stderr}"
+            );
+            output
+        }
+        None => panic!(
+            "no python interpreter could be started (tried PYTHON, python3, python, py); the \
+             provenance gates need one — set PYTHON to a real python.exe"
+        ),
+    }
 }
 
 #[test]

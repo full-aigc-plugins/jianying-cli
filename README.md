@@ -179,6 +179,16 @@ cargo build --release
 cargo test                                     # 349 unit/contract tests
 python tools/parity_run.py                     # 55/55 PASS
 python tools/gen_catalogs.py <pyJYD检出> --check  # 目录与 pyJYD metadata 一致
+
+> **Windows 上跑测试前先确认 Python 解释器**：`provenance_guard` 等门禁会 `shell out` 到 Python。
+> Microsoft Store 的 `python3.exe` 是可启动但立刻失败的占位别名（退出码 9009），门禁会误报失败。
+> 设 `PYTHON` 指向真实解释器即可（现在是可操作提示，不再只打印占位提示）：
+>
+> ```powershell
+> $env:PYTHON = (Get-Command python.cmd).Source   # 或任意真实 python.exe
+> $env:JIANYING_CLI_PROCESS_LIST = "$env:TEMP\empty.txt"   # 本机 tasklist 卡死时用它跳过"剪映在运行"检查
+> cargo test -p jianying-cli
+> ```
 ```
 
 历史上这套测试抓出并修正了：border/阴影的精确数值映射（×0.002、/600）、
