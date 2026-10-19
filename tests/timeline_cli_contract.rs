@@ -1963,6 +1963,300 @@ fn audio_effect_attaches_from_the_catalog_and_is_idempotent() {
 }
 
 #[test]
+fn audio_effect_param_tunes_voice_change_pitch_through_the_draft_protocol() {
+    let root = std::env::temp_dir().join(format!(
+        "jianying-audio-effect-param-{}",
+        uuid::Uuid::new_v4().simple()
+    ));
+    let _ = std::fs::remove_dir_all(&root);
+    std::fs::create_dir_all(&root).unwrap();
+    std::fs::write(root.join("voice.mp3"), b"fixture").unwrap();
+    let plan: Plan = serde_json::from_value(serde_json::json!({
+        "schema":"jianying-cli-plan/v1","name":"audio-effect-param",
+        "canvas":{"width":1920,"height":1080,"fps":30},
+        "tracks":[{"type":"audio","segments":[{
+            "start_us":0,"duration_us":2000000,"source":"voice.mp3"
+        }]}]
+    }))
+    .unwrap();
+    let draft_path = root.join("draft");
+    draft::build(&plan, &root, &draft_path, None, &audio_probe_stub).unwrap();
+    let id = run_ok(&[
+        "timeline",
+        "segments",
+        &draft_path.to_string_lossy(),
+        "--track",
+        "audio",
+        "--json",
+    ])[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let applied = run_ok(&[
+        "timeline",
+        "audio-effect",
+        &draft_path.to_string_lossy(),
+        &id,
+        "8bit",
+        "--json",
+    ]);
+    let material_id = applied["material_id"].as_str().unwrap().to_owned();
+
+    // 注入未知字段：命令只允许改 value，其余必须原样保留。
+    let mut timeline = draft::load_timeline(&draft_path).unwrap();
+    {
+        let effects = timeline["materials"]["audio_effects"]
+            .as_array_mut()
+            .unwrap();
+        let effect = effects
+            .iter_mut()
+            .find(|effect| effect["id"] == serde_json::json!(&material_id))
+            .unwrap();
+        effect["unrecognized_material_field"] = serde_json::json!({"keep": true});
+        effect["audio_adjust_params"][0]["unrecognized_param_field"] = serde_json::json!("keep");
+    }
+    timeline["tracks"][0]["segments"][0]["unrecognized_segment_field"] = serde_json::json!(7);
+    jianying_cli::template::save_timeline(&draft_path, &timeline).unwrap();
+
+    let changed = run_ok(&[
+        "timeline",
+        "audio-effect-param",
+        &draft_path.to_string_lossy(),
+        &id,
+        "8bit",
+        "--params",
+        "[80,60,100]",
+        "--json",
+    ]);
+    assert_eq!(changed["material_id"], serde_json::json!(&material_id));
+    assert_eq!(
+        changed["params"],
+        serde_json::json!([
+            "change_voice_param_pitch_shift",
+            "change_voice_param_timbre",
+            "change_voice_param_strength"
+        ])
+    );
+    assert_eq!(changed["old_values"], serde_json::json!([0.5, 1.0, 1.0]));
+    assert_eq!(changed["values"], serde_json::json!([0.8, 0.6, 1.0]));
+
+    // 两个草稿镜像必须写成同一份时间线，且只有 value 变化。
+    let content = fs::read(draft_path.join("draft_content.json")).unwrap();
+    let info = fs::read(draft_path.join("draft_info.json")).unwrap();
+    assert_eq!(content, info, "双镜像必须写入同一份时间线");
+    for mirror in ["draft_content.json", "draft_info.json"] {
+        let wire: serde_json::Value =
+            serde_json::from_slice(&fs::read(draft_path.join(mirror)).unwrap()).unwrap();
+        let effect = wire["materials"]["audio_effects"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|effect| effect["id"] == serde_json::json!(&material_id))
+            .unwrap();
+        assert_eq!(effect["type"], "audio_effect");
+        assert_eq!(effect["name"], "8bit");
+        assert_eq!(effect["unrecognized_material_field"]["keep"], true);
+        assert_eq!(
+            effect["audio_adjust_params"][0]["unrecognized_param_field"],
+            "keep"
+        );
+        let values = effect["audio_adjust_params"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|param| param["value"].as_f64().unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(values, vec![0.8, 0.6, 1.0], "{mirror} 参数值必须落盘");
+        assert_eq!(
+            wire["tracks"][0]["segments"][0]["unrecognized_segment_field"],
+            7
+        );
+    }
+
+    // 计划路径对同一目录项写同一批字段：命令与计划必须同义。
+    let authored_root = root.join("authored");
+    std::fs::create_dir_all(&authored_root).unwrap();
+    std::fs::write(authored_root.join("voice.mp3"), b"fixture").unwrap();
+    let authored_plan: Plan = serde_json::from_value(serde_json::json!({
+        "schema":"jianying-cli-plan/v1","name":"audio-effect-param-authored",
+        "canvas":{"width":1920,"height":1080,"fps":30},
+        "tracks":[{"type":"audio","segments":[{
+            "start_us":0,"duration_us":2000000,"source":"voice.mp3",
+            "audio_effects":[{"name":"8bit","params":{
+                "change_voice_param_pitch_shift":80,
+                "change_voice_param_timbre":60,
+                "change_voice_param_strength":100
+            }}]
+        }]}]
+    }))
+    .unwrap();
+    let authored = root.join("authored-draft");
+    draft::build(
+        &authored_plan,
+        &authored_root,
+        &authored,
+        None,
+        &audio_probe_stub,
+    )
+    .unwrap();
+    let authored_timeline = draft::load_timeline(&authored).unwrap();
+    let authored_values = authored_timeline["materials"]["audio_effects"][0]["audio_adjust_params"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|param| param["value"].as_f64().unwrap())
+        .collect::<Vec<_>>();
+    assert_eq!(
+        authored_values,
+        vec![0.8, 0.6, 1.0],
+        "命令必须与计划写同一批 draft 字段"
+    );
+
+    // 拒绝路径：非法参数不得留下任何写入。
+    let before = fs::read(draft_path.join("draft_content.json")).unwrap();
+    let before_info = fs::read(draft_path.join("draft_info.json")).unwrap();
+    let draft_arg = draft_path.to_string_lossy().into_owned();
+    let assert_rejected = |segment_id: &str, params: &str| {
+        let output = run(&[
+            "timeline",
+            "audio-effect-param",
+            draft_arg.as_str(),
+            segment_id,
+            "8bit",
+            "--params",
+            params,
+            "--json",
+        ]);
+        assert_eq!(
+            output.status.code(),
+            Some(1),
+            "params={params} stdout={}",
+            String::from_utf8_lossy(&output.stdout)
+        );
+        assert_eq!(
+            fs::read(draft_path.join("draft_content.json")).unwrap(),
+            before,
+            "拒绝路径不得改动 draft_content.json"
+        );
+        assert_eq!(
+            fs::read(draft_path.join("draft_info.json")).unwrap(),
+            before_info,
+            "拒绝路径不得改动 draft_info.json"
+        );
+    };
+    assert_rejected(&id, "[101,60,100]");
+    assert_rejected(&id, "[-1,60,100]");
+    assert_rejected(&id, "[80]");
+    assert_rejected("missing-segment", "[80,60,100]");
+
+    // 未挂载的效果不能凭空调参。
+    let bare = root.join("bare-draft");
+    draft::build(&plan, &root, &bare, None, &audio_probe_stub).unwrap();
+    let bare_id = run_ok(&[
+        "timeline",
+        "segments",
+        &bare.to_string_lossy(),
+        "--track",
+        "audio",
+        "--json",
+    ])[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let not_attached = run(&[
+        "timeline",
+        "audio-effect-param",
+        &bare.to_string_lossy(),
+        &bare_id,
+        "8bit",
+        "--params",
+        "[80,60,100]",
+        "--json",
+    ]);
+    assert_eq!(not_attached.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&not_attached.stdout).contains("is not attached"));
+
+    // 部分音色条目在目录里没有可调参数，必须给出可操作错误而不是空写。
+    let no_params_draft = root.join("tone-draft");
+    draft::build(&plan, &root, &no_params_draft, None, &audio_probe_stub).unwrap();
+    let tone_id = run_ok(&[
+        "timeline",
+        "segments",
+        &no_params_draft.to_string_lossy(),
+        "--track",
+        "audio",
+        "--json",
+    ])[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    run_ok(&[
+        "timeline",
+        "audio-effect",
+        &no_params_draft.to_string_lossy(),
+        &tone_id,
+        "台湾小哥",
+        "--json",
+    ]);
+    let no_params = run(&[
+        "timeline",
+        "audio-effect-param",
+        &no_params_draft.to_string_lossy(),
+        &tone_id,
+        "台湾小哥",
+        "--params",
+        "[]",
+        "--json",
+    ]);
+    assert_eq!(no_params.status.code(), Some(1));
+    assert!(
+        String::from_utf8_lossy(&no_params.stdout).contains("no tunable parameters"),
+        "stdout={}",
+        String::from_utf8_lossy(&no_params.stdout)
+    );
+
+    // 有参数的音色预设（大叔：音调/音色）也能按目录顺序调参。
+    run_ok(&[
+        "timeline",
+        "audio-effect",
+        &no_params_draft.to_string_lossy(),
+        &tone_id,
+        "大叔",
+        "--json",
+    ]);
+    let tuned_tone = run_ok(&[
+        "timeline",
+        "audio-effect-param",
+        &no_params_draft.to_string_lossy(),
+        &tone_id,
+        "大叔",
+        "--params",
+        "[70,40]",
+        "--json",
+    ]);
+    assert_eq!(tuned_tone["params"], serde_json::json!(["音调", "音色"]));
+    assert_eq!(tuned_tone["values"], serde_json::json!([0.7, 0.4]));
+    let tone_wire: serde_json::Value =
+        serde_json::from_slice(&fs::read(no_params_draft.join("draft_info.json")).unwrap())
+            .unwrap();
+    let tone_effect = tone_wire["materials"]["audio_effects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|effect| effect["id"] == tuned_tone["material_id"])
+        .unwrap();
+    let tone_values = tone_effect["audio_adjust_params"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|param| param["value"].as_f64().unwrap())
+        .collect::<Vec<_>>();
+    assert_eq!(tone_values, vec![0.7, 0.4]);
+
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
 fn pitch_toggles_is_tone_modify_and_matches_the_plan_field() {
     let root = std::env::temp_dir().join(format!("jianying-pitch-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&root);

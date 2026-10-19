@@ -709,6 +709,11 @@
       "evidence": "tests/timeline_cli_contract.rs: catalog audio effect attach onto audio segments, idempotent re-apply, unknown names rejected"
     },
     {
+      "id": "timeline.audio_effect_params",
+      "status": "partial",
+      "evidence": "tests/timeline_cli_contract.rs: catalog-declared audio_adjust_params values written through MutationPlan with dual-mirror readback, unknown-field preservation and plan `audio_effects[].params` parity; native-editor voice-change listening acceptance pending, so the control stays partial"
+    },
+    {
       "id": "resource.no_network_fetch",
       "status": "external_dependency",
       "evidence": "docs/resource-library.md: JianYing material catalogs sit behind signed APIs; this CLI deliberately neither signs requests nor reads the runtime agent token"

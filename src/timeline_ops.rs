@@ -2951,23 +2951,26 @@ pub fn apply_resource(draft: &Path, id: &str, entry: &Value) -> Result<Value> {
     })
 }
 
+/// 在三个音频效果目录里解析名称，并返回目录项及其 `category_id` / `category_name`。
+fn resolve_audio_effect(name: &str) -> Result<(&'static Value, &'static str, &'static str)> {
+    let scene = crate::catalogs::find(crate::catalogs::audio_scene_effects(), name);
+    let tone = crate::catalogs::find(crate::catalogs::tone_effects(), name);
+    let song = crate::catalogs::find(crate::catalogs::speech_to_songs(), name);
+    match (scene, tone, song) {
+        (Some(entry), _, _) => Ok((entry, "sound_effect", "场景音")),
+        (_, Some(entry), _) => Ok((entry, "timbre", "音色")),
+        (_, _, Some(entry)) => Ok((entry, "song", "声音成曲")),
+        _ => bail!(
+            "unknown audio effect {name:?}; list names with `jianying catalog audio-scene-effects|tone-effects|speech-to-songs`"
+        ),
+    }
+}
+
 /// 为音频片段挂一个音效（场景音效 / 音色 / 声音成曲）。
 ///
 /// 与计划路径写出的结构保持一致；同一资源重复挂载是幂等的。
 pub fn audio_effect(draft: &Path, id: &str, name: &str) -> Result<Value> {
-    let (entry, category_id, category_name) = {
-        let scene = crate::catalogs::find(crate::catalogs::audio_scene_effects(), name);
-        let tone = crate::catalogs::find(crate::catalogs::tone_effects(), name);
-        let song = crate::catalogs::find(crate::catalogs::speech_to_songs(), name);
-        match (scene, tone, song) {
-            (Some(entry), _, _) => (entry, "sound_effect", "场景音"),
-            (_, Some(entry), _) => (entry, "timbre", "音色"),
-            (_, _, Some(entry)) => (entry, "song", "声音成曲"),
-            _ => bail!(
-                "unknown audio effect {name:?}; list names with `jianying catalog audio-scene-effects|tone-effects|speech-to-songs`"
-            ),
-        }
-    };
+    let (entry, category_id, category_name) = resolve_audio_effect(name)?;
     let resolved_name = entry["name"].as_str().unwrap_or(name).to_owned();
     let resource_id = crate::catalogs::resource_id(entry);
     let params = crate::catalogs::adjust_params(entry, None);
@@ -3044,6 +3047,180 @@ pub fn audio_effect(draft: &Path, id: &str, name: &str) -> Result<Value> {
             "category_id": category_id
         }))
     })
+}
+
+/// 调整已挂载音频效果（场景音效 / 音色 / 声音成曲）的目录参数。
+///
+/// 参数按目录顺序寻址（`parameter_index`），取值沿用计划与剪映 UI 的 0..100 标度，
+/// 落盘到 `materials.audio_effects[i].audio_adjust_params[j].value`（草稿内为 0..1）。
+/// 只改中选条目的 `value`，其余键、未知字段和其他参数条目原样保留。
+pub fn audio_effect_param(draft: &Path, id: &str, name: &str, values: &[f64]) -> Result<Value> {
+    if id.trim().is_empty() {
+        bail!("segment id must not be blank");
+    }
+    let (entry, _, _) = resolve_audio_effect(name)?;
+    let resolved_name = entry["name"].as_str().unwrap_or(name).to_owned();
+    let resource_id = crate::catalogs::resource_id(entry);
+    let spec: Vec<(String, f64, f64)> = entry["params"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|param| {
+            (
+                param["name"].as_str().unwrap_or_default().to_owned(),
+                param["min"].as_f64().unwrap_or(0.0),
+                param["max"].as_f64().unwrap_or(1.0),
+            )
+        })
+        .collect();
+    if spec.is_empty() {
+        bail!(
+            "audio effect {resolved_name:?} declares no tunable parameters in the bundled catalog"
+        );
+    }
+    if values.len() != spec.len() {
+        let names: Vec<&str> = spec.iter().map(|(name, _, _)| name.as_str()).collect();
+        bail!(
+            "audio effect {resolved_name:?} declares {} parameter(s) {names:?}; got {} value(s)",
+            spec.len(),
+            values.len()
+        );
+    }
+    let mut normalized = Vec::with_capacity(values.len());
+    for (index, (param_name, min, max)) in spec.iter().enumerate() {
+        let value = values[index];
+        if !value.is_finite() || !(0.0..=100.0).contains(&value) {
+            bail!("parameter[{index}] {param_name:?} must be a finite number in [0, 100], got {value}");
+        }
+        // 目录里的 min/max 是 0..1，UI 标度是 0..100；先按目录范围拒绝越界。
+        let low = (min * 100.0).max(0.0);
+        let high = (max * 100.0).min(100.0);
+        if value < low || value > high {
+            bail!(
+                "parameter[{index}] {param_name:?} must be within [{low}, {high}] \
+                 (catalog range), got {value}"
+            );
+        }
+        normalized.push(value / 100.0);
+    }
+    let change = mutate(draft, |timeline| {
+        let refs: Vec<String> = {
+            let segment = find_segment_mut(timeline, id)?;
+            segment["extra_material_refs"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        };
+        let effects = timeline["materials"]["audio_effects"]
+            .as_array_mut()
+            .context("materials.audio_effects must be an array")?;
+        let mut matched = Vec::new();
+        for (index, effect) in effects.iter().enumerate() {
+            let same_resource = effect["resource_id"].as_str().unwrap_or("") == resource_id;
+            let referenced = effect["id"]
+                .as_str()
+                .is_some_and(|material_id| refs.iter().any(|known| known == material_id));
+            if same_resource && referenced {
+                matched.push(index);
+            }
+        }
+        let position = match matched.as_slice() {
+            [] => bail!(
+                "audio effect {resolved_name:?} is not attached to segment {id}; run \
+                 `timeline audio-effect {id} {resolved_name}` first"
+            ),
+            [only] => *only,
+            _ => bail!(
+                "segment {id} references {} {resolved_name:?} materials; refusing to guess",
+                matched.len()
+            ),
+        };
+        let effect = &mut effects[position];
+        let material_id = effect["id"].as_str().unwrap_or_default().to_owned();
+        let params = effect["audio_adjust_params"]
+            .as_array_mut()
+            .with_context(|| {
+                format!("audio effect {material_id} is missing audio_adjust_params")
+            })?;
+        if params.len() != normalized.len() {
+            bail!(
+                "audio effect {material_id} carries {} audio_adjust_params but the catalog \
+                 lists {}",
+                params.len(),
+                normalized.len()
+            );
+        }
+        let mut old_values = Vec::with_capacity(normalized.len());
+        for (index, value) in normalized.iter().enumerate() {
+            // 客户端按 parameterIndex + portIndex 匹配参数；缺失索引时退回数组顺序。
+            let slot = params
+                .iter()
+                .position(|param| parameter_index(param) == Some(index))
+                .unwrap_or(index);
+            let param = params
+                .get_mut(slot)
+                .with_context(|| format!("parameter[{index}] is missing from {material_id}"))?;
+            let old = param["value"].as_f64().with_context(|| {
+                format!("parameter[{index}] of {material_id} has no numeric value")
+            })?;
+            old_values.push(old);
+            param["value"] = json!(value);
+        }
+        Ok(json!({
+            "ok": true, "id": id, "name": resolved_name, "material_id": material_id,
+            "params": spec.iter().map(|(name, _, _)| name.clone()).collect::<Vec<_>>(),
+            "old_values": old_values, "values": normalized.clone()
+        }))
+    })?;
+    // 事务提交后逐个镜像回读，不能只相信内存里的拟写值。
+    let material_id = change["material_id"]
+        .as_str()
+        .unwrap_or_default()
+        .to_owned();
+    for mirror in ["draft_content.json", "draft_info.json"] {
+        let timeline: Value = serde_json::from_slice(&std::fs::read(draft.join(mirror))?)?;
+        let effect = timeline["materials"]["audio_effects"]
+            .as_array()
+            .with_context(|| format!("{mirror} materials.audio_effects must be an array"))?
+            .iter()
+            .find(|effect| effect["id"].as_str() == Some(material_id.as_str()))
+            .with_context(|| {
+                format!("audio effect {material_id} missing after commit in {mirror}")
+            })?;
+        let params = effect["audio_adjust_params"]
+            .as_array()
+            .with_context(|| format!("{mirror} audio effect {material_id} lost its params"))?;
+        for (index, expected) in normalized.iter().enumerate() {
+            let slot = params
+                .iter()
+                .position(|param| parameter_index(param) == Some(index))
+                .unwrap_or(index);
+            let got = params
+                .get(slot)
+                .and_then(|param| param["value"].as_f64())
+                .with_context(|| {
+                    format!("parameter[{index}] readback missing in {mirror} for {material_id}")
+                })?;
+            if (got - expected).abs() > 1e-9 {
+                bail!(
+                    "audio effect parameter readback mismatch in {mirror} for {material_id}: \
+                     parameter[{index}] is {got}, expected {expected}"
+                );
+            }
+        }
+    }
+    Ok(change)
+}
+
+fn parameter_index(param: &Value) -> Option<usize> {
+    param
+        .get("parameter_index")
+        .or_else(|| param.get("parameterIndex"))
+        .and_then(Value::as_u64)
+        .map(|value| value as usize)
 }
 
 fn find_segment_mut<'a>(timeline: &'a mut Value, id: &str) -> Result<&'a mut Value> {

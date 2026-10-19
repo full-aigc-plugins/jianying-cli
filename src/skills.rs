@@ -71,12 +71,13 @@ const SKILLS: &[Skill] = &[
     Skill {
         id: "audio-mix",
         name: "音频处理",
-        intent: "音量、淡入淡出、变速、音效挂载",
+        intent: "音量、淡入淡出、变速、变调、音效挂载与变声参数",
         status: "supported",
         commands: &[
             &["timeline", "volume"],
             &["timeline", "audio-fade"],
             &["timeline", "audio-effect"],
+            &["timeline", "audio-effect-param"],
             &["timeline", "pitch"],
         ],
         evidence: "tests/timeline_cli_contract.rs",

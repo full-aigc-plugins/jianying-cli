@@ -61,7 +61,8 @@ npx -y rea-agents@latest analyze-javascript-application "<安装目录>\Resource
 | 变速 | ✅ `timeline speed` |
 | 换音色 / 声音效果 / 改编翻唱（音效挂载） | ✅ `timeline audio-effect`（场景音效 / 音色 / 声音成曲） |
 | 响度统一 / 音频降噪 / 人声美化 / 声音分离 / 立体声平衡 / 声道配置 / 音频翻译 | ❌ 未实现（DSP 与联网能力，L3 范围外） |
-| 变调 | ⚠️ 仅 plan `change_pitch` → `is_tone_modify`；无编辑命令 |
+| 变调 | ✅ `timeline pitch on\|off` → 片段 `is_tone_modify`；与计划 `change_pitch` 同义 |
+| 变声参数（音高偏移 / 音色 / 强度） | ⚠️ `timeline audio-effect-param --params` 改已挂载音效的 `audio_adjust_params[].value`（目录 0-1，UI 0-100）；真实编辑器听感验收待补 |
 | 音乐库 / 音效库（左侧素材库：热门/最新/纯音乐/旅行/轻快/恋爱旋律/K-POP/卡点/治愈/国风/AI 音乐） | ❌ 联网目录，插件不做抓取；改由 `resource mine/import/apply` 复用用户自己的素材 |
 
 ### 3.2 文本面板（花字）

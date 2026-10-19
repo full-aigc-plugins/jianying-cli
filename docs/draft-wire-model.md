@@ -53,6 +53,30 @@ wire 门禁：
 新建、模板编辑、模板叠加、发布与 `verify` 均复用同一门禁，因此不再出现“plan 合法但模板
 操作写出非法编辑字段”的两套规则。
 
+## 变调与变声的协议位置（客户端 11.6.0.14552 实装证据）
+
+“音高”在本协议里是两类不同字段，不要混为一谈：
+
+| 语义 | draft 字段路径 | 证据 |
+|---|---|---|
+| 变速时同步变调开关 | `tracks[].segments[].is_tone_modify`（bool） | 客户端 `canvas_agent` 的 Segment wire schema `common` 列表显式含 `speed`、`is_tone_modify`；本仓库 `timeline pitch` 与计划 `change_pitch` 都写这一字段 |
+| 变速倍率 | `tracks[].segments[].speed` + `materials.speeds[].speed` | 同上；`materials.speeds` companion 由 `DraftEditSemantics` 校验一致 |
+| 变声/音色（资源引用） | `materials.audio_effects[].{type=audio_effect, resource_id, category_id, category_name, sub_type, speaker_id, production_path, is_vc_clone_tone}`，由 `tracks[].segments[].extra_material_refs` 引用 | `AudioEffect` wire schema `common` 列表；客户端 `MetaTypeAudioEffect="audio_effect"` |
+| 变声参数（音高偏移/音色/强度） | `materials.audio_effects[].audio_adjust_params[].{name, value, default_value, min_value, max_value, parameterIndex, portIndex}`，`value` 为 0..1 | `AudioEffect` wire schema 的 `array.audio_adjust_params`；客户端 `_setVoiceChangeParams` 以 `parameterIndex`+`portIndex` 匹配后写 `value` |
+| 变声预设的参数名 | `change_voice_param_pitch_shift` / `change_voice_param_timbre` / `change_voice_param_strength` 等 | 本仓库 `catalogs/audio_scene_effects.json`（源自 pyJianYingDraft）与客户端 `po/zh-Hans.po` 的 `change_voice_param_*` 词条一致 |
+
+由此可得两条边界：
+
+- **协议层可表达**：变速变调开关、音色/变声资源挂载、以及目录声明的变声参数值，都能
+  只用 draft JSON 写入；`timeline pitch`、`timeline audio-effect`、
+  `timeline audio-effect-param` 分别覆盖这三层。
+- **协议层不可表达**：任意半音/共振峰的“连续变调”、AI 音色克隆，客户端是先把结果渲染成
+  音频文件再写 `production_path`（VVC 变声分支以 `sub_type == AudioEffectTypeVCVoiceChange`
+  取 `productionPath` 作为片段资源），因此这类操作必须走真实 DSP/联网，不能伪装成草稿字段。
+
+新增变量声参数的命令遵循既有事务模式：精确片段 ID、目录参数个数与 0..1 范围校验、
+`MutationPlan` 原子提交、提交后逐镜像回读，只改 `value`，未知字段与其他参数条目原样保留。
+
 ## 无损边界
 
 - 每层对象使用 `serde(flatten)` 保存未知字段；已存在的未知根字段、画布字段、轨道字段、

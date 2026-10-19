@@ -77,6 +77,17 @@ fn semantic_control_catalog_prefers_direct_draft_routes_and_contains_no_coordina
         .as_str()
         .unwrap()
         .contains("timeline track-rename"));
+    let voice_change = controls
+        .iter()
+        .find(|control| control["semantic_id"] == "timeline.audio.voice_change")
+        .unwrap();
+    assert_eq!(voice_change["route"], "draft_protocol");
+    assert_eq!(voice_change["status"], "partial");
+    assert_eq!(voice_change["capability"], "timeline.audio_effect_params");
+    assert!(voice_change["command"]
+        .as_str()
+        .unwrap()
+        .contains("timeline audio-effect-param"));
     assert!(!serde_json::to_string(&envelope)
         .unwrap()
         .contains("screen_coordinate"));

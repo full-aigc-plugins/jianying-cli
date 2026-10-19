@@ -720,6 +720,16 @@ enum TimelineOp {
         /// Catalog name (场景音效 / 音色 / 声音成曲)
         name: String,
     },
+    /// Tune catalog parameters (e.g. voice-change pitch-shift/timbre) of an attached audio effect
+    AudioEffectParam {
+        draft: PathBuf,
+        id: String,
+        /// Catalog name (场景音效 / 音色 / 声音成曲) already attached to the segment
+        name: String,
+        /// JSON array of numbers in the 0-100 UI scale, ordered like the catalog params
+        #[arg(long)]
+        params: String,
+    },
     /// Toggle speed-synchronised pitch change (plan `change_pitch` / is_tone_modify)
     Pitch {
         draft: PathBuf,
@@ -2838,6 +2848,19 @@ fn run(cmd: Command, json: bool, profile: &str, host_read_only: bool) -> Result<
             }
             TimelineOp::AudioEffect { draft, id, name } => {
                 print_output(timeline_ops::audio_effect(&draft, &id, &name)?, json)
+            }
+            TimelineOp::AudioEffectParam {
+                draft,
+                id,
+                name,
+                params,
+            } => {
+                let values: Vec<f64> = serde_json::from_str(&params)
+                    .context("--params must be a JSON array of numbers")?;
+                print_output(
+                    timeline_ops::audio_effect_param(&draft, &id, &name, &values)?,
+                    json,
+                )
             }
             TimelineOp::Pitch { draft, id, state } => {
                 let enabled = match state.trim().to_ascii_lowercase().as_str() {
