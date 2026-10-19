@@ -433,6 +433,71 @@ fn runtime_discover_reports_unverified_installations_and_orphan_draft_roots() {
 }
 
 #[test]
+fn runtime_discover_finds_per_user_windows_installation_without_claiming_support() {
+    let nonce = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let root = std::env::temp_dir().join(format!(
+        "jianying-runtime-cli-windows-discovery-{}-{nonce}",
+        std::process::id()
+    ));
+    let local_app_data = root.join("LocalAppData");
+    let installation = local_app_data.join("JianyingPro");
+    let apps = installation.join("Apps");
+    let executable = apps.join("JianyingPro.exe");
+    fs::create_dir_all(apps.join("11.6.0.14552")).unwrap();
+    fs::write(&executable, b"synthetic windows launcher").unwrap();
+    let draft_root = local_app_data.join("JianyingPro/User Data/Projects/com.lveditor.draft");
+    fs::create_dir_all(&draft_root).unwrap();
+
+    // 只覆盖 --local-app-data：默认搜索根必须包含逐用户 LOCALAPPDATA 布局。
+    let discovered = Command::new(env!("CARGO_BIN_EXE_jianying"))
+        .args([
+            "--json",
+            "runtime",
+            "discover",
+            "--platform",
+            "windows",
+            "--home",
+            root.join("home").to_str().unwrap(),
+            "--local-app-data",
+            local_app_data.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        discovered.status.success(),
+        "stdout={} stderr={}",
+        String::from_utf8_lossy(&discovered.stdout),
+        String::from_utf8_lossy(&discovered.stderr)
+    );
+    let envelope: Value = serde_json::from_slice(&discovered.stdout).unwrap();
+    let data = &envelope["data"];
+    assert_eq!(data["state"], "found_unverified");
+    assert_eq!(data["automatic_routing"], false);
+    assert_eq!(data["support_status"], "unverified");
+    let installations = data["installations"].as_array().unwrap();
+    let discovered_jianying = installations
+        .iter()
+        .find(|installation| installation["product_id"] == "jianying")
+        .expect("per-user windows installation not discovered");
+    assert_eq!(discovered_jianying["version"], "11.6.0.14552");
+    assert_eq!(
+        discovered_jianying["installation_root"],
+        installation.to_string_lossy().as_ref()
+    );
+    assert_eq!(discovered_jianying["support_status"], "unverified");
+    assert_eq!(discovered_jianying["automatic_routing"], false);
+    assert_eq!(
+        data["draft_roots"][0]["path"],
+        draft_root.to_string_lossy().as_ref()
+    );
+    assert_eq!(data["draft_roots"][0]["exists"], true);
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn render_help_exposes_native_as_a_distinct_operation() {
     let output = run(&["render", "--help"]);
     assert!(output.status.success());

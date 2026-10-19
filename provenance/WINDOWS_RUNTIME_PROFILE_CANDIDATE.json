@@ -1,0 +1,75 @@
+{
+  "schema": "jianying-windows-runtime-profile-candidate/v1",
+  "observed_at": "2026-10-20",
+  "host": {
+    "os": "windows",
+    "note": "本机安装且运行过剪映专业版；发现与探测均为只读"
+  },
+  "discovery": {
+    "state": "found_unverified",
+    "platform": "windows",
+    "installation": {
+      "product_id": "jianying",
+      "product": "JianYing Pro",
+      "version": "11.6.0.14552",
+      "installation_root": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro",
+      "executable_identity": {
+        "path": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\Apps/JianyingPro.exe",
+        "sha256": "4611aaa8ce00efc6afb41384d3f0313206d403a9bb1a1f83d6b6514cd2e5025a",
+        "byte_length": 5410328
+      },
+      "process_name": "JianyingPro.exe",
+      "draft_roots": [
+        "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro/User Data/Projects/com.lveditor.draft"
+      ],
+      "support_status": "unverified",
+      "automatic_routing": false
+    }
+  },
+  "probe": {
+    "profile": {
+      "id": "jianying-windows-11.6.0.14552",
+      "product": "JianYing Pro",
+      "version": "11.6.0.14552",
+      "platform": "windows",
+      "capabilities": [
+        "runtime.discovery",
+        "runtime.controls",
+        "runtime.profile"
+      ],
+      "file_identity": {
+        "path": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\Apps/JianyingPro.exe",
+        "sha256": "4611aaa8ce00efc6afb41384d3f0313206d403a9bb1a1f83d6b6514cd2e5025a",
+        "byte_length": 5410328
+      },
+      "process_names": [
+        "JianyingPro.exe"
+      ],
+      "draft_roots": [
+        "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro/User Data/Projects/com.lveditor.draft"
+      ]
+    },
+    "result": {
+      "supported": true,
+      "editor_running": false,
+      "materials_available": true,
+      "executable_identity": {
+        "path": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\Apps\\JianyingPro.exe",
+        "sha256": "4611aaa8ce00efc6afb41384d3f0313206d403a9bb1a1f83d6b6514cd2e5025a",
+        "byte_length": 5410328
+      },
+      "permissions": {
+        "executable_readable": true,
+        "draft_root_readable": true,
+        "draft_root_writable": true
+      }
+    }
+  },
+  "claims": {
+    "installation_discovered": true,
+    "profile_probe_supported": true,
+    "native_routing_enabled": false,
+    "host_canary_run": false,
+    "note": "探测只证明可执行文件身份、版本、平台、草稿根与声明的 capability 一致；未做冷重开/连续播放/原生导出的真实验收。"
+  }
+}

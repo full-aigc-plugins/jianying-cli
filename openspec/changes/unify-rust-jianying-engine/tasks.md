@@ -123,6 +123,16 @@
 - [x] 8.7 实现显式授权的原生导出任务、进度/结果验证，并严格区分代理渲染与原生导出
 - [x] 8.8 使用仅由本项目生成的合成素材完成独立运行验证，并附受限来源隔离审查记录
 - [ ] 8.9 获取合法 Windows 测试环境后确定首个支持 Runtime Profile；在此之前 capability 明确报告不支持
+      *2026-10-20：**环境已就位并完成只读确定**——本机安装剪映专业版 11.6.0.14552（按用户安装布局
+      `%LOCALAPPDATA%\JianyingPro\Apps\JianyingPro.exe`，版本取自 `Apps/<version>`）。此前
+      `runtime discover` 在该布局下返回空，现已支持该布局与 Windows 版本读取：
+      `state=found_unverified`、`version=11.6.0.14552`、executable 5410328 字节 /
+      sha256 `4611aaa8…5025a`、草稿根存在、`automatic_routing=false`、`support_status=unverified`。
+      用发现结果构造候选 profile `jianying-windows-11.6.0.14552` 并跑 `runtime probe`：
+      `supported=true`、`editor_running=false`、`materials_available=true`、读写权限均 true；证据见
+      `provenance/WINDOWS_RUNTIME_PROFILE_CANDIDATE.json` 与 `docs/native-runtime-foundation.md`。
+      **仍未完成**：把该候选提升为 supported 需要真实冷重开、连续播放与原生导出的宿主机 canary（与 9.3 同源），
+      在此之前 `runtime.profile.windows` 继续报 `external_dependency`（已核对 capabilities 输出）。*
   - 本地门禁证据（2026-09-20）：发布制品验证器和独立打包器均强制 `runtime.profile.windows` 保持 `platform=windows`、`status=external_dependency`、`availability=unsupported`；绕过 CI 步骤顺序也不能签发提前升级的 archive。真实 Windows canary 仍未取得，因此任务保持未完成。
 - [x] 8.10 定义 TtsProvider、TtsRequest、TtsArtifact、ProviderCapability 和凭据引用契约，覆盖音色、情绪、SSML、时间戳、流式、格式与平台条件
 - [x] 8.11 实现 local-command、macOS say、Windows 系统 TTS、本地 HTTP/进程适配器，并为小米 MiMo、火山、阿里百炼、百度、腾讯、MiniMax、智谱 GLM 建立独立 adapter 和离线 fixture 合约测试

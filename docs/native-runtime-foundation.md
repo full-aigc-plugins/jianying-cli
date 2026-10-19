@@ -35,6 +35,25 @@ macOS 发现同时支持旧 `JianyingPro` 和新版 `VideoFusion-macOS` executab
 `20cdaeb576fed9cdf85fc1858336a90291173d0ab03ccd0c225abe580ceae428`。
 这仅证明安装发现和文件身份；未作为冷重开、播放或原生导出证据。
 
+2026-10-20 Windows 只读验证：本机按用户安装布局安装剪映专业版
+（`%LOCALAPPDATA%\JianyingPro\Apps\JianyingPro.exe`，payload 目录 `Apps\11.6.0.14552`）。
+`runtime discover` 此前在该布局下返回 `installations: []`，现已支持按用户安装目录并从
+`Apps/<version>` 目录取版本：
+
+- `state=found_unverified`，`support_status=unverified`，`automatic_routing=false`；
+- `version=11.6.0.14552`，executable 5410328 字节，
+  SHA-256 `4611aaa8ce00efc6afb41384d3f0313206d403a9bb1a1f83d6b6514cd2e5025a`；
+- 草稿根 `%LOCALAPPDATA%\JianyingPro\User Data\Projects\com.lveditor.draft` 存在。
+
+用该发现结果构造候选 profile（id `jianying-windows-11.6.0.14552`）并执行
+`jianying runtime probe`：`supported=true`、`editor_running=false`、
+`materials_available=true`，权限三项均为 true。证据固化在
+`provenance/WINDOWS_RUNTIME_PROFILE_CANDIDATE.json`。
+
+这**只**证明发现、版本读取、文件身份与草稿根权限；未做冷重开、连续播放、原生导出的真实验收，
+因此 capability manifest 仍把 `runtime.profile.windows` 报为 `external_dependency`，
+不把 Windows 宣称为 supported。
+
 当前探测层是可复用的判定内核；支持 profile 仍需 8.9 与 9.3 的合法宿主 canary，因此
 capability manifest 不把真实剪映 runtime 控制宣称为 supported。
 

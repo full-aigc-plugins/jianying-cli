@@ -42,7 +42,8 @@ pub fn discover_runtime_installations(
             let identity = RuntimeFileIdentity::from_path(&executable)?;
             let version = match platform {
                 RuntimePlatform::MacOs => macos_bundle_version(&installation_root),
-                RuntimePlatform::Windows | RuntimePlatform::Linux => None,
+                RuntimePlatform::Windows => windows_application_version(&installation_root),
+                RuntimePlatform::Linux => None,
             };
             let product_draft_roots = draft_roots
                 .iter()
@@ -163,9 +164,26 @@ fn candidates(platform: RuntimePlatform) -> &'static [RuntimeCandidate] {
             None,
             "JianyingPro.exe",
         ),
+        // 逐用户安装器布局：启动器位于 <安装根>/Apps/，与版本化负载目录同级。
+        (
+            "JianyingPro",
+            "Apps/JianyingPro.exe",
+            "jianying",
+            "JianYing Pro",
+            None,
+            "JianyingPro.exe",
+        ),
         (
             "CapCut",
             "CapCut.exe",
+            "capcut",
+            "CapCut",
+            None,
+            "CapCut.exe",
+        ),
+        (
+            "CapCut",
+            "Apps/CapCut.exe",
             "capcut",
             "CapCut",
             None,
@@ -208,6 +226,56 @@ fn macos_bundle_version(bundle: &Path) -> Option<String> {
     (!version.is_empty()).then(|| version.to_owned())
 }
 
+/// 读取 Windows 安装根下 `Apps` 中版本化负载目录名；纯函数，可在任意主机上用临时目录验证。
+///
+/// 逐用户布局为 `<安装根>/Apps/<版本>/`，启动器为 `<安装根>/Apps/JianyingPro.exe`；
+/// 只接受形如 `11.6.0.14552` 的纯数字点分名，并按数值分量比较（`11.10.0` 高于 `11.9.0`）。
+/// 没有版本化目录、目录不可读或名称不是版本时返回 `None`，不读取注册表、环境变量或运行中进程。
+fn windows_application_version(installation_root: &Path) -> Option<String> {
+    let apps = installation_root.join("Apps");
+    let mut highest: Option<(Vec<u64>, String)> = None;
+    for entry in std::fs::read_dir(&apps).ok()?.flatten() {
+        let path = entry.path();
+        if !path.is_dir() {
+            continue;
+        }
+        let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+            continue;
+        };
+        let Some(components) = version_components(name) else {
+            continue;
+        };
+        // 先比数值分量，再比名称，保证同名数值（如 `011.6` 与 `11.6`）下结果稳定。
+        let replaces = match highest.as_ref() {
+            None => true,
+            Some((current_components, current_name)) => {
+                (&components, name) > (current_components, current_name.as_str())
+            }
+        };
+        if replaces {
+            highest = Some((components, name.to_owned()));
+        }
+    }
+    highest.map(|(_, name)| name)
+}
+
+/// 把目录名解析为版本数值分量；至少两段且每段均为十进制数字时才视为版本。
+fn version_components(name: &str) -> Option<Vec<u64>> {
+    let parts: Vec<&str> = name.split('.').collect();
+    if parts.len() < 2 {
+        return None;
+    }
+    parts
+        .iter()
+        .map(|part| {
+            if part.is_empty() || !part.bytes().all(|byte| byte.is_ascii_digit()) {
+                return None;
+            }
+            part.parse::<u64>().ok()
+        })
+        .collect()
+}
+
 fn xml_string_after_key(text: &str, key: &str) -> Option<String> {
     let key = format!("<key>{key}</key>");
     let tail = text.split_once(&key)?.1;
@@ -215,4 +283,70 @@ fn xml_string_after_key(text: &str, key: &str) -> Option<String> {
     let end = tail[start..].find("</string>")? + start;
     let value = tail[start..end].trim();
     (!value.is_empty()).then(|| value.to_owned())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::windows_application_version;
+    use std::path::{Path, PathBuf};
+
+    /// 建立最小 Windows 逐用户安装夹具：`Apps/JianyingPro.exe` 与空的 `Apps/` 目录。
+    fn fixture(name: &str) -> PathBuf {
+        let root = std::env::temp_dir().join(format!(
+            "jianying-windows-version-{name}-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(root.join("Apps")).unwrap();
+        std::fs::write(root.join("Apps/JianyingPro.exe"), b"synthetic launcher").unwrap();
+        root
+    }
+
+    fn add_directory(root: &Path, name: &str) {
+        std::fs::create_dir_all(root.join("Apps").join(name)).unwrap();
+    }
+
+    #[test]
+    fn reads_version_from_the_single_versioned_directory() {
+        let root = fixture("single");
+        add_directory(&root, "11.6.0.14552");
+        assert_eq!(
+            windows_application_version(&root).as_deref(),
+            Some("11.6.0.14552")
+        );
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn picks_highest_version_by_numeric_components_not_lexicographically() {
+        let root = fixture("several");
+        add_directory(&root, "11.9.0");
+        add_directory(&root, "11.10.0");
+        add_directory(&root, "9.99.99999");
+        assert_eq!(
+            windows_application_version(&root).as_deref(),
+            Some("11.10.0")
+        );
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn reports_no_version_when_apps_has_no_versioned_directory() {
+        let root = fixture("none");
+        assert_eq!(windows_application_version(&root), None);
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn ignores_directories_that_are_not_version_shaped() {
+        let root = fixture("non-version");
+        add_directory(&root, "data");
+        add_directory(&root, "cef");
+        add_directory(&root, "11.6.0.14552");
+        assert_eq!(
+            windows_application_version(&root).as_deref(),
+            Some("11.6.0.14552")
+        );
+        std::fs::remove_dir_all(root).unwrap();
+    }
 }
