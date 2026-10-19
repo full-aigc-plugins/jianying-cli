@@ -1,0 +1,129 @@
+{
+  "schema": "jianying-batch-remix-ffprobe-verification/v1",
+  "observed_at": "2026-10-20",
+  "host": {
+    "os": "windows",
+    "note": "本机无 ffprobe，本轮下载 ffmpeg 9.0.2 essentials 并把其 bin 加入 PATH"
+  },
+  "probe": "ffprobe version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+  "producer": {
+    "script": "jianyingcraft-plugin/ui/skill-smoke.mjs",
+    "scenario": "batch-remix-loop",
+    "command": "FILMCRAFT_CLI=<abs>/target/debug/filmcraft-cli.exe node ui/skill-smoke.mjs",
+    "engine_cli": "filmcraft-cli 0.8.0",
+    "workspace_dir": "C:\\Users\\hnxyh\\AppData\\Local\\Temp\\jc-skills-rtiqrh"
+  },
+  "files": [
+    {
+      "name": "loop-0.mp4",
+      "bytes": 18038231,
+      "sha256": "152fb3b57184afef6eab83ddd50e807e18540da259e46a015b1731faa5226279",
+      "duration": 26.794,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "streams": [
+        {
+          "type": "video",
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "sample_rate": null,
+          "channels": null
+        },
+        {
+          "type": "audio",
+          "codec": "aac",
+          "width": null,
+          "height": null,
+          "sample_rate": "48000",
+          "channels": 2
+        }
+      ]
+    },
+    {
+      "name": "loop-1.mp4",
+      "bytes": 18032893,
+      "sha256": "5396ee429b5641d20a1a810a87444aa3bc69b372943d6f07b8d1e543bd74368d",
+      "duration": 26.794,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "streams": [
+        {
+          "type": "video",
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "sample_rate": null,
+          "channels": null
+        },
+        {
+          "type": "audio",
+          "codec": "aac",
+          "width": null,
+          "height": null,
+          "sample_rate": "48000",
+          "channels": 2
+        }
+      ]
+    },
+    {
+      "name": "loop-2.mp4",
+      "bytes": 18036216,
+      "sha256": "4601e41d5b7fce184065ee84c828e00c55c4ea32685d44adc2df838f563218c6",
+      "duration": 26.794,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "streams": [
+        {
+          "type": "video",
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "sample_rate": null,
+          "channels": null
+        },
+        {
+          "type": "audio",
+          "codec": "aac",
+          "width": null,
+          "height": null,
+          "sample_rate": "48000",
+          "channels": 2
+        }
+      ]
+    },
+    {
+      "name": "remix.mp4",
+      "bytes": 17984537,
+      "sha256": "187759cb8d21eeed95fbb140763c68fcc4d3525590a7d235fb1e65cd0c63a04b",
+      "duration": 26.794,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "streams": [
+        {
+          "type": "video",
+          "codec": "h264",
+          "width": 1920,
+          "height": 1080,
+          "sample_rate": null,
+          "channels": null
+        },
+        {
+          "type": "audio",
+          "codec": "aac",
+          "width": null,
+          "height": null,
+          "sample_rate": "48000",
+          "channels": 2
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "three_loops": true,
+    "distinct_sha256": true,
+    "all_h264_1080p": true,
+    "all_have_aac_48k_stereo": true,
+    "durations_match": true
+  },
+  "claims": {
+    "external_ffprobe_verified": true,
+    "note": "证明三轮导出都是可解析的 h264/aac mp4、总时长一致且内容不同；不证明画面内容正确（无人眼审）。"
+  }
+}
