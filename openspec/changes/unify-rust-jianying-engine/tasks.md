@@ -152,6 +152,7 @@
 - [x] 9.2 为所有未批准 wire diff 输出最小字段路径、输入 fixture 和可复现命令
 - [ ] 9.3 在受支持的 macOS 剪映版本执行创建、已有草稿编辑、冷重开、播放和原生导出 canary
   - 2026-09-21 真实 canary：Rust 生成的 6 秒合成草稿已通过剪映打开、完整退出后的冷重开、播放和 GUI 原生 MOV 导出；H.264 720p30 + AAC、完整解码和字幕烧录通过。应用保存后的元数据为不透明非 JSON，隔离 `job edit` 失败，新增复制前结构化拒绝，因此整体任务保持未完成。见 `docs/native-canary-20260921.md`，不将 GUI 导出冒充 Rust native adapter。
+  - → 步骤见 docs/runbooks/macos-canary.md
 - [x] 9.4 在 Codex、ZCode、Kimi 经插件执行相同 Job，验证 schema、task ID 和结果语义一致
 - [x] 9.5 构建 macOS arm64/x64 与 Windows x64 发布制品、checksums、SBOM、许可证和 capability manifest
   - 正式发布证据（2026-09-21）：GitHub Actions run `35534748729` 从 tag `v1.6.13` 和 source commit `c9ba52ad8a359b6938275438c1e41a11b31f1765` 完成 source/parity gate 及 macOS arm64、macOS x64、Windows x64 三个平台原生测试、release build、运行时命令面验证、SPDX SBOM、确定性打包和上传。稳定 Release 已公开且 `isImmutable=true`，10 个资产均有 GitHub SHA-256；release index SHA-256 为 `92681d802e1362945d95ab9643d92d44d7060a136718a0f686f204b869e7a497`，`gh release verify` 与 `gh release verify-asset` 均通过。
@@ -164,3 +165,4 @@
   - Tag 绑定门禁（2026-09-21）：鉴于 GitHub 只在公开后锁定 Release tag，初次与最终 publication plan 均重新解析远端 lightweight/annotated tag，并要求直接或 peeled commit 等于发布 checkout；tag 删除、移动、重复或异常输出均 fail closed。真实三平台 Release 尚未取得，任务保持未完成。
 - [x] 9.6 完成旧命令兼容期文档、迁移指南和回滚演练，不删除 v1 parser
 - [ ] 9.7 运行完整 parity、来源、差分和真实剪映门禁，仅在全部目标证据满足后标记变更可归档
+  - → 步骤见 docs/runbooks/macos-canary.md（仅 macOS 冷重开/播放/原生导出；9.7 的 parity/差分门禁不在其中）
