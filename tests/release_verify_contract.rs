@@ -6,10 +6,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
 fn run(args: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_jianying"))
-        .args(args)
-        .output()
-        .unwrap()
+    test_command().args(args).output().unwrap()
 }
 
 fn run_ok(args: &[&str]) -> Value {
@@ -203,4 +200,23 @@ fn capability_drift_between_the_binary_and_the_bundle_is_detected() {
         .unwrap()
         .is_empty());
     let _ = fs::remove_dir_all(root);
+}
+
+/// Builds the CLI command used by these tests.
+///
+/// `JIANYING_CLI_PROCESS_LIST` replaces the host process listing with a fixed file: the
+/// production path shells out to `tasklist`, which can wedge (it does on the machine these
+/// tests were stabilised on) and every write path now refuses to run when it cannot tell
+/// whether the editor is open. The listing source is all this replaces - the "editor is
+/// running -> refuse" rule itself is still asserted with a synthetic listing.
+fn test_command() -> Command {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.env(
+        "JIANYING_CLI_PROCESS_LIST",
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty-processes.txt"
+        ),
+    );
+    command
 }

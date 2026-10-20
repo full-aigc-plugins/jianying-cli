@@ -4,10 +4,7 @@ use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 fn run(args: &[&str]) -> std::process::Output {
-    Command::new(env!("CARGO_BIN_EXE_jianying"))
-        .args(args)
-        .output()
-        .expect("run jianying")
+    test_command().args(args).output().expect("run jianying")
 }
 
 #[test]
@@ -411,7 +408,7 @@ fn runtime_discover_reports_unverified_installations_and_orphan_draft_roots() {
     let draft_root = home.join("Movies/JianyingPro/User Data/Projects/com.lveditor.draft");
     fs::create_dir_all(&draft_root).unwrap();
 
-    let discovered = Command::new(env!("CARGO_BIN_EXE_jianying"))
+    let discovered = test_command()
         .args([
             "--json",
             "runtime",
@@ -463,7 +460,7 @@ fn runtime_discover_finds_per_user_windows_installation_without_claiming_support
     fs::create_dir_all(&draft_root).unwrap();
 
     // 只覆盖 --local-app-data：默认搜索根必须包含逐用户 LOCALAPPDATA 布局。
-    let discovered = Command::new(env!("CARGO_BIN_EXE_jianying"))
+    let discovered = test_command()
         .args([
             "--json",
             "runtime",
@@ -564,7 +561,7 @@ fn native_export_plan_emits_the_exact_approval_binding_without_starting_an_edito
     fs::write(&profile_path, serde_json::to_vec_pretty(&profile).unwrap()).unwrap();
     let output_path = root.join("native.mp4");
 
-    let output = Command::new(env!("CARGO_BIN_EXE_jianying"))
+    let output = test_command()
         .current_dir(&root)
         .args([
             "--json",
@@ -621,7 +618,7 @@ fn native_export_plan_emits_the_exact_approval_binding_without_starting_an_edito
         )
         .unwrap();
     let submit_native = |approval_id: &str| {
-        Command::new(env!("CARGO_BIN_EXE_jianying"))
+        test_command()
             .current_dir(&root)
             .args([
                 "--json",
@@ -662,7 +659,7 @@ fn native_export_plan_emits_the_exact_approval_binding_without_starting_an_edito
         let mut arguments = vec!["--json", "render", "native-task"];
         arguments.extend_from_slice(operation);
         arguments.extend_from_slice(&["--state-root", state_root.to_str().unwrap()]);
-        let output = Command::new(env!("CARGO_BIN_EXE_jianying"))
+        let output = test_command()
             .current_dir(&root)
             .args(arguments)
             .output()
@@ -745,4 +742,23 @@ fn native_export_plan_emits_the_exact_approval_binding_without_starting_an_edito
     assert_eq!(drifted["error"]["type"], "native_artifact_invalid");
 
     fs::remove_dir_all(root).unwrap();
+}
+
+/// Builds the CLI command used by these tests.
+///
+/// `JIANYING_CLI_PROCESS_LIST` replaces the host process listing with a fixed file: the
+/// production path shells out to `tasklist`, which can wedge (it does on the machine these
+/// tests were stabilised on) and every write path now refuses to run when it cannot tell
+/// whether the editor is open. The listing source is all this replaces - the "editor is
+/// running -> refuse" rule itself is still asserted with a synthetic listing.
+fn test_command() -> Command {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.env(
+        "JIANYING_CLI_PROCESS_LIST",
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty-processes.txt"
+        ),
+    );
+    command
 }

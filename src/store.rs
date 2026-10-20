@@ -110,6 +110,39 @@ fn process_listing() -> Option<String> {
     read_platform_process_listing()
 }
 
+/// How long the platform process listing may take before it is abandoned.
+///
+/// `tasklist` is a WMI-backed command and can wedge (seen on this host: it never
+/// returned). Without a bound, every write path and every MCP tool that asks "is
+/// the editor running?" inherits that hang, so the child is killed after this.
+const PROCESS_LISTING_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
+
+/// Run `command` with a deadline; `None` means it did not finish in time.
+#[cfg(windows)]
+fn output_with_timeout(mut command: std::process::Command) -> Option<std::process::Output> {
+    use std::time::Instant;
+    let mut child = command
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .ok()?;
+    let deadline = Instant::now() + PROCESS_LISTING_TIMEOUT;
+    loop {
+        match child.try_wait() {
+            Ok(Some(_)) => return child.wait_with_output().ok(),
+            Ok(None) if Instant::now() < deadline => {
+                std::thread::sleep(std::time::Duration::from_millis(20))
+            }
+            // Either the deadline passed or the wait failed: stop the child, never block on it.
+            _ => {
+                let _ = child.kill();
+                let _ = child.wait();
+                return None;
+            }
+        }
+    }
+}
+
 #[cfg(unix)]
 fn read_platform_process_listing() -> Option<String> {
     let out = Command::new("ps").args(["-axo", "comm="]).output().ok()?;
@@ -118,10 +151,9 @@ fn read_platform_process_listing() -> Option<String> {
 
 #[cfg(windows)]
 fn read_platform_process_listing() -> Option<String> {
-    let out = Command::new("tasklist")
-        .args(["/FO", "CSV"])
-        .output()
-        .ok()?;
+    let mut command = Command::new("tasklist");
+    command.args(["/FO", "CSV"]);
+    let out = output_with_timeout(command)?;
     Some(String::from_utf8_lossy(&out.stdout).into_owned())
 }
 
@@ -132,9 +164,22 @@ fn read_platform_process_listing() -> Option<String> {
 
 /// 返回正在运行的剪映/CapCut 进程名；空列表表示可以安全写入草稿。
 pub fn editors_running() -> Vec<String> {
-    let Some(text) = process_listing() else {
-        return vec![];
-    };
+    editors_running_checked().unwrap_or_default()
+}
+
+/// [`editors_running`], but an unreadable or timed-out process listing is an error
+/// instead of "nothing is running".
+///
+/// Write paths use this so a wedged `tasklist` cannot be mistaken for a safe moment
+/// to rewrite a draft the user may have open in the editor.
+pub fn editors_running_checked() -> Result<Vec<String>> {
+    let text = process_listing().ok_or_else(|| {
+        anyhow::anyhow!(
+            "cannot tell whether JianYing/CapCut is running: the process listing did not \
+             answer within {}s; close the editor or retry",
+            PROCESS_LISTING_TIMEOUT.as_secs()
+        )
+    })?;
     #[cfg(unix)]
     let mut found = editors_from_process_listing(&text);
     #[cfg(not(unix))]
@@ -149,7 +194,7 @@ pub fn editors_running() -> Vec<String> {
     };
     found.sort();
     found.dedup();
-    found
+    Ok(found)
 }
 
 pub fn doctor() -> Result<Value> {
@@ -198,7 +243,7 @@ pub fn directories() -> Value {
 pub fn rename(root: &Path, name: &str, new_name: &str) -> Result<Value> {
     validate_store_name(name)?;
     validate_store_name(new_name)?;
-    let running = editors_running();
+    let running = editors_running_checked()?;
     if !running.is_empty() {
         bail!(
             "editor is running ({}); close JianYing/CapCut before renaming drafts",
@@ -289,7 +334,7 @@ pub fn sync_timelines(draft: &Path, apply: bool, force_newer: bool) -> Result<Va
     let mut reconciled = Vec::new();
     let mut backups = Vec::new();
     if apply {
-        let running = editors_running();
+        let running = editors_running_checked()?;
         if !running.is_empty() {
             bail!(
                 "editor is running ({}); close JianYing/CapCut before syncing timelines",
@@ -339,7 +384,7 @@ pub fn restore(snapshot: &Path, target: &Path) -> Result<Value> {
             snapshot.display()
         );
     }
-    let running = editors_running();
+    let running = editors_running_checked()?;
     if !running.is_empty() {
         bail!(
             "editor is running ({}); close JianYing/CapCut before restoring drafts",
@@ -456,7 +501,12 @@ fn find_store_key(root_meta: &Value) -> Option<String> {
 /// Copy a built draft into the draft root and register it in
 /// `root_meta_info.json`. Non-destructive: refuses existing destinations.
 pub fn publish(draft_dir: &Path, root: &Path, force: bool) -> Result<Value> {
-    let running = editors_running();
+    // --force is the explicit override: an unknown listing must not block it.
+    let running = if force {
+        editors_running()
+    } else {
+        editors_running_checked()?
+    };
     if !running.is_empty() && !force {
         bail!(
             "editor is running ({}); close 剪映/CapCut first, or pass --force",

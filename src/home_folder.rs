@@ -506,7 +506,7 @@ fn counts(documents: &Documents) -> Result<Value> {
 
 fn ensure_safe_mutation_target(root: &Path) -> Result<()> {
     if is_platform_config_root(root) {
-        let running = crate::store::editors_running();
+        let running = crate::store::editors_running_checked()?;
         if !running.is_empty() {
             bail!(
                 "editor_running: close JianYing/CapCut before modifying the real homepage config ({})",

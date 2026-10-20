@@ -98,7 +98,7 @@ pub fn diagnose(draft: &Path, bundle: Option<&Path>) -> Result<Value> {
     } else {
         "unknown"
     };
-    let editors = crate::store::editors_running();
+    let editors = crate::store::editors_running_checked()?;
     let mut actions = Vec::new();
     if diverged {
         actions.push("Timeline files diverge. Close JianYing/CapCut, back up the project, then review `jianying store sync` before --apply.".to_owned());
@@ -911,7 +911,7 @@ fn merge_tracks(combined: &mut Value, appended: &mut Value) -> Result<()> {
 }
 
 fn reject_running_editor() -> Result<()> {
-    let running = crate::store::editors_running();
+    let running = crate::store::editors_running_checked()?;
     if !running.is_empty() {
         bail!(
             "editor is running ({}); close JianYing/CapCut before mutating drafts",

@@ -10,7 +10,10 @@ fn run(args: &[&str]) -> Output {
         .args(args)
         .env(
             "JIANYING_CLI_PROCESS_LIST",
-            std::env::temp_dir().join("no-editor.txt"),
+            concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/tests/fixtures/empty-processes.txt"
+            ),
         )
         .output()
         .unwrap()

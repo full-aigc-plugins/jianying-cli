@@ -2724,7 +2724,7 @@ pub(crate) fn mutate_with_path<F>(draft: &Path, operation: F) -> Result<Value>
 where
     F: FnOnce(&mut Value, &Path, &Path) -> Result<Value>,
 {
-    let running = crate::store::editors_running();
+    let running = crate::store::editors_running_checked()?;
     if !running.is_empty() {
         bail!(
             "editor is running ({}); close it before mutating drafts",

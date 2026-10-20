@@ -7,7 +7,7 @@ use std::process::{Command, Output};
 use std::sync::OnceLock;
 
 fn run(args: &[&str]) -> Output {
-    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    let mut command = test_command();
     command.args(args);
     // 时间线合同必须只观察合成草稿，不能被开发机上正在运行的剪映污染。
     // 用无输出的 `ps` 测试替身隔离宿主进程；生产二进制仍保持运行中拒写门禁。
@@ -2343,4 +2343,23 @@ fn pitch_toggles_is_tone_modify_and_matches_the_plan_field() {
     assert_eq!(invalid.status.code(), Some(1));
     assert!(String::from_utf8_lossy(&invalid.stdout).contains("pitch state must be on/off"));
     let _ = std::fs::remove_dir_all(root);
+}
+
+/// Builds the CLI command used by these tests.
+///
+/// `JIANYING_CLI_PROCESS_LIST` replaces the host process listing with a fixed file: the
+/// production path shells out to `tasklist`, which can wedge (it does on the machine these
+/// tests were stabilised on) and every write path now refuses to run when it cannot tell
+/// whether the editor is open. The listing source is all this replaces - the "editor is
+/// running -> refuse" rule itself is still asserted with a synthetic listing.
+fn test_command() -> Command {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.env(
+        "JIANYING_CLI_PROCESS_LIST",
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty-processes.txt"
+        ),
+    );
+    command
 }

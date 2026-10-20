@@ -19,10 +19,7 @@ fn probe_stub(path: &Path) -> Result<MediaInfo> {
 }
 
 fn run(args: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_jianying"))
-        .args(args)
-        .output()
-        .unwrap()
+    test_command().args(args).output().unwrap()
 }
 
 fn run_ok(args: &[&str]) -> Value {
@@ -171,4 +168,23 @@ fn job_batch_alias_executes_the_same_persistent_v2_handler() {
     assert!(out.join("0000/draft_content.json").is_file());
     assert!(out.join("0001/draft_content.json").is_file());
     let _ = std::fs::remove_dir_all(root);
+}
+
+/// Builds the CLI command used by these tests.
+///
+/// `JIANYING_CLI_PROCESS_LIST` replaces the host process listing with a fixed file: the
+/// production path shells out to `tasklist`, which can wedge (it does on the machine these
+/// tests were stabilised on) and every write path now refuses to run when it cannot tell
+/// whether the editor is open. The listing source is all this replaces - the "editor is
+/// running -> refuse" rule itself is still asserted with a synthetic listing.
+fn test_command() -> Command {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.env(
+        "JIANYING_CLI_PROCESS_LIST",
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty-processes.txt"
+        ),
+    );
+    command
 }

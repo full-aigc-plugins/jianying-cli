@@ -48,10 +48,7 @@ fn compile_ffprobe_stub(root: &Path) -> PathBuf {
 }
 
 fn run(args: &[&str]) -> std::process::Output {
-    Command::new(env!("CARGO_BIN_EXE_jianying"))
-        .args(args)
-        .output()
-        .expect("run jianying")
+    test_command().args(args).output().expect("run jianying")
 }
 
 fn fixture(root: &Path) -> (PathBuf, PathBuf) {
@@ -232,4 +229,23 @@ fn runtime_acceptance_verify_fails_closed_on_missing_binding_or_output_drift() {
         String::from_utf8_lossy(&drifted.stderr)
     );
     assert!(drifted_text.contains("output_sha256_mismatch"));
+}
+
+/// Builds the CLI command used by these tests.
+///
+/// `JIANYING_CLI_PROCESS_LIST` replaces the host process listing with a fixed file: the
+/// production path shells out to `tasklist`, which can wedge (it does on the machine these
+/// tests were stabilised on) and every write path now refuses to run when it cannot tell
+/// whether the editor is open. The listing source is all this replaces - the "editor is
+/// running -> refuse" rule itself is still asserted with a synthetic listing.
+fn test_command() -> Command {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.env(
+        "JIANYING_CLI_PROCESS_LIST",
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty-processes.txt"
+        ),
+    );
+    command
 }

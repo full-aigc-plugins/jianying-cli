@@ -34,10 +34,7 @@ fn build(root: &Path, name: &str, size: f64) -> PathBuf {
 }
 
 fn run(args: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_jianying"))
-        .args(args)
-        .output()
-        .unwrap()
+    test_command().args(args).output().unwrap()
 }
 
 fn run_ok(args: &[&str]) -> Value {
@@ -350,4 +347,23 @@ fn template_material_replacement_isolated_segment_timing_and_failure_are_atomic(
     assert_eq!(count_files(&output), files_before_failure);
     assert_eq!(draft::verify(&output).unwrap()["ok"], true);
     let _ = std::fs::remove_dir_all(root);
+}
+
+/// Builds the CLI command used by these tests.
+///
+/// `JIANYING_CLI_PROCESS_LIST` replaces the host process listing with a fixed file: the
+/// production path shells out to `tasklist`, which can wedge (it does on the machine these
+/// tests were stabilised on) and every write path now refuses to run when it cannot tell
+/// whether the editor is open. The listing source is all this replaces - the "editor is
+/// running -> refuse" rule itself is still asserted with a synthetic listing.
+fn test_command() -> Command {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.env(
+        "JIANYING_CLI_PROCESS_LIST",
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty-processes.txt"
+        ),
+    );
+    command
 }

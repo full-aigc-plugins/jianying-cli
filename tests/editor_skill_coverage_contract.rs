@@ -11,7 +11,7 @@ fn root() -> &'static Path {
 }
 
 fn catalog_paths() -> BTreeSet<String> {
-    let output = Command::new(env!("CARGO_BIN_EXE_jianying"))
+    let output = test_command()
         .args(["commands", "--json"])
         .output()
         .expect("run commands --json");
@@ -152,4 +152,23 @@ fn coverage_report_matches_the_mapping_and_has_no_problems() {
     let scripts = report["summary"]["scripts"].as_i64().unwrap();
     assert!(methods >= 10, "advertised methods 太少: {methods}");
     assert!(scripts >= 10, "scripts 太少: {scripts}");
+}
+
+/// Builds the CLI command used by these tests.
+///
+/// `JIANYING_CLI_PROCESS_LIST` replaces the host process listing with a fixed file: the
+/// production path shells out to `tasklist`, which can wedge (it does on the machine these
+/// tests were stabilised on) and every write path now refuses to run when it cannot tell
+/// whether the editor is open. The listing source is all this replaces - the "editor is
+/// running -> refuse" rule itself is still asserted with a synthetic listing.
+fn test_command() -> Command {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.env(
+        "JIANYING_CLI_PROCESS_LIST",
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty-processes.txt"
+        ),
+    );
+    command
 }

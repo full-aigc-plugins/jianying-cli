@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::process::{Command, Output};
 
 fn bin() -> Command {
-    Command::new(env!("CARGO_BIN_EXE_jianying"))
+    test_command()
 }
 
 fn temp_root() -> PathBuf {
@@ -111,4 +111,23 @@ fn config_schema_is_machine_readable() {
         json(&schema)["data"]["$id"],
         "https://partme.ai/schemas/jianying-config-v1.schema.json"
     );
+}
+
+/// Builds the CLI command used by these tests.
+///
+/// `JIANYING_CLI_PROCESS_LIST` replaces the host process listing with a fixed file: the
+/// production path shells out to `tasklist`, which can wedge (it does on the machine these
+/// tests were stabilised on) and every write path now refuses to run when it cannot tell
+/// whether the editor is open. The listing source is all this replaces - the "editor is
+/// running -> refuse" rule itself is still asserted with a synthetic listing.
+fn test_command() -> Command {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_jianying"));
+    command.env(
+        "JIANYING_CLI_PROCESS_LIST",
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/empty-processes.txt"
+        ),
+    );
+    command
 }
