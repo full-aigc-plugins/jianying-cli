@@ -165,4 +165,14 @@
   - Tag 绑定门禁（2026-09-21）：鉴于 GitHub 只在公开后锁定 Release tag，初次与最终 publication plan 均重新解析远端 lightweight/annotated tag，并要求直接或 peeled commit 等于发布 checkout；tag 删除、移动、重复或异常输出均 fail closed。真实三平台 Release 尚未取得，任务保持未完成。
 - [x] 9.6 完成旧命令兼容期文档、迁移指南和回滚演练，不删除 v1 parser
 - [ ] 9.7 运行完整 parity、来源、差分和真实剪映门禁，仅在全部目标证据满足后标记变更可归档
+      *2026-10-20 本机复跑（非 mac/真机部分）*：`python tools/parity_run.py --bin target/release/jianying.exe
+      --pyjyd-src <checkout>/pyJianYingDraft` → **55 passed / 0 failed**（对照 pyJYD 6bb2d06）；
+      `python tools/gen_catalogs.py <checkout>/pyJianYingDraft --check` → **catalogs up to date**；
+      `cargo test -p jianying-cli` → 63 targets / **281 passed**；`provenance_guard` 4 passed。
+      parity 报告与仓库内 `provenance/PARITY_RUN.json` 逐字节一致，说明是可复现基线而不是新基线。
+      *环境要点（三次看似无关的失败都出在这里）*：parity 需要 `ffmpeg` 在 PATH（否则 subprocess 直接
+      FileNotFoundError）；需要 `PYTHONUTF8=1`（否则按 GBK 读场景 JSON，第 21 个场景解码失败）；
+      `--pyjyd-src` 必须指向包目录而不是仓库根（指向根会让 import 解析成命名空间包，55 个场景全部报
+      module has no attribute 'DraftFolder'）。本机 pip 卡死，pymediainfo 是直接下载 windows wheel 解包安装的。
+      **仍缺（9.7 因此保持未勾）**：真实剪映侧门禁与 macOS 目标证据。
   - → 步骤见 docs/runbooks/macos-canary.md（仅 macOS 冷重开/播放/原生导出；9.7 的 parity/差分门禁不在其中）
