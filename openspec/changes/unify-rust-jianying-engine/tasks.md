@@ -232,6 +232,11 @@
       `parity_run --report` 55/55 且报告逐字节相同，pyJYD behavior/examples/api 三份报告均逐字节相同，
       `unittest` **39 OK**，`check_provenance` ok。
       release 侧也做了一次端到端：在干净的 HEAD 重建二进制后打包，包内 `manifest.json` / `provenance/CAPABILITIES.json` /
+      *2026-10-21 再补一条守卫*：media analysis 的 ffmpeg 替身有两个实现（POSIX 的 shell 脚本 / Windows 的
+      rustc 编译件），而每次 CI 只跑其中一个——另一个会悄悄腐烂。新测试用同一组 argv 同时驱动两者并逐行比对 stderr：
+      Windows 上编译原生件 + 用 Git Bash 跑脚本，POSIX 上反过来；把 Rust 替身里任一行删掉该测试即变红（已验证）。
+      两个坑：Windows 的 `shutil.which("bash")` 会命中 WSL 启动器（无法执行原生路径），所以候选 shell 必须先
+      跑一段脚本自证；Git Bash 需要把脚本参数写成 `/c/...` 而不是 `C:\...`。
       `SHA256SUMS` / schema **全部 LF、零 CRLF**（修前 CAPABILITIES.json 有 9581 个 CRLF）；
       `jianying release verify` 11 个文件全通过、能力契约 171/171，篡改 `THIRD_PARTY_NOTICES.md` 后
       正好该项 `sha256 mismatch`。
