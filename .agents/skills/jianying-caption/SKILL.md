@@ -44,6 +44,7 @@ jianying media catalog --domain <domain> --search 关键词 --json
 
 - 字幕样式不单独成目录：样式由字体 + 文本动画 + 位置组合而成。字幕文本先用 `jianying media transcribe` 得到 SRT，再逐个写 textSegment。
 - 编号是 `resource_id`（16 位以上数字串），不是 `effect_id`，两者不要混用。
+- 执行端**编号与显示名都接受**（2026-10-22 在 11.7 上逐类型实测：特效/滤镜/转场/字体/文本动画/蒙版均落地到草稿）；传编号时草稿里的显示名会保留那串数字，属外观问题不影响渲染。
 - 表里的每一行都由脚本从 `catalogs/` 复制而来，`--check` 会拦住手工改动。
 
 ## 清单

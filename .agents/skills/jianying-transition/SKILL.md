@@ -44,6 +44,7 @@ jianying media catalog --domain transitions --search 关键词 --json
 
 - `is_overlap=true` 的转场会占用前后片段的重叠时长；`duration_us` 是建议时长。
 - 编号是 `resource_id`（16 位以上数字串），不是 `effect_id`，两者不要混用。
+- 执行端**编号与显示名都接受**（2026-10-22 在 11.7 上逐类型实测：特效/滤镜/转场/字体/文本动画/蒙版均落地到草稿）；传编号时草稿里的显示名会保留那串数字，属外观问题不影响渲染。
 - 表里的每一行都由脚本从 `catalogs/` 复制而来，`--check` 会拦住手工改动。
 
 ## 清单
