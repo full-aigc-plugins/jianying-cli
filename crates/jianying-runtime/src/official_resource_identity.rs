@@ -89,9 +89,15 @@ fn inspect_draft_resource(
         path: content_path.clone(),
         message: error.to_string(),
     })?;
-    let document: Value = serde_json::from_slice(&bytes).map_err(|error| RuntimeError::Io {
-        path: content_path.clone(),
-        message: error.to_string(),
+    let document: Value = serde_json::from_slice(&bytes).map_err(|error| {
+        if looks_like_encrypted_draft_content(&bytes) {
+            RuntimeError::DraftContentEncrypted(content_path.clone())
+        } else {
+            RuntimeError::Io {
+                path: content_path.clone(),
+                message: error.to_string(),
+            }
+        }
     })?;
     let mut matches = Vec::new();
     find_resource_nodes(&document, resource_id, &mut matches);
@@ -126,4 +132,24 @@ fn find_resource_nodes<'a>(value: &'a Value, resource_id: &str, matches: &mut Ve
         }
         _ => {}
     }
+}
+
+/// 判断 `draft_content.json` 是否是剪映自己加密后的信封（Base64 文本，解码后不是 JSON）。
+///
+/// 剪映专业版会加密它自己创建的草稿；CLI 创建的草稿保持明文。这个判断只用于给出可行动的
+/// 错误，而不是假装读懂了加密内容。
+fn looks_like_encrypted_draft_content(bytes: &[u8]) -> bool {
+    let trimmed = bytes
+        .iter()
+        .copied()
+        .skip_while(|byte| byte.is_ascii_whitespace())
+        .collect::<Vec<u8>>();
+    if trimmed.is_empty() {
+        return false;
+    }
+    // 明文 JSON 一定以 { 或 [ 开头，走到这里说明解析已失败；只剩“像 Base64 的信封”这一种可能。
+    let all_envelope_chars = trimmed.iter().all(|byte| {
+        byte.is_ascii_alphanumeric() || matches!(byte, b'+' | b'/' | b'=' | b'\r' | b'\n')
+    });
+    all_envelope_chars && trimmed.len() >= 16
 }

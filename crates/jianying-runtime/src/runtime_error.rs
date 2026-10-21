@@ -66,6 +66,11 @@ pub enum RuntimeError {
     AssetIdentityMismatch(PathBuf),
     #[error("official draft resource is missing or ambiguous: {0}")]
     DraftResourceUnavailable(String),
+    #[error(
+        "draft content is not readable JSON: {0} (剪映 encrypts the draft_content.json of drafts it creates itself; \
+         a draft written by `jianying build` stays plain JSON)"
+    )]
+    DraftContentEncrypted(PathBuf),
     #[error("official resource identity kind does not match the verification input")]
     ResourceIdentityKindMismatch,
     #[error("official asset is preview-only and cannot be delivered")]

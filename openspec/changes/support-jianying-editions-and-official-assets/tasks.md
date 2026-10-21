@@ -80,6 +80,13 @@
     **仍缺**：真实官方素材下载、价格文件/政府授权/用户可见提示（收据契约里没有这三类字段），以及 register/list/show。
     合成 fixture 在自身 `title` 里写明“synthetic fixture (not a real asset)”，不会被误当真实素材。
 - [ ] 4.3 在真实剪映完成冷重开、连续播放和原生导出，独立验证媒体流、时长、画面、音轨与来源归属。
+  - *2026-10-21 加密草稿：CLI 现在会明说，而不是吐 serde 报错*。分析结果：这些文件是 Base64 信封
+    （`10月21日` 3832 B → 解码 2873 B 高熵字节，仅首字节 `{` 是巧合），单字节 XOR 试不出来，是真正的加密；
+    逆推 11.6 的加密方案不是我能在本轮承诺的事。
+    因此做的是**让失败可执行**：`inspect_draft_resource` 识别信封（Base64 字符集且解析失败）→ 新错误
+    `DraftContentEncrypted`，CLI 输出 `type: draft_content_encrypted`，消息说明“不是可读 JSON、剪映会加密
+    自己建的草稿、`jianying build` 生成的仍是明文”，恢复建议指向重建草稿。用真实的 `10月21日` 验证过；
+    坏掉但不是信封的文件仍按 `Io` 报（单元测试两个方向都断言）。
   - *2026-10-21 阻塞发现：编辑器会加密自己创建的草稿*。`draft_resource` 收据需要读 `draft_content.json`，
     但**编辑器新建**的草稿是加密的（`10月21日`/`10月20日`/`10月18日` 首字节为 `E2c546X0dd…`），
     而 **CLI 创建**的草稿仍是明文 JSON（`canary-template`/`canary-11.6`/`material-canary`）。

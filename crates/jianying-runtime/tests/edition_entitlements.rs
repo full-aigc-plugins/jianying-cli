@@ -319,6 +319,78 @@ fn receipt_store_is_idempotent_sorted_and_rejects_conflicting_overwrite() {
 }
 
 #[test]
+fn encrypted_editor_draft_is_reported_as_encrypted_not_as_a_parse_error() {
+    // 剪映 encrypts the draft_content.json of the drafts it creates itself. Pointing the receipt
+    // path at such a draft used to fail with a bare serde message ("expected value at line 1
+    // column 1"), which reads like a corrupted file rather than an encrypted one.
+    let root = fixture_root("encrypted-draft");
+    let draft = root.join("draft");
+    fs::create_dir_all(&draft).unwrap();
+    fs::write(
+        draft.join("draft_content.json"),
+        b"E2c546X0dd5kydoYh01EdFbD+ab/cd==\n",
+    )
+    .unwrap();
+
+    let error = OfficialAssetReceipt::new_draft_resource(
+        "official-sticker-002",
+        "加密草稿",
+        OfficialResourceKind::Sticker,
+        OfficialAssetTier::Professional,
+        &draft,
+        "sticker-1",
+        1_200,
+        "https://example.invalid/terms",
+        [OfficialAssetUsage::Personal],
+        BTreeSet::new(),
+        false,
+    )
+    .unwrap_err();
+    assert!(
+        matches!(
+            error,
+            jianying_runtime::RuntimeError::DraftContentEncrypted(_)
+        ),
+        "unexpected error: {error}"
+    );
+    let message = error.to_string();
+    assert!(
+        message.contains("not readable JSON"),
+        "message must say the content is not readable: {message}"
+    );
+    assert!(
+        !message.contains("expected value"),
+        "the raw serde message must not leak through: {message}"
+    );
+
+    // 坏掉但不是信封的文件仍然按 I/O 报，不能被误判成加密
+    fs::write(
+        draft.join("draft_content.json"),
+        b"\x00\x01 not json at all \xff",
+    )
+    .unwrap();
+    let error = OfficialAssetReceipt::new_draft_resource(
+        "official-sticker-003",
+        "损坏草稿",
+        OfficialResourceKind::Sticker,
+        OfficialAssetTier::Basic,
+        &draft,
+        "sticker-1",
+        1_200,
+        "https://example.invalid/terms",
+        [OfficialAssetUsage::Personal],
+        BTreeSet::new(),
+        false,
+    )
+    .unwrap_err();
+    assert!(
+        matches!(error, jianying_runtime::RuntimeError::Io { .. }),
+        "a corrupt file is not an encrypted envelope: {error}"
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn draft_embedded_resource_identity_detects_missing_duplicate_and_changed_nodes() {
     let root = fixture_root("draft-resource");
     let draft = root.join("draft");
