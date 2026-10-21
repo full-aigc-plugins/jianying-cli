@@ -1,0 +1,19 @@
+{
+  "schema": "jianying-transition-silently-dropped/v1",
+  "observed_at": "2026-10-22T02:20+08:00",
+  "finding": "a jianying-job/v2 video segment that declares a transition builds with exit 0, but the produced draft contains no transition at all: materials.transitions is empty and the segment carries no transition reference",
+  "variants_tried": {
+    "transition={\"name\":\"叠化\",\"duration_us\":500000}": "exit 0, draft has 0 transitions",
+    "transition={\"resource_id\":\"6724845717472416269\",\"duration_us\":500000}": "exit 0, draft has 0 transitions",
+    "transition={\"name\":\"6724845717472416269\",\"duration_us\":500000}": "exit 0, draft has 0 transitions"
+  },
+  "why_it_matters": "an automated edit that asks for 叠化 between two clips gets a green build and a draft without the transition; the same class of silent failure the resource-id work was meant to eliminate",
+  "context": [
+    "the plan format does support transitions - tests/parity/scenarios/03-transition.json exists - so the loss is in the job-to-plan conversion or in the wire compiler for this segment shape",
+    "jianying-job-v2.schema.json declares transition.required=[name] and additionalProperties=false, so the by-id variant should not even have been accepted"
+  ],
+  "not_proven": [
+    "that every job shape loses the transition - only single video segments were tried",
+    "whether the plan path (jianying build) still applies transitions correctly; that is the parity scenario and was not rerun here"
+  ]
+}
