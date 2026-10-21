@@ -858,6 +858,19 @@ pub fn plan_from_project(project: &DraftProject) -> Result<Plan> {
                     keyframes,
                     ..
                 } => {
+                    // 贴纸编号来自应用侧在线素材，内嵌目录里没有，因此不能查目录；
+                    // 这里只拦住明显不是编号的输入：空白、控制字符、空白字符、超长。
+                    if resource_id.trim().is_empty()
+                        || resource_id.len() > 64
+                        || !resource_id.chars().all(|c| {
+                            c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.' | ':')
+                        })
+                    {
+                        anyhow::bail!(
+                            "sticker resource_id {resource_id:?} must be a non-blank token of at most 64 chars; \
+                             stickers are application-issued so no bundled catalogue can check them"
+                        );
+                    }
                     segment.resource_id = Some(resource_id.clone());
                     apply_transform(&mut segment, transform);
                     apply_keyframes(&mut segment, keyframes.as_ref());
