@@ -105,6 +105,25 @@
           "sha256": "ab3dc1143796b8af6ada12771cb78a06e2b2be6174bf8ebd96b18fa6efa211a2"
         }
       ]
+    },
+    "timeline_toolbar": {
+      "icons_visible": [
+        "撤销",
+        "重做",
+        "分割",
+        "删除",
+        "（两个未标注图标）",
+        "录音"
+      ],
+      "labels": "none - the toolbar is icon-only, so the names above are read from the icon shapes",
+      "partial": true,
+      "evidence": [
+        {
+          "file": "19-timeline-toolbar-strip.png",
+          "sha256": "1a6ddcfeaace4e224423c199c2bb68bc1fa744c858c09bb5d6f114727a1d066e",
+          "note": "cropped from 11-template-draft-open.png"
+        }
+      ]
     }
   },
   "publish_restrictions_observed": {
@@ -114,9 +133,10 @@
     "note": "the exports and template operations used no professional material"
   },
   "not_enumerated": [
-    "segment right-click context menu (the capture attempt opened the shell start menu instead)",
     "page preview bench (页面预览台) controls",
     "canary/beta build: only 11.6.0.14552 is installed on this host, and the task's earlier note pins 11.6.0-beta2/beta3",
-    "professional edition restrictions (this account is a personal one)"
+    "professional edition restrictions (this account is a personal one)",
+    "segment right-click context menu: two attempts failed (blind right-click opened the shell start menu; Shift+F10 after a blind select did nothing because the app had navigated to the cloud-space page)",
+    "labels for the icon-only timeline toolbar"
   ]
 }
