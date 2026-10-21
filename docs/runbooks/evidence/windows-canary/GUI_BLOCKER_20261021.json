@@ -15,17 +15,23 @@
   ],
   "state_left_behind": {
     "editor_running": true,
-    "pid": 67648,
     "open_draft": "10月21日 (created by this attempt, empty)",
-    "drafts_created": [
-      "canary-11.6",
-      "canary-template",
-      "10月21日"
-    ]
+    "other_windows": "minimised during the attempt and restored afterwards"
   },
   "note": "The owner confirmed the professional entitlement is active. This round could not verify it in the UI because the desktop is in use by other applications; no claim about the entitlement state is made here.",
   "unblock": [
-    "close the other windows (or bring 剪映专业版 to the front and keep it in front) and say when",
-    "or take the material yourself and tell me where it landed"
-  ]
+    "click 官方素材, drag one material onto the timeline, tell me the draft name - I then run the receipt/verify/register/preflight chain against that draft",
+    "or take the material yourself and say where it landed"
+  ],
+  "second_attempt": {
+    "observed_at": "2026-10-21T17:00+08:00",
+    "method": "minimised every other top-level window, made the editor HWND_TOPMOST, then clicked with synthetic mouse events",
+    "what_worked": "the editor was unobstructed, SetForegroundWindow reported 剪映专业版, and clicks on the home page had worked earlier (a draft opened)",
+    "what_failed": "clicking the 官方素材 tab in the left panel produced no change after hover + click + 15 s; a control click on the already-selected 素材 tab also produced nothing, as expected",
+    "conclusion": "the editor's side panel does not react to synthetic mouse events on this session, so the material cannot be taken by automation here",
+    "captures_deleted": [
+      "23-editor-clean.png",
+      "24-official-materials.png"
+    ]
+  }
 }
