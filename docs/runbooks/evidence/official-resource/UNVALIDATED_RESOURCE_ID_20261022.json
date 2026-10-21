@@ -28,5 +28,15 @@
   "why_it_matters": "this is exactly the plan-to-execution gate an automated editor needs: without it an agent that invents or mistypes a resource id gets a green build and a draft that fails in the editor",
   "nuance": "not every id can be checked against the embedded catalogs: stickers are online materials whose ids come from the application, so a sticker id has no catalog entry by design. Filters (1052) and video effects (1337) do, and Job v2 transitions reference a `name`, which is also catalogued - so a strict existence check would have to skip stickers and validate the other two.",
   "current_mitigation": "tools/plan_resource_lint.py already reports unknown ids, VIP-without-entitlement and timing defects for a plan or job document; it is not yet wired into `job run`",
-  "next_step": "validate filterEffectSegment.resource_id against the filter/effect catalogs and transition.name against the transition catalog inside job validation, returning invalid_job with the JSON path; leave sticker ids alone and document why"
+  "next_step": "validate filterEffectSegment.resource_id against the filter/effect catalogs and transition.name against the transition catalog inside job validation, returning invalid_job with the JSON path; leave sticker ids alone and document why",
+  "correction_2026_10_22": {
+    "what_was_wrong": "the finding said `job run` accepts an unknown resource id. Re-testing by segment kind shows that filters and effects are already validated: a filter segment with 9999999999999999999 fails with \"filter is not in the bundled catalog\". Only stickers pass through, because sticker ids are issued by the application and have no catalogue entry by design.",
+    "product_change": "job_runner now rejects a sticker resource_id that is blank, longer than 64 chars, or contains anything other than letters, digits, hyphen, underscore, dot or colon. It does not and cannot check the id against a catalogue.",
+    "regression": {
+      "sticker_id_NOT_A_NUMBER": "execution_failed - sticker resource_id must be a non-blank token",
+      "sticker_id_19_digits": "still accepted on purpose: no catalogue exists for stickers",
+      "filter_id_unknown": "unchanged, already refused by the bundled catalogue"
+    },
+    "gates": "cargo test --workspace 123 targets / 383 passed; clippy -D warnings and fmt --check clean"
+  }
 }
