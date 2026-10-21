@@ -216,6 +216,12 @@
       `EDITOR_SKILL_COVERAGE.json` **逐字节相同**——它原来也漏了 `newline="\n"`，本轮一并修掉。
       另外 4 个写入器（behavior/examples parity、goal snapshot、enum 导入）也补上了 `newline="\n"`；
       `GOAL_SNAPSHOT.json` 含 `generated_at` 时间戳，本来就不可逐字节复现，未列入 cmp 门禁。
+      *2026-10-21 给这条语义补上守卫*：`store` 里把「读不到清单 = 错误」抽成 `editors_from_listing`，
+      新增 3 条**跨平台**单元测试（缺失清单 → 错误且文案点名编辑器与处理建议；空清单 → 无编辑器；
+      清单点名编辑器 → 上报）；Python 侧在 `tests/test_release_tools.py` 增加守卫：凡是设置
+      `JIANYING_CLI_PROCESS_LIST` 的文件都必须指向 `tests/fixtures/empty-processes.txt`，
+      仅 7 个自建合成清单的文件在显式白名单里并注明原因。守卫已做反证（把某个 fixture 路径改坏 → 变红，
+      恢复 → 变绿）。`cargo test --workspace` 现为 **123 targets / 380 passed**，`unittest` **37 OK**。
       - `jianying selftest --json` → `ok=true`，7 项：**5 pass / 2 skip**（skip 的是 media 与 render，需要 ffprobe/ffmpeg 与真实素材）；
       - `jianying doctor --json` / `status --json` → ok，`editors_running=[]`，能力 **171（supported 150 / 其他 21）**；
       - CLI 自带 MCP 服务 `jianying mcp serve` 走 stdio：`initialize` 返回 `jianying-cli 1.7.0`，`tools/list` **17 个工具**，`tools/call jianying_doctor` 与 `jianying_capabilities` 均返回完整 JSON。
