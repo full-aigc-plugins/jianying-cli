@@ -1,0 +1,88 @@
+{
+  "schema": "jianying-final-gates/v1",
+  "observed_at": "2026-10-21",
+  "task": "4.5 的可执行部分：OpenSpec strict + 冻结产物回归 + 全量验证",
+  "commit": "46aac3256c281c22ff253b40aceaaa5998f35c78",
+  "gates": {
+    "openspec_validate_all_strict": {
+      "command": "openspec validate --all --strict",
+      "exit": 0,
+      "output": "2 passed, 0 failed (change/support-jianying-editions-and-official-assets, change/unify-rust-jianying-engine)"
+    },
+    "cargo_fmt_check": {
+      "command": "cargo fmt --check",
+      "exit": 0
+    },
+    "cargo_clippy": {
+      "command": "cargo clippy --all-targets -- -D warnings",
+      "exit": 0
+    },
+    "cargo_test_workspace": {
+      "command": "cargo test --workspace --no-fail-fast",
+      "exit": 0,
+      "output": "123 targets, 382 passed, 0 failed"
+    },
+    "python_unittest": {
+      "command": "python -m unittest tests/test_release_tools.py tests/test_verify_release_runtime.py",
+      "exit": 0,
+      "output": "40 tests OK"
+    },
+    "check_provenance": {
+      "command": "python tools/check_provenance.py --root .",
+      "exit": 0
+    },
+    "check_provenance_negative": {
+      "command": "python tools/check_provenance.py --root . --self-test-negative-cases",
+      "exit": 0
+    },
+    "parity_run": {
+      "command": "python tools/parity_run.py --pyjyd-src <pkg dir> --report <tmp>",
+      "exit": 0,
+      "output": "55 passed, 0 failed"
+    },
+    "gen_catalogs_check": {
+      "command": "python tools/gen_catalogs.py <pkg dir> --check",
+      "exit": 0,
+      "output": "catalogs up to date with 6bb2d06a713f7b58e1375269daec835a03882086"
+    }
+  },
+  "frozen_artifacts": {
+    "files": [
+      "provenance/PARITY_RUN.json",
+      "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json",
+      "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json",
+      "provenance/CAPCUT_UTILITY_DIFFERENTIALS.json",
+      "provenance/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json",
+      "provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json",
+      "provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json",
+      "provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json",
+      "provenance/PARITY_MATRIX.json",
+      "provenance/WINDOWS_RUNTIME_PROFILE_CANDIDATE.json"
+    ],
+    "sha256": {
+      "provenance/PARITY_RUN.json": "16d6bc9c1cfabee59c27d40e8cb18575880a156cf844b2ba90e7ca45761745bf",
+      "provenance/CAPCUT_PROJECT_DIFFERENTIALS.json": "64c2c0b32226b771f9955f3a2440f30b57e7a20d433c31f012e00b0ce365c0be",
+      "provenance/CAPCUT_TIMELINE_DIFFERENTIALS.json": "15c4e70201b8a6fc6fba5fe1539d46c4af459a5fa7faa4cc125e0725e03d3d99",
+      "provenance/CAPCUT_UTILITY_DIFFERENTIALS.json": "4302ffe716056205092faa56ed5a8f5418738ba38225a8c0b2a60d6a7d19b0df",
+      "provenance/CAPCUT_MEDIA_ANALYSIS_DIFFERENTIALS.json": "aaa74fa5f947e59936bd5c68ac68ddb3e9902631f4395232abe336a0bb9dbbae",
+      "provenance/CAPCUT_MEDIA_MUTATION_DIFFERENTIALS.json": "3755a352a9eaa5be54790fcb3c7595e68bf98a4cfd71e873001ab004f53e227d",
+      "provenance/CAPCUT_MATERIAL_DISCOVERY_DIFFERENTIALS.json": "792fc2bb51e8504f612ad6eea36ada499ee2a4437861102b7d0118f72b381eb3",
+      "provenance/CAPCUT_INTERCHANGE_DIFFERENTIALS.json": "5ec80d219acd4c1eac78e1a547c42d3ac02fa089ff079e0c3d93dbc1520bba6f",
+      "provenance/PARITY_MATRIX.json": "9ed02ffafffa0a7f6bb0e636657524eedf25898827c438c9137238e86d3d0c1d",
+      "provenance/WINDOWS_RUNTIME_PROFILE_CANDIDATE.json": "f2469399a8100ea588fb46de031b03fb8e409d67d32ddd0804fcd3a8312c89b2"
+    },
+    "crlf_bytes_in_every_file": 0,
+    "parity_report_regenerated_byte_identical": true,
+    "regenerated_sha256": "16d6bc9c1cfabee59c27d40e8cb18575880a156cf844b2ba90e7ca45761745bf"
+  },
+  "environment_needed_to_reproduce": [
+    "ffmpeg on PATH (parity_run generates fixtures with lavfi)",
+    "PYTHONPATH including tools/ so the pymediainfo compatibility adapter satisfies upstream imports",
+    "--pyjyd-src points at the package directory (…/pyJianYingDraft/pyJianYingDraft), because tools/parity_reference.py takes its parent",
+    "upstream checked out at 6bb2d06a713f7b58e1375269daec835a03882086 - the commit the report pins"
+  ],
+  "not_proven": [
+    "4.5 also asks for final publishability and the docs/archive steps; those depend on 2.12 and 4.1-4.3, which are still open",
+    "no release was published and no tag was created - that needs the owner's explicit approval"
+  ]
+}

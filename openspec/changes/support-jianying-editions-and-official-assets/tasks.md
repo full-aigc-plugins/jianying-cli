@@ -103,4 +103,13 @@
     证据：`docs/runbooks/evidence/official-resource/DOWNGRADE_ACCEPTANCE_20261021.json`（含二进制 sha256）。
     诚实边界：降级环境是**喂给 CLI 的基础版凭据快照**，不是真的基础版账号；本次未驱动编辑器。
 - [ ] 4.5 运行完整测试、OpenSpec strict、发布制品黑盒与三宿主验收；全部证据完成后再启用默认路由、同步并归档。
+  - *2026-10-21 可执行部分已跑通（4.5 仍未勾，因为发布性与归档依赖前四项）*：
+    `openspec validate --all --strict` 2 passed / 0 failed；`cargo fmt --check`、`cargo clippy -D warnings`、
+    `cargo test --workspace`（123 targets / 382 passed）、`python -m unittest`（40 OK）、
+    `check_provenance`（含负例自检）全部 exit 0；`parity_run.py` 跑到 55/55，且重新生成的 `PARITY_RUN.json`
+    与仓库里那份**字节完全一致**；`gen_catalogs.py --check` 与上游 commit 6bb2d06 一致。
+    10 个冻结产物逐个记录 sha256 且 CRLF=0。
+    复现所需环境也写进证据了：ffmpeg 在 PATH、PYTHONPATH 含 tools/ 以提供 pymediainfo 适配层、
+    --pyjyd-src 指向包目录、上游固定在 6bb2d06。证据：docs/runbooks/evidence/release/FINAL_GATES_20261021.json。
+    **未勾原因**：发布性要求 2.12 与 4.1-4.3 完成；且没有打 tag、没有发布——那需要业主明确批准。
 - [x] 4.6 用不可变发布二进制对真实首页空文件夹完成“列表 → 移入最近删除 → 回收站回读 → 恢复 → 冷重开”差分验收，并证明 GUI 条目消失但未返回活动列表时不会被误报为成功。
