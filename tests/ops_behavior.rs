@@ -20,7 +20,26 @@ fn probe_stub(_p: &Path) -> Result<jianying_cli::probe::MediaInfo> {
     })
 }
 
+/// Declare "no editor is running" for the in-process write paths.
+///
+/// `store`/`template` refuse to touch a draft when they cannot tell whether JianYing is
+/// open; the production listing shells out to `tasklist`, which this suite must not
+/// depend on (it can wedge, and there is no editor here anyway). The seam only replaces
+/// the listing source - the "editor is running -> refuse" rule has its own tests.
+fn quiet_process_listing() {
+    static ONCE: std::sync::Once = std::sync::Once::new();
+    ONCE.call_once(|| {
+        let path =
+            std::env::temp_dir().join(format!("jyc-test-processes-{}.txt", std::process::id()));
+        std::fs::write(&path, b"").expect("write the empty process listing");
+        // SAFETY: one process-global test seam, written once before any test body runs its
+        // first write; every writer sets the same value, so concurrent readers agree.
+        unsafe { std::env::set_var("JIANYING_CLI_PROCESS_LIST", &path) };
+    });
+}
+
 fn tmpdir(tag: &str) -> PathBuf {
+    quiet_process_listing();
     let d = std::env::temp_dir().join(format!("jyc-ops-{tag}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&d);
     std::fs::create_dir_all(&d).unwrap();
