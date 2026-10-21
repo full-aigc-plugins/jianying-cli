@@ -1,6 +1,6 @@
 {
   "schema": "jianying-windows-runtime-profile-candidate/v1",
-  "observed_at": "2026-10-20",
+  "observed_at": "2026-10-21",
   "host": {
     "os": "windows",
     "note": "本机安装且运行过剪映专业版；发现与探测均为只读"
@@ -69,7 +69,9 @@
     "installation_discovered": true,
     "profile_probe_supported": true,
     "native_routing_enabled": false,
-    "host_canary_run": false,
-    "note": "探测只证明可执行文件身份、版本、平台、草稿根与声明的 capability 一致；未做冷重开/连续播放/原生导出的真实验收。"
+    "host_canary_run": true,
+    "note": "探测只证明可执行文件身份、版本、平台、草稿根与声明的 capability 一致；未做冷重开/连续播放/原生导出的真实验收。",
+    "canary_evidence": "docs/runbooks/evidence/windows-canary/CANARY_20261021.json",
+    "promotion": "a CLI-built draft was published into the real store, opened by JianYing Pro 11.6.0.14552, rendered its text and was exported natively (1080x1920, 30 fps, h264); native routing stays disabled"
   }
 }

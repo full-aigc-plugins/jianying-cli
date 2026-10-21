@@ -1,0 +1,162 @@
+{
+  "schema": "jianying-windows-host-canary/v1",
+  "observed_at": "2026-10-21",
+  "host": {
+    "os": "windows",
+    "editor": {
+      "name": "剪映专业版",
+      "product": "JianYing Pro",
+      "version": "11.6.0.14552",
+      "executable": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\Apps\\JianyingPro.exe",
+      "executable_sha256": "4611aaa8ce00efc6afb41384d3f0313206d403a9bb1a1f83d6b6514cd2e5025a"
+    },
+    "account": {
+      "state": "logged_in",
+      "edition_label_seen": "个人版",
+      "note": "session showed an SVIP upsell banner; no professional edition was used"
+    },
+    "display": {
+      "width": 2560,
+      "height": 1440
+    }
+  },
+  "cli": {
+    "version": "1.7.0",
+    "binary": "target/release/jianying.exe",
+    "contract_state": "committed_unreleased",
+    "note": "an unreleased build can never satisfy runtime acceptance verify, which requires released"
+  },
+  "steps": [
+    {
+      "step": "build",
+      "command": "jianying build plan.json --out draft --json",
+      "result": "draft written"
+    },
+    {
+      "step": "publish",
+      "command": "jianying publish draft --json",
+      "result": "registered in the real draft store",
+      "store": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Projects\\com.lveditor.draft\\canary-11.6"
+    },
+    {
+      "step": "open",
+      "result": "editor opened the draft; title bar, canvas 9:16, 30 fps and both text clips visible",
+      "screenshots": [
+        "03-after-double-click.png"
+      ]
+    },
+    {
+      "step": "menu",
+      "result": "menu enumerated on this exact version",
+      "items": [
+        "文件",
+        "编辑",
+        "布局模式",
+        "更多操作",
+        "帮助",
+        "账号",
+        "全局设置",
+        "返回首页",
+        "退出草稿"
+      ],
+      "screenshots": [
+        "04-editor-menu.png"
+      ]
+    },
+    {
+      "step": "export",
+      "result": "native export succeeded",
+      "screenshots": [
+        "06-export-panel.png",
+        "07-export-result.png"
+      ]
+    }
+  ],
+  "native_output": {
+    "path": "C:\\Users\\hnxyh\\Videos\\canary-11.6.mp4",
+    "copied_to": "09-exported-video.mp4",
+    "sha256": "0fa30ad7d73a5f6ed7b5cfe402cc784c9a41fbfcab621799e3a4b9014da69f13",
+    "byte_length": 105811,
+    "probe": {
+      "container": "mp4",
+      "duration_seconds": 4.017007,
+      "video": {
+        "codec": "h264",
+        "width": 1080,
+        "height": 1920,
+        "fps": 30,
+        "frames": 120,
+        "pix_fmt": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "sample_rate": 44100,
+        "channels": 2
+      }
+    },
+    "frame": {
+      "file": "08-exported-frame.png",
+      "sha256": "88b18a1caa08d8b81f385f5cbcef6809b18118d5fed10212c7383eb2638d1e95",
+      "observation": "the exported frame carries the plan's text 'canary 11.6'"
+    },
+    "probe_tool": "ffmpeg/ffprobe 9.0.2 essentials"
+  },
+  "draft_identity": {
+    "draft_content_sha256": "b4a51a3f299312037e01e3be3900552d381d3298020cbeac52e93678348f17e2",
+    "note": "digest of the draft the editor opened and exported"
+  },
+  "claims": {
+    "draft_opens_in_real_editor": true,
+    "timeline_and_canvas_match_the_plan": true,
+    "cold_open_after_publish": true,
+    "native_export": true,
+    "continuous_playback": false,
+    "menu_enumerated_on_exact_version": true,
+    "professional_edition_materials": false,
+    "cold_reopen_after_exit": false
+  },
+  "not_proven": [
+    "continuous playback was not recorded as evidence",
+    "cold reopen after a full editor exit was not exercised",
+    "template replace/import and recursive import were not opened in the editor",
+    "professional (SVIP) materials were unavailable on this account"
+  ],
+  "artifacts": {
+    "01-jianying-home.png": {
+      "sha256": "85636e48ddfd04b5ad1cfd7552d5d0e454d7302487519b35d2764fb04eece72a",
+      "bytes": 486702
+    },
+    "02-jianying-maximized.png": {
+      "sha256": "b9bcfe7d5b0b1cb3c115bcd98201d100ffadac6dc074cc7e6bbcd81a19573560",
+      "bytes": 685901
+    },
+    "03-after-double-click.png": {
+      "sha256": "b6d8e1820d7151488eec60ad21006755a2594557e2be52cfb47aeb8c64b192b1",
+      "bytes": 137947
+    },
+    "04-editor-menu.png": {
+      "sha256": "eb91b49b6336ca7719285f9e86a628d20b0e92cf82f0d3efb0a5c808552837ba",
+      "bytes": 178914
+    },
+    "05-export-dialog.png": {
+      "sha256": "3d4b45e7dd6a32f01aaad16451d4e417202ff3a8bd827016eb58bec4bd24c380",
+      "bytes": 171603
+    },
+    "06-export-panel.png": {
+      "sha256": "3443fb6c8fb52cb0955b614ec9615791a5b850508574724c01d5b1158a7b9bcc",
+      "bytes": 184592
+    },
+    "07-export-result.png": {
+      "sha256": "9057f01fdb0527489dd064382c4aeae3fe4d51576c99dca11b35c76791b3b644",
+      "bytes": 197129
+    },
+    "08-exported-frame.png": {
+      "sha256": "88b18a1caa08d8b81f385f5cbcef6809b18118d5fed10212c7383eb2638d1e95",
+      "bytes": 20391
+    },
+    "09-exported-video.mp4": {
+      "sha256": "0fa30ad7d73a5f6ed7b5cfe402cc784c9a41fbfcab621799e3a4b9014da69f13",
+      "bytes": 105811
+    }
+  }
+}

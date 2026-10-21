@@ -46,6 +46,13 @@
   - 完成（2026-09-22）：固定 pyJianYingDraft `c3318066` 的 8 类长短策略与文字样式观察值进入 `PYJYD_TEMPLATE_DIFFERENTIALS.json`；Rust 按相同顺序执行裁头、裁尾、裁尾对齐、居中收缩、向前/向后延长、推动后续和截断素材尾部。文字替换使用 UTF-16 码元比例重算并记录相对 Python code-point 的获准增强差异。
   - 按片段替换会拆分共享素材身份并通过 `MutationPlan` 原子提交；失败黑盒证明草稿字节和素材文件数均不变。轨道导入递归收集普通字段和 JSON 字符串中的素材引用，重映射轨道/片段/素材 ID、复制本地文件且保留无关 JSON 原文；删除源草稿后目标仍通过 bundle 校验。
 - [ ] 4.12 将 pyJianYingDraft 四个 `partial` 提升为有差分和真实剪映证据的 `supported`；CI 必须拒绝完成声明与 parity 状态不一致
+      *2026-10-21 真实编辑器进展（仍未勾）*：本机 canary 证明**创建路径**在 JianYing Pro 11.6.0.14552 里成立——
+      CLI 造的草稿被编辑器打开、文本片段与 9:16/30fps 画布正确渲染、并原生导出成功（见
+      `docs/runbooks/evidence/windows-canary/CANARY_20261021.json`）。因此四条 partial 里
+      「typed segment / track 放置 / project 创建」的**渲染侧**已有实机证据；
+      **仍缺**：`template replace-text` / `import-track` / 递归导入 / 隔离编辑后的草稿在编辑器里打开验证，
+      以及 `source_claims.pyjianyingdraft` 从 incomplete 改 complete（门禁要求四条 partial 全部消失才能改）。
+      在这些没做之前，四条 partial 一条都不能改成 supported——那会变成没有证据的声明。
       *2026-10-21 核实 4.12 为何不能勾*：四条 `partial`（`typed-timeline-authoring`、`project-domain`、
       `track-domain`、`segment-domain`）的 `gap` 都写成同一种句式——「实现已完成，**只剩真实编辑器里的最终提升**」，
       `blocking_tasks` 全指向 `4.12`。而 `tools/check_provenance.py::validate_pyjianyingdraft_completion`
@@ -129,7 +136,18 @@
 - [x] 8.6 验证相同内容哈希与配置复用结果，付费或不明状态请求不得静默重提
 - [x] 8.7 实现显式授权的原生导出任务、进度/结果验证，并严格区分代理渲染与原生导出
 - [x] 8.8 使用仅由本项目生成的合成素材完成独立运行验证，并附受限来源隔离审查记录
-- [ ] 8.9 获取合法 Windows 测试环境后确定首个支持 Runtime Profile；在此之前 capability 明确报告不支持
+- [x] 8.9 获取合法 Windows 测试环境后确定首个支持 Runtime Profile；在此之前 capability 明确报告不支持
+      *2026-10-21 收官（本机真实编辑器 canary）*：在**同一台** Windows 主机上用正常账号登录的
+      JianYing Pro **11.6.0.14552** 完成了一次端到端 canary——
+      `jianying build` 造草稿 → `jianying publish` 注册进真实草稿库 → 编辑器内**打开**该草稿（标题栏、9:16 画布、
+      30 fps、两条文本片段与预览文字均与计划一致）→ 展开菜单逐项登记 → **原生导出成功**
+      （`C:/Users/hnxyh/Videos/canary-11.6.mp4`，ffprobe：h264 **1080×1920 / 30 fps / 120 帧 / 4.017 s** + AAC 44.1 kHz；
+      抽帧可见计划里的文字 "canary 11.6"）。
+      证据目录 `docs/runbooks/evidence/windows-canary/`（9 个截图/视频 + `CANARY_20261021.json`，含每个文件的 sha256），
+      `provenance/WINDOWS_RUNTIME_PROFILE_CANDIDATE.json` 的 `host_canary_run` 已置 true。
+      *口径*：`runtime probe` 对该版本返回 `supported=true`，且 `automatic_routing` 仍为 false（本任务只要求“确认首个支持 Profile”，
+      不要求启用原生路由）；`native_routing_enabled` 仍为 false，未被本次 canary 改变。
+      *未做*：连续播放未录成证据、退出后冷重开未跑、模板替换/递归导入未在编辑器里打开、账号为个人版无专业素材。
       *2026-10-20：**环境已就位并完成只读确定**——本机安装剪映专业版 11.6.0.14552（按用户安装布局
       `%LOCALAPPDATA%\JianyingPro\Apps\JianyingPro.exe`，版本取自 `Apps/<version>`）。此前
       `runtime discover` 在该布局下返回空，现已支持该布局与 Windows 版本读取：
@@ -172,6 +190,12 @@
   - Tag 绑定门禁（2026-09-21）：鉴于 GitHub 只在公开后锁定 Release tag，初次与最终 publication plan 均重新解析远端 lightweight/annotated tag，并要求直接或 peeled commit 等于发布 checkout；tag 删除、移动、重复或异常输出均 fail closed。真实三平台 Release 尚未取得，任务保持未完成。
 - [x] 9.6 完成旧命令兼容期文档、迁移指南和回滚演练，不删除 v1 parser
 - [ ] 9.7 运行完整 parity、来源、差分和真实剪映门禁，仅在全部目标证据满足后标记变更可归档
+      *2026-10-21 真实剪映证据到手*：同一台主机的 JianYing Pro 11.6.0.14552 上完成
+      build → publish → **编辑器打开** → **原生导出**（ffprobe：h264 1080×1920 / 30fps / 120 帧 / 4.017s + AAC 44.1k）
+      并抽帧确认画面文字；证据 `docs/runbooks/evidence/windows-canary/`（9 个媒体文件 + JSON 记录，含逐文件 sha256）。
+      这把 9.7 里「真实剪映门禁」与「原生导出」两块的空白补上了。**仍缺**：macOS 目标证据、
+      `runtime acceptance verify` 的正式记录（该记录要求 CLI 处于 `released` 状态，当前二进制是
+      `committed_unreleased`，因此只能在正式发布后生成）、连续播放与退出后冷重开。
       *2026-10-21 本机补跑 capcut-cli 差分（CI 的 `parity` job）*：按 CI 的 pin 克隆并构建
       `capcut-cli @ 49f70e3`（npm 10.9.3 `ci --ignore-scripts` + `run build`），用 release 二进制跑四个
       黑盒差分：
