@@ -92,21 +92,57 @@ fn parity_failures_emit_pointer_fixture_and_reproduction_argv() {
 
 #[test]
 fn pyjianyingdraft_completion_claim_tracks_partial_rows_and_open_tasks() {
+    // The invariant, not a snapshot: the claim is complete exactly when no partial row
+    // remains, every partial row still explains its gap and points at an open task, and every
+    // promoted row names the real-editor evidence that justified the promotion.
     let parity: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string("provenance/PARITY_MATRIX.json").unwrap())
             .unwrap();
-    assert_eq!(parity["source_claims"]["pyjianyingdraft"], "incomplete");
     let rows = parity["functions"]
         .as_array()
         .unwrap()
         .iter()
-        .chain(parity["data_structures"].as_array().unwrap());
-    let partial = rows
-        .filter(|row| row["source"] == "pyjianyingdraft" && row["status"] == "partial")
+        .chain(parity["data_structures"].as_array().unwrap())
+        .filter(|row| row["source"] == "pyjianyingdraft")
+        .cloned()
         .collect::<Vec<_>>();
-    assert_eq!(partial.len(), 4);
-    for row in partial {
+    let partial = rows
+        .iter()
+        .filter(|row| row["status"] == "partial")
+        .collect::<Vec<_>>();
+    let claim = parity["source_claims"]["pyjianyingdraft"].as_str().unwrap();
+    assert_eq!(claim, if partial.is_empty() { "complete" } else { "incomplete" });
+
+    let tasks = std::fs::read_to_string("openspec/changes/unify-rust-jianying-engine/tasks.md")
+        .unwrap();
+    for row in &partial {
         assert!(row["gap"].as_str().is_some_and(|value| !value.is_empty()));
-        assert!(!row["blocking_tasks"].as_array().unwrap().is_empty());
+        let blocking = row["blocking_tasks"]
+            .as_array()
+            .expect("a partial row must name its blocking tasks");
+        assert!(!blocking.is_empty());
+        for task in blocking {
+            let id = task.as_str().unwrap();
+            assert!(
+                tasks.contains(&format!("- [ ] {id}")),
+                "blocking task {id} must still be open"
+            );
+        }
+    }
+
+    let promoted = rows
+        .iter()
+        .filter(|row| row["status"] == "supported" && row["real_editor_evidence"].is_string())
+        .collect::<Vec<_>>();
+    assert!(
+        !promoted.is_empty(),
+        "the matrix must record which rows came from real-editor evidence"
+    );
+    for row in promoted {
+        let evidence = row["real_editor_evidence"].as_str().unwrap();
+        assert!(
+            std::path::Path::new(evidence).is_file(),
+            "real-editor evidence {evidence} must exist"
+        );
     }
 }

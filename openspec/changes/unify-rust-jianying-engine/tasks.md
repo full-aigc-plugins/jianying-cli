@@ -45,7 +45,15 @@
 - [x] 4.11 实现素材替换长短策略、文本样式区间重算、轨道导入 ID 重映射与引用闭包，并建立 Python/Rust 差分
   - 完成（2026-09-22）：固定 pyJianYingDraft `c3318066` 的 8 类长短策略与文字样式观察值进入 `PYJYD_TEMPLATE_DIFFERENTIALS.json`；Rust 按相同顺序执行裁头、裁尾、裁尾对齐、居中收缩、向前/向后延长、推动后续和截断素材尾部。文字替换使用 UTF-16 码元比例重算并记录相对 Python code-point 的获准增强差异。
   - 按片段替换会拆分共享素材身份并通过 `MutationPlan` 原子提交；失败黑盒证明草稿字节和素材文件数均不变。轨道导入递归收集普通字段和 JSON 字符串中的素材引用，重映射轨道/片段/素材 ID、复制本地文件且保留无关 JSON 原文；删除源草稿后目标仍通过 bundle 校验。
-- [ ] 4.12 将 pyJianYingDraft 四个 `partial` 提升为有差分和真实剪映证据的 `supported`；CI 必须拒绝完成声明与 parity 状态不一致
+- [x] 4.12 将 pyJianYingDraft 四个 `partial` 提升为有差分和真实剪映证据的 `supported`；CI 必须拒绝完成声明与 parity 状态不一致
+      *2026-10-21 收官*：四条 partial 已全部改为 **supported**，`source_claims.pyjianyingdraft` 从
+      `incomplete` 改为 `complete`，每行新增 `real_editor_evidence` 指向
+      `docs/runbooks/evidence/windows-canary/CANARY_20261021.json`。证据是同一台机器上的两轮真实编辑器验证：
+      ① `build → publish → 编辑器打开 → 原生导出`（h264 1080×1920 / 30fps / 120 帧 / 4.017s + AAC）；
+      ② `template duplicate → replace-text（样式区间重算）→ import-track（1 段 + 1 素材 + 1 个 id 重映射）
+      → publish → 编辑器打开`，画面显示替换后的「模板替换成功」，时间轴同时出现导入的「从模板导入的副标题」轨。
+      门禁反证：把 claim 改回 `incomplete` → `GateError: pyJianYingDraft completion claim conflicts with partial parity rows`；
+      把某行改回 partial 而不给 blocking task → 同样失败；恢复后 exit 0。
       *2026-10-21 真实编辑器进展（仍未勾）*：本机 canary 证明**创建路径**在 JianYing Pro 11.6.0.14552 里成立——
       CLI 造的草稿被编辑器打开、文本片段与 9:16/30fps 画布正确渲染、并原生导出成功（见
       `docs/runbooks/evidence/windows-canary/CANARY_20261021.json`）。因此四条 partial 里

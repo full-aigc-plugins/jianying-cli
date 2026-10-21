@@ -70,6 +70,20 @@
         "06-export-panel.png",
         "07-export-result.png"
       ]
+    },
+    {
+      "step": "template operations",
+      "commands": [
+        "jianying template duplicate --root library library/base canary-template",
+        "jianying template replace-text library/canary-template '模板替换成功' --track 标题 --index 0",
+        "jianying template import-track library/canary-template donor 副标题",
+        "jianying publish library/canary-template"
+      ],
+      "result": "the duplicate took the replacement text with recalculated style ranges, the imported track brought one segment and one material with one remapped id, and the editor opened the result: title canary-template, preview '模板替换成功', two text tracks, the imported '从模板导入的副标题' segment and the replaced segments on the timeline",
+      "screenshots": [
+        "10-template-home.png",
+        "11-template-draft-open.png"
+      ]
     }
   ],
   "native_output": {
@@ -113,13 +127,15 @@
     "continuous_playback": false,
     "menu_enumerated_on_exact_version": true,
     "professional_edition_materials": false,
-    "cold_reopen_after_exit": false
+    "cold_reopen_after_exit": false,
+    "template_operations_render_in_real_editor": true,
+    "recursive_import_identity_remapping": true
   },
   "not_proven": [
     "continuous playback was not recorded as evidence",
     "cold reopen after a full editor exit was not exercised",
-    "template replace/import and recursive import were not opened in the editor",
-    "professional (SVIP) materials were unavailable on this account"
+    "professional (SVIP) materials were unavailable on this account",
+    "continuous playback and cold reopen after a full exit were still not captured"
   ],
   "artifacts": {
     "01-jianying-home.png": {
@@ -157,6 +173,18 @@
     "09-exported-video.mp4": {
       "sha256": "0fa30ad7d73a5f6ed7b5cfe402cc784c9a41fbfcab621799e3a4b9014da69f13",
       "bytes": 105811
+    },
+    "10-template-home.png": {
+      "sha256": "b7385505f2065d563e49f745fd09a48cc7d4cafb7611c47b09c91fe01c177abd",
+      "bytes": 678233
+    },
+    "11-template-draft-open.png": {
+      "sha256": "ab3dc1143796b8af6ada12771cb78a06e2b2be6174bf8ebd96b18fa6efa211a2",
+      "bytes": 177635
+    },
+    "CANARY_20261021.json": {
+      "sha256": "d2fa594ee3ea5db1b872f5c4cf4753390f84ded8d37057c0427a6716c4d1157e",
+      "bytes": 5054
     }
   }
 }

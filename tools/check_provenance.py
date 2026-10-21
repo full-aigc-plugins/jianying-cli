@@ -669,8 +669,17 @@ def negative_self_test(root: Path, source_manifest: dict, parity: dict, v1: dict
     else:
         raise GateError("negative self-test accepted a restricted fixture source")
 
+    # The completion claim is only false while a partial row exists, so the synthetic case has
+    # to reintroduce one: a claim of complete plus a partial row must be rejected.
     false_completion = copy.deepcopy(parity)
     false_completion["source_claims"]["pyjianyingdraft"] = "complete"
+    rows = false_completion.get("data_structures", [])
+    target = next((row for row in rows if row.get("source") == "pyjianyingdraft"), None)
+    if target is None:
+        raise GateError("negative self-test cannot find a pyJianYingDraft row to regress")
+    target["status"] = "partial"
+    target["gap"] = "synthetic regression for the negative self-test"
+    target["blocking_tasks"] = ["4.12"]
     try:
         validate(root, source_manifest, false_completion, v1)
     except GateError:
