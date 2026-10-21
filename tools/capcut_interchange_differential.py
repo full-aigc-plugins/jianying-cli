@@ -116,8 +116,8 @@ def write_fixture(project: pathlib.Path) -> None:
         }
     )
     encoded = json.dumps(timeline, ensure_ascii=False, indent=2)
-    (project / "draft_content.json").write_text(encoded, encoding="utf-8")
-    (project / "draft_info.json").write_text(encoded, encoding="utf-8")
+    (project / "draft_content.json").write_text(encoded, encoding="utf-8", newline="\n")
+    (project / "draft_info.json").write_text(encoded, encoding="utf-8", newline="\n")
 
 
 def main() -> int:

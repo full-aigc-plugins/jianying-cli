@@ -65,11 +65,11 @@ def ffmpeg_stub(directory: pathlib.Path) -> pathlib.Path:
     """Build the fake ffmpeg the scene/silence parsers read."""
     if os.name != "nt":
         fake = directory / "fake-ffmpeg"
-        fake.write_text(SHELL_STUB, encoding="utf-8")
+        fake.write_text(SHELL_STUB, encoding="utf-8", newline="\n")
         fake.chmod(fake.stat().st_mode | 0o111)
         return fake
     source = directory / "ffmpeg_stub.rs"
-    source.write_text(RUST_STUB, encoding="utf-8")
+    source.write_text(RUST_STUB, encoding="utf-8", newline="\n")
     binary = directory / ("fake-ffmpeg.exe")
     subprocess.run(
         ["rustc", "-O", "-o", str(binary), str(source)],
@@ -128,8 +128,7 @@ def main() -> int:
             "1\n00:00:00,000 --> 00:00:02,000\nthis is the intended sentence\n\n"
             "2\n00:00:03,000 --> 00:00:05,000\nthis is the intended sentence\n\n"
             "3\n00:00:06,000 --> 00:00:07,000\nfinal unique line here\n",
-            encoding="utf-8",
-        )
+            encoding="utf-8", newline="\n")
         rust_retakes = invoke([
             str(rust), "media", "retakes", "--srt", str(srt), "--json",
         ])["data"]

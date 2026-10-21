@@ -278,8 +278,7 @@ def main() -> int:
     )
     arguments.output.write_text(
         json.dumps(plan, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+        encoding="utf-8", newline="\n")
     missing = [Path(item) for item in plan["missing"]]
     arguments.missing_paths0.write_bytes(
         b"".join(str(path).encode() + b"\0" for path in missing)

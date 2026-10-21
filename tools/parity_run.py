@@ -266,7 +266,7 @@ import sys, os, json
 sys.path.insert(0, {json.dumps(str(pyjyd_src))})
 from pyJianYingDraft import parity_reference
 parity_reference.build({json.dumps(str(plan_path))}, {json.dumps(str(out_dir))})
-''')
+''', encoding="utf-8", newline="\n")
     run([sys.executable, str(script)])
 
 
@@ -341,14 +341,14 @@ def main():
         with tempfile.TemporaryDirectory(prefix=f"parity-{name}-") as tmp:
             tmp = Path(tmp)
             plan_path = tmp / "plan.json"
-            plan_path.write_text(json.dumps(spec["plan"], ensure_ascii=False))
+            plan_path.write_text(json.dumps(spec["plan"], ensure_ascii=False), encoding="utf-8", newline="\n")
             media = spec.get("media", [])
             for m in media:
                 run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", m["gen"], "-y", str(tmp / m["name"])])
             srt_spec = spec.get("srt")
             cli_extra = []
             if srt_spec:
-                (tmp / "subs.srt").write_text(srt_spec["text"])
+                (tmp / "subs.srt").write_text(srt_spec["text"], encoding="utf-8", newline="\n")
                 cli_extra = ["--srt", str(tmp / "subs.srt")]
                 for opt in ("offset", "size", "align", "color", "border", "y"):
                     if opt in srt_spec:
@@ -363,7 +363,7 @@ def main():
                     "align": srt_spec.get("align", 1),
                     "color": srt_spec.get("color"),
                     "y": srt_spec.get("y", -0.8),
-                }))
+                }), encoding="utf-8", newline="\n")
             try:
                 run([sys.executable, str(ROOT / "tools" / "parity_reference.py"),
                      str(plan_path), str(tmp / "ref"), str(pyjyd_src)])

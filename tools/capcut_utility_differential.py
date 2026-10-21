@@ -156,8 +156,8 @@ def main() -> int:
                 },
             }
             encoded = json.dumps(timeline, ensure_ascii=False, indent=2)
-            (path / "draft_content.json").write_text(encoded, encoding="utf-8")
-            (path / "draft_info.json").write_text(encoded, encoding="utf-8")
+            (path / "draft_content.json").write_text(encoded, encoding="utf-8", newline="\n")
+            (path / "draft_info.json").write_text(encoded, encoding="utf-8", newline="\n")
 
         draft_path = root / "draft"
         write_draft(draft_path, "Harvest")
@@ -214,7 +214,7 @@ def main() -> int:
         write_draft(library / "one", "One")
         write_draft(library / "two", "Two", fresh=True)
         (library / "broken").mkdir()
-        (library / "broken" / "draft_content.json").write_text("not-json", encoding="utf-8")
+        (library / "broken" / "draft_content.json").write_text("not-json", encoding="utf-8", newline="\n")
         rust_sync = rust_json(
             rust, "media", "harvest-enums", "sync", "--drafts", str(library),
             "--catalogue", str(rust_catalogue)
@@ -272,7 +272,7 @@ def main() -> int:
         info_path = draft_path / "draft_info.json"
         info = json.loads(info_path.read_text(encoding="utf-8"))
         info["name"] = "diverged"
-        info_path.write_text(json.dumps(info, ensure_ascii=False, indent=2), encoding="utf-8")
+        info_path.write_text(json.dumps(info, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
         rust_bundle = root / "rust-diagnose.json"
         upstream_bundle = root / "upstream-diagnose.json"
         rust_diverged = rust_json(
@@ -309,8 +309,8 @@ def main() -> int:
             "materials": {"videos": [], "audios": [], "texts": [], "speeds": []},
         }
         encoded = json.dumps(timeline, ensure_ascii=False, indent=2)
-        (draft_path / "draft_content.json").write_text(encoded, encoding="utf-8")
-        (draft_path / "draft_info.json").write_text(encoded, encoding="utf-8")
+        (draft_path / "draft_content.json").write_text(encoded, encoding="utf-8", newline="\n")
+        (draft_path / "draft_info.json").write_text(encoded, encoding="utf-8", newline="\n")
         assets = draft_path / "assets" / "video"
         assets.mkdir(parents=True)
         (assets / "private.mp4").write_bytes(b"private-media")
@@ -340,8 +340,7 @@ def main() -> int:
 
         for bundle in [rust_bundle, upstream_bundle]:
             (bundle / "leak.json").write_text(
-                json.dumps({"path": "/Users/hansmustermann/private.mov"}), encoding="utf-8"
-            )
+                json.dumps({"path": "/Users/hansmustermann/private.mov"}), encoding="utf-8", newline="\n")
         rust_failed = subprocess.run(
             [str(rust), "project", "fixture", str(rust_bundle), "--check", "--json"],
             text=True, capture_output=True, check=False,
@@ -368,8 +367,7 @@ def main() -> int:
         for name in ["clip1.mp4", "clip2.mp4", "music.mp3"]:
             (root / name).write_bytes(b"synthetic")
         (root / "captions.srt").write_text(
-            "1\n00:00:00,000 --> 00:00:01,000\nHello\n", encoding="utf-8"
-        )
+            "1\n00:00:00,000 --> 00:00:01,000\nHello\n", encoding="utf-8", newline="\n")
         template = {
             "name": "cta", "type": "text",
             "segment": {
@@ -388,8 +386,7 @@ def main() -> int:
             "extra_materials": [],
         }
         (root / "template.json").write_text(
-            json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
+            json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
         base_tracks = [
             {"type": "video", "items": [
                 {"ref": "hero", "path": "clip1.mp4", "start": 0, "duration": 2,
@@ -424,7 +421,7 @@ def main() -> int:
             ],
         }
         spec_path = root / "spec.json"
-        spec_path.write_text(json.dumps(rich_spec, ensure_ascii=False, indent=2), encoding="utf-8")
+        spec_path.write_text(json.dumps(rich_spec, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
 
         rust_plan = rust_json(rust, "project", "compile", str(spec_path), "--check")
         upstream_plan = upstream_json(entry, "compile", str(spec_path), "--check")
@@ -485,12 +482,11 @@ def main() -> int:
         batch_spec["tracks"] = json.loads(json.dumps(base_tracks))
         batch_spec["tracks"][2]["items"][0]["text"] = "{{title}} for {{price}}"
         batch_path = root / "batch.json"
-        batch_path.write_text(json.dumps(batch_spec, ensure_ascii=False, indent=2), encoding="utf-8")
+        batch_path.write_text(json.dumps(batch_spec, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
         rows = root / "rows.jsonl"
         rows.write_text(
             '{"name":"A","title":"Alpha","price":9}\n'
-            '{"name":"B","title":"Beta","price":19}\n', encoding="utf-8"
-        )
+            '{"name":"B","title":"Beta","price":19}\n', encoding="utf-8", newline="\n")
         rust_store = root / "rust-store"
         upstream_store = root / "upstream-store"
         rust_store.mkdir()
@@ -510,7 +506,7 @@ def main() -> int:
                       "evidence": "fixed-upstream placeholder substitution, row ordering, distinct draft naming and two-draft build"})
 
         bad_rows = root / "bad-rows.jsonl"
-        bad_rows.write_text('{"name":"valid","title":"A","price":1}\n{"wrong":"missing"}\n', encoding="utf-8")
+        bad_rows.write_text('{"name":"valid","title":"A","price":1}\n{"wrong":"missing"}\n', encoding="utf-8", newline="\n")
         rust_fail_store = root / "rust-fail-store"
         upstream_fail_store = root / "upstream-fail-store"
         rust_fail_store.mkdir()

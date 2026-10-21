@@ -113,7 +113,7 @@ def main() -> int:
         print(f"ERROR: {error}")
         return 1
     arguments.output.parent.mkdir(parents=True, exist_ok=True)
-    arguments.output.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    arguments.output.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps({"output": str(arguments.output), "platforms": len(index["artifacts"])}))
     return 0
 

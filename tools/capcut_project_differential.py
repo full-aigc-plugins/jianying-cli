@@ -46,8 +46,8 @@ def read_timeline(project: pathlib.Path) -> dict[str, Any]:
 
 def write_timeline(project: pathlib.Path, value: dict[str, Any]) -> None:
     encoded = json.dumps(value, ensure_ascii=False, indent=2)
-    (project / "draft_content.json").write_text(encoded, encoding="utf-8")
-    (project / "draft_info.json").write_text(encoded, encoding="utf-8")
+    (project / "draft_content.json").write_text(encoded, encoding="utf-8", newline="\n")
+    (project / "draft_info.json").write_text(encoded, encoding="utf-8", newline="\n")
 
 
 def main() -> int:
@@ -121,8 +121,8 @@ def main() -> int:
 
         srt_a = root / "a.srt"
         srt_b = root / "b.srt"
-        srt_a.write_text("1\n00:00:00,000 --> 00:00:01,000\nA\n", encoding="utf-8")
-        srt_b.write_text("1\n00:00:00,000 --> 00:00:02,000\nB\n", encoding="utf-8")
+        srt_a.write_text("1\n00:00:00,000 --> 00:00:01,000\nA\n", encoding="utf-8", newline="\n")
+        srt_b.write_text("1\n00:00:00,000 --> 00:00:02,000\nB\n", encoding="utf-8", newline="\n")
         draft_a = root / "a"
         draft_b = root / "b"
         rust_data(rust, "project", "quickstart", "a", "--out", str(draft_a), "--srt", str(srt_a))
@@ -145,8 +145,7 @@ def main() -> int:
             "1\n00:00:00,000 --> 00:00:01,000\none\n\n"
             "2\n00:00:01,000 --> 00:00:02,000\ntwo\n\n"
             "3\n00:00:02,000 --> 00:00:03,000\nthree\n",
-            encoding="utf-8",
-        )
+            encoding="utf-8", newline="\n")
         cut_source = root / "cut-source"
         rust_data(
             rust, "project", "quickstart", "cut-source", "--out", str(cut_source),

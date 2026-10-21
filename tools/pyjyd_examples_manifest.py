@@ -160,7 +160,7 @@ def main() -> int:
         print(json.dumps({"ok": True, "cases": len(cases), "tests": document["total_tests"]}))
         return 0
 
-    OUT.write_text(rendered, encoding="utf-8")
+    OUT.write_text(rendered, encoding="utf-8", newline="\n")
     print(json.dumps({"ok": True, "cases": len(cases), "tests": document["total_tests"]}))
     return 0
 

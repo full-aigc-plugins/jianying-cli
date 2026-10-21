@@ -210,7 +210,7 @@ def main() -> int:
     report = build_report()
     rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if arguments.output:
-        arguments.output.write_text(rendered, encoding="utf-8")
+        arguments.output.write_text(rendered, encoding="utf-8", newline="\n")
     else:
         print(rendered, end="")
     return 0 if report["prerequisitesReady"] else 1

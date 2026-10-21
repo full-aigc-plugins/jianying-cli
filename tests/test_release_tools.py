@@ -882,5 +882,46 @@ class ListingSeamHygiene(unittest.TestCase):
         )
 
 
+
+class ToolWritesArePlatformIndependent(unittest.TestCase):
+    """No tool may let the platform's text mode decide the bytes it produces.
+
+    Four separate defects had the same shape: `write_text(..., encoding="utf-8")` on Windows
+    turns every newline into CRLF, so a report that CI compares with `cmp` can never match
+    the committed LF baseline. Saying so once, for every writer, is cheaper than finding the
+    fifth one.
+    """
+
+    def write_text_calls(self):
+        import re
+
+        for path in sorted((ROOT / "tools").glob("*.py")):
+            text = path.read_text(encoding="utf-8")
+            for match in re.finditer(r"\.write_text\(", text):
+                depth = 0
+                index = match.end() - 1
+                while index < len(text):
+                    if text[index] == "(":
+                        depth += 1
+                    elif text[index] == ")":
+                        depth -= 1
+                        if depth == 0:
+                            break
+                    index += 1
+                yield path.name, text[match.end() - 1:index + 1]
+
+    def test_every_write_text_call_forces_lf(self):
+        offenders = [
+            f"{name}: {call[:60]}"
+            for name, call in self.write_text_calls()
+            if "newline=" not in call
+        ]
+        self.assertEqual(offenders, [], "these writers inherit the platform newline")
+
+    def test_the_scan_sees_the_writers(self):
+        calls = list(self.write_text_calls())
+        self.assertGreater(len(calls), 30, f"expected many writers, saw {len(calls)}")
+
+
 if __name__ == "__main__":
     unittest.main()

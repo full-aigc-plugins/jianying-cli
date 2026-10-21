@@ -303,8 +303,7 @@ def copy_contract_files(
     capabilities.update(identity)
     (provenance / "CAPABILITIES.json").write_text(
         json.dumps(capabilities, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+        encoding="utf-8", newline="\n")
     shutil.copy2(sbom, bundle / "SBOM.spdx.json")
 
 
@@ -321,13 +320,12 @@ def write_manifest(bundle: Path, platform: str, release_version: str) -> None:
         "files": files,
     }
     (bundle / "manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     checksum_lines = [
         f"{sha256(file)}  {file.relative_to(bundle).as_posix()}"
         for file in sorted(path for path in bundle.rglob("*") if path.is_file())
     ]
-    (bundle / "SHA256SUMS").write_text("\n".join(checksum_lines) + "\n", encoding="utf-8")
+    (bundle / "SHA256SUMS").write_text("\n".join(checksum_lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def archive_bundle(
@@ -427,7 +425,7 @@ def write_release_entry(
         "sourceCommit": capabilities["source_commit"],
     }
     path = output_dir / f"jianying-cli-{release_version}-{platform}.release-entry.json"
-    path.write_text(json.dumps(entry, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(entry, indent=2) + "\n", encoding="utf-8", newline="\n")
     return path
 
 
@@ -472,7 +470,7 @@ def main() -> int:
         )
     checksum = sha256(archive)
     checksum_path = archive.with_suffix(archive.suffix + ".sha256")
-    checksum_path.write_text(f"{checksum}  {archive.name}\n", encoding="utf-8")
+    checksum_path.write_text(f"{checksum}  {archive.name}\n", encoding="utf-8", newline="\n")
     print(json.dumps({
         "archive": str(archive),
         "sha256": checksum,

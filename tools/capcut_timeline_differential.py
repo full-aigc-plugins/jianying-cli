@@ -54,7 +54,7 @@ def rebase_metadata(project: pathlib.Path) -> None:
     value["draft_fold_path"] = str(project.resolve())
     value["draft_root_path"] = str(project.parent.resolve())
     value["draft_json_file"] = str((project / "draft_content.json").resolve())
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
 
 
 def clone(base: pathlib.Path, target: pathlib.Path) -> pathlib.Path:
@@ -73,8 +73,8 @@ def read_timeline(project: pathlib.Path) -> dict[str, Any]:
 
 def write_timeline(project: pathlib.Path, value: dict[str, Any]) -> None:
     encoded = json.dumps(value, ensure_ascii=False, indent=2)
-    (project / "draft_content.json").write_text(encoded, encoding="utf-8")
-    (project / "draft_info.json").write_text(encoded, encoding="utf-8")
+    (project / "draft_content.json").write_text(encoded, encoding="utf-8", newline="\n")
+    (project / "draft_info.json").write_text(encoded, encoding="utf-8", newline="\n")
 
 
 def main() -> int:
@@ -100,8 +100,7 @@ def main() -> int:
         srt.write_text(
             "1\n00:00:00,000 --> 00:00:01,000\nhello\n\n"
             "2\n00:00:01,000 --> 00:00:02,000\nworld\n",
-            encoding="utf-8",
-        )
+            encoding="utf-8", newline="\n")
         base = root / "base"
         rust_data(rust, "project", "quickstart", "timeline", "--out", str(base), "--srt", str(srt))
         segment_id = rust_data(rust, "timeline", "segments", str(base))[0]["id"]

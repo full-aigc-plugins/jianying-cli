@@ -150,7 +150,7 @@ def prepare_media(case: dict, target: Path) -> None:
         run(["ffmpeg", "-hide_banner", "-v", "error", *media["gen"], "-y", str(output)])
     # 参照实现也要读这份字幕，因此在准备素材阶段就写入
     if case.get("srt"):
-        (target / "captions.srt").write_text(case["srt"], encoding="utf-8")
+        (target / "captions.srt").write_text(case["srt"], encoding="utf-8", newline="\n")
 
 
 def build_reference(case: dict, case_dir: Path, media_dir: Path, out: Path, pyjyd_src: Path, env: dict) -> None:

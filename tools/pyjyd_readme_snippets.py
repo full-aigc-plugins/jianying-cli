@@ -102,7 +102,7 @@ def main() -> int:
             print("README_SNIPPETS.json is stale; rerun without --check", file=sys.stderr)
             return 1
     else:
-        OUT.write_text(rendered, encoding="utf-8")
+        OUT.write_text(rendered, encoding="utf-8", newline="\n")
 
     unmapped = [item for item in document["snippets"] if item["maps_to"] == "unmapped"]
     # out_of_scope 必须有理由，不允许只写一个标签

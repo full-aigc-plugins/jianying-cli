@@ -39,7 +39,7 @@ def rebase(project: pathlib.Path) -> None:
     value["draft_fold_path"] = str(project.resolve())
     value["draft_root_path"] = str(project.parent.resolve())
     value["draft_json_file"] = str((project / "draft_content.json").resolve())
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
 
 
 def pair(root: pathlib.Path, base: pathlib.Path, name: str) -> tuple[pathlib.Path, pathlib.Path]:
@@ -143,8 +143,8 @@ def main() -> int:
             value = timeline(project)
             value["materials"]["videos"][0]["path"] = str(root / "missing" / "red.mp4")
             encoded = json.dumps(value, ensure_ascii=False, indent=2)
-            (project / "draft_content.json").write_text(encoded, encoding="utf-8")
-            (project / "draft_info.json").write_text(encoded, encoding="utf-8")
+            (project / "draft_content.json").write_text(encoded, encoding="utf-8", newline="\n")
+            (project / "draft_info.json").write_text(encoded, encoding="utf-8", newline="\n")
         r = rust(binary, "media", "relink", str(rproj), "--dir", str(root), "--stage")
         u = upstream(entry, "relink", str(uproj), "--dir", str(root), "--stage")
         assert r["relinked_count"] == u["relinked"] == 1
@@ -165,7 +165,7 @@ def main() -> int:
         # Python script is the only stand-in that runs unchanged on POSIX and Windows
         # (a shebang script is not executable there).
         generator = root / "fake_tts.py"
-        generator.write_text(TTS_STUB, encoding="utf-8")
+        generator.write_text(TTS_STUB, encoding="utf-8", newline="\n")
         template = f'"{sys.executable}" "{generator}" {{out}} {{text}}'
         rproj, uproj = pair(root, base, "tts")
         r = rust(binary, "media", "tts", str(rproj), "0s", "--text", "hello world", "--tts-cmd", template)
