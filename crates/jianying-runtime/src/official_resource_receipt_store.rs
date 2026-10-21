@@ -81,9 +81,16 @@ impl OfficialResourceReceiptStore {
     /// 读取指定资源标识的收据并重新校验文档。
     pub fn show(&self, asset_id: &str) -> Result<OfficialAssetReceipt, RuntimeError> {
         let path = self.path(asset_id);
-        let bytes = fs::read(&path).map_err(|error| RuntimeError::Io {
-            path: path.clone(),
-            message: error.to_string(),
+        let bytes = fs::read(&path).map_err(|error| match error.kind() {
+            // A missing file here means "this asset was never registered", not an I/O fault:
+            // the operator cannot act on a hashed store filename.
+            std::io::ErrorKind::NotFound => {
+                RuntimeError::AssetReceiptNotRegistered(asset_id.to_owned())
+            }
+            _ => RuntimeError::Io {
+                path: path.clone(),
+                message: error.to_string(),
+            },
         })?;
         let receipt: OfficialAssetReceipt = serde_json::from_slice(&bytes)
             .map_err(|error| RuntimeError::InvalidAssetReceipt(error.to_string()))?;

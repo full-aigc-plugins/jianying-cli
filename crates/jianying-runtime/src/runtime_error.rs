@@ -74,6 +74,8 @@ pub enum RuntimeError {
     AssetUsageNotAllowed(String),
     #[error("invalid official asset receipt: {0}")]
     InvalidAssetReceipt(String),
+    #[error("official asset receipt is not registered: {0}")]
+    AssetReceiptNotRegistered(String),
     #[error(
         "runtime ownership check failed for pid {0}; refusing to control an unverified process"
     )]

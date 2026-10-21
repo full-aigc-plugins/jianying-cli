@@ -86,6 +86,7 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
             jianying_runtime::RuntimeError::ControlUnavailable { .. } => "control_unavailable",
             jianying_runtime::RuntimeError::InvalidEntitlement(_) => "invalid_entitlement",
             jianying_runtime::RuntimeError::InvalidAssetReceipt(_) => "invalid_asset_receipt",
+            jianying_runtime::RuntimeError::AssetReceiptNotRegistered(_) => "asset_not_registered",
             jianying_runtime::RuntimeError::UnsupportedProduct { .. }
             | jianying_runtime::RuntimeError::UnsupportedVersion { .. }
             | jianying_runtime::RuntimeError::UnsupportedPlatform
@@ -95,7 +96,11 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
             jianying_runtime::RuntimeError::OwnershipMismatch(_) => "runtime_ownership_mismatch",
             _ => "runtime_error",
         };
-        let recovery = if error_type.starts_with("entitlement")
+        let recovery = if error_type == "asset_not_registered" {
+            vec![
+                "register the receipt first: `jianying media official register <receipt> --entitlement <evidence> --usage <usage>`".to_owned(),
+            ]
+        } else if error_type.starts_with("entitlement")
             || error_type.starts_with("asset_")
             || error_type == "invalid_entitlement"
             || error_type == "invalid_asset_receipt"

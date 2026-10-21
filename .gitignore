@@ -7,3 +7,5 @@ __pycache__/
 /dist/
 # 运行时任务日志（docs/job-lifecycle.md）：本地状态，不入库
 .jianying-jobs/
+# 运行时官方素材收据库（register/list/show 的本地状态），不入库
+.jianying-official-resources/

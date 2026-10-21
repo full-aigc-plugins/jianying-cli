@@ -223,6 +223,78 @@ fn professional_entitlement_and_resource_receipt_complete_a_cli_round_trip() {
 }
 
 #[test]
+fn preflight_of_an_unregistered_asset_names_the_asset_instead_of_an_io_error() {
+    // A missing receipt used to surface as "runtime I/O failed for <hashed store path>", which
+    // tells an operator nothing and suggests re-probing the runtime. It must name the asset.
+    let root = fixture_root("not-registered");
+    fs::create_dir_all(&root).unwrap();
+    let entitlement_path = root.join("entitlement.json");
+    fs::write(
+        &entitlement_path,
+        serde_json::to_vec(&serde_json::json!({
+            "schema_version":"jianying-entitlement/v1",
+            "edition":"professional",
+            "status":"active",
+            "source":"gui_observed",
+            "observed_at_epoch_seconds":1000,
+            "expires_at_epoch_seconds":9999,
+            "capabilities":["official_assets.professional"]
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    let store_root = root.join("store");
+    let requirements_path = root.join("requirements.json");
+    fs::write(
+        &requirements_path,
+        serde_json::to_vec(&serde_json::json!({
+            "schema_version":"jianying-official-resource-preflight/v1",
+            "requirements":[{
+                "asset_id":"never-registered",
+                "usage":"personal",
+                "resource":root.join("missing-resource.dat")
+            }]
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+
+    let output = run(&[
+        "--json",
+        "media",
+        "official",
+        "preflight",
+        requirements_path.to_str().unwrap(),
+        "--entitlement",
+        entitlement_path.to_str().unwrap(),
+        "--at",
+        "1500",
+        "--store-root",
+        store_root.to_str().unwrap(),
+    ]);
+    assert!(!output.status.success());
+    let envelope: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(envelope["error"]["type"], "asset_not_registered");
+    let message = envelope["error"]["message"].as_str().unwrap();
+    assert!(
+        message.contains("never-registered"),
+        "the message must name the asset: {message}"
+    );
+    assert!(
+        !message.contains("runtime I/O failed"),
+        "a missing receipt is not an I/O fault: {message}"
+    );
+    let recovery = envelope["error"]["recovery"].as_array().unwrap();
+    assert!(
+        recovery.iter().any(|item| item
+            .as_str()
+            .is_some_and(|text| text.contains("media official register"))),
+        "recovery must point at registering the receipt: {recovery:?}"
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn expired_professional_entitlement_fails_without_downgrade() {
     let root = fixture_root("expired");
     fs::create_dir_all(&root).unwrap();
