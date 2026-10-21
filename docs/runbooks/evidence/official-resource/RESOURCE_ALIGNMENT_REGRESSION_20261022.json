@@ -1,0 +1,16 @@
+{
+  "schema": "jianying-resource-alignment-regression/v1",
+  "observed_at": "2026-10-22T03:10+08:00",
+  "purpose": "confirm the resource-alignment series changed no wire output",
+  "checks": {
+    "parity_run": {
+      "result": "55 passed, 0 failed",
+      "report_byte_identical": true,
+      "sha256_prefix": "16d6bc9c1cfabee5"
+    },
+    "gen_catalogs_check": "up to date with the pinned upstream commit",
+    "check_provenance": "ok (includes the negative self-test path)",
+    "python_unittest": "release tools 41 + release runtime tests pass"
+  },
+  "why_it_matters": "the series touched catalog resolution (numeric ids), the transition alias, and a test seam; parity compares generated drafts against pyJianYingDraft scene by scene, so a byte-identical report is the evidence that those changes altered no wire output"
+}
