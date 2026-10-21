@@ -1,0 +1,103 @@
+{
+  "schema": "jianying-official-material-canary/v1",
+  "observed_at": "2026-10-21T17:10..17:18+08:00",
+  "editor": {
+    "product": "剪映专业版",
+    "version": "11.6.0.14552",
+    "account_seen_in_ui": "小汤圆的首部"
+  },
+  "owner_statement": "权益已生效 (the owner confirmed the professional entitlement is active)",
+  "what_was_done": [
+    "relaunched the editor and, at the owner's instruction, brought it to the foreground and kept it unobstructed",
+    "opened 官方素材 in the new draft 10月21日 and captured the panel",
+    "hovered a material and read the VIP badge, then previewed it (top bar: 正在预览 → 视频 · 可商用)",
+    "dragged that material onto the timeline; the clip appeared as 流星小仙女文字片头，人物图文 00:00:03:00 and the draft auto-saved",
+    "created a fresh draft with the CLI (jianying build ... --out <draft root>/material-canary), opened it in the editor and confirmed the CLI-authored text segment is visible there"
+  ],
+  "screenshots": [
+    {
+      "file": "31-official-materials-open.png",
+      "sha256": "020fd37cb1fbc01755e6c2aed9c2b0caf172112771d539ad75604f6525e2ad35",
+      "bytes": 794839,
+      "shows": "官方素材 panel: categories 热门/视频中国/通用/… and the banner 创意有风险，使用前请确保已获得相应版权"
+    },
+    {
+      "file": "32-material-hover.png",
+      "sha256": "85e7b242f81c46596cfa732ffbd1c333131d7ff2553ba2d3d2ebde27b0ac9668",
+      "bytes": 795295,
+      "shows": "hovering a material shows the blue V badge - the panel is selling VIP assets"
+    },
+    {
+      "file": "33-material-added.png",
+      "sha256": "2d1f16d5ae68d367f49de5aef0250a687afc377b1e458509a93414cb5544235f",
+      "bytes": 797543,
+      "shows": "the material previewing in the player, top bar reads 正在预览 → 视频 · 可商用"
+    },
+    {
+      "file": "34-material-dragged.png",
+      "sha256": "19e003034c24d32a9f50ed5bedb1955f3efd9b88199d63e77abc63f3568a3dd6",
+      "bytes": 854112,
+      "shows": "the material on the timeline as 流星小仙女文字片头，人物图文 00:00:03:00, draft 10月21日 auto-saving"
+    },
+    {
+      "file": "37-material-canary-open.png",
+      "sha256": "4de91baebce1c71bc65f64ed7320249a6c79c30f5ce6b76cbccb9e9100de8c36",
+      "bytes": 169005,
+      "shows": "CLI-built draft material-canary opened in the editor with its CLI text segment 官方素材联调"
+    },
+    {
+      "file": "39-official-material-on-cli-draft.png",
+      "sha256": "fb3abfd8fac51daf40340f3c8c0348beeb20d7acb571091eeca47e870634d421",
+      "bytes": 804017,
+      "shows": "官方素材 panel open inside the CLI-built draft"
+    },
+    {
+      "file": "41-material-added-to-canary.png",
+      "sha256": "18d6d105dce8868753cb2920d88349ccb7f0757c8b6b06e385cb1619115a60d9",
+      "bytes": 810438,
+      "shows": "the second drag inside material-canary produced no clip - only the editor's own card 卡顿提示 appeared; recorded as the failed attempt"
+    }
+  ],
+  "draft_encryption_finding": {
+    "summary": "剪映 encrypts the draft_content.json of drafts it creates itself; drafts created by the CLI stay plain JSON. This decides whether `jianying media official verify --draft` can read a draft at all.",
+    "observed": {
+      "10月21日 (editor-created, material added)": {
+        "bytes": 3832,
+        "plain_json": false,
+        "head": "E2c546X0dd5kydoYh01EdFbD"
+      },
+      "10月20日 (editor-created)": {
+        "bytes": 3832,
+        "plain_json": false,
+        "head": "5CEEf1RHHEE+gh8by+Dh"
+      },
+      "10月18日 (editor-created)": {
+        "bytes": 1048,
+        "plain_json": false,
+        "head": "c2E1Qa+ij02jWEYLlaiY"
+      },
+      "canary-template (CLI-created, later opened and edited in the editor)": {
+        "bytes": 4005,
+        "plain_json": true
+      },
+      "canary-11.6 (CLI-created)": {
+        "bytes": 2835,
+        "plain_json": true
+      },
+      "material-canary (CLI-created)": {
+        "bytes": 5397,
+        "plain_json": true
+      }
+    },
+    "consequence": "the draft-embedded receipt path works only for drafts the CLI wrote; the material taken in the editor landed in an editor-created (encrypted) draft, so no receipt can be built from it without decryption support"
+  },
+  "not_proven": [
+    "the licence terms of the material: the app only shows the banner 创意有风险，使用前请确保已获得相应版权 and the label 可商用 - no terms document was obtained",
+    "that the material survives export into a published video (no export was run for it)",
+    "that the VIP badge equals the CLI's professional tier for this exact asset",
+    "adding an official material into a CLI-created (plain) draft: two drag attempts in material-canary produced no clip"
+  ],
+  "hand_off": [
+    "extract one material into a plain draft, or teach the CLI to read the encrypted draft content, then 4.2's real receipt can be built"
+  ]
+}
