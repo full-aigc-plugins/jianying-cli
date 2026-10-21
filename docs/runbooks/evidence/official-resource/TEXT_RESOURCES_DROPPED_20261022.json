@@ -1,0 +1,37 @@
+{
+  "schema": "jianying-plan-text-resources-dropped/v1",
+  "observed_at": "2026-10-22T02:50+08:00",
+  "finding": "a plan text segment with `font` (name or numeric id) and `animation_in` (name or id) builds with exit 0, but the draft carries neither: the text material has no font field and materials contains only `texts`",
+  "probes": [
+    {
+      "input": "font=6841117833447870990 (id of 3D 만화)",
+      "exit": 0,
+      "draft_text_keys": "no font field"
+    },
+    {
+      "input": "font=3D 만화 (name)",
+      "exit": 0,
+      "draft_text_keys": "no font field"
+    },
+    {
+      "input": "animation_in={\"name\":\"7078181271393800711\"}",
+      "exit": 0,
+      "draft": "no animation"
+    },
+    {
+      "input": "animation_in={\"name\":\"冲屏位移\"}",
+      "exit": 0,
+      "draft": "no animation"
+    }
+  ],
+  "why_it_matters": "the same silent-drop class as the transition: the caller declares a font or an entrance animation, the build is green, and the draft simply has no such material - an automated edit cannot tell it failed",
+  "context": [
+    "the ids and names used here are real catalog entries with vip=false, so this is not a bad-input case",
+    "catalogs::resolve already accepts both forms after the resource-alignment fix, so the loss is after resolution",
+    "draft.rs resolves fonts at one site; the text-segment writer is the likely place where the value is not attached"
+  ],
+  "not_proven": [
+    "whether the font would be dropped for a different text-segment shape (styles/range)",
+    "whether the wire format expects the font as a separate material bucket rather than a text field"
+  ]
+}
