@@ -6,3 +6,5 @@
 *.toml text eol=lf
 *.yaml text eol=lf
 *.yml text eol=lf
+# 证据 fixture 的字节即身份（收据里记录 sha256），不能被换行转换改写
+*.dat binary

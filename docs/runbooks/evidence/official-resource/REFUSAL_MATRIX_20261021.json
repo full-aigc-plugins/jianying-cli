@@ -122,6 +122,10 @@
     ]
   },
   "fixtures": {
+    "REFUSAL_MATRIX_20261021.json": {
+      "sha256": "67c4f26fe1fac0bf59a23eee52c9b26c76d739ce01424740b57049bdf6d8c84e",
+      "bytes": 5750
+    },
     "ent-basic.json": {
       "sha256": "4c4e275d37abbd05097f9811aa1fba2ba141fb78de49fc520ad734ed71be2901",
       "bytes": 229
@@ -163,5 +167,6 @@
     "no real JianYing official asset was downloaded (that needs the professional entitlement)",
     "price files, government/licence authorisation and user-visible notices were not exercised: the receipt contract has no fields for them, so those parts of 4.2 still need the real account",
     "register/list/show were not exercised by this matrix"
-  ]
+  ],
+  "reproducible_from_the_repository": "the fixtures live next to this record and the matrix was re-run against those copies: 1 verified, 6 refused. .gitattributes marks *.dat binary so the resource bytes (which the receipts hash) survive a checkout on any platform."
 }
