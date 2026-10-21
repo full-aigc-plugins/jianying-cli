@@ -19,5 +19,10 @@
   "not_proven": [
     "that a sticker placed by hand in the editor would be harvestable - it would be encrypted too",
     "that the add path produces a catalogue usable by the generator; it was not exercised end to end here"
-  ]
+  ],
+  "follow_up_2026_10_22": {
+    "add_path_probe": "media harvest-enums add sticker demo-sticker … was refused: \"unknown or id-only kind \\\"sticker\\\"; writable kinds: video_effects, filters, transitions, masks, audio_effects\". So the add command cannot register a sticker id either - the previous note in the sticker skill was wrong and has been corrected.",
+    "add_path_works_for_supported_kinds": "media harvest-enums add transitions demo-transition 7296357486490144036 --apply wrote a catalogue with one entry (kind/slug/name/resource_id/harvested_from=manual), so the registration mechanism itself works for the five supported kinds.",
+    "conclusion": "there is currently no supported path to register a sticker id: sync cannot read the encrypted editor drafts, and add does not accept the sticker kind. The job path therefore only shape-checks sticker ids."
+  }
 }
