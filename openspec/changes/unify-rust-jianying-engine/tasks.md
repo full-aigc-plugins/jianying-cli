@@ -46,6 +46,13 @@
   - 完成（2026-09-22）：固定 pyJianYingDraft `c3318066` 的 8 类长短策略与文字样式观察值进入 `PYJYD_TEMPLATE_DIFFERENTIALS.json`；Rust 按相同顺序执行裁头、裁尾、裁尾对齐、居中收缩、向前/向后延长、推动后续和截断素材尾部。文字替换使用 UTF-16 码元比例重算并记录相对 Python code-point 的获准增强差异。
   - 按片段替换会拆分共享素材身份并通过 `MutationPlan` 原子提交；失败黑盒证明草稿字节和素材文件数均不变。轨道导入递归收集普通字段和 JSON 字符串中的素材引用，重映射轨道/片段/素材 ID、复制本地文件且保留无关 JSON 原文；删除源草稿后目标仍通过 bundle 校验。
 - [ ] 4.12 将 pyJianYingDraft 四个 `partial` 提升为有差分和真实剪映证据的 `supported`；CI 必须拒绝完成声明与 parity 状态不一致
+      *2026-10-21 核实 4.12 为何不能勾*：四条 `partial`（`typed-timeline-authoring`、`project-domain`、
+      `track-domain`、`segment-domain`）的 `gap` 都写成同一种句式——「实现已完成，**只剩真实编辑器里的最终提升**」，
+      `blocking_tasks` 全指向 `4.12`。而 `tools/check_provenance.py::validate_pyjianyingdraft_completion`
+      会强制：只要还有 partial，pyJYD 完成声明必须是 `incomplete`，且每个 partial 引用的 blocking task
+      **必须是未勾状态**。已做反证——把 4.12 临时勾上，门禁立刻失败：
+      `partial pyJianYingDraft row typed-timeline-authoring does not reference an open task: 4.12`；恢复后 exit 0。
+      也就是说这条任务**在结构上**要等真实剪映证据，不是缺一条断言。
 
 ## 5. 领域命令树与机器契约
 
