@@ -78,6 +78,14 @@
     证据：`docs/runbooks/evidence/windows-canary/OFFICIAL_MATERIAL_20261021.json`（6 张截图带 sha256）。
     **仍未勾**：没有拿到该素材的授权条款文本（应用只给横幅与“可商用”标签），也没有导出成片证明可发布。
 - [ ] 4.2 用发布 Rust CLI 验证收据并编译真实草稿，证明篡改文件、过期权益和用途冲突均被拒绝。
+  - *2026-10-22 真实素材链路跑通，且**全程无需人工***：编辑器在 10-21 会话里已把素材下载到
+    `User Data\Cache\onlineMaterial\2d89c299….mp4`（220,485 B，h264 1022x662@60，1.8 s）。
+    CLI 用 `media add-video` 把这份**真实素材**复制进自己建的明文草稿 `auto-canary`（字节一致），
+    生成 `downloaded_file` 收据（sha256 `107e163d…`）→ `verify` **verified** → `register` **registered** →
+    `list` 1 条 → `preflight` **ready**。面板标注的 `不可商用` 由契约强制：`--usage commercial` →
+    `asset_use_denied: official asset usage is not allowed: commercial`。
+    证据：`docs/runbooks/evidence/official-resource/REAL_ASSET_CHAIN_20261022.json`。
+    **仍未勾**：授权条款文本只有面板标签，不是条款文件；且编辑器内的播放/导出未验证（见 4.3）。
   - *2026-10-21 全链路往返已跑通（4.2 仍未勾）*：新增 `tools/official_receipt_roundtrip.py`，用发布二进制
     建真实草稿 → 生成 `draft_resource` 收据 → `verify`（verified）→ `register`（registered）→ `show` →
     `list`（恰好 1 条）→ `preflight`（ready），再跑三个负例：未注册素材 `asset_not_registered`、
@@ -99,6 +107,10 @@
     **仍缺**：真实官方素材下载、价格文件/政府授权/用户可见提示（收据契约里没有这三类字段），以及 register/list/show。
     合成 fixture 在自身 `title` 里写明“synthetic fixture (not a real asset)”，不会被误当真实素材。
 - [ ] 4.3 在真实剪映完成冷重开、连续播放和原生导出，独立验证媒体流、时长、画面、音轨与来源归属。
+  - *2026-10-22 真实素材已进明文草稿*：`auto-canary` 里有 `videos/2af5bdc4…`（源缓存文件同 sha256），
+    该草稿由 CLI 建、未被编辑器写过，因此仍是明文，收据链可用。**编辑器内播放/导出**仍未做：
+    一旦用剪映打开，保存后草稿会被加密（`material-canary` 已从 1767 B 明文变成 2892 B 加密），
+    所以观察必须用副本，并接受“观察完即加密”这一事实。
   - *2026-10-21 漂移现在会被点名（CLI 行为改进）*：编辑器保存会换掉草稿/素材/片段 id，收据因此找不到节点，
     以前只报 `official draft resource is missing or ambiguous: … matched 0 nodes`——把责任推给调用方的
     resource id。现在 `verify_draft` 会同时读草稿摘要：如果摘要也不一致，就报新错误 `DraftContentChanged`，

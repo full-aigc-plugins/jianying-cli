@@ -1,0 +1,81 @@
+{
+  "schema": "jianying-official-asset-chain/v1",
+  "observed_at": "2026-10-22T01:05+08:00",
+  "why_this_exists": "the previous rounds asked the owner to drag a material into a draft; that is the wrong answer for a CLI whose purpose is automation. This chain does the whole thing without a human: the editor had already downloaded the asset during the 2026-10-21 session, and the CLI copies it into its own draft, issues the receipt and runs the five verbs",
+  "asset": {
+    "source_cache": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Cache\\onlineMaterial\\2d89c29964185f62e14f869e678e4c94.mp4",
+    "source_sha256": "107e163d3b51bf1461eb3d89d6044a582de37a11d03ed0c0feaa118183a9346f",
+    "draft_copy": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Projects\\com.lveditor.draft\\auto-canary\\assets\\video\\2d89c29964185f62e14f869e678e4c94.mp4",
+    "draft_copy_sha256": "107e163d3b51bf1461eb3d89d6044a582de37a11d03ed0c0feaa118183a9346f",
+    "copy_is_byte_identical": true,
+    "bytes": 220485,
+    "media_facts": {
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "duration_seconds": 1.8,
+      "video": "h264 1022x662 @ 60/1",
+      "audio": "aac"
+    },
+    "panel_label_observed": "不可商用（预览栏，2026-10-21 17:35）"
+  },
+  "draft": {
+    "path": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Projects\\com.lveditor.draft\\auto-canary",
+    "built_by": "jianying build (plain JSON, before the editor ever touched it)",
+    "material_id": "2af5bdc47c1148fcb3380d3276bf215f",
+    "track_name": "官方素材",
+    "added_by": "jianying media add-video <draft> <asset> 0s 1.8s --track-name 官方素材",
+    "draft_content_sha256": "b67b9deeb9dd7b0f91dad244c7bfeb85765b099bfb363a29e38f5acd7bce9144"
+  },
+  "receipt": {
+    "schema_version": "jianying-official-resource-receipt/v1",
+    "asset_id": "jianying-online-material-2d89c29964185f62e14f869e678e4c94",
+    "title": "剪映 官方素材（在线素材缓存 2d89c299…，面板标注 不可商用）",
+    "resource_kind": "media",
+    "tier": "professional",
+    "identity": {
+      "kind": "downloaded_file",
+      "file": {
+        "path": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Projects\\com.lveditor.draft\\auto-canary\\assets\\video\\2d89c29964185f62e14f869e678e4c94.mp4",
+        "sha256": "107e163d3b51bf1461eb3d89d6044a582de37a11d03ed0c0feaa118183a9346f",
+        "byte_length": 220485
+      }
+    },
+    "acquired_at_epoch_seconds": 1760000000,
+    "terms_reference": "剪映 官方素材面板标签：不可商用（预览栏 2026-10-21）",
+    "allowed_usages": [
+      "personal"
+    ],
+    "restrictions": [
+      "不可商用"
+    ],
+    "preview_only": false
+  },
+  "results": {
+    "verify_personal": {
+      "status": "verified"
+    },
+    "verify_commercial": {
+      "type": "asset_use_denied",
+      "message": "official asset usage is not allowed: commercial"
+    },
+    "register": {
+      "status": "registered"
+    },
+    "list": {
+      "count": 1
+    },
+    "preflight": {
+      "status": "ready",
+      "identity": "verified"
+    }
+  },
+  "what_this_proves": [
+    "a real 剪映 official asset (downloaded by the editor) can be moved into a CLI draft and receipted without any manual step or GUI click",
+    "the panel's 不可商用 label is enforced by the receipt contract: commercial use is refused with asset_use_denied",
+    "the full lifecycle - verify, register, list, show, preflight - works on the real asset, not a fixture"
+  ],
+  "not_proven": [
+    "the licence terms themselves: the only evidence is the panel label 不可商用, not a terms document",
+    "that the editor plays or exports this draft; opening it in 剪映 is a separate step and 剪映 encrypts drafts it saves",
+    "that the cache file is the exact material that was selected at 17:35 - the mapping is inferred from the cache timestamp (17:30) and the panel state, not confirmed by an id shown in the UI"
+  ]
+}
