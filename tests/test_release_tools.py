@@ -1080,3 +1080,59 @@ class ResourceSkillsMatchTheCatalogs(unittest.TestCase):
                 self.assertRegex(cells[0], r"^`[0-9]{6,}`$", f"{table}: {row[:80]}")
                 checked += 1
         self.assertGreater(checked, 3000, f"only {checked} rows checked")
+
+
+class PlanResourceLint(unittest.TestCase):
+    """`tools/plan_resource_lint.py`：编号不存在、VIP 无权益、时间越界都要被拦住。"""
+
+    def _run(self, document, *extra):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "plan.json"
+            path.write_text(json.dumps(document, ensure_ascii=False), encoding="utf-8", newline="\n")
+            return subprocess.run(
+                [sys.executable, str(ROOT / "tools" / "plan_resource_lint.py"), str(path), *extra],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+
+    def _plan(self, resource_id, **segment):
+        body = {"material_id": "m1", "start_us": 0, "duration_us": 2_000_000}
+        body.update(segment)
+        if resource_id is not None:
+            body["transition"] = {"resource_id": resource_id, "duration_us": 500_000}
+        return {"schema": "jianying-cli-plan/v1", "name": "lint",
+                "tracks": [{"type": "video", "segments": [body]}]}
+
+    def test_known_stock_transition_passes(self):
+        completed = self._run(self._plan("6724845717472416269"))
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertIn("ok", completed.stdout)
+
+    def test_unknown_id_is_reported_with_its_json_path(self):
+        completed = self._run(self._plan("9999999999999999999"))
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("unknown_id", completed.stdout)
+        self.assertIn("$.tracks[0].segments[0].transition.resource_id", completed.stdout)
+
+    def test_vip_id_without_professional_entitlement_is_reported(self):
+        completed = self._run(self._plan("7448898555617481225"))
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("vip_without_entitlement", completed.stdout)
+
+    def test_vip_id_with_professional_entitlement_passes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            evidence = Path(tmp) / "ent.json"
+            evidence.write_text(json.dumps({
+                "schema_version": "jianying-entitlement/v1", "edition": "professional", "status": "active",
+                "source": "gui_observed", "observed_at_epoch_seconds": 1_760_000_000,
+                "expires_at_epoch_seconds": 1_760_000_000 + 86_400,
+                "capabilities": ["official_assets.professional"],
+            }), encoding="utf-8", newline="\n")
+            completed = self._run(self._plan("7448898555617481225"), "--entitlement", str(evidence))
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
+    def test_negative_start_and_zero_duration_are_reported(self):
+        completed = self._run(self._plan(None, start_us=-5, duration_us=0))
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("negative_start", completed.stdout)
+        self.assertIn("non_positive_duration", completed.stdout)
+        self.assertIn("$.tracks[0].segments[0]", completed.stdout)

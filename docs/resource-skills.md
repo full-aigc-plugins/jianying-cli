@@ -68,3 +68,20 @@
 python tools/gen_resource_skills.py           # 写入
 python tools/gen_resource_skills.py --check   # CI 用：不一致就失败
 ```
+
+## 执行前的一道闸：`plan_resource_lint`
+
+规划出来的 action 不能直接扔进执行器。`tools/plan_resource_lint.py` 在计划与执行之间做三件事：
+
+```bash
+python tools/plan_resource_lint.py plan.json --entitlement evidence.json --json
+```
+
+| 检查 | 命中时 |
+| --- | --- |
+| 编号是否存在 | `unknown_id`（带 JSON 路径，例如 `$.tracks[0].segments[0].transition.resource_id`） |
+| VIP 素材是否有专业权益 | `vip_without_entitlement`（没传 `--entitlement` 时按无权益处理） |
+| 时间字段是否合理 | `negative_start` / `non_positive_duration` |
+
+索引来自 `catalogs/`，当前可解析 **4529 个 resource_id / 4541 个 effect_id**。退出码 0 表示这份计划可以交给执行器；
+它不是只读草稿校验的替代品，只是把“素材选错”这类问题挡在执行之前。
