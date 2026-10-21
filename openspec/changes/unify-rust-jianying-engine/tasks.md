@@ -194,6 +194,8 @@
         55 fixtures、各类差分计数与 `migration_rollback: passed`）。
       **本机无法复核**：media analysis / media mutation 两个差分（harness 用 `#!/bin/sh` 脚本冒充 ffmpeg，
       Windows 报 os error 193）；`release-artifacts.yml` 的签名/公证链路（需 macOS + 证书）。
+      *2026-10-21 release-artifacts.yml 的可本机部分*：用 CI 的身份变量（`JIANYING_BUILD_CONTRACT_STATE=committed_unreleased`、`RELEASE_REF=`、`SOURCE_COMMIT=<HEAD>`）重建 release 二进制后，`tools/generate_sbom.py` 产出 **237 个 package** 的 SPDX SBOM；`tools/package_release.py --platform win32-x64` 产出 `jianying-cli-1.7.0-win32-x64.zip`（8,385,794 B）、sha256 sidecar 自校验通过、`release-entry.json` 带内容状态/发布引用/二进制与 SBOM 摘要；压缩包内含二进制、LICENSE、SBOM、SHA256SUMS、THIRD_PARTY_NOTICES、manifest.json、CAPABILITIES.json 与 6 个 schema。三平台 release index 只有单平台时**按设计拒绝**（exactly one entry for each supported platform），属 CI 组装步骤。
+      *再补一条证据*：`parity_run.py --report` 的报告与 `provenance/PARITY_RUN.json` **逐字节相同**（本地 cmp 通过），并在 `tests/test_release_tools.py` 加了两个守卫——provenance 证据必须是 LF、八条 cmp 门禁的写入器必须显式 `newline="\n"`；守卫在人为去掉 flag 时确实变红（已验证后恢复）。
       *2026-10-20 本机复跑（非 mac/真机部分）*：`python tools/parity_run.py --bin target/release/jianying.exe
       --pyjyd-src <checkout>/pyJianYingDraft` → **55 passed / 0 failed**（对照 pyJYD 6bb2d06）；
       `python tools/gen_catalogs.py <checkout>/pyJianYingDraft --check` → **catalogs up to date**；
