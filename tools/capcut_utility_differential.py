@@ -14,12 +14,24 @@ PINNED = "49f70e3b07f1a236d45acb9b49a70c141dd1ee98"
 
 
 def invoke(argv: list[str]) -> str:
-    process = subprocess.run(argv, capture_output=True, check=False)
-    # 固定上游会在约 128 KiB 处截断部分枚举 JSON；截断点可能落在 UTF-8
-    # 多字节字符中间。先以替换模式解码，让下游的“已批准上游截断”分支按
-    # 固定 src/enums.json 复核内容，而不是由 Python 在 JSON 校验前随机崩溃。
-    stdout = process.stdout.decode("utf-8", errors="replace")
-    stderr = process.stderr.decode("utf-8", errors="replace")
+    """Run a CLI and return its stdout.
+
+    stdout goes to a file rather than a pipe. The pinned upstream writes a large JSON
+    document with console.log and exits immediately, and on macOS a piped write is cut off
+    at the 64 KiB pipe buffer - the same invocation then produced a truncated document on
+    one platform and a complete one on the other, which made this report impossible to
+    compare with `cmp`. A regular file has no such limit, so every platform now sees the
+    same bytes.
+    """
+    with tempfile.NamedTemporaryFile(prefix="capcut-utility-", suffix=".out", delete=False) as handle:
+        capture = pathlib.Path(handle.name)
+    try:
+        with capture.open("wb") as sink:
+            process = subprocess.run(argv, stdout=sink, stderr=subprocess.PIPE, check=False)
+        stdout = capture.read_bytes().decode("utf-8", errors="replace")
+        stderr = process.stderr.decode("utf-8", errors="replace")
+    finally:
+        capture.unlink(missing_ok=True)
     if process.returncode != 0:
         raise RuntimeError(
             f"command failed ({process.returncode}): {argv!r}\n"

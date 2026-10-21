@@ -450,23 +450,20 @@ def validate_capcut_utility_differentials(source_manifest: dict, report: dict) -
     }
     if actual_enums != expected_enums or len(enum_cases) != len(actual_enums):
         raise GateError("capcut utility differential enum coverage is incomplete")
-    allowed_enum_statuses = {"exact", "approved-upstream-stdout-truncation"}
-    if any(
-        case.get("status") not in allowed_enum_statuses or not case.get("evidence")
+    # The harness captures the upstream document in a file, so a truncated document is no
+    # longer something to approve - it means the capture path regressed on this platform.
+    truncated = [
+        f"{case.get('namespace')}/{case.get('category')}"
         for case in enum_cases
-    ):
+        if case.get("status") != "exact"
+    ]
+    if truncated:
+        raise GateError(
+            "capcut utility enum differential did not compare a complete upstream document: "
+            + ", ".join(sorted(truncated))
+        )
+    if any(not case.get("evidence") for case in enum_cases):
         raise GateError("capcut utility enum differential lacks valid evidence")
-    approved = {
-        (case.get("namespace"), case.get("category"))
-        for case in enum_cases
-        if case.get("status") == "approved-upstream-stdout-truncation"
-    }
-    if approved != {
-        ("jianying", "transitions"),
-        ("jianying", "scene_effects"),
-        ("jianying", "filters"),
-    }:
-        raise GateError("capcut utility enum approved differences drifted")
     harvest_cases = [case for case in cases if case.get("command") == "harvest-enums"]
     if {(case.get("mode"), case.get("status")) for case in harvest_cases} != {
         ("scan", "semantic-command-map"),

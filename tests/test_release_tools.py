@@ -49,12 +49,26 @@ UTILITY_SPEC.loader.exec_module(UTILITY)
 
 class ReleaseIndexTests(unittest.TestCase):
     def test_capcut_utility_runner_survives_upstream_mid_codepoint_truncation(self) -> None:
-        truncated = subprocess.CompletedProcess([], 0, b'[{"name":"\xe4\xb8', b"")
-        with patch.object(UTILITY.subprocess, "run", return_value=truncated) as run:
+        """A document cut inside a UTF-8 sequence must decode with a replacement, not raise.
+
+        The runner captures stdout in a file rather than a pipe, so the fake run writes
+        into the sink it is handed - that also proves the sink is a real file.
+        """
+        written = []
+
+        def fake_run(argv, stdout=None, stderr=None, check=False):
+            self.assertIsNotNone(stdout, "stdout must be redirected to a file")
+            self.assertNotIsInstance(stdout, int)
+            stdout.write(b'[{"name":"\xe4\xb8')
+            written.append(True)
+            return subprocess.CompletedProcess(argv, 0, b"", b"")
+
+        with patch.object(UTILITY.subprocess, "run", side_effect=fake_run) as run:
             output = UTILITY.invoke(["node", "dist/index.js", "enums"])
 
         self.assertEqual(output, '[{"name":"\ufffd')
-        self.assertTrue(run.call_args.kwargs["capture_output"])
+        self.assertEqual(written, [True])
+        self.assertNotIn("capture_output", run.call_args.kwargs)
         self.assertNotIn("text", run.call_args.kwargs)
 
     def test_release_packager_decodes_binary_output_as_utf8(self) -> None:

@@ -126,8 +126,8 @@
       "command": "enums",
       "namespace": "jianying",
       "category": "transitions",
-      "status": "approved-upstream-stdout-truncation",
-      "evidence": "upstream exits zero after truncating piped JSON at 65536 bytes; Rust entries and order equal the same pinned src/enums.json"
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
     },
     {
       "command": "enums",
@@ -182,8 +182,8 @@
       "command": "enums",
       "namespace": "jianying",
       "category": "scene_effects",
-      "status": "approved-upstream-stdout-truncation",
-      "evidence": "upstream exits zero after truncating piped JSON at 65536 bytes; Rust entries and order equal the same pinned src/enums.json"
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
     },
     {
       "command": "enums",
@@ -210,8 +210,8 @@
       "command": "enums",
       "namespace": "jianying",
       "category": "filters",
-      "status": "approved-upstream-stdout-truncation",
-      "evidence": "upstream exits zero after truncating piped JSON at 65536 bytes; Rust entries and order equal the same pinned src/enums.json"
+      "status": "exact",
+      "evidence": "fixed-upstream CLI entries and order"
     },
     {
       "command": "enums",
