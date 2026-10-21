@@ -503,6 +503,10 @@ fn render_impl(
         "audio_segments_mixed": if has_audio { aidx - input_idx } else { 0 },
         "captions_burned": if burn_captions { drawtext.len() } else { 0 },
         "caption_font_file": caption_font,
+        // 机读的限制说明：只在 note 里写一句人话，调用方无法据此判断“这次渲染漏了什么”。
+        "unsupported_features": ["transition", "effect", "mask"],
+        "preview_approximations": ["background_blur"],
+        "truth_source": "jianying_native_export",
     }))
 }
 
