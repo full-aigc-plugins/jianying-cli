@@ -815,5 +815,72 @@ class CommittedEvidenceNewlines(unittest.TestCase):
         self.assertEqual(offenders, [], "these cmp-gated writers do not force LF")
 
 
+
+class ListingSeamHygiene(unittest.TestCase):
+    """Everything that writes a draft has to declare which editor processes exist.
+
+    `store::editors_running_checked` treats an unreadable listing as an error, so a helper
+    that points JIANYING_CLI_PROCESS_LIST at a path nobody creates stops every write path it
+    drives. That failure mode is silent on read-only commands, which is how seven callers
+    drifted into it once already. The fixture is the normal seam; the files below build their
+    own synthetic listing (and say why) instead.
+    """
+
+    SELF = "tests/test_release_tools.py"
+    FIXTURE_FRAGMENT = "empty-processes.txt"
+    SELF_CREATED = {
+        # builds a temp listing inside the test and writes it before use
+        "tests/agent_contract.rs": "writes its own listing to prove a running editor is detected",
+        "tests/eval_loop_contract.rs": "empty_process_listing() creates a temp file",
+        "tests/integration.rs": "sets the seam in-process after writing the file",
+        "tests/ops_behavior.rs": "sets the seam in-process after writing the file",
+        "tests/path_equivalence.rs": "empty_process_listing() creates a temp file",
+        "tests/pipeline_contract.rs": "empty_process_listing() creates a temp file",
+        "tests/resource_cli_contract.rs": "empty_process_listing() creates a temp file",
+    }
+
+    def seam_users(self):
+        for base in ("tools", "tests"):
+            for path in sorted((ROOT / base).rglob("*")):
+                if not path.is_file() or path.suffix not in {".py", ".rs", ".mjs"}:
+                    continue
+                relative = str(path.relative_to(ROOT)).replace("\\", "/")
+                if relative == self.SELF:
+                    continue
+                text = path.read_text(encoding="utf-8", errors="ignore")
+                if "JIANYING_CLI_PROCESS_LIST" in text:
+                    yield relative, text
+
+    def test_every_seam_user_uses_the_fixture_or_declares_its_own_listing(self):
+        offenders = []
+        for relative, text in self.seam_users():
+            if relative in self.SELF_CREATED:
+                continue
+            if self.FIXTURE_FRAGMENT in text:
+                continue
+            offenders.append(relative)
+        self.assertEqual(
+            offenders,
+            [],
+            "these files set the seam without the fixture: use "
+            "tests/fixtures/empty-processes.txt, or add an entry to SELF_CREATED saying "
+            "how the file gets its own listing",
+        )
+
+    def test_the_committed_fixture_exists_and_is_empty(self):
+        fixture = ROOT / "tests" / "fixtures" / "empty-processes.txt"
+        self.assertTrue(fixture.is_file(), "the empty listing fixture must exist")
+        self.assertEqual(fixture.read_bytes(), b"", "the fixture must stay empty")
+
+    def test_the_fixture_is_the_normal_path(self):
+        users = list(self.seam_users())
+        self.assertGreater(len(users), 40, f"expected many seam users, saw {len(users)}")
+        with_fixture = [name for name, text in users if self.FIXTURE_FRAGMENT in text]
+        self.assertGreaterEqual(
+            len(with_fixture), len(users) - len(self.SELF_CREATED),
+            f"unexpected split: {len(with_fixture)} of {len(users)}",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

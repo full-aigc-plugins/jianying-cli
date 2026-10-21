@@ -173,7 +173,13 @@ pub fn editors_running() -> Vec<String> {
 /// Write paths use this so a wedged `tasklist` cannot be mistaken for a safe moment
 /// to rewrite a draft the user may have open in the editor.
 pub fn editors_running_checked() -> Result<Vec<String>> {
-    let text = process_listing().ok_or_else(|| {
+    editors_from_listing(process_listing())
+}
+
+/// The fail-closed rule in one place: an absent listing is an error, an empty listing is
+/// not. Kept separate from the platform command so it can be tested on every platform.
+fn editors_from_listing(listing: Option<String>) -> Result<Vec<String>> {
+    let text = listing.ok_or_else(|| {
         anyhow::anyhow!(
             "cannot tell whether JianYing/CapCut is running: the process listing did not \
              answer within {}s; close the editor or retry",
@@ -663,4 +669,38 @@ pub fn remove(root: &Path, name: &str) -> Result<Value> {
         std::fs::write(&root_meta_path, serde_json::to_string_pretty(&root_meta)?)?;
     }
     Ok(json!({"status": "removed", "name": name}))
+}
+
+/// Cross-platform: the distinction between "no editor" and "cannot tell" is the whole
+/// point of the fail-closed rule, and it must not depend on the platform command.
+#[cfg(test)]
+mod listing_tests {
+    #[test]
+    fn a_missing_listing_is_an_error_that_names_the_editor_and_the_deadline() {
+        let error = super::editors_from_listing(None).expect_err("a missing listing must fail");
+        let message = error.to_string();
+        assert!(
+            message.contains("cannot tell whether JianYing/CapCut is running"),
+            "{message}"
+        );
+        assert!(message.contains("close the editor or retry"), "{message}");
+    }
+
+    #[test]
+    fn an_empty_listing_means_no_editor_is_running() {
+        let found =
+            super::editors_from_listing(Some(String::new())).expect("an empty listing is fine");
+        assert!(found.is_empty(), "{found:?}");
+    }
+
+    #[test]
+    fn a_listing_that_names_the_editor_is_reported() {
+        let listing = if cfg!(windows) {
+            "Image Name,Session#\nJianyingPro.exe,1\nCapCut.exe,2\n".to_owned()
+        } else {
+            "/Applications/CapCut.app/Contents/MacOS/CapCut\n".to_owned()
+        };
+        let found = super::editors_from_listing(Some(listing)).expect("a readable listing is fine");
+        assert!(!found.is_empty(), "the editor must be reported");
+    }
 }
