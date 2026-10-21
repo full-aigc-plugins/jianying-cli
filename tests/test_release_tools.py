@@ -1136,3 +1136,47 @@ class PlanResourceLint(unittest.TestCase):
         self.assertIn("negative_start", completed.stdout)
         self.assertIn("non_positive_duration", completed.stdout)
         self.assertIn("$.tracks[0].segments[0]", completed.stdout)
+
+
+class PlanResourceLintDrafts(unittest.TestCase):
+    """`--draft` 模式：明文草稿要能核对，加密草稿要明确报出而不是抛解析错。"""
+
+    def _lint(self, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "plan_resource_lint.py"), *args],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+
+    def test_plain_draft_with_known_ids_passes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = Path(tmp) / "draft"
+            draft.mkdir()
+            (draft / "draft_content.json").write_text(json.dumps({
+                "materials": {"masks": [{"name": "线性", "resource_id": "6791652175668843016"}]},
+                "tracks": [],
+            }), encoding="utf-8", newline="\n")
+            completed = self._lint("--draft", str(draft))
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertIn("ok", completed.stdout)
+
+    def test_unknown_id_in_a_draft_is_reported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = Path(tmp) / "draft"
+            draft.mkdir()
+            (draft / "draft_content.json").write_text(json.dumps({
+                "materials": {"masks": [{"name": "x", "resource_id": "9999999999999999999"}]},
+                "tracks": [],
+            }), encoding="utf-8", newline="\n")
+            completed = self._lint("--draft", str(draft))
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("unknown_id", completed.stdout)
+
+    def test_encrypted_draft_is_named_not_parsed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = Path(tmp) / "draft"
+            draft.mkdir()
+            (draft / "draft_content.json").write_bytes(b"E2c546X0dd5kydoYh01EdFbD+ab/cd==")
+            completed = self._lint("--draft", str(draft))
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("draft_content_encrypted", completed.stdout)
+        self.assertNotIn("Traceback", completed.stderr)

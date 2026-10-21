@@ -9,6 +9,7 @@ walks a plan or job document for `resource_id` / `effect_id` fields and answers 
   3. are the time fields sane (start >= 0, duration > 0)?
 
     python tools/plan_resource_lint.py plan.json [--entitlement evidence.json] [--json]
+    python tools/plan_resource_lint.py --draft <draft dir> [--json]
 
 Exit code 0 means every id resolved and no timing defect was found; 1 means at least one problem.
 Nothing here mutates a draft or contacts the editor.
@@ -23,7 +24,12 @@ CATALOGS = ROOT / "catalogs"
 
 RESOURCE_KEYS = {"resource_id", "material_resource_id", "resourceId"}
 # 只有这些父字段的编号在内嵌目录里；其余（如 text_effect 花字）目录未覆盖，不能判死
-CATALOGUED_PARENTS = {"transition", "filter", "effect", "sticker", "video_effect", "audio_effect"}
+CATALOGUED_PARENTS = {
+    "transition", "filter", "effect", "sticker", "video_effect", "audio_effect",
+    # 草稿里的素材桶名
+    "masks", "fonts", "material_animations", "video_animations", "text_animations",
+    "mix_modes", "effects", "transitions", "filters",
+}
 EFFECT_KEYS = {"effect_id", "effectId"}
 VIP_CAPABILITY = "official_assets.professional"
 
@@ -100,10 +106,27 @@ def timed_spans(document, path="$"):
             yield from timed_spans(child, f"{path}[{i}]")
 
 
+def lint_draft(directory, by_resource, by_effect, capabilities):
+    """读取一个草稿目录，核对里面的资源引用；加密草稿要明确报告而不是抛解析错。"""
+    content = Path(directory) / "draft_content.json"
+    if not content.is_file():
+        return [{"kind": "draft_missing_content", "path": str(content)}]
+    raw = content.read_bytes()
+    try:
+        document = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        stripped = raw.lstrip()
+        if stripped and all(chr(b).isalnum() or chr(b) in "+/=:\r\n" for b in stripped[:64]):
+            return [{"kind": "draft_content_encrypted", "path": str(content)}]
+        return [{"kind": "draft_content_unreadable", "path": str(content)}]
+    return lint(document, by_resource, by_effect, capabilities)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("documents", nargs="+", help="plan or job JSON files")
+    parser.add_argument("documents", nargs="*", help="plan or job JSON files")
     parser.add_argument("--entitlement", help="entitlement evidence JSON; without it VIP ids are flagged")
+    parser.add_argument("--draft", action="append", default=[], help="draft directory to lint instead of a plan")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
@@ -115,6 +138,10 @@ def main():
         return [f for f in findings if f["kind"] != "unverified_id"]
 
     results = []
+    for name in args.draft:
+        findings = lint_draft(name, by_resource, by_effect, capabilities)
+        results.append({"document": name, "findings": findings, "ok": not blocking(findings)})
+
     for name in args.documents:
         path = Path(name)
         try:
