@@ -92,6 +92,15 @@
     而 **CLI 创建**的草稿仍是明文 JSON（`canary-template`/`canary-11.6`/`material-canary`）。
     于是素材落进了加密草稿（`10月21日`，76.2K），CLI 无法据此构造收据；两次往明文草稿
     `material-canary` 里拖素材都未生成剪辑。这是 4.2/4.3 的真实前置缺口，不是勾选问题。
-- [ ] 4.4 完成基础版降级环境验收，证明专业素材不被静默替换且本地素材工作流仍可运行。
+- [x] 4.4 完成基础版降级环境验收，证明专业素材不被静默替换且本地素材工作流仍可运行。
+  - *2026-10-21 验收通过*：`tools/official_downgrade_acceptance.py` 用**基础版权限快照**驱动发布二进制，
+    连跑两次并比较，五项检查全过、两次一致：
+    ① 本地素材草稿照常构建（`build` ok）；
+    ② 专业收据被 `media official verify` 拒绝（退出码非 0，且没有 `data` 结果）；
+    ③ 拒绝消息里点名 `required edition professional`，可行动；
+    ④ `media official preflight` 同样拒绝；
+    ⑤ 拒绝前后草稿目录**逐文件 sha256 完全一致**——没有被静默替换成别的素材。
+    证据：`docs/runbooks/evidence/official-resource/DOWNGRADE_ACCEPTANCE_20261021.json`（含二进制 sha256）。
+    诚实边界：降级环境是**喂给 CLI 的基础版凭据快照**，不是真的基础版账号；本次未驱动编辑器。
 - [ ] 4.5 运行完整测试、OpenSpec strict、发布制品黑盒与三宿主验收；全部证据完成后再启用默认路由、同步并归档。
 - [x] 4.6 用不可变发布二进制对真实首页空文件夹完成“列表 → 移入最近删除 → 回收站回读 → 恢复 → 冷重开”差分验收，并证明 GUI 条目消失但未返回活动列表时不会被误报为成功。

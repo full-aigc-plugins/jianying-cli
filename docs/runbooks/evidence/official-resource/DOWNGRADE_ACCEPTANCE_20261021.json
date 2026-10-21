@@ -1,0 +1,77 @@
+{
+  "schema": "jianying-basic-edition-acceptance/v1",
+  "observed_at": "2026-10-21",
+  "task": "4.4 基础版降级环境验收：专业素材不被静默替换，且本地素材工作流仍可运行",
+  "how": "tools/official_downgrade_acceptance.py drives the release binary end to end with a basic-edition entitlement snapshot, a professional receipt and a local-material plan, twice, and compares the two runs",
+  "binary": {
+    "path": "target/release/jianying.exe",
+    "sha256": "6aff2e385cb279abb275b158969b1995ce3ec698a9ef6e3e9b3800af53b4c150",
+    "bytes": 24935936,
+    "version": "1.7.0"
+  },
+  "summary": {
+    "runs": 2,
+    "passed": true,
+    "reproducible": true,
+    "checks": {
+      "local_workflow_builds": true,
+      "professional_asset_refused": true,
+      "refusal_names_edition": true,
+      "preflight_refuses": true,
+      "draft_untouched": true
+    }
+  },
+  "run": {
+    "steps": {
+      "local_workflow_builds": {
+        "exit": 0,
+        "ok": true,
+        "draft_exists": true,
+        "detail": null
+      },
+      "professional_asset_refused": {
+        "exit": 1,
+        "type": "entitlement_denied",
+        "message": "runtime edition basic does not satisfy required edition professional",
+        "names_required_edition": true,
+        "claims_ready": false
+      },
+      "preflight_refuses": {
+        "exit": 1,
+        "ok": false,
+        "type": "asset_not_registered"
+      }
+    },
+    "draft_before_sha256": [
+      "draft_content.json",
+      "draft_info.json",
+      "draft_meta_info.json"
+    ],
+    "draft_after_sha256": [
+      "draft_content.json",
+      "draft_info.json",
+      "draft_meta_info.json"
+    ],
+    "draft_unchanged": true,
+    "no_material_substituted": true,
+    "checks": {
+      "local_workflow_builds": true,
+      "professional_asset_refused": true,
+      "refusal_names_edition": true,
+      "preflight_refuses": true,
+      "draft_untouched": true
+    },
+    "passed": true
+  },
+  "what_the_checks_mean": {
+    "local_workflow_builds": "the same CLI still builds a local-material draft while only a basic entitlement is present",
+    "professional_asset_refused": "the professional receipt is rejected and no ready result is produced",
+    "refusal_names_edition": "the refusal message names the required edition, so it can be acted on",
+    "preflight_refuses": "a Job preflight over the same requirement refuses instead of proceeding",
+    "draft_untouched": "the draft tree is byte-identical before and after the refusals - nothing was silently substituted"
+  },
+  "not_proven": [
+    "no real basic-edition account was used: the downgraded environment is a basic entitlement snapshot fed to the CLI, while the machine's account is the professional one",
+    "the editor was not driven in this acceptance; the draft is the CLI's own plain-JSON draft"
+  ]
+}
