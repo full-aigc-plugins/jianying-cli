@@ -923,5 +923,112 @@ class ToolWritesArePlatformIndependent(unittest.TestCase):
         self.assertGreater(len(calls), 30, f"expected many writers, saw {len(calls)}")
 
 
+
+class FfmpegStubBranchesAgree(unittest.TestCase):
+    """The differential stand-in has two implementations; they must behave the same.
+
+    media-analysis relies on the stub emitting fixed ffmpeg diagnostics. On POSIX it is a
+    shell script, on Windows a rustc-compiled executable, so only one of the two ever runs in
+    a given CI job. Comparing them here keeps the branch nobody runs from drifting.
+    """
+
+    ARG_SETS = (
+        ("-i", "input.mp4", "silencedetect=noise=-30dB"),
+        ("-i", "input.mp4", "-vf", "select"),
+    )
+
+    def stub_module(self):
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location(
+            "capcut_media_analysis_differential",
+            ROOT / "tools" / "capcut_media_analysis_differential.py",
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def posix_shell(self):
+        """Find a shell that actually runs a script.
+
+        `shutil.which("bash")` finds the WSL launcher on Windows, which cannot execute a
+        native path, so each candidate has to prove itself before it is used.
+        """
+        import shutil
+        import subprocess
+
+        candidates = [
+            r"C:\Program Files\Git\bin\bash.exe",
+            r"C:\Program Files\Git\usr\bin\sh.exe",
+            shutil.which("bash"),
+            shutil.which("sh"),
+        ]
+        for candidate in candidates:
+            if not candidate:
+                continue
+            try:
+                probe = subprocess.run(
+                    [candidate, "-c", "echo stub-ok"], capture_output=True, text=True
+                )
+            except OSError:
+                continue
+            if probe.returncode == 0 and "stub-ok" in probe.stdout:
+                return candidate
+        return None
+
+    def run_posix_stub(self, module, work):
+        import subprocess
+
+        shell = self.posix_shell()
+        if shell is None:
+            self.skipTest("no POSIX shell that runs a script")
+        script = work / "fake-ffmpeg"
+        script.write_text(module.SHELL_STUB, encoding="utf-8", newline="\n")
+        script.chmod(0o755)
+        # Git Bash wants /c/... rather than C:\...
+        target = str(script).replace("\\", "/")
+        if len(target) > 1 and target[1] == ":":
+            target = "/" + target[0].lower() + target[2:]
+        return {
+            args: subprocess.run(
+                [shell, target, *args], capture_output=True, text=True
+            ).stderr.splitlines()
+            for args in self.ARG_SETS
+        }
+
+    def run_native_stub(self, module, work):
+        import subprocess
+
+        if os.name == "nt":
+            binary = module.ffmpeg_stub(work)
+        else:
+            source = work / "ffmpeg_stub.rs"
+            source.write_text(module.RUST_STUB, encoding="utf-8", newline="\n")
+            binary = work / "fake-ffmpeg"
+            subprocess.run(
+                ["rustc", "-O", "-o", str(binary), str(source)],
+                check=True,
+                capture_output=True,
+            )
+        return {
+            args: subprocess.run(
+                [str(binary), *args], capture_output=True, text=True
+            ).stderr.splitlines()
+            for args in self.ARG_SETS
+        }
+
+    def test_both_implementations_emit_the_same_diagnostics(self):
+        import tempfile
+
+        module = self.stub_module()
+        with tempfile.TemporaryDirectory(prefix="stub-parity-") as temporary:
+            work = Path(temporary)
+            posix = self.run_posix_stub(module, work)
+            native = self.run_native_stub(module, work)
+        self.assertEqual(posix, native)
+        for args in self.ARG_SETS:
+            self.assertTrue(native[args], f"the stub printed nothing for {args}")
+
+
 if __name__ == "__main__":
     unittest.main()
