@@ -85,6 +85,13 @@
     **仍缺**：真实官方素材下载、价格文件/政府授权/用户可见提示（收据契约里没有这三类字段），以及 register/list/show。
     合成 fixture 在自身 `title` 里写明“synthetic fixture (not a real asset)”，不会被误当真实素材。
 - [ ] 4.3 在真实剪映完成冷重开、连续播放和原生导出，独立验证媒体流、时长、画面、音轨与来源归属。
+  - *2026-10-21 漂移现在会被点名（CLI 行为改进）*：编辑器保存会换掉草稿/素材/片段 id，收据因此找不到节点，
+    以前只报 `official draft resource is missing or ambiguous: … matched 0 nodes`——把责任推给调用方的
+    resource id。现在 `verify_draft` 会同时读草稿摘要：如果摘要也不一致，就报新错误 `DraftContentChanged`，
+    消息里带 recorded/observed 两个摘要并说明“编辑器每次保存都会重新生成 id”，恢复建议是“按当前草稿重开收据”。
+    用真实数据验证：收据绑在全新 `jianying build` 草稿（`draft_content.json` 5397 B）上，去验**编辑器保存过**的
+    `material-canary`（1767 B），得到 `type: draft_content_changed`。只改节点内容、id 不变时仍是 identity mismatch。
+    证据：`docs/runbooks/evidence/official-resource/DRAFT_DRIFT_20261021.json`。
   - *2026-10-21 又一个前置缺口：编辑器保存会重写 CLI 草稿*。用 CLI 建的 `material-canary`（5397 B）在编辑器
     打开并保存后变成 1767 B：`fps=30.0`、`source="default"`、`extra_info.created_via`、`config` 里 12 个非空键
     被丢弃，44 个空 materials 桶与 8 个空 keyframes 桶被删；草稿 id、素材 id、片段 id **全部重新生成**。

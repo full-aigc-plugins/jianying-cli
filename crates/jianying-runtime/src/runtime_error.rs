@@ -71,6 +71,11 @@ pub enum RuntimeError {
          a draft written by `jianying build` stays plain JSON)"
     )]
     DraftContentEncrypted(PathBuf),
+    #[error(
+        "draft content changed since the receipt was issued: recorded {recorded}, observed {observed} \
+         (the editor regenerates draft, material and segment ids whenever it saves)"
+    )]
+    DraftContentChanged { recorded: String, observed: String },
     #[error("official resource identity kind does not match the verification input")]
     ResourceIdentityKindMismatch,
     #[error("official asset is preview-only and cannot be delivered")]

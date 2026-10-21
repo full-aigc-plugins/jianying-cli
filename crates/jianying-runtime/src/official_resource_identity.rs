@@ -60,12 +60,28 @@ impl OfficialResourceIdentity {
         let Self::DraftResource {
             resource_id,
             resource_sha256,
-            ..
+            observed_draft_sha256,
         } = self
         else {
             return Err(RuntimeError::ResourceIdentityKindMismatch);
         };
-        let (observed_resource_sha256, _) = inspect_draft_resource(&draft, resource_id)?;
+        let (observed_resource_sha256, _) = match inspect_draft_resource(&draft, resource_id) {
+            Ok(pair) => pair,
+            Err(RuntimeError::DraftResourceUnavailable(detail)) => {
+                // 节点消失最常见的原因是编辑器保存后重新生成了 id；此时草稿摘要也已改变，
+                // 报“草稿被改写过”比报“资源不可用”更贴近事实。
+                if let Ok(Some(observed)) = read_draft_content_sha256(&draft) {
+                    if observed != *observed_draft_sha256 {
+                        return Err(RuntimeError::DraftContentChanged {
+                            recorded: observed_draft_sha256.clone(),
+                            observed,
+                        });
+                    }
+                }
+                return Err(RuntimeError::DraftResourceUnavailable(detail));
+            }
+            Err(other) => return Err(other),
+        };
         if observed_resource_sha256 != *resource_sha256 {
             return Err(RuntimeError::AssetIdentityMismatch(
                 draft.as_ref().to_path_buf(),
@@ -152,4 +168,17 @@ fn looks_like_encrypted_draft_content(bytes: &[u8]) -> bool {
         byte.is_ascii_alphanumeric() || matches!(byte, b'+' | b'/' | b'=' | b'\r' | b'\n')
     });
     all_envelope_chars && trimmed.len() >= 16
+}
+
+/// 读取草稿 `draft_content.json` 的整体摘要；读不到时返回 `None`，由调用方保留原错误。
+fn read_draft_content_sha256(draft: impl AsRef<Path>) -> Result<Option<String>, RuntimeError> {
+    let path = draft.as_ref().join("draft_content.json");
+    match fs::read(&path) {
+        Ok(bytes) => Ok(Some(format!("{:x}", Sha256::digest(&bytes)))),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(RuntimeError::Io {
+            path,
+            message: error.to_string(),
+        }),
+    }
 }

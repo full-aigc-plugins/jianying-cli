@@ -319,6 +319,88 @@ fn receipt_store_is_idempotent_sorted_and_rejects_conflicting_overwrite() {
 }
 
 #[test]
+fn a_rewritten_draft_is_reported_as_changed_not_as_a_missing_resource() {
+    // The editor regenerates draft, material and segment ids on every save. A receipt built before
+    // that save then cannot find its node, and "resource unavailable" hides what actually happened.
+    let root = fixture_root("draft-rewritten");
+    let draft = root.join("draft");
+    fs::create_dir_all(&draft).unwrap();
+    fs::write(
+        draft.join("draft_content.json"),
+        br#"{"materials":{"texts":[{"id":"text-1","content":"{\"text\":\"hello\"}"}]},"tracks":[]}"#,
+    )
+    .unwrap();
+    let receipt = OfficialAssetReceipt::new_draft_resource(
+        "official-text-001",
+        "改写检测",
+        OfficialResourceKind::TextTemplate,
+        OfficialAssetTier::Professional,
+        &draft,
+        "text-1",
+        1_200,
+        "https://example.invalid/terms",
+        [OfficialAssetUsage::Personal],
+        BTreeSet::new(),
+        false,
+    )
+    .unwrap();
+
+    // 保存后的草稿：id 全部换新，内容也不同
+    fs::write(
+        draft.join("draft_content.json"),
+        br#"{"materials":{"texts":[{"id":"text-2","content":"{\"text\":\"hello\"}"}]},"tracks":[]}"#,
+    )
+    .unwrap();
+    let error = receipt
+        .verify_draft(
+            &draft,
+            &professional_snapshot(2_000),
+            OfficialAssetUsage::Personal,
+            1_500,
+        )
+        .unwrap_err();
+    assert!(
+        matches!(
+            error,
+            jianying_runtime::RuntimeError::DraftContentChanged { .. }
+        ),
+        "unexpected error: {error}"
+    );
+    let message = error.to_string();
+    assert!(
+        message.contains("changed since the receipt was issued"),
+        "{message}"
+    );
+    assert!(
+        message.contains("regenerates"),
+        "the reason must be stated: {message}"
+    );
+
+    // 只改内容、id 不变：仍然是 identity mismatch，不能被新分支吞掉
+    fs::write(
+        draft.join("draft_content.json"),
+        br#"{"materials":{"texts":[{"id":"text-1","content":"{\"text\":\"changed\"}"}]},"tracks":[]}"#,
+    )
+    .unwrap();
+    let error = receipt
+        .verify_draft(
+            &draft,
+            &professional_snapshot(2_000),
+            OfficialAssetUsage::Personal,
+            1_500,
+        )
+        .unwrap_err();
+    assert!(
+        matches!(
+            error,
+            jianying_runtime::RuntimeError::AssetIdentityMismatch(_)
+        ),
+        "node edits must stay an identity mismatch: {error}"
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn encrypted_editor_draft_is_reported_as_encrypted_not_as_a_parse_error() {
     // 剪映 encrypts the draft_content.json of the drafts it creates itself. Pointing the receipt
     // path at such a draft used to fail with a bare serde message ("expected value at line 1

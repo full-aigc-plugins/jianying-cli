@@ -72,6 +72,7 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
                 "asset_resource_unavailable"
             }
             jianying_runtime::RuntimeError::DraftContentEncrypted(_) => "draft_content_encrypted",
+            jianying_runtime::RuntimeError::DraftContentChanged { .. } => "draft_content_changed",
             jianying_runtime::RuntimeError::ResourceIdentityKindMismatch => {
                 "asset_identity_kind_mismatch"
             }
@@ -97,7 +98,13 @@ pub fn error_envelope(error: &Error) -> ErrorEnvelope {
             jianying_runtime::RuntimeError::OwnershipMismatch(_) => "runtime_ownership_mismatch",
             _ => "runtime_error",
         };
-        let recovery = if error_type == "draft_content_encrypted" {
+        let recovery = if error_type == "draft_content_changed" {
+            vec![
+                "re-issue the receipt against the draft as it is now: the editor rewrites ids on every save, \
+                 so a receipt cannot survive one"
+                    .to_owned(),
+            ]
+        } else if error_type == "draft_content_encrypted" {
             vec![
                 "recreate the draft with `jianying build` (CLI drafts stay plain JSON), or add the material \
                  to a CLI-authored draft instead of a draft 剪映 created"

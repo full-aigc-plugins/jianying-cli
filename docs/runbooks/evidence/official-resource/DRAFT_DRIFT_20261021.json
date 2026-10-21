@@ -1,0 +1,31 @@
+{
+  "schema": "jianying-draft-drift/v1",
+  "observed_at": "2026-10-21T17:40+08:00",
+  "question": "can the CLI tell that the editor rewrote a draft after a receipt was issued?",
+  "setup": {
+    "receipt_built_from": {
+      "path": "a fresh `jianying build` of the same plan (pre-editor state)",
+      "draft_content_sha256": "99f58d85c75acdad5316d5dda6a1581236a88288aef83f7f61816b088866187d",
+      "bytes": 5397
+    },
+    "verified_against": {
+      "path": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Projects\\com.lveditor.draft\\material-canary",
+      "draft_content_sha256": "880e1e1a0a8a4b8fdb4e8b3d6cc418859ed85100a940b78e3ad59a63268d399b",
+      "bytes": 1767,
+      "note": "this is the real draft the editor opened and saved earlier in the session"
+    }
+  },
+  "result": {
+    "type": "draft_content_changed",
+    "message": "draft content changed since the receipt was issued: recorded 99f58d85c75acdad5316d5dda6a1581236a88288aef83f7f61816b088866187d, observed 880e1e1a0a8a4b8fdb4e8b3d6cc418859ed85100a940b78e3ad59a63268d399b (the editor regenerates draft, material and segment ids whenever it saves)",
+    "recovery": [
+      "re-issue the receipt against the draft as it is now: the editor rewrites ids on every save, so a receipt cannot survive one"
+    ],
+    "exit_behaviour": "ok=false, non-zero exit"
+  },
+  "why_this_matters": "before this change the same situation surfaced as 'official draft resource is missing or ambiguous: resource … matched 0 nodes', which points at the caller's resource id instead of at the editor save that actually invalidated the receipt",
+  "not_proven": [
+    "the receipt used synthetic terms and a synthetic asset id; only the drafts are real",
+    "no editor save was triggered during this measurement - the saved draft came from the earlier session"
+  ]
+}
