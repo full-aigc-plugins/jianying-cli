@@ -1,0 +1,27 @@
+{
+  "schema": "jianying-proxy-render-evidence/v1",
+  "observed_at": "2026-10-22T03:20+08:00",
+  "purpose": "supplementary material for 4.3: prove the CLI can render the draft that carries the real official asset",
+  "command": "jianying render proxy <auto-canary> --out <tmp>/auto-canary-proxy.mp4 --json",
+  "draft": {
+    "path": "auto-canary (CLI-built, holds the real asset 2d89c299…)",
+    "asset_sha256": "107e163d3b51bf1461eb3d89d6044a582de37a11d03ed0c0feaa118183a9346f",
+    "asset_duration_s": 1.8,
+    "asset_stream": "h264 1022x662 @60 fps + aac"
+  },
+  "proxy": {
+    "path": "auto-canary-proxy.mp4",
+    "bytes": 76130,
+    "sha256": "f56508a00256f9613778f2fec48b205032a2000d22b8e01ef70edd180da19842",
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video": "h264 540x960 @30/1",
+    "audio": "aac",
+    "duration_s": 1.790703
+  },
+  "what_it_shows": "the draft that carries the official asset resolves the media, flattens its one video track and mixes its audio; the rendered duration matches the 1.8 s source within a frame (1.7907 s), so the asset is readable end to end",
+  "what_it_does_not_show": [
+    "this is the ffmpeg proxy, not 剪映 内导出 - the CLI says so in its own note",
+    "transitions, effects and masks are deliberately not rendered by the proxy",
+    "nothing in the editor was observed: 4.3 still needs the playback/export observation inside 剪映"
+  ]
+}
