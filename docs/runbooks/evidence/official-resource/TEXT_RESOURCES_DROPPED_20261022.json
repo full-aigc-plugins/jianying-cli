@@ -1,7 +1,7 @@
 {
   "schema": "jianying-plan-text-resources-dropped/v1",
   "observed_at": "2026-10-22T02:50+08:00",
-  "finding": "a plan text segment with `font` (name or numeric id) and `animation_in` (name or id) builds with exit 0, but the draft carries neither: the text material has no font field and materials contains only `texts`",
+  "finding": "CORRECTED: font and text animation both reach the draft; the earlier claim that they were dropped was a verification mistake (see correction_2026_10_22)",
   "probes": [
     {
       "input": "font=6841117833447870990 (id of 3D 만화)",
@@ -33,5 +33,19 @@
   "not_proven": [
     "whether the font would be dropped for a different text-segment shape (styles/range)",
     "whether the wire format expects the font as a separate material bucket rather than a text field"
-  ]
+  ],
+  "correction_2026_10_22": {
+    "what_was_wrong": "the record said font and text animation never reach the draft. They do. The check only looked at top-level text-material keys, while the writer puts the font inside the serialized `content` JSON as styles[].font, and the animation as a material_animations entry referenced from the segment.",
+    "measured_again": {
+      "font=6841117833447870990 (id)": "styles[0].font = {id: 6841117833447870990, path: \"D:\"}",
+      "font=3D 만화 (name)": "same id written - name and id both resolve to the catalog entry",
+      "animation_in name/id": "material_animations has 1 entry and the segment extra_material_refs points at it",
+      "font probes": "material_animations is empty, as expected when no animation was asked for"
+    },
+    "where_the_writer_does_it": {
+      "font": "src/draft.rs build_text_content() sets styles[].font from the resolved entry",
+      "animation": "a material_animations entry is created and linked through extra_material_refs"
+    },
+    "lesson": "verify a draft by parsing the material content and the reference lists, not by looking for a top-level key with the field name - the wire format nests both of them"
+  }
 }
