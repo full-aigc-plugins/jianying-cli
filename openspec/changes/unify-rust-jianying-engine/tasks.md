@@ -222,6 +222,19 @@
       `JIANYING_CLI_PROCESS_LIST` 的文件都必须指向 `tests/fixtures/empty-processes.txt`，
       仅 7 个自建合成清单的文件在显式白名单里并注明原因。守卫已做反证（把某个 fixture 路径改坏 → 变红，
       恢复 → 变绿）。`cargo test --workspace` 现为 **123 targets / 380 passed**，`unittest` **37 OK**。
+
+      *2026-10-21 把 LF 规则做成全局不变量*：`tools/` 里约 45 处 `write_text` 全部显式 `newline="\n"`
+      （仓库里没有任何地方刻意写 CRLF）。此前已修 4 处，这次把其余的补完，并加了一条全局守卫
+      （任何写入器缺 `newline=` 即失败，已做反证）。两条原本会写坏证据的工具——
+      `examples/pyjyd/CASES.json`（11 用例 / 51 测试）与 `examples/pyjyd/README_SNIPPETS.json`（32 片段）——
+      在修复前重写会写入 220 / 336 个 CRLF，修复后重写**零差异**。
+      改完重新验证未影响正确性：七个 capcut 差分中六个报告仍逐字节相同（utility 仍是上游管道截断造成的 3 行差异），
+      `parity_run --report` 55/55 且报告逐字节相同，pyJYD behavior/examples/api 三份报告均逐字节相同，
+      `unittest` **39 OK**，`check_provenance` ok。
+      release 侧也做了一次端到端：在干净的 HEAD 重建二进制后打包，包内 `manifest.json` / `provenance/CAPABILITIES.json` /
+      `SHA256SUMS` / schema **全部 LF、零 CRLF**（修前 CAPABILITIES.json 有 9581 个 CRLF）；
+      `jianying release verify` 11 个文件全通过、能力契约 171/171，篡改 `THIRD_PARTY_NOTICES.md` 后
+      正好该项 `sha256 mismatch`。
       - `jianying selftest --json` → `ok=true`，7 项：**5 pass / 2 skip**（skip 的是 media 与 render，需要 ffprobe/ffmpeg 与真实素材）；
       - `jianying doctor --json` / `status --json` → ok，`editors_running=[]`，能力 **171（supported 150 / 其他 21）**；
       - CLI 自带 MCP 服务 `jianying mcp serve` 走 stdio：`initialize` 返回 `jianying-cli 1.7.0`，`tools/list` **17 个工具**，`tools/call jianying_doctor` 与 `jianying_capabilities` 均返回完整 JSON。
