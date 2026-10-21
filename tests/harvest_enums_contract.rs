@@ -154,3 +154,60 @@ fn test_command() -> Command {
     );
     command
 }
+
+#[test]
+fn add_registers_a_sticker_id_and_refuses_a_blank_one() {
+    // 贴纸没有内嵌目录，只能人工登记；这条命令是唯一入口，两侧都要钉住。
+    let root = std::env::temp_dir().join(format!(
+        "jianying-harvest-sticker-{}-{}",
+        std::process::id(),
+        uuid::Uuid::new_v4().simple()
+    ));
+    std::fs::create_dir_all(&root).unwrap();
+    let catalogue = root.join("user-enums.json");
+    let catalogue_text = catalogue.to_string_lossy();
+
+    let data = data(&[
+        "--json",
+        "media",
+        "harvest-enums",
+        "add",
+        "sticker",
+        "sticker-demo",
+        "6791652175668843016",
+        "--catalogue",
+        &catalogue_text,
+        "--apply",
+    ]);
+    assert_eq!(
+        data["added"],
+        json!(1),
+        "sticker registration reported: {data}"
+    );
+
+    let written: Value = serde_json::from_slice(&std::fs::read(&catalogue).unwrap()).unwrap();
+    let entries = written["entries"].as_array().cloned().unwrap_or_default();
+    assert_eq!(entries.len(), 1);
+    assert_eq!(entries[0]["kind"], json!("sticker"));
+    assert_eq!(entries[0]["resource_id"], json!("6791652175668843016"));
+    assert_eq!(entries[0]["harvested_from"], json!("manual"));
+
+    let refused = run(&[
+        "--json",
+        "media",
+        "harvest-enums",
+        "add",
+        "sticker",
+        "sticker-blank",
+        "",
+        "--catalogue",
+        &catalogue_text,
+        "--apply",
+    ]);
+    assert!(
+        !refused.status.success(),
+        "a blank sticker id must be refused"
+    );
+
+    let _ = std::fs::remove_dir_all(root);
+}
