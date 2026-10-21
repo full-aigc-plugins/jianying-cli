@@ -124,6 +124,48 @@
           "note": "cropped from 11-template-draft-open.png"
         }
       ]
+    },
+    "preview_bench": {
+      "controls": [
+        "当前时间码 00:00:00:16",
+        "总时长 00:00:02:00",
+        "播放/暂停",
+        "适配（下拉）",
+        "全屏",
+        "画面比例 9:16",
+        "缩放适配"
+      ],
+      "labels": "read from the bar under the player in 42-editor-state.png",
+      "evidence": [
+        {
+          "file": "47-preview-bench-controls.png",
+          "sha256": "e8d1e0d3271329b5b35c4d8705b359396abe32bd83e68e0151556d1b2e048116",
+          "note": "crop of the preview bench bar"
+        }
+      ]
+    },
+    "top_media_toolbar": {
+      "items": [
+        "文本",
+        "贴纸",
+        "特效",
+        "转场",
+        "字幕",
+        "智能包装",
+        "滤镜",
+        "调节",
+        "模板",
+        "数字人",
+        "插件"
+      ],
+      "labels": "icon + Chinese label, left to right",
+      "evidence": [
+        {
+          "file": "48-top-media-toolbar.png",
+          "sha256": "bf3dd756c35ac6e89689eb6737d841b1484ba3c25fa9fbda0099f1d4bd37a558",
+          "note": "crop of the top media-type toolbar"
+        }
+      ]
     }
   },
   "publish_restrictions_observed": {
@@ -137,6 +179,34 @@
     "canary/beta build: only 11.6.0.14552 is installed on this host, and the task's earlier note pins 11.6.0-beta2/beta3",
     "professional edition restrictions (this account is a personal one)",
     "segment right-click context menu: two attempts failed (blind right-click opened the shell start menu; Shift+F10 after a blind select did nothing because the app had navigated to the cloud-space page)",
-    "labels for the icon-only timeline toolbar"
+    "segment right-click context menu: five attempts (blind right-click, Shift+F10, right-click inside a selected draft) never produced the app menu; the last two were blocked by another application's always-on-top window"
+  ],
+  "publish_restrictions": {
+    "observed": [
+      {
+        "where": "官方素材 panel, preview bar",
+        "text": "正在预览 → 视频 · 可商用",
+        "screenshot": "33-material-added.png"
+      },
+      {
+        "where": "官方素材 panel, preview bar",
+        "text": "正在预览 → 视频 · 不可商用",
+        "screenshot": "43-material-downloaded.png"
+      },
+      {
+        "where": "官方素材 panel, top banner",
+        "text": "创意有风险，使用前请确保已获得相应版权",
+        "screenshot": "31-official-materials-open.png"
+      }
+    ],
+    "meaning": "the editor marks each official material with a commercial-availability label and shows a copyright banner; these are the only user-visible publish restrictions found, and they map onto a receipt's allowed_usages",
+    "not_found": "the 导出 dialog was not opened in this session, so any export-time restriction notice is unrecorded"
+  },
+  "failed_attempts": [
+    {
+      "file": "46-segment-right-click.png",
+      "sha256": "10a2e21e19fa7805d0cfd1d1e4eca883bec8133a560fd71647658eb601a64589",
+      "what_happened": "the editor was raised with SetWindowPos(HWND_TOPMOST) but another session's Layui Vue Gallery window sat above it, GetForegroundWindow reported a different handle, and the right-click landed outside the timeline"
+    }
   ]
 }
