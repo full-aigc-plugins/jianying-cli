@@ -1,0 +1,10 @@
+{
+  "schema": "jianying-mcp-test-environment/v1",
+  "observed_at": "2026-10-22T02:35+08:00",
+  "symptom": "tests/eval_loop_contract.rs::the_loop_is_reachable_over_mcp failed on a clean checkout with left: Null, right: \"clean\"",
+  "root_cause": "the test spawns `jianying mcp serve` without the process-listing seam, so it reads the real process table; with 剪映 running the loop refuses to mutate drafts and answers \"editor is running (JianyingPro.exe); close it before mutating drafts\", which parses to an envelope without data",
+  "proof": "replaying the same three MCP requests by hand against target/debug/jianying.exe reproduced that exact error; the failure therefore depended on the desktop state, not on the code under test",
+  "fix": "the test now sets JIANYING_CLI_PROCESS_LIST to tests/fixtures/empty-processes.txt, the seam the rest of the suite uses, so it no longer depends on whether the owner has the editor open",
+  "gates": "cargo test --workspace 123 targets / 385 passed / 0 failed; clippy -D warnings clean; check_provenance ok",
+  "note": "the product behaviour itself was correct - failing closed while the editor runs is intended"
+}

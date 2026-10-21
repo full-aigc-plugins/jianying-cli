@@ -805,6 +805,15 @@ fn the_loop_is_reachable_over_mcp() {
     ];
     let mut child = Command::new(env!("CARGO_BIN_EXE_jianying"))
         .args(["mcp", "serve"])
+        // 让进程探测走固定夹具：否则本机开着剪映时这条测试会因为“编辑器在运行”而失败，
+        // 那是产品正确的失败关闭行为，不该被当作回归。
+        .env(
+            "JIANYING_CLI_PROCESS_LIST",
+            concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/tests/fixtures/empty-processes.txt"
+            ),
+        )
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
