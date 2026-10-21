@@ -1412,3 +1412,75 @@ fn test_command() -> Command {
     );
     command
 }
+
+#[test]
+fn sticker_resource_id_must_be_a_token_and_is_not_catalogue_checked() {
+    // 贴纸编号由应用下发，内嵌目录不覆盖它，所以这里只能拒绝“根本不是编号”的输入；
+    // 这条测试同时钉住两件事：明显非法的要被拦，合法的（哪怕不是纯数字）不许误杀。
+    let root = temp_root("sticker-id-shape");
+    let job_with = |name: &str, resource_id: &str| {
+        serde_json::json!({
+            "schema": "jianying-job/v2",
+            "operation": "create",
+            "project": {
+                "type": "new",
+                "project": {
+                    "name": name,
+                    "width": 1080,
+                    "height": 1920,
+                    "frame_rate": {"numerator": 30, "denominator": 1},
+                    "timeline": {"tracks": [{
+                        "id": "sticker-1",
+                        "kind": "sticker",
+                        "segments": [{
+                            "type": "sticker",
+                            "id": "s1",
+                            "range": {"start_us": 0, "duration_us": 1000000},
+                            "resource_id": resource_id
+                        }]
+                    }]},
+                    "materials": []
+                }
+            }
+        })
+    };
+
+    let bad = root.join("bad.json");
+    write_json(&bad, &job_with("bad-sticker", "not a token"));
+    let output = run(&[
+        "--json",
+        "job",
+        "run",
+        bad.to_str().unwrap(),
+        "--out",
+        root.join("draft-bad").to_str().unwrap(),
+    ]);
+    assert!(
+        !output.status.success(),
+        "a resource id with spaces must be refused"
+    );
+    let envelope = stdout_json(&output);
+    let message = envelope["error"]["message"].as_str().unwrap_or_default();
+    assert!(
+        message.contains("sticker resource_id"),
+        "the failure must name the sticker resource id: {message}"
+    );
+
+    let good = root.join("good.json");
+    write_json(&good, &job_with("good-sticker", "sticker-a"));
+    let output = run(&[
+        "--json",
+        "job",
+        "run",
+        good.to_str().unwrap(),
+        "--out",
+        root.join("draft-good").to_str().unwrap(),
+    ]);
+    assert!(
+        output.status.success(),
+        "a plain token must still be accepted: {}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+
+    let _ = std::fs::remove_dir_all(root);
+}
