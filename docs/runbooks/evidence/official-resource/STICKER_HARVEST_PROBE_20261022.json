@@ -1,0 +1,23 @@
+{
+  "schema": "jianying-sticker-harvest-probe/v1",
+  "observed_at": "2026-10-22T02:05+08:00",
+  "question": "can the sticker catalogue be filled from what is already on disk?",
+  "command": "jianying media harvest-enums sync --drafts <draft library> --json",
+  "result": {
+    "drafts_scanned": 5,
+    "drafts_skipped": 6,
+    "found": 0,
+    "new": [],
+    "applied": false
+  },
+  "why_zero": [
+    "the six skipped drafts are the ones the editor created - they are encrypted, so the scanner cannot read a timeline from them",
+    "the five readable drafts are CLI-built and contain only text and video materials, so there is no sticker or effect id to learn"
+  ],
+  "consequence": "sticker ids cannot be harvested from this machine's state. The supported path is `jianying media harvest-enums add <KIND> <SLUG> <RESOURCE_ID>` - register one manually witnessed id once, then reference it by id.",
+  "also_learned": "the same encryption that breaks draft_resource receipts also breaks enum harvesting, so any feature that reads the editor's drafts inherits that limitation",
+  "not_proven": [
+    "that a sticker placed by hand in the editor would be harvestable - it would be encrypted too",
+    "that the add path produces a catalogue usable by the generator; it was not exercised end to end here"
+  ]
+}

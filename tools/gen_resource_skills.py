@@ -74,8 +74,11 @@ TYPES = {
         "catalogs": [],
         "job_field": "stickerSegment（`resource_id` 必填）",
         "note": (
-            "贴纸没有内嵌目录：剪映的贴纸是在线素材，编号来自应用侧。可用 "
-            "`jianying media harvest-enums` 把应用写出的真实 id 采集到用户目录，再按 id 引用。"
+            "贴纸没有内嵌目录：剪映的贴纸是在线素材，编号来自应用侧。两条采集路径实测于 2026-10-22："
+            "`media harvest-enums sync --drafts <库根>` 会**跳过**编辑器建的草稿（它们被加密），"
+            "可读的明文草稿里又只有文本/视频，所以 `found` 为 0；真正可用的路径是 "
+            "`media harvest-enums add <KIND> <SLUG> <RESOURCE_ID>` 把人工见证到的编号登记一次。"
+            "登记后按 id 引用，并在 `references/` 里补它的用途。"
         ),
     },
     "caption": {

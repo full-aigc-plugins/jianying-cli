@@ -42,7 +42,7 @@ jianying media catalog --domain <domain> --search 关键词 --json
 
 ## 注意
 
-- 贴纸没有内嵌目录：剪映的贴纸是在线素材，编号来自应用侧。可用 `jianying media harvest-enums` 把应用写出的真实 id 采集到用户目录，再按 id 引用。
+- 贴纸没有内嵌目录：剪映的贴纸是在线素材，编号来自应用侧。两条采集路径实测于 2026-10-22：`media harvest-enums sync --drafts <库根>` 会**跳过**编辑器建的草稿（它们被加密），可读的明文草稿里又只有文本/视频，所以 `found` 为 0；真正可用的路径是 `media harvest-enums add <KIND> <SLUG> <RESOURCE_ID>` 把人工见证到的编号登记一次。登记后按 id 引用，并在 `references/` 里补它的用途。
 - 编号是 `resource_id`（16 位以上数字串），不是 `effect_id`，两者不要混用。
 - 表里的每一行都由脚本从 `catalogs/` 复制而来，`--check` 会拦住手工改动。
 
