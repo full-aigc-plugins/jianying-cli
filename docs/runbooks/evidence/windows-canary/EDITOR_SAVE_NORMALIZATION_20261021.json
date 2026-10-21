@@ -1,0 +1,111 @@
+{
+  "schema": "jianying-editor-save-normalization/v1",
+  "observed_at": "2026-10-21T17:35+08:00",
+  "question": "what does 剪映 change when it opens a CLI-built draft and saves it?",
+  "inputs": {
+    "cli_draft": {
+      "bytes": 5397,
+      "sha256": "2257476b73c1c32f9693afe6b5e302194b251cdcd2bff02c5a652305a6fd3e22"
+    },
+    "editor_saved": {
+      "bytes": 1767,
+      "sha256": "880e1e1a0a8a4b8fdb4e8b3d6cc418859ed85100a940b78e3ad59a63268d399b"
+    }
+  },
+  "dropped_by_the_editor": {
+    "top_level": [
+      "cover",
+      "fps",
+      "free_render_index_mode_on",
+      "group_container",
+      "keyframe_graph_list",
+      "mutable_config",
+      "relationships",
+      "render_index_track_mode_on",
+      "retouch_cover",
+      "source",
+      "static_cover_image_path",
+      "time_marks"
+    ],
+    "non_empty_among_them": {
+      "fps": 30.0,
+      "source": "default"
+    },
+    "config_keys": [
+      "adjust_max_index",
+      "attachment_info",
+      "combination_max_index",
+      "export_range",
+      "extract_audio_last_index",
+      "lyrics_recognition_id",
+      "lyrics_sync",
+      "lyrics_taskinfo",
+      "maintrack_adsorb",
+      "material_save_mode",
+      "multi_language_current",
+      "multi_language_list"
+    ],
+    "non_empty_config_values": {
+      "adjust_max_index": 1,
+      "combination_max_index": 1,
+      "extract_audio_last_index": 1,
+      "lyrics_sync": true,
+      "maintrack_adsorb": true,
+      "multi_language_current": "none"
+    },
+    "extra_info": {
+      "created_via": "jianying-cli"
+    },
+    "empty_buckets": {
+      "materials": 44,
+      "keyframes": 8
+    }
+  },
+  "regenerated_ids": {
+    "draft_id": "3CD9CFB1-55DB-49EF-9AA8-070AE09712C0 -> 87F6124C-6107-4AF9-AFE1-7A8D9A63F02E",
+    "text_material_id": "b9e7d6f413f445728b238d1341bc851b -> db12f33aeada44aeb0ed8dc5f2f6e818",
+    "segment_id": "0fe4bc6d871b4515b172c6ad172c7d7f -> 8b327a9b67184f649bb73acbf0d9d32c"
+  },
+  "semantics_preserved": {
+    "canvas": "1080x1920 9:16, same values (key order differs)",
+    "duration_us": 2000000,
+    "text_content": "identical string and styles",
+    "segment_timing": "target start 0 omitted (equivalent), duration 2000000 kept; source_timerange null on a text segment"
+  },
+  "consequence_for_the_cli": "a draft_resource receipt records the node digest and the draft digest, so any editor save invalidates it: the ids are regenerated and fps/source/created_via disappear. Receipts therefore have to be built from a draft the editor does not own, or after the editor's final save - not across it.",
+  "licence_labels_seen_in_the_same_panel": [
+    {
+      "material": "流星小仙女文字片头（人物图文）",
+      "label": "正在预览 → 视频 · 可商用",
+      "screenshot": "33-material-added.png"
+    },
+    {
+      "material": "本轮选中的实拍视频片段",
+      "label": "正在预览 → 视频 · 不可商用",
+      "screenshot": "43-material-downloaded.png"
+    }
+  ],
+  "licence_labels_note": "the panel exposes a per-material availability label (可商用 / 不可商用) in the preview bar; that is the user-visible restriction 2.12 asks to be enumerated, and it maps onto a receipt's allowed_usages",
+  "screenshots": [
+    {
+      "file": "42-editor-state.png",
+      "sha256": "0ab7a0046a29e0d15ddc32010a5cd48204bc32a1fcbe7a21e06eaeb929546c24",
+      "bytes": 810928
+    },
+    {
+      "file": "43-material-downloaded.png",
+      "sha256": "6e061f4d8af1d601f2467f9f957535df6937615b2f213c070fb397fb68e71fd1",
+      "bytes": 1671232
+    },
+    {
+      "file": "44-material-on-timeline.png",
+      "sha256": "2b15d1c715e1b1b16e66a451a107dab317f5b7fd7bbd4ab121b64610b09e7c49",
+      "bytes": 810748
+    }
+  ],
+  "not_proven": [
+    "whether dropping fps/source/created_via changes playback or export behaviour - no export was run for this draft",
+    "why the drag from the panel to the timeline produces no clip under synthetic mouse events; three attempts failed, and neither right-click nor the download button responded beyond selecting the item",
+    "whether an editor save of a draft with video segments also nulls source_timerange - this draft had no video segment"
+  ]
+}
