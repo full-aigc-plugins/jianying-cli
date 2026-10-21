@@ -1,0 +1,55 @@
+{
+  "schema": "jianying-resource-alignment-matrix/v1",
+  "observed_at": "2026-10-22T03:00+08:00",
+  "purpose": "one place that records, per resource type, whether a real catalog id is accepted and whether the material actually reaches the draft",
+  "types": {
+    "effect": {
+      "id_accepted": true,
+      "reaches_draft": true,
+      "how_checked": "job run with 7051836120224502308; effect material present",
+      "test": "job_cli_contract::filter_and_effect_segments_accept_the_numeric_resource_id"
+    },
+    "filter": {
+      "id_accepted": true,
+      "reaches_draft": true,
+      "how_checked": "job run with 7127828208690433311 (1980)",
+      "test": "same"
+    },
+    "transition": {
+      "id_accepted": true,
+      "reaches_draft": true,
+      "how_checked": "two-segment job, materials.transitions=1 name=叠化",
+      "test": "job_cli_contract::a_declared_transition_must_reach_the_draft"
+    },
+    "font": {
+      "id_accepted": true,
+      "reaches_draft": true,
+      "how_checked": "plan build, styles[0].font = {id, path}"
+    },
+    "text_animation": {
+      "id_accepted": true,
+      "reaches_draft": true,
+      "how_checked": "plan build, material_animations=1 linked via extra_material_refs"
+    },
+    "mask": {
+      "id_accepted": true,
+      "reaches_draft": true,
+      "how_checked": "plan build, materials.masks=1 with resource_id 6791652175668843016",
+      "probe_2026_10_22": {
+        "by_name": "name 线性",
+        "by_id": "name becomes the id string, resource_id correct"
+      }
+    },
+    "sticker": {
+      "id_accepted": "shape only",
+      "reaches_draft": "not applicable (no catalogue)",
+      "note": "ids come from the application; 21 witnessed ids registered in the user catalogue"
+    }
+  },
+  "polish_issue": {
+    "symptom": "when a numeric id is passed, the material keeps the id text as its display `name` (mask probe shows name=\"6791652175668843016\" while resource_id is right)",
+    "impact": "cosmetic: the editor will show a numeric name for that mask/filter/effect, and any name-based report reads oddly",
+    "fix_option": "after a successful id lookup, callers should take the display name from the catalog entry instead of echoing the input"
+  },
+  "verdict": "every catalogued type accepts a numeric resource_id and lands in the draft; only the display-name polish and the sticker catalogue gap remain"
+}
