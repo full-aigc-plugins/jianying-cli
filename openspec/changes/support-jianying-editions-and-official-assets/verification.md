@@ -359,3 +359,22 @@ timeline track-rename → project verify`。两份草稿镜像逐字节一致，
 复算方式（任何人、任何机器）：`python tools/official_downgrade_acceptance.py`、
 `python tools/official_receipt_roundtrip.py`、`python tools/check_provenance.py --root .`、
 `python tools/parity_run.py --pyjyd-src <包目录>`；前两个脚本都会连跑两次并比较。
+
+## 2026-10-22 — 资源对齐与自动化能力：能力 / 复算方式 / 证据
+
+这一节只列本次新增或修好的东西，每条都写明怎么复算，接手的人不必重跑我的会话。
+
+| 能力 | 怎么复算 | 证据 / 测试 |
+| --- | --- | --- |
+| 7 个资源技能（转场/滤镜/特效/文本/音频/贴纸/字幕），4123 行清单 | `python tools/gen_resource_skills.py --check` 必须 0 stale | `tests/test_release_tools.py::ResourceSkillsMatchTheCatalogs` |
+| 编号与显示名都能引用（特效/滤镜/转场/字体/文本动画/蒙版逐一实测） | 用任一真实编号跑 job 或 plan build，素材必须进草稿 | `RESOURCE_ALIGNMENT_MATRIX_20261022.json` |
+| Job 的 `transition` 不再被静默丢弃 | 双段 job 首段声明转场 → `materials.transitions` 必须有 1 条 | `tests/job_cli_contract.rs::a_declared_transition_must_reach_the_draft` |
+| 贴纸可通过 `media harvest-enums add sticker` 登记 | 登记后目录 `kind=sticker`，空编号被拒 | `tests/harvest_enums_contract.rs::add_registers_a_sticker_id_and_refuses_a_blank_one` |
+| 计划/草稿资源检查（未知编号 / VIP 无权益 / 时间越界，加密草稿点名） | `python tools/plan_resource_lint.py <plan>` 或 `--draft <dir>` | `tests/test_release_tools.py::PlanResourceLint*` |
+| 代理渲染的限制可机读 | `render proxy` 输出含 `unsupported_features` / `preview_truth_source` | `render.rs` 结果对象 |
+| 真实素材链路（缓存素材 → CLI 草稿 → 收据 → preflight） | 见证据文件；`不可商用` 由契约强制拒绝商业用途 | `REAL_ASSET_CHAIN_20261022.json` |
+| MCP loop 测试不再依赖桌面状态 | `cargo test -p jianying-cli --test eval_loop_contract` | `RELEASE_MCP_TEST_SEAM_20261022.json` |
+| 对齐系列未改变任何 wire 输出 | `python tools/parity_run.py --pyjyd-src <包目录>` 55/55 且报告字节一致 | `RESOURCE_ALIGNMENT_REGRESSION_20261022.json` |
+
+仍未完成、且都需要外部条件：4.1（授权条款）、4.2/4.3（明文草稿里的真实素材 + 编辑器内观察）、
+2.12 尾项（发布设置界面）、4.5（打 tag 与发布）、unify 9.3/9.7（macOS + 真实剪映）。
