@@ -1556,3 +1556,130 @@ fn filter_and_effect_segments_accept_the_numeric_resource_id() {
 
     let _ = std::fs::remove_dir_all(root);
 }
+
+#[test]
+fn a_declared_transition_must_reach_the_draft() {
+    // 回归：Job 里的 `transition` 曾经在反序列化时被静默丢掉，构建成功但草稿里没有转场。
+    // 需要一个能被 ffprobe 读到的真实视频；没有样本时跳过，不伪造媒体。
+    let media = match std::env::var("JIANYING_TEST_MEDIA")
+        .ok()
+        .map(PathBuf::from)
+        .filter(|path| path.is_file())
+    {
+        Some(path) => path,
+        None => {
+            let cached = PathBuf::from(
+                r"C:\Users\hnxyh\AppData\Local\JianyingPro\User Data\Projects\com.lveditor.draft\auto-canary\assets\video\2d89c29964185f62e14f869e678e4c94.mp4",
+            );
+            if !cached.is_file() {
+                eprintln!("skipping: set JIANYING_TEST_MEDIA to a readable video");
+                return;
+            }
+            cached
+        }
+    };
+
+    let root = temp_root("transition-lands");
+    let segment = |id: &str, start: i64, transition: Option<serde_json::Value>| {
+        let mut value = serde_json::json!({
+            "type": "video",
+            "id": id,
+            "range": {"start_us": start, "duration_us": 1800000},
+            "material_id": "m1",
+            "source_range": {"start_us": 0, "duration_us": 1800000},
+            "speed": 1.0,
+            "volume": 1.0
+        });
+        if let Some(transition) = transition {
+            value["transition"] = transition;
+        }
+        value
+    };
+    let job = |segments: Vec<serde_json::Value>, name: &str| {
+        serde_json::json!({
+            "schema": "jianying-job/v2",
+            "operation": "create",
+            "project": {"type": "new", "project": {
+                "name": name,
+                "width": 1080, "height": 1920,
+                "frame_rate": {"numerator": 30, "denominator": 1},
+                "timeline": {"tracks": [{"id": "v1", "kind": "video", "segments": segments}]},
+                "materials": [{"type": "video", "id": "m1", "path": media}]
+            }}
+        })
+    };
+
+    let paired = root.join("paired.json");
+    write_json(
+        &paired,
+        &job(
+            vec![
+                segment(
+                    "s1",
+                    0,
+                    Some(serde_json::json!({"name": "叠化", "duration_us": 500000})),
+                ),
+                segment("s2", 1800000, None),
+            ],
+            "transition-paired",
+        ),
+    );
+    let output = run(&[
+        "--json",
+        "job",
+        "run",
+        paired.to_str().unwrap(),
+        "--out",
+        root.join("draft-paired").to_str().unwrap(),
+    ]);
+    assert!(
+        output.status.success(),
+        "paired transition job failed: {}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    let content = std::fs::read(root.join("draft-paired").join("draft_content.json")).unwrap();
+    let document: Value = serde_json::from_slice(&content).unwrap();
+    let transitions = document["materials"]["transitions"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
+    assert_eq!(
+        transitions.len(),
+        1,
+        "the declared transition did not reach the draft"
+    );
+    assert_eq!(transitions[0]["name"], "叠化");
+
+    let orphan = root.join("orphan.json");
+    write_json(
+        &orphan,
+        &job(
+            vec![segment(
+                "s1",
+                0,
+                Some(serde_json::json!({"name": "叠化", "duration_us": 500000})),
+            )],
+            "transition-orphan",
+        ),
+    );
+    let output = run(&[
+        "--json",
+        "job",
+        "run",
+        orphan.to_str().unwrap(),
+        "--out",
+        root.join("draft-orphan").to_str().unwrap(),
+    ]);
+    assert!(
+        !output.status.success(),
+        "a trailing transition must be refused"
+    );
+    let envelope = stdout_json(&output);
+    let message = envelope["error"]["message"].as_str().unwrap_or_default();
+    assert!(
+        message.contains("needs a following segment"),
+        "unexpected refusal: {message}"
+    );
+
+    let _ = std::fs::remove_dir_all(root);
+}
