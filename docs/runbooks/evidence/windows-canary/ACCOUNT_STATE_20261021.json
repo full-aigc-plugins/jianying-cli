@@ -1,0 +1,39 @@
+{
+  "schema": "jianying-editor-account-state/v1",
+  "observed_at": "2026-10-21T16:40+08:00",
+  "purpose": "check whether the professional (SVIP) login the owner reported is visible to the client",
+  "method": [
+    "restarted JianyingPro.exe (taskkill, then launch) so the client would reload its session",
+    "captured the home page and the cloud-space page"
+  ],
+  "observed": {
+    "account_name": "小汤圆的首部",
+    "upsell_visible_home": "开通AI Ultra会员，今年享新价",
+    "upsell_visible_editor": "现在开通，低至1.9元/天",
+    "svip_badge_visible": false,
+    "professional_materials_state": "not exercised beyond opening the panel; the click landed on the cloud space"
+  },
+  "screenshots": [
+    {
+      "file": "13-account-svip-home.png",
+      "sha256": "69d83f72b9c8b42b1c636522633dd96d0bddb99a722df74aa0d9d0166ca6e28d",
+      "shows": "home page after a full client restart: account 小汤圆的首部, banner 开通AI Ultra会员，今年享新价"
+    },
+    {
+      "file": "14-draft-reopened.png",
+      "sha256": "dfea9f92ee8936c00e485e1d72cffbb35c3cb1cadeefe1d543b00b2aaffd77b5",
+      "shows": "the same home page with the local drafts; canary-template and canary-11.6 are listed"
+    },
+    {
+      "file": "16-official-materials.png",
+      "sha256": "0369a01cc99af6ce2e83c92bf8e0db38e7f00486119ec4d1d1eccf13d69381e9",
+      "shows": "the panel my click landed on (my cloud space, empty), reached from the home page"
+    }
+  ],
+  "conclusion": "The client still shows a personal-edition account with membership upsells after a restart. The SVIP login reported by the owner is not visible from this session, so the editions tasks that depend on professional materials stayed untouched rather than being claimed.",
+  "not_proven": [
+    "whether the owner logged in on this machine, on another machine, or with a different account",
+    "whether an SVIP session would change these two screens",
+    "whether the app needs an explicit re-login/logout cycle to pick the subscription up"
+  ]
+}
