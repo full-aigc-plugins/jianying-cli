@@ -5248,12 +5248,15 @@ fn run_harvest_enum_add(
     apply: bool,
     json: bool,
 ) -> Result<()> {
+    // 贴纸编号来自应用侧、内嵌目录不覆盖，扫描也读不到（编辑器草稿被加密），
+    // 所以它只能靠人工见证登记一次；这里把 sticker 纳入可写 kind。
     const WRITABLE_KINDS: &[&str] = &[
         "video_effects",
         "filters",
         "transitions",
         "masks",
         "audio_effects",
+        "sticker",
     ];
     if !WRITABLE_KINDS.contains(&kind) {
         bail!(
