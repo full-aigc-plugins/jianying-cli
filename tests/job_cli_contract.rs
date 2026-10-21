@@ -1484,3 +1484,75 @@ fn sticker_resource_id_must_be_a_token_and_is_not_catalogue_checked() {
 
     let _ = std::fs::remove_dir_all(root);
 }
+
+#[test]
+fn filter_and_effect_segments_accept_the_numeric_resource_id() {
+    // 技能里教的是编号，Job v2 的字段也叫 resource_id；目录解析必须两种写法都认，
+    // 否则“对齐后的资源”在执行时会被当成名字查不到。
+    let root = temp_root("resource-id-resolution");
+    let media = root.join("clip.mp4");
+    std::fs::write(&media, b"not a real video").unwrap();
+
+    for (kind, segment_type, resource_id, extra) in [
+        (
+            "effect",
+            "effect",
+            "7051836120224502308",
+            serde_json::json!({"parameters": {}}),
+        ),
+        (
+            "filter",
+            "filter",
+            "7127828208690433311",
+            serde_json::json!({"intensity": 50}),
+        ),
+    ] {
+        let mut segment = serde_json::json!({
+            "type": segment_type,
+            "id": "seg-1",
+            "range": {"start_us": 0, "duration_us": 1000000},
+            "resource_id": resource_id,
+        });
+        for (key, value) in extra.as_object().unwrap() {
+            segment[key] = value.clone();
+        }
+        let mut track = serde_json::json!({
+            "id": "track-1",
+            "kind": kind,
+            "segments": [segment],
+        });
+        if kind == "effect" {
+            // effect 段挂在视频轨上，视频轨需要至少一个片段引用素材
+            track["segments"] = serde_json::json!([]);
+        }
+        let job = serde_json::json!({
+            "schema": "jianying-job/v2",
+            "operation": "create",
+            "project": {"type": "new", "project": {
+                "name": format!("resolution-{kind}"),
+                "width": 1080, "height": 1920,
+                "frame_rate": {"numerator": 30, "denominator": 1},
+                "timeline": {"tracks": [track]},
+                "materials": [{"type": "video", "id": "m1", "path": media}]
+            }}
+        });
+        let path = root.join(format!("{kind}.json"));
+        write_json(&path, &job);
+        let output = run(&[
+            "--json",
+            "job",
+            "run",
+            path.to_str().unwrap(),
+            "--out",
+            root.join(format!("draft-{kind}")).to_str().unwrap(),
+        ]);
+        let envelope = stdout_json(&output);
+        let message = envelope["error"]["message"].as_str().unwrap_or_default();
+        assert!(
+            !message.contains("is not in the bundled catalog"),
+            "{kind} rejected a numeric resource_id: {message}"
+        );
+    }
+
+    let _ = std::fs::remove_dir_all(root);
+}
