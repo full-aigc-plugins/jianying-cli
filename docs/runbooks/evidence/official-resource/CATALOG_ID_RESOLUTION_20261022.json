@@ -1,0 +1,12 @@
+{
+  "schema": "jianying-catalog-id-resolution/v1",
+  "observed_at": "2026-10-22T02:30+08:00",
+  "finding": "Job v2 writes the resource as `resource_id`, but catalog resolution looked the value up as a display name, so passing the id the skills advertise failed with \"effect \\\"7051836120224502308\\\" is not in the bundled catalog\".",
+  "fix": "catalogs::resolve now falls back to a numeric resource_id lookup (catalogs::find_by_resource_id) when the display-name lookup misses.",
+  "verified": {
+    "effect_segment_with_id_7051836120224502308": "job run exits 0 and writes the draft",
+    "effect_segment_with_name_放大镜": "still exits 0 (the name path is unchanged)",
+    "effect_segment_with_name_海邊光斑": "still refused - it is not in the snapshot"
+  },
+  "gates": "cargo test --workspace 123 targets / 384 passed; clippy -D warnings clean"
+}

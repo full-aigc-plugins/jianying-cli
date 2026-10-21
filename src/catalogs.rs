@@ -68,8 +68,12 @@ pub fn resolve(
     name: &str,
     allow_vip: bool,
 ) -> Result<&'static Value> {
-    let entry = find(catalog, name).ok_or_else(|| {
-        anyhow::anyhow!("{domain} {name:?} is not in the bundled catalog (name is case-sensitive)")
+    // Job v2 把资源写成 `resource_id`，而目录里的名字是另一套；两种都接受，
+    // 否则调用方按字段名传编号会被当成“名字不存在”。
+    let entry = find(catalog, name).or_else(|| find_by_resource_id(catalog, name)).ok_or_else(|| {
+        anyhow::anyhow!(
+            "{domain} {name:?} is not in the bundled catalog (accepts the display name or the numeric resource_id)"
+        )
     })?;
     if entry["vip"].as_bool().unwrap_or(false) && !allow_vip {
         bail!(
@@ -118,4 +122,15 @@ pub fn adjust_params(
         }
     }
     Value::Array(out)
+}
+
+/// 按 `resource_id` 查目录条目（调用方直接传编号时的回退路径）。
+pub fn find_by_resource_id<'a>(catalog: &'a Value, resource_id: &str) -> Option<&'a Value> {
+    if resource_id.is_empty() || !resource_id.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    catalog
+        .as_array()?
+        .iter()
+        .find(|e| e["resource_id"].as_str() == Some(resource_id))
 }
