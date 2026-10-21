@@ -85,3 +85,10 @@ python tools/plan_resource_lint.py plan.json --entitlement evidence.json --json
 
 索引来自 `catalogs/`，当前可解析 **4529 个 resource_id / 4541 个 effect_id**。退出码 0 表示这份计划可以交给执行器；
 它不是只读草稿校验的替代品，只是把“素材选错”这类问题挡在执行之前。
+
+### 已知缺口（2026-10-22）
+
+`jianying job run` 目前**不校验** `resource_id` 是否存在：一个 `9999999999999999999` 的贴纸段能构建成功并产出草稿
+（复现见 `docs/runbooks/evidence/official-resource/UNVALIDATED_RESOURCE_ID_20261022.json`）。在执行前请先跑
+`tools/plan_resource_lint.py`。校验若要进产品，需要区分三类：滤镜/特效有目录可查，转场按 `name` 也可查，
+而贴纸的编号来自应用侧、本来就不在目录里，不能一刀切。

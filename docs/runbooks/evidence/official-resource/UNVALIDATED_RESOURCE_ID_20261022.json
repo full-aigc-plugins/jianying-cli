@@ -1,0 +1,32 @@
+{
+  "schema": "jianying-unvalidated-resource-id/v1",
+  "observed_at": "2026-10-22T01:40+08:00",
+  "finding": "`jianying job run` accepts a sticker segment whose resource_id does not exist in any catalog and writes a draft from it. A fabricated id silently becomes a broken sticker in the draft.",
+  "reproduction": {
+    "job": {
+      "path": "temp",
+      "sha256": "21c9d4099ded2a56e7c819cc413229c2af76d059881bebe54d1738a51332c008"
+    },
+    "segment": {
+      "type": "sticker",
+      "resource_id": "9999999999999999999",
+      "range": {
+        "start_us": 0,
+        "duration_us": 1000000
+      }
+    },
+    "command": "jianying job run job.json --out draft --json",
+    "exit": 0,
+    "result": {
+      "ok": true,
+      "operation": "create",
+      "segments": 1
+    },
+    "draft_written": true,
+    "draft_content_bytes": 4861
+  },
+  "why_it_matters": "this is exactly the plan-to-execution gate an automated editor needs: without it an agent that invents or mistypes a resource id gets a green build and a draft that fails in the editor",
+  "nuance": "not every id can be checked against the embedded catalogs: stickers are online materials whose ids come from the application, so a sticker id has no catalog entry by design. Filters (1052) and video effects (1337) do, and Job v2 transitions reference a `name`, which is also catalogued - so a strict existence check would have to skip stickers and validate the other two.",
+  "current_mitigation": "tools/plan_resource_lint.py already reports unknown ids, VIP-without-entitlement and timing defects for a plan or job document; it is not yet wired into `job run`",
+  "next_step": "validate filterEffectSegment.resource_id against the filter/effect catalogs and transition.name against the transition catalog inside job validation, returning invalid_job with the JSON path; leave sticker ids alone and document why"
+}
