@@ -1,0 +1,31 @@
+{
+  "schema": "jianying-editor-gui-blocker/v1",
+  "observed_at": "2026-10-21T16:55+08:00",
+  "goal": "4.1: open the editor, reach 官方素材 and take one official material",
+  "result": "not completed - the desktop is shared and other applications keep covering the editor",
+  "what_was_done": [
+    "relaunched JianyingPro.exe and waited for its window (pid 67648, title 剪映专业版)",
+    "made the window topmost with SetWindowPos(HWND_TOPMOST) and maximised it",
+    "clicked 开始创作 (hero banner) and reached the editor with a new draft named 10月21日",
+    "tried to click 官方素材 in the left panel"
+  ],
+  "what_went_wrong": [
+    "another application's window (a /uview/switch component demo in a browser, plus a VS Code window) sat above the editor's left panel, so the click never reached the editor",
+    "three captures from the attempt showed the wrong window, so they were deleted rather than filed"
+  ],
+  "state_left_behind": {
+    "editor_running": true,
+    "pid": 67648,
+    "open_draft": "10月21日 (created by this attempt, empty)",
+    "drafts_created": [
+      "canary-11.6",
+      "canary-template",
+      "10月21日"
+    ]
+  },
+  "note": "The owner confirmed the professional entitlement is active. This round could not verify it in the UI because the desktop is in use by other applications; no claim about the entitlement state is made here.",
+  "unblock": [
+    "close the other windows (or bring 剪映专业版 to the front and keep it in front) and say when",
+    "or take the material yourself and tell me where it landed"
+  ]
+}
