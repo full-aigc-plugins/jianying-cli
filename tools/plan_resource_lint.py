@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parent.parent
 CATALOGS = ROOT / "catalogs"
 
 RESOURCE_KEYS = {"resource_id", "material_resource_id", "resourceId"}
+# 只有这些父字段的编号在内嵌目录里；其余（如 text_effect 花字）目录未覆盖，不能判死
+CATALOGUED_PARENTS = {"transition", "filter", "effect", "sticker", "video_effect", "audio_effect"}
 EFFECT_KEYS = {"effect_id", "effectId"}
 VIP_CAPABILITY = "official_assets.professional"
 
@@ -44,16 +46,16 @@ def load_index():
     return by_resource, by_effect
 
 
-def walk(value, path="$"):
+def walk(value, path="$.", parent=None):
     if isinstance(value, dict):
         for key, child in value.items():
-            here = f"{path}.{key}"
+            here = f"{path}.{key}" if path != "$." else f"$.{key}"
             if key in RESOURCE_KEYS or key in EFFECT_KEYS:
-                yield (key in RESOURCE_KEYS, str(child), here)
-            yield from walk(child, here)
+                yield (key in RESOURCE_KEYS, str(child), here, parent)
+            yield from walk(child, here, key)
     elif isinstance(value, list):
         for i, child in enumerate(value):
-            yield from walk(child, f"{path}[{i}]")
+            yield from walk(child, f"{path}[{i}]", parent)
 
 
 def entitlement_capabilities(path):
@@ -65,12 +67,14 @@ def entitlement_capabilities(path):
 
 def lint(document, by_resource, by_effect, capabilities):
     findings = []
-    for is_resource, value, where in walk(document):
+    for is_resource, value, where, parent in walk(document):
         table = by_resource if is_resource else by_effect
         hit = table.get(value)
         label = "resource_id" if is_resource else "effect_id"
         if hit is None:
-            findings.append({"kind": "unknown_id", "field": label, "id": value, "path": where})
+            # 父字段不在已登记目录里时只能说“无法核对”，不能说“编号不存在”
+            kind = "unknown_id" if parent in CATALOGUED_PARENTS else "unverified_id"
+            findings.append({"kind": kind, "field": label, "id": value, "path": where, "parent": parent})
             continue
         domain, entry = hit
         if entry.get("vip") and VIP_CAPABILITY not in capabilities:
@@ -106,6 +110,10 @@ def main():
     by_resource, by_effect = load_index()
     capabilities = entitlement_capabilities(args.entitlement)
 
+    def blocking(findings):
+        """`unverified_id` 只提示“目录未覆盖”，不阻塞。"""
+        return [f for f in findings if f["kind"] != "unverified_id"]
+
     results = []
     for name in args.documents:
         path = Path(name)
@@ -115,9 +123,9 @@ def main():
             results.append({"document": str(path), "error": str(error), "findings": []})
             continue
         findings = lint(document, by_resource, by_effect, capabilities)
-        results.append({"document": str(path), "findings": findings, "ok": not findings})
+        results.append({"document": str(path), "findings": findings, "ok": not blocking(findings)})
 
-    total = sum(len(r["findings"]) for r in results)
+    total = sum(len(blocking(r["findings"])) for r in results)
     payload = {
         "ok": total == 0 and all("error" not in r for r in results),
         "catalog_ids": {"resources": len(by_resource), "effects": len(by_effect)},
