@@ -774,5 +774,46 @@ class ReleaseIndexTests(unittest.TestCase):
                 self.assertEqual(first.read_bytes(), second.read_bytes())
 
 
+
+class CommittedEvidenceNewlines(unittest.TestCase):
+    """The evidence under provenance/ is compared byte-for-byte with `cmp` in CI.
+
+    A report written from a Windows checkout with the default text mode would carry
+    CRLF and could never match the committed LF baseline, so the writers pass
+    newline="\n" and this test keeps the committed side honest as well.
+    """
+
+    def test_provenance_files_are_lf_only(self):
+        offenders = []
+        for path in sorted((ROOT / "provenance").rglob("*")):
+            if not path.is_file():
+                continue
+            if path.suffix not in {".json", ".md", ".txt"}:
+                continue
+            data = path.read_bytes()
+            if b"\r\n" in data:
+                offenders.append(str(path.relative_to(ROOT)))
+        self.assertEqual(offenders, [], "these evidence files carry CRLF")
+
+    def test_cmp_gated_writers_force_lf(self):
+        """Every report that CI compares with `cmp` must open its output as LF."""
+        gated = {
+            "parity_run.py": "--report",
+            "capcut_project_differential.py": "--output",
+            "capcut_timeline_differential.py": "--output",
+            "capcut_media_analysis_differential.py": "--output",
+            "capcut_media_mutation_differential.py": "--output",
+            "capcut_material_discovery_differential.py": "--output",
+            "capcut_interchange_differential.py": "--output",
+            "capcut_utility_differential.py": "--output",
+        }
+        offenders = []
+        for name in gated:
+            source = (ROOT / "tools" / name).read_text(encoding="utf-8")
+            if 'newline="\\n"' not in source:
+                offenders.append(name)
+        self.assertEqual(offenders, [], "these cmp-gated writers do not force LF")
+
+
 if __name__ == "__main__":
     unittest.main()
