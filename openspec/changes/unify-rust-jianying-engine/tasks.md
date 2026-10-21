@@ -198,6 +198,11 @@
   - Tag 绑定门禁（2026-09-21）：鉴于 GitHub 只在公开后锁定 Release tag，初次与最终 publication plan 均重新解析远端 lightweight/annotated tag，并要求直接或 peeled commit 等于发布 checkout；tag 删除、移动、重复或异常输出均 fail closed。真实三平台 Release 尚未取得，任务保持未完成。
 - [x] 9.6 完成旧命令兼容期文档、迁移指南和回滚演练，不删除 v1 parser
 - [ ] 9.7 运行完整 parity、来源、差分和真实剪映门禁，仅在全部目标证据满足后标记变更可归档
+      *2026-10-21 验收记录（draft，未通过校验）*：按 `runtime acceptance verify` 的契约把 canary 事实填成了
+      `docs/runbooks/evidence/windows-canary/ACCEPTANCE_DRAFT_20261021.json`，并用产品命令验了一遍——
+      报错 `invalid /environment/cli/contract_state: expected released, found committed_unreleased`。
+      这精确定位了剩余条件：记录要求 CLI 处于 `released`（需正式发版），且 `cold_reopen`、`continuous_playback`、
+      `human_review` 三项必须为 `passed` 并有真实观察。三项目前都是真实缺口，不是格式问题。
       *2026-10-21 真实剪映证据到手*：同一台主机的 JianYing Pro 11.6.0.14552 上完成
       build → publish → **编辑器打开** → **原生导出**（ffprobe：h264 1080×1920 / 30fps / 120 帧 / 4.017s + AAC 44.1k）
       并抽帧确认画面文字；证据 `docs/runbooks/evidence/windows-canary/`（9 个媒体文件 + JSON 记录，含逐文件 sha256）。

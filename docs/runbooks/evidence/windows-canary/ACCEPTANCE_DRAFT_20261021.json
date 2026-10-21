@@ -1,0 +1,49 @@
+{
+  "schema": "jianying-video-acceptance/v1",
+  "case_id": "windows-11.6.0.14552-template-canary",
+  "scenario": "build, template-operate, publish, open and export a draft in the real editor",
+  "environment": {
+    "editor": {
+      "name": "剪映专业版",
+      "version": "11.6.0.14552",
+      "bundle_version": "11.6.0",
+      "runtime_identity": "sha256:4611aaa8ce00efc6afb41384d3f0313206d403a9bb1a1f83d6b6514cd2e5025a"
+    },
+    "cli": {
+      "version": "1.7.0",
+      "release_ref": "v1.7.0",
+      "contract_state": "committed_unreleased",
+      "sha256": "eb7ea624738be6241a6528a1792cd2e3dbc95bf606959d79bddd980e76577e17"
+    }
+  },
+  "workflow": {
+    "draft_digest": "ab5b57b966437f60a469232e604d1400e1b67758c8185e7b8224713bf88f913f",
+    "approval_id": "canary-20261021-template",
+    "published_draft": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Projects\\com.lveditor.draft\\canary-template"
+  },
+  "evidence_levels": {
+    "cold_reopen": "pending",
+    "continuous_playback": "pending",
+    "native_export": "passed",
+    "human_review": "pending",
+    "agent_visual_review": "passed"
+  },
+  "observations": {
+    "cold_reopen": "not exercised",
+    "continuous_playback": "not recorded",
+    "native_export": "export finished from the editor's 导出 panel and the file probes as h264 1080x1920 30fps"
+  },
+  "native_output": {
+    "video": {
+      "path": "C:\\Users\\hnxyh\\Videos\\canary-11.6.mp4",
+      "sha256": "0fa30ad7d73a5f6ed7b5cfe402cc784c9a41fbfcab621799e3a4b9014da69f13",
+      "byte_length": 105811,
+      "export_observation": "ffprobe: h264 1080x1920 30fps 120 frames 4.017s, aac 44.1k"
+    }
+  },
+  "source_evidence": {
+    "source_attribution_status": "verified",
+    "manifest": "E:\\workspaces\\workspace-agent-skills\\full-aigc-plugins-repositories\\jianying-cli\\provenance\\SOURCE_MANIFEST.json"
+  },
+  "draft_note": "This is a draft, not a verified record. It is filled from the 2026-10-21 canary so the remaining requirements are concrete: `jianying runtime acceptance verify` rejects it with `invalid /environment/cli/contract_state: expected released, found committed_unreleased`, and it would still need cold_reopen, continuous_playback and human_review set to passed with real observations, plus a recomputed native media identity. All of that waits for a release build."
+}

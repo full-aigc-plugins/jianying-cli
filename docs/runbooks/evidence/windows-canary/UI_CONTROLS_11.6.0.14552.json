@@ -1,0 +1,122 @@
+{
+  "schema": "jianying-editor-ui-enumeration/v1",
+  "observed_at": "2026-10-21",
+  "editor": {
+    "product": "剪映专业版",
+    "version": "11.6.0.14552",
+    "platform": "windows",
+    "account_edition": "个人版",
+    "note": "the edition matters: SVIP upsell was visible, professional materials were unavailable"
+  },
+  "how": "captured from the editor window with the CLI-built draft canary-template open",
+  "menus": {
+    "main": {
+      "items": [
+        "文件",
+        "编辑",
+        "布局模式",
+        "更多操作",
+        "帮助",
+        "账号",
+        "全局设置",
+        "返回首页",
+        "退出草稿"
+      ],
+      "evidence": [
+        {
+          "file": "04-editor-menu.png",
+          "sha256": "eb91b49b6336ca7719285f9e86a628d20b0e92cf82f0d3efb0a5c808552837ba"
+        }
+      ]
+    },
+    "left_panel_tabs": {
+      "items": [
+        "媒体",
+        "音频",
+        "文本",
+        "贴纸",
+        "特效",
+        "转场",
+        "字幕",
+        "智能包装",
+        "滤镜",
+        "调节",
+        "模板",
+        "数字人",
+        "素材"
+      ],
+      "evidence": [
+        {
+          "file": "03-after-double-click.png",
+          "sha256": "b6d8e1820d7151488eec60ad21006755a2594557e2be52cfb47aeb8c64b192b1"
+        }
+      ]
+    },
+    "text_panel_groups": {
+      "items": [
+        "导入",
+        "文本",
+        "花字",
+        "智能文本",
+        "我的",
+        "AI生成",
+        "云素材",
+        "官方素材",
+        "即梦AI"
+      ],
+      "evidence": [
+        {
+          "file": "11-template-draft-open.png",
+          "sha256": "ab3dc1143796b8af6ada12771cb78a06e2b2be6174bf8ebd96b18fa6efa211a2"
+        }
+      ]
+    },
+    "export_settings": {
+      "fields": [
+        "导出至",
+        "分辨率",
+        "格式",
+        "帧率",
+        "码率",
+        "音频导出"
+      ],
+      "observed": {
+        "resolution": "原始（以草稿尺寸 1080×1920 导出）",
+        "format": "MP4",
+        "fps": "30",
+        "bitrate": "推荐",
+        "estimate": "时长 4秒 / 大小 4MB"
+      },
+      "evidence": [
+        {
+          "file": "06-export-panel.png",
+          "sha256": "3443fb6c8fb52cb0955b614ec9615791a5b850508574724c01d5b1158a7b9bcc"
+        }
+      ]
+    },
+    "timeline_track_headers": {
+      "items": [
+        "文本轨（两条）",
+        "音频轨（空）"
+      ],
+      "evidence": [
+        {
+          "file": "11-template-draft-open.png",
+          "sha256": "ab3dc1143796b8af6ada12771cb78a06e2b2be6174bf8ebd96b18fa6efa211a2"
+        }
+      ]
+    }
+  },
+  "publish_restrictions_observed": {
+    "account_edition": "个人版",
+    "upsell_visible": "现在开通，低至1.9元/天（SVIP）",
+    "professional_materials": "unavailable with this edition",
+    "note": "the exports and template operations used no professional material"
+  },
+  "not_enumerated": [
+    "segment right-click context menu (the capture attempt opened the shell start menu instead)",
+    "page preview bench (页面预览台) controls",
+    "canary/beta build: only 11.6.0.14552 is installed on this host, and the task's earlier note pins 11.6.0-beta2/beta3",
+    "professional edition restrictions (this account is a personal one)"
+  ]
+}
