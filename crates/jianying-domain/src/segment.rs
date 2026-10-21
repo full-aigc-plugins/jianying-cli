@@ -37,7 +37,9 @@ pub enum Segment {
         animation_out: Option<Animation>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         animation_group: Option<Animation>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
+        // Job v2 把转场写成 `transition`，领域字段叫 `transition_out`；不认别名时 serde 会静默丢掉它，
+        // 于是“声明了转场”的 Job 构建成功、草稿里却没有转场。
+        #[serde(default, alias = "transition", skip_serializing_if = "Option::is_none")]
         transition_out: Option<Transition>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         fade: Option<Fade>,
