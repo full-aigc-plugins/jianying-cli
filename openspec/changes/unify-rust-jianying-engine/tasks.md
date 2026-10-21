@@ -200,7 +200,13 @@
       *2026-10-21 产品侧（release 二进制）复核*：用当前 HEAD 重建 release 二进制后，`tools/package_release.py` 产出 `jianying-cli-1.7.0-win32-x64.zip`（8,385,799 B），再用**产品自己的命令**验证这个包：
       - `jianying release verify <bundle> --json` → `data.ok=true`，**11 个文件**逐个 sha256/大小复核全部通过，能力契约 **171 declared / 171 embedded，mismatches=[]**；
       - 负例：把 `THIRD_PARTY_NOTICES.md` 改一个字符后重跑 → `data.ok=false`、`files_failed=1`，失败项正是 `THIRD_PARTY_NOTICES.md`、`reason="sha256 mismatch"`，能力契约仍 171/171。（注：按既有契约，篡改只体现在 `data.ok` 里、进程退出码为 0；只有 manifest schema 不受支持才 exit 1——这是被 `tests/release_verify_contract.rs` 固定住的设计，不是缺陷。）
-      - `jianying selftest --json` → `ok=true`，7 项：**5 pass / 2 skip**（skip 的是 media 与 render，需要 ffprobe/ffmpeg 与真实素材）；      - `jianying doctor --json` / `status --json` → ok，`editors_running=[]`，能力 **171（supported 150 / 其他 21）**；
+
+      *2026-10-21 把两条此前在本机跑不了的差分修成可跑*：media analysis 的替身原本是 `#!/bin/sh` 脚本，Windows 无法执行（`--ffmpeg-cmd` 只接受单个路径而不是命令行）。现在非 Windows 仍用 shell 脚本，Windows 则用 `rustc` 现场编译一个等价的小可执行文件，两条路径输出一致；media mutation 的 TTS 替身从 shell 脚本改成 Python 生成器，模板写成带引号的 `<python> <script> {out} {text}`（模板拆分器支持引号，`text_delivery` 仍是 `argv`），一次模板两端通用。
+      结果：`capcut_media_analysis_differential.py` **3 passed、报告逐字节相同**；`capcut_media_mutation_differential.py` **6 passed、报告逐字节相同**。
+      **七个差分里六个**在本机与基线逐字节一致（project 11 / timeline 32 / media analysis 3 / media mutation 6 / material discovery 2 / interchange 2）。
+      剩下的 `capcut_utility_differential.py`（42 passed）报告差 3 行：上游 Node CLI 在 macOS 上把管道里的 JSON 截断在 65536 字节（基线记为 `approved-upstream-stdout-truncation`），而在本机 Windows 上上游吐出了完整 JSON（记为 `exact`）。这是上游按平台的管道行为差异，harness 两条分支都判通过；要让它也逐字节一致，只能把上游改成写文件采集并重生成基线——那会改动 macOS 的既有证据，我没有单方面动它。
+      - `jianying selftest --json` → `ok=true`，7 项：**5 pass / 2 skip**（skip 的是 media 与 render，需要 ffprobe/ffmpeg 与真实素材）；
+      - `jianying doctor --json` / `status --json` → ok，`editors_running=[]`，能力 **171（supported 150 / 其他 21）**；
       - CLI 自带 MCP 服务 `jianying mcp serve` 走 stdio：`initialize` 返回 `jianying-cli 1.7.0`，`tools/list` **17 个工具**，`tools/call jianying_doctor` 与 `jianying_capabilities` 均返回完整 JSON。
       *2026-10-20 本机复跑（非 mac/真机部分）*：`python tools/parity_run.py --bin target/release/jianying.exe
       --pyjyd-src <checkout>/pyJianYingDraft` → **55 passed / 0 failed**（对照 pyJYD 6bb2d06）；

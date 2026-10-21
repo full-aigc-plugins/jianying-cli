@@ -24,6 +24,62 @@ def invoke(argv: list[str]) -> Any:
     return json.loads(process.stdout)
 
 
+SHELL_STUB = (
+    "#!/bin/sh\n"
+    "echo 'Duration: 00:00:06.000, start: 0.000000' >&2\n"
+    "case \"$*\" in\n"
+    "  *silencedetect*) echo 'silence_start: 1.0' >&2; "
+    "echo 'silence_end: 2.0 | silence_duration: 1.0' >&2; "
+    "echo 'silence_start: 5.0' >&2;;\n"
+    "  *) echo 'frame:0 pts:1 pts_time:1.0' >&2; "
+    "echo 'lavfi.scene_score=0.5' >&2; "
+    "echo 'frame:1 pts:3 pts_time:3.0' >&2; "
+    "echo 'lavfi.scene_score=0.9' >&2;;\n"
+    "esac\nexit 0\n"
+)
+
+# Windows cannot exec a shebang script, and `--ffmpeg-cmd` is a single path rather than a
+# command line, so the stand-in has to be a real executable there. rustc is always present
+# where this harness runs (it builds the binary under test), so compiling one keeps the
+# differential identical on both platforms instead of skipping it.
+RUST_STUB = """use std::env;
+
+fn main() {
+    let joined = env::args().skip(1).collect::<Vec<_>>().join(" ");
+    eprintln!("Duration: 00:00:06.000, start: 0.000000");
+    if joined.contains("silencedetect") {
+        eprintln!("silence_start: 1.0");
+        eprintln!("silence_end: 2.0 | silence_duration: 1.0");
+        eprintln!("silence_start: 5.0");
+    } else {
+        eprintln!("frame:0 pts:1 pts_time:1.0");
+        eprintln!("lavfi.scene_score=0.5");
+        eprintln!("frame:1 pts:3 pts_time:3.0");
+        eprintln!("lavfi.scene_score=0.9");
+    }
+}
+"""
+
+
+def ffmpeg_stub(directory: pathlib.Path) -> pathlib.Path:
+    """Build the fake ffmpeg the scene/silence parsers read."""
+    if os.name != "nt":
+        fake = directory / "fake-ffmpeg"
+        fake.write_text(SHELL_STUB, encoding="utf-8")
+        fake.chmod(fake.stat().st_mode | 0o111)
+        return fake
+    source = directory / "ffmpeg_stub.rs"
+    source.write_text(RUST_STUB, encoding="utf-8")
+    binary = directory / ("fake-ffmpeg.exe")
+    subprocess.run(
+        ["rustc", "-O", "-o", str(binary), str(source)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return binary
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--upstream", type=pathlib.Path, required=True)
@@ -43,22 +99,7 @@ def main() -> int:
         root = pathlib.Path(temporary)
         media = root / "input.mp4"
         media.write_bytes(b"fixture")
-        fake = root / "fake-ffmpeg"
-        fake.write_text(
-            "#!/bin/sh\n"
-            "echo 'Duration: 00:00:06.000, start: 0.000000' >&2\n"
-            "case \"$*\" in\n"
-            "  *silencedetect*) echo 'silence_start: 1.0' >&2; "
-            "echo 'silence_end: 2.0 | silence_duration: 1.0' >&2; "
-            "echo 'silence_start: 5.0' >&2;;\n"
-            "  *) echo 'frame:0 pts:1 pts_time:1.0' >&2; "
-            "echo 'lavfi.scene_score=0.5' >&2; "
-            "echo 'frame:1 pts:3 pts_time:3.0' >&2; "
-            "echo 'lavfi.scene_score=0.9' >&2;;\n"
-            "esac\nexit 0\n",
-            encoding="utf-8",
-        )
-        fake.chmod(fake.stat().st_mode | 0o111)
+        fake = ffmpeg_stub(root)
 
         rust_scenes = invoke([
             str(rust), "media", "scenes", str(media), "--ffmpeg-cmd", str(fake),

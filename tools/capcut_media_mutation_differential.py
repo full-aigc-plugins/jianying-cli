@@ -8,6 +8,7 @@ import json
 import pathlib
 import shutil
 import subprocess
+import sys
 import tempfile
 from typing import Any
 
@@ -65,6 +66,29 @@ def ffmpeg(*args: str) -> None:
     subprocess.run(
         ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", *args], check=True
     )
+
+
+# Writes a deterministic one-second PCM WAV, so both implementations probe the same
+# duration without needing a real speech model.
+TTS_STUB = """\
+import math
+import struct
+import sys
+import wave
+
+out, text = sys.argv[1], sys.argv[2]
+rate = 24000
+frames = rate
+with wave.open(out, "wb") as handle:
+    handle.setnchannels(1)
+    handle.setsampwidth(2)
+    handle.setframerate(rate)
+    payload = bytearray()
+    for index in range(frames):
+        sample = int(12000 * math.sin(2 * math.pi * 600 * index / rate))
+        payload += struct.pack("<h", sample)
+    handle.writeframes(bytes(payload))
+"""
 
 
 def main() -> int:
@@ -136,13 +160,13 @@ def main() -> int:
         }
         cases.append({"command": "add-sfx", "status": "exact-fields"})
 
-        generator = root / "fake-tts.sh"
-        generator.write_text(
-            "#!/bin/sh\nffmpeg -hide_banner -loglevel error -y -f lavfi -i sine=frequency=600:duration=1 \"$1\"\n",
-            encoding="utf-8",
-        )
-        generator.chmod(0o755)
-        template = f"{generator} {{out}} {{text}}"
+        # One template for both implementations. The interpreter path is absolute and
+        # quoted because the template is split on whitespace with quote support, and a
+        # Python script is the only stand-in that runs unchanged on POSIX and Windows
+        # (a shebang script is not executable there).
+        generator = root / "fake_tts.py"
+        generator.write_text(TTS_STUB, encoding="utf-8")
+        template = f'"{sys.executable}" "{generator}" {{out}} {{text}}'
         rproj, uproj = pair(root, base, "tts")
         r = rust(binary, "media", "tts", str(rproj), "0s", "--text", "hello world", "--tts-cmd", template)
         u = upstream(entry, "tts", str(uproj), "0s", "--text", "hello world", "--tts-cmd", template)
