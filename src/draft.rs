@@ -525,7 +525,8 @@ fn mask_entry(materials: &mut Value, mask: &crate::plan::Mask, info: &MediaInfo)
             "width": width
         },
         "id": id,
-        "name": mask.name,
+        // 传数字编号时也要写目录里的显示名，否则剪映界面会显示一串数字
+        "name": entry["name"],
         "platform": "all",
         "position_info": "",
         "resource_type": shape,
