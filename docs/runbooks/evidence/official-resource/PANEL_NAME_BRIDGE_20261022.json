@@ -1,0 +1,141 @@
+{
+  "schema": "jianying-panel-name-bridge/v1",
+  "observed_at": "2026-10-22T02:05+08:00",
+  "what_was_done": "clicked every resource tab in the editor (素材/音频/文本/贴纸/特效/转场/字幕/滤镜) and let each panel load",
+  "screenshot": {
+    "file": "52-filter-tab.png",
+    "sha256": "1be1f7e5d2033d97b1f145d82f91ebd6ec83ac6245b9a2768d7f5c78615ed9ba",
+    "bytes": 958178
+  },
+  "panel": {
+    "tab": "特效",
+    "categories_seen": [
+      "热门",
+      "万圣节",
+      "基础",
+      "动感",
+      "氛围",
+      "创意",
+      "暗黑",
+      "边框",
+      "多屏",
+      "音效",
+      "光",
+      "景心",
+      "音频",
+      "旅行",
+      "自然",
+      "奇幻",
+      "复古",
+      "电影",
+      "bling",
+      "扭曲",
+      "综合",
+      "分屏",
+      "宠物",
+      "投影",
+      "绘画",
+      "黑屏",
+      "人物特效"
+    ],
+    "named_items_sampled": 42
+  },
+  "name_bridge": {
+    "matched": [
+      {
+        "panel_name": "丁达尔光线",
+        "resource_id": "6834008866137575950",
+        "vip": false
+      },
+      {
+        "panel_name": "放大镜",
+        "resource_id": "7051836120224502308",
+        "vip": false
+      },
+      {
+        "panel_name": "模糊",
+        "resource_id": "6739752823140913675",
+        "vip": false
+      },
+      {
+        "panel_name": "放大镜视角",
+        "resource_id": "7447417965676335667",
+        "vip": true
+      },
+      {
+        "panel_name": "天使光",
+        "resource_id": "6721949326022545928",
+        "vip": false
+      },
+      {
+        "panel_name": "红包来了",
+        "resource_id": "7320154851793441307",
+        "vip": true
+      },
+      {
+        "panel_name": "荧光扫描",
+        "resource_id": "7041474808986472967",
+        "vip": false
+      },
+      {
+        "panel_name": "爆炸",
+        "resource_id": "6740540228194275844",
+        "vip": false
+      },
+      {
+        "panel_name": "金粉飘落",
+        "resource_id": "7456695082293400115",
+        "vip": true
+      },
+      {
+        "panel_name": "星光",
+        "resource_id": "6717433583289504268",
+        "vip": false
+      }
+    ],
+    "unmatched": [
+      "海边光斑",
+      "多彩涂鸦",
+      "回忆检索",
+      "红绸光斑",
+      "云层散开",
+      "碎片重叠",
+      "水中倒影",
+      "深浅感人",
+      "糖果色块",
+      "3D玻璃",
+      "冷调光影",
+      "细闪II",
+      "金片II",
+      "新春回忆",
+      "草地足球场",
+      "红绸画卷",
+      "童话舞台",
+      "金秋月满",
+      "飘雪II",
+      "照片墙",
+      "喜庆舞台",
+      "粒子微光",
+      "粉笔渐变",
+      "色彩地标",
+      "闪闪灵动",
+      "保护童心",
+      "开篇",
+      "舞动",
+      "复古文艺范",
+      "动感",
+      "光影",
+      "星尘"
+    ],
+    "rate": "10/42"
+  },
+  "reverse_engineering_result": {
+    "rp_db_after_browsing": "still zero rows in effect/category_data/panel_category - the panel metadata is not persisted there",
+    "app_version": "11.7.0.14614",
+    "conclusion": "browsing the panel gives names and categories on screen, and about a quarter of those names still exist in the embedded 2026-09-26 catalog, so a name-to-id bridge covers a subset; the rest needs the app metadata that is not readable on disk"
+  },
+  "not_proven": [
+    "that downloading an item writes its resource id anywhere readable - the cache stores md5-named files",
+    "that the unmatched names are absent from the app catalog rather than renamed"
+  ]
+}
