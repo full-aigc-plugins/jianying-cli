@@ -165,6 +165,20 @@
   - Tag 绑定门禁（2026-09-21）：鉴于 GitHub 只在公开后锁定 Release tag，初次与最终 publication plan 均重新解析远端 lightweight/annotated tag，并要求直接或 peeled commit 等于发布 checkout；tag 删除、移动、重复或异常输出均 fail closed。真实三平台 Release 尚未取得，任务保持未完成。
 - [x] 9.6 完成旧命令兼容期文档、迁移指南和回滚演练，不删除 v1 parser
 - [ ] 9.7 运行完整 parity、来源、差分和真实剪映门禁，仅在全部目标证据满足后标记变更可归档
+      *2026-10-21 本机补跑 capcut-cli 差分（CI 的 `parity` job）*：按 CI 的 pin 克隆并构建
+      `capcut-cli @ 49f70e3`（npm 10.9.3 `ci --ignore-scripts` + `run build`），用 release 二进制跑四个
+      黑盒差分：
+      - `capcut_project_differential.py` → **11 passed / 0 failed**，产物与
+        `provenance/CAPCUT_PROJECT_DIFFERENTIALS.json` **逐字节相同**；
+      - `capcut_timeline_differential.py` → **32 passed / 0 failed**，产物**逐字节相同**；
+      - `capcut_media_analysis_differential.py` 与 `capcut_media_mutation_differential.py` 在本机**无法跑**：
+        这两个 harness 用一个 `#!/bin/sh` 脚本冒充 ffmpeg，Windows 上执行它报
+        `os error 193（不是有效的 Win32 应用程序）`。这是 harness 的平台限制，不是产品缺陷。
+      *顺带修了一处跨平台缺陷*：七个差分工具写证据文件用的是 `write_text(..., encoding="utf-8")`，
+      Windows 文本模式会把 `
+` 变成 `
+`，导致 CI 的 `cmp` 门禁在 Windows 上**永远无法通过**。现在统一
+      传 `newline="\n"`，上面两个"逐字节相同"就是修好后的结果。
       *2026-10-20 本机复跑（非 mac/真机部分）*：`python tools/parity_run.py --bin target/release/jianying.exe
       --pyjyd-src <checkout>/pyJianYingDraft` → **55 passed / 0 failed**（对照 pyJYD 6bb2d06）；
       `python tools/gen_catalogs.py <checkout>/pyJianYingDraft --check` → **catalogs up to date**；

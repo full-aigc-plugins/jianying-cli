@@ -859,7 +859,7 @@ def main() -> int:
     }
     encoded = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
-        args.output.write_text(encoded, encoding="utf-8")
+        args.output.write_text(encoded, encoding="utf-8", newline="\n")
     print(encoded, end="")
     return 0
 
