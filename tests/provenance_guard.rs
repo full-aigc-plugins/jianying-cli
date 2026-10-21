@@ -111,10 +111,17 @@ fn pyjianyingdraft_completion_claim_tracks_partial_rows_and_open_tasks() {
         .filter(|row| row["status"] == "partial")
         .collect::<Vec<_>>();
     let claim = parity["source_claims"]["pyjianyingdraft"].as_str().unwrap();
-    assert_eq!(claim, if partial.is_empty() { "complete" } else { "incomplete" });
+    assert_eq!(
+        claim,
+        if partial.is_empty() {
+            "complete"
+        } else {
+            "incomplete"
+        }
+    );
 
-    let tasks = std::fs::read_to_string("openspec/changes/unify-rust-jianying-engine/tasks.md")
-        .unwrap();
+    let tasks =
+        std::fs::read_to_string("openspec/changes/unify-rust-jianying-engine/tasks.md").unwrap();
     for row in &partial {
         assert!(row["gap"].as_str().is_some_and(|value| !value.is_empty()));
         let blocking = row["blocking_tasks"]
