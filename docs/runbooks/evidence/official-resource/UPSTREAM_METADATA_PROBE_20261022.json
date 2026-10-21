@@ -1,0 +1,30 @@
+{
+  "schema": "jianying-upstream-metadata-probe/v1",
+  "observed_at": "2026-10-22T02:15+08:00",
+  "question": "would updating the pyJianYingDraft snapshot cover the 32 panel names that did not match?",
+  "method": "git fetch in the reference checkout, then compare pyJianYingDraft/metadata/video_scene_effect.py between the pinned commit and FETCH_HEAD",
+  "result": {
+    "pinned_commit": "6bb2d06a",
+    "upstream_head": "3f96377b",
+    "metadata_bytes_pinned": 566375,
+    "metadata_bytes_upstream": 566375,
+    "sample_names_in_upstream": [
+      "放大镜",
+      "天使光",
+      "星光"
+    ],
+    "sample_names_absent_upstream": [
+      "海边光斑",
+      "多彩涂鸦",
+      "丁达尔光线",
+      "碎片重叠",
+      "水中倒影"
+    ],
+    "verdict": "the upstream metadata file is byte-for-byte the same size and still lacks the newer 11.7 effects, so refreshing the snapshot would not raise the name-to-id coverage"
+  },
+  "consequence": "the remaining panel names can only be bound to ids through the application itself, and the application does not persist them where a script can read them (rp.db has zero rows after browsing, drafts are encrypted, cached media files are md5-named). The practical route stays: register witnessed ids with media harvest-enums add.",
+  "not_proven": [
+    "that the byte size equality implies identical content - the file was compared by size and by a name sample, not by hash",
+    "whether a future upstream release will add the 11.7 effects"
+  ]
+}
