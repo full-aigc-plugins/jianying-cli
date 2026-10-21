@@ -1046,3 +1046,37 @@ class FfmpegStubBranchesAgree(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ResourceSkillsMatchTheCatalogs(unittest.TestCase):
+    """`.agents/skills/jianying-*` 必须与 catalogs 一致，防止编号表漂移。"""
+
+    def test_generated_skills_are_current(self):
+        completed = subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "gen_resource_skills.py"), "--check"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            completed.returncode,
+            0,
+            "resource skills are stale; run python tools/gen_resource_skills.py\n"
+            + completed.stdout
+            + completed.stderr,
+        )
+        self.assertIn("0 stale", completed.stdout)
+
+    def test_every_table_row_carries_a_catalog_id(self):
+        """表里每一行都以 catalog 的真实 resource_id 开头，不允许多余行。"""
+        skills = ROOT / ".agents" / "skills"
+        checked = 0
+        for table in sorted(skills.glob("jianying-*/references/*.md")):
+            rows = [line for line in table.read_text(encoding="utf-8").splitlines()
+                    if line.startswith("| `")]
+            self.assertTrue(rows, f"{table} has no rows")
+            for row in rows:
+                cells = [cell.strip() for cell in row.strip("|").split("|")]
+                self.assertRegex(cells[0], r"^`[0-9]{6,}`$", f"{table}: {row[:80]}")
+                checked += 1
+        self.assertGreater(checked, 3000, f"only {checked} rows checked")
