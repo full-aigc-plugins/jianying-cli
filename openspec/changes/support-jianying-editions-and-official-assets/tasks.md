@@ -78,6 +78,13 @@
     证据：`docs/runbooks/evidence/windows-canary/OFFICIAL_MATERIAL_20261021.json`（6 张截图带 sha256）。
     **仍未勾**：没有拿到该素材的授权条款文本（应用只给横幅与“可商用”标签），也没有导出成片证明可发布。
 - [ ] 4.2 用发布 Rust CLI 验证收据并编译真实草稿，证明篡改文件、过期权益和用途冲突均被拒绝。
+  - *2026-10-21 全链路往返已跑通（4.2 仍未勾）*：新增 `tools/official_receipt_roundtrip.py`，用发布二进制
+    建真实草稿 → 生成 `draft_resource` 收据 → `verify`（verified）→ `register`（registered）→ `show` →
+    `list`（恰好 1 条）→ `preflight`（ready），再跑三个负例：未注册素材 `asset_not_registered`、
+    过期凭据拒绝、只改节点内容保留 id → `asset_identity_mismatch`。九项全过，**连跑两次结论一致**。
+    为了让报告可复现，去掉每次 `build` 都会变的素材 id（只记“找到唯一节点”）。
+    证据：`docs/runbooks/evidence/official-resource/RECEIPT_ROUNDTRIP_20261021.json`（含二进制 sha256）。
+    **仍未勾**：收据是 synthetic 的（title 已写明），真实剪映素材需要授权条款文本与明文草稿，两者都还缺。
   - *2026-10-21 拒绝路径已用产品命令跑通（4.2 仍未勾）*：按 `schemas/jianying-entitlement-v1` 与
     `schemas/jianying-official-resource-receipt-v1` 造了**合成**凭据/收据，逐条驱动
     `jianying media official verify … --usage … --at 1760000100`，结果：

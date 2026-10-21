@@ -1,0 +1,102 @@
+{
+  "schema": "jianying-official-receipt-roundtrip/v1",
+  "observed_at": "2026-10-21",
+  "task": "4.2 的 CLI 侧半边：用发布二进制跑完 verify/register/show/list/preflight 全链路",
+  "how": "tools/official_receipt_roundtrip.py 建真实草稿 -> 生成 draft_resource 收据 -> 五个动词 + 三个负例，连跑两次比较",
+  "binary": {
+    "path": "target/release/jianying.exe",
+    "sha256": "5da936b5f694b972fcc86382a833e86796a476f24357792d1e47a2987ad9eafd",
+    "bytes": 24956416
+  },
+  "summary": {
+    "runs": 2,
+    "passed": true,
+    "reproducible": true,
+    "checks": {
+      "build": true,
+      "verify": true,
+      "register": true,
+      "show": true,
+      "list": true,
+      "preflight": true,
+      "unregistered_refused": true,
+      "expired_refused": true,
+      "tampered_refused": true
+    }
+  },
+  "run": {
+    "asset_id": "roundtrip-draft-text-0001",
+    "steps": {
+      "build": {
+        "exit": 0,
+        "ok": true
+      },
+      "node_located": {
+        "unique": true
+      },
+      "verify": {
+        "exit": 0,
+        "ok": true,
+        "status": "verified"
+      },
+      "register": {
+        "exit": 0,
+        "ok": true,
+        "status": "registered"
+      },
+      "show": {
+        "exit": 0,
+        "ok": true
+      },
+      "list": {
+        "exit": 0,
+        "ok": true,
+        "count": 1
+      },
+      "preflight": {
+        "exit": 0,
+        "ok": true,
+        "status": "ready"
+      },
+      "preflight_unregistered": {
+        "exit": 1,
+        "type": "asset_not_registered"
+      },
+      "preflight_expired": {
+        "exit": 1,
+        "type": "invalid_entitlement"
+      },
+      "verify_tampered": {
+        "exit": 1,
+        "type": "asset_identity_mismatch"
+      }
+    },
+    "checks": {
+      "build": true,
+      "verify": true,
+      "register": true,
+      "show": true,
+      "list": true,
+      "preflight": true,
+      "unregistered_refused": true,
+      "expired_refused": true,
+      "tampered_refused": true
+    },
+    "passed": true
+  },
+  "what_the_checks_mean": {
+    "build": "发布二进制建出真实草稿，并按 id 找到唯一素材节点",
+    "verify": "收据 + 草稿 + 凭据 -> status: verified",
+    "register": "写入收据库 -> status: registered",
+    "show": "按 asset_id 取回收据",
+    "list": "库里恰好一条",
+    "preflight": "Job 需求 -> status: ready",
+    "unregistered_refused": "未注册素材 -> asset_not_registered（本轮新错误类型）",
+    "expired_refused": "过期凭据 -> 拒绝",
+    "tampered_refused": "只改节点内容保留 id -> asset_identity_mismatch"
+  },
+  "not_proven": [
+    "收据是 synthetic 的（title 已写明），不是真实剪映素材；真实素材那半边仍需要授权条款与明文草稿",
+    "没有驱动编辑器：这是 CLI 与草稿文件的闭环，不是编辑器内验证"
+  ]
+}
