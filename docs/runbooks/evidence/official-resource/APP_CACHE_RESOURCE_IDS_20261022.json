@@ -1,0 +1,2601 @@
+{
+  "schema": "jianying-app-cache-resource-ids/v1",
+  "observed_at": "2026-10-22T02:00+08:00",
+  "why": "the user asked for reverse-engineering instead of manual enumeration; this is the read-only part: what ids the application itself has already cached, and what type each one declares in its own config files",
+  "source_dirs": [
+    "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Cache\\effect",
+    "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Cache\\artistEffect"
+  ],
+  "counts": {
+    "effect": 252,
+    "artistEffect": 7
+  },
+  "type_signals": {
+    "AmazingFeature": 219,
+    "InfoSticker": 26,
+    "TouchGes": 4,
+    "AmazingFilter": 2,
+    "matting": 1,
+    "Default": 1,
+    "LyricStyle": 1,
+    "all_sentence": 1
+  },
+  "entries": [
+    {
+      "cache_kind": "effect",
+      "id": "115534218",
+      "numeric": true,
+      "files": 27,
+      "bytes": 139318,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534219",
+      "numeric": true,
+      "files": 27,
+      "bytes": 116655,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534220",
+      "numeric": true,
+      "files": 27,
+      "bytes": 160258,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534221",
+      "numeric": true,
+      "files": 27,
+      "bytes": 175374,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534222",
+      "numeric": true,
+      "files": 27,
+      "bytes": 227061,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534223",
+      "numeric": true,
+      "files": 27,
+      "bytes": 164639,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534224",
+      "numeric": true,
+      "files": 27,
+      "bytes": 110375,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534225",
+      "numeric": true,
+      "files": 27,
+      "bytes": 108770,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534226",
+      "numeric": true,
+      "files": 27,
+      "bytes": 198065,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534227",
+      "numeric": true,
+      "files": 27,
+      "bytes": 92762,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534228",
+      "numeric": true,
+      "files": 27,
+      "bytes": 156734,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534229",
+      "numeric": true,
+      "files": 27,
+      "bytes": 165937,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534230",
+      "numeric": true,
+      "files": 27,
+      "bytes": 193239,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534231",
+      "numeric": true,
+      "files": 27,
+      "bytes": 83817,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "115534232",
+      "numeric": true,
+      "files": 27,
+      "bytes": 113173,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7202575978646737469",
+      "numeric": true,
+      "files": 40,
+      "bytes": 88136,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7202576698775179837",
+      "numeric": true,
+      "files": 22,
+      "bytes": 42962,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7216624865233605178",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7226239683078918712",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7226240000730337852",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7226240367983596093",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7226240439760720421",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7226240499487609401",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231834484956467768",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231834666011988517",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231834768910848571",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231834926805422651",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231835018450965051",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231835230057796157",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231835412396773944",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231835591422251576",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7231835658950545976",
+      "numeric": true,
+      "files": 2,
+      "bytes": 251,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7237449940027314748",
+      "numeric": true,
+      "files": 3,
+      "bytes": 7016,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7237450043844727353",
+      "numeric": true,
+      "files": 3,
+      "bytes": 5695,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7297207184457208357",
+      "numeric": true,
+      "files": 3,
+      "bytes": 3234,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7297207371648995878",
+      "numeric": true,
+      "files": 3,
+      "bytes": 1974,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7301686950317003315",
+      "numeric": true,
+      "files": 3,
+      "bytes": 3567,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7366590389928595994",
+      "numeric": true,
+      "files": 11,
+      "bytes": 10626,
+      "type_signals": [
+        "matting"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7397035364310848051",
+      "numeric": true,
+      "files": 51,
+      "bytes": 111000,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406016931926379816",
+      "numeric": true,
+      "files": 135,
+      "bytes": 3167297,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406017234474175796",
+      "numeric": true,
+      "files": 17,
+      "bytes": 14109,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406018149583310114",
+      "numeric": true,
+      "files": 53,
+      "bytes": 1216226,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406173825450233122",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1842174,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406173874112531752",
+      "numeric": true,
+      "files": 10,
+      "bytes": 17466,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406173887018323234",
+      "numeric": true,
+      "files": 11,
+      "bytes": 769858,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406173928936279336",
+      "numeric": true,
+      "files": 135,
+      "bytes": 1773188,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406173948041252131",
+      "numeric": true,
+      "files": 12,
+      "bytes": 96150,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406173953661701411",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1493033,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406173954416692532",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1394194,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174013644426531",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1391263,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174026269199668",
+      "numeric": true,
+      "files": 12,
+      "bytes": 120101,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174048629165364",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1226553,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174064206826767",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1875350,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174119940721935",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1379714,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174206645325056",
+      "numeric": true,
+      "files": 80,
+      "bytes": 1125529,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174224722824500",
+      "numeric": true,
+      "files": 11,
+      "bytes": 1253158,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174256108719375",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1347351,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174351718010146",
+      "numeric": true,
+      "files": 29,
+      "bytes": 154018,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174382676086050",
+      "numeric": true,
+      "files": 21,
+      "bytes": 174829,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174410027175220",
+      "numeric": true,
+      "files": 14,
+      "bytes": 186984,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174432668028175",
+      "numeric": true,
+      "files": 12,
+      "bytes": 109437,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174445548719394",
+      "numeric": true,
+      "files": 12,
+      "bytes": 170774,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174451949260084",
+      "numeric": true,
+      "files": 12,
+      "bytes": 173789,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174469707926819",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1368498,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174488410262784",
+      "numeric": true,
+      "files": 11,
+      "bytes": 611270,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174489727339791",
+      "numeric": true,
+      "files": 17,
+      "bytes": 13226,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174539454909730",
+      "numeric": true,
+      "files": 12,
+      "bytes": 183208,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174561663782159",
+      "numeric": true,
+      "files": 12,
+      "bytes": 92169,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174564343991586",
+      "numeric": true,
+      "files": 12,
+      "bytes": 179356,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174577568517411",
+      "numeric": true,
+      "files": 135,
+      "bytes": 5298231,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174590969449780",
+      "numeric": true,
+      "files": 14,
+      "bytes": 208059,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174614939880704",
+      "numeric": true,
+      "files": 16,
+      "bytes": 48539,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174643247123746",
+      "numeric": true,
+      "files": 12,
+      "bytes": 193782,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174660452257024",
+      "numeric": true,
+      "files": 11,
+      "bytes": 265984,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174674402495759",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1454470,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174767792901416",
+      "numeric": true,
+      "files": 12,
+      "bytes": 200333,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174769218997544",
+      "numeric": true,
+      "files": 12,
+      "bytes": 158333,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174795131260194",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1404562,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174828278877475",
+      "numeric": true,
+      "files": 21,
+      "bytes": 173106,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174836470435107",
+      "numeric": true,
+      "files": 12,
+      "bytes": 116589,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174852874341684",
+      "numeric": true,
+      "files": 80,
+      "bytes": 2940424,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174928266906932",
+      "numeric": true,
+      "files": 14,
+      "bytes": 123241,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174933820198196",
+      "numeric": true,
+      "files": 12,
+      "bytes": 187797,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174938438044943",
+      "numeric": true,
+      "files": 12,
+      "bytes": 95808,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406174968096001332",
+      "numeric": true,
+      "files": 12,
+      "bytes": 153306,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406175039264951592",
+      "numeric": true,
+      "files": 12,
+      "bytes": 182064,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406175181615402280",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1400505,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406175199361649920",
+      "numeric": true,
+      "files": 12,
+      "bytes": 104055,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406175201282592040",
+      "numeric": true,
+      "files": 11,
+      "bytes": 73461,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406175318072888576",
+      "numeric": true,
+      "files": 11,
+      "bytes": 132699,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406179526570560783",
+      "numeric": true,
+      "files": 21,
+      "bytes": 162255,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406179674688163112",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1024974,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406179874521632035",
+      "numeric": true,
+      "files": 12,
+      "bytes": 94562,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406179901545483554",
+      "numeric": true,
+      "files": 12,
+      "bytes": 189246,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406179915206348032",
+      "numeric": true,
+      "files": 12,
+      "bytes": 137676,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406179927055273250",
+      "numeric": true,
+      "files": 53,
+      "bytes": 1228251,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180028360281378",
+      "numeric": true,
+      "files": 79,
+      "bytes": 3411202,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180115371101475",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1772295,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180241716071695",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1842967,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180342048115968",
+      "numeric": true,
+      "files": 12,
+      "bytes": 128180,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180345395105064",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1770018,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180402202823988",
+      "numeric": true,
+      "files": 14,
+      "bytes": 113636,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180402349624628",
+      "numeric": true,
+      "files": 11,
+      "bytes": 96355,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180417797229859",
+      "numeric": true,
+      "files": 21,
+      "bytes": 180738,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180431730707727",
+      "numeric": true,
+      "files": 12,
+      "bytes": 160592,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180455961136436",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1324269,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180485614865716",
+      "numeric": true,
+      "files": 14,
+      "bytes": 216621,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180518250712355",
+      "numeric": true,
+      "files": 29,
+      "bytes": 157994,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180523250289972",
+      "numeric": true,
+      "files": 12,
+      "bytes": 165184,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180529718037800",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1028863,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180529726344463",
+      "numeric": true,
+      "files": 12,
+      "bytes": 145883,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180541361392896",
+      "numeric": true,
+      "files": 17,
+      "bytes": 13237,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180567638740258",
+      "numeric": true,
+      "files": 135,
+      "bytes": 1822893,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180604204698895",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1594225,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180633006968064",
+      "numeric": true,
+      "files": 29,
+      "bytes": 158001,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180661783989539",
+      "numeric": true,
+      "files": 96,
+      "bytes": 2678700,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180665495964962",
+      "numeric": true,
+      "files": 14,
+      "bytes": 123846,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180678133386548",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1847357,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180715752213760",
+      "numeric": true,
+      "files": 11,
+      "bytes": 70093,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180719233387811",
+      "numeric": true,
+      "files": 14,
+      "bytes": 114123,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180724149079330",
+      "numeric": true,
+      "files": 14,
+      "bytes": 127336,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180734387359010",
+      "numeric": true,
+      "files": 53,
+      "bytes": 1225074,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180789513129250",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1264302,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180793103420724",
+      "numeric": true,
+      "files": 71,
+      "bytes": 1057391,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180832710266147",
+      "numeric": true,
+      "files": 14,
+      "bytes": 357628,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180845658066228",
+      "numeric": true,
+      "files": 12,
+      "bytes": 120604,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180858115263744",
+      "numeric": true,
+      "files": 11,
+      "bytes": 606072,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180859033750824",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1021557,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180908216175887",
+      "numeric": true,
+      "files": 12,
+      "bytes": 144664,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180908924996879",
+      "numeric": true,
+      "files": 12,
+      "bytes": 82596,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180936083164431",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1404999,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180958421945640",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1162805,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180976516205864",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1641752,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180977199942947",
+      "numeric": true,
+      "files": 12,
+      "bytes": 99991,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406180986888654120",
+      "numeric": true,
+      "files": 14,
+      "bytes": 303507,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181031520259343",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1139532,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181043188796712",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1269922,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181043948064035",
+      "numeric": true,
+      "files": 11,
+      "bytes": 268299,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181065636728116",
+      "numeric": true,
+      "files": 11,
+      "bytes": 279469,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181066823732515",
+      "numeric": true,
+      "files": 14,
+      "bytes": 115361,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181066823765263",
+      "numeric": true,
+      "files": 14,
+      "bytes": 135348,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181070514720040",
+      "numeric": true,
+      "files": 12,
+      "bytes": 92530,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181088818695459",
+      "numeric": true,
+      "files": 14,
+      "bytes": 156434,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181156770565428",
+      "numeric": true,
+      "files": 80,
+      "bytes": 1418856,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181185690357027",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1165061,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181207551069440",
+      "numeric": true,
+      "files": 21,
+      "bytes": 150490,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181224902888738",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1328438,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181227415342336",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1728856,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181235665456436",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1128139,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181235799674127",
+      "numeric": true,
+      "files": 12,
+      "bytes": 160669,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181254669929763",
+      "numeric": true,
+      "files": 12,
+      "bytes": 185057,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181272059596066",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1148829,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181317001366824",
+      "numeric": true,
+      "files": 14,
+      "bytes": 562936,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181345992379688",
+      "numeric": true,
+      "files": 135,
+      "bytes": 1904163,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181359015808256",
+      "numeric": true,
+      "files": 80,
+      "bytes": 1088509,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181364103449871",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1321445,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181378557070627",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1793019,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181380121529634",
+      "numeric": true,
+      "files": 11,
+      "bytes": 69737,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181385926446371",
+      "numeric": true,
+      "files": 14,
+      "bytes": 216172,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181389613190435",
+      "numeric": true,
+      "files": 29,
+      "bytes": 157995,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181438145580288",
+      "numeric": true,
+      "files": 12,
+      "bytes": 139871,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181453064572212",
+      "numeric": true,
+      "files": 79,
+      "bytes": 2000621,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181476619832576",
+      "numeric": true,
+      "files": 14,
+      "bytes": 183942,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181489412427060",
+      "numeric": true,
+      "files": 12,
+      "bytes": 442508,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181505413713187",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1504708,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181589526367522",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1128812,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181596337949967",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1202748,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181641258798388",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1479099,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181648317844771",
+      "numeric": true,
+      "files": 79,
+      "bytes": 1441372,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181764923657507",
+      "numeric": true,
+      "files": 29,
+      "bytes": 158001,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7406181936772680960",
+      "numeric": true,
+      "files": 12,
+      "bytes": 97750,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7407778857819983104",
+      "numeric": true,
+      "files": 29,
+      "bytes": 188453,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7407779333319724340",
+      "numeric": true,
+      "files": 33,
+      "bytes": 226422,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7407779576430038312",
+      "numeric": true,
+      "files": 29,
+      "bytes": 188455,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7407779701294452020",
+      "numeric": true,
+      "files": 29,
+      "bytes": 213238,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7407780118225030440",
+      "numeric": true,
+      "files": 29,
+      "bytes": 190989,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7407780451747646772",
+      "numeric": true,
+      "files": 29,
+      "bytes": 192406,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408028088627465524",
+      "numeric": true,
+      "files": 52,
+      "bytes": 423110,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408028287785602319",
+      "numeric": true,
+      "files": 17,
+      "bytes": 246936,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076250339740980",
+      "numeric": true,
+      "files": 14,
+      "bytes": 170733,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076339699322112",
+      "numeric": true,
+      "files": 52,
+      "bytes": 153288,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076382099705128",
+      "numeric": true,
+      "files": 53,
+      "bytes": 223769,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076560076442914",
+      "numeric": true,
+      "files": 12,
+      "bytes": 111271,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076652644732194",
+      "numeric": true,
+      "files": 17,
+      "bytes": 57104,
+      "type_signals": [
+        "AmazingFeature",
+        "TouchGes"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076684760550691",
+      "numeric": true,
+      "files": 12,
+      "bytes": 66599,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076694126365992",
+      "numeric": true,
+      "files": 14,
+      "bytes": 111358,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076708705799464",
+      "numeric": true,
+      "files": 14,
+      "bytes": 199365,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076752733359360",
+      "numeric": true,
+      "files": 15,
+      "bytes": 48852,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076899777350927",
+      "numeric": true,
+      "files": 14,
+      "bytes": 254472,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076901236985103",
+      "numeric": true,
+      "files": 17,
+      "bytes": 55132,
+      "type_signals": [
+        "AmazingFeature",
+        "TouchGes"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076906219818274",
+      "numeric": true,
+      "files": 12,
+      "bytes": 66726,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076932065152296",
+      "numeric": true,
+      "files": 12,
+      "bytes": 18263,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076966890425615",
+      "numeric": true,
+      "files": 17,
+      "bytes": 247030,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408076994463780111",
+      "numeric": true,
+      "files": 14,
+      "bytes": 111353,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077018560073000",
+      "numeric": true,
+      "files": 14,
+      "bytes": 209316,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077026705280256",
+      "numeric": true,
+      "files": 22,
+      "bytes": 163353,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077033378532608",
+      "numeric": true,
+      "files": 106,
+      "bytes": 1662647,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077058544323874",
+      "numeric": true,
+      "files": 29,
+      "bytes": 1139647,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077108586515746",
+      "numeric": true,
+      "files": 15,
+      "bytes": 46376,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077163217292584",
+      "numeric": true,
+      "files": 12,
+      "bytes": 66709,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077173958954275",
+      "numeric": true,
+      "files": 17,
+      "bytes": 55145,
+      "type_signals": [
+        "AmazingFeature",
+        "TouchGes"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077178895682831",
+      "numeric": true,
+      "files": 110,
+      "bytes": 1952707,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077199015726351",
+      "numeric": true,
+      "files": 96,
+      "bytes": 1700553,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077315294399796",
+      "numeric": true,
+      "files": 17,
+      "bytes": 55128,
+      "type_signals": [
+        "AmazingFeature",
+        "TouchGes"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077315642576128",
+      "numeric": true,
+      "files": 12,
+      "bytes": 89638,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077323980836111",
+      "numeric": true,
+      "files": 12,
+      "bytes": 84890,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077387772087586",
+      "numeric": true,
+      "files": 12,
+      "bytes": 111107,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077448513998114",
+      "numeric": true,
+      "files": 64,
+      "bytes": 1198030,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077553891609896",
+      "numeric": true,
+      "files": 14,
+      "bytes": 111547,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077568752045347",
+      "numeric": true,
+      "files": 14,
+      "bytes": 111362,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077575353814306",
+      "numeric": true,
+      "files": 14,
+      "bytes": 144000,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077631049960744",
+      "numeric": true,
+      "files": 14,
+      "bytes": 157234,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077660934491427",
+      "numeric": true,
+      "files": 12,
+      "bytes": 104578,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077691880049960",
+      "numeric": true,
+      "files": 20,
+      "bytes": 85833,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077756111605044",
+      "numeric": true,
+      "files": 17,
+      "bytes": 83435,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077756392672546",
+      "numeric": true,
+      "files": 12,
+      "bytes": 97093,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077820116667700",
+      "numeric": true,
+      "files": 51,
+      "bytes": 152334,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408077945408867619",
+      "numeric": true,
+      "files": 14,
+      "bytes": 111360,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408078015114054952",
+      "numeric": true,
+      "files": 14,
+      "bytes": 176440,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408078020835118376",
+      "numeric": true,
+      "files": 96,
+      "bytes": 1716586,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408757645705743616",
+      "numeric": true,
+      "files": 35,
+      "bytes": 392082,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408757645705760000",
+      "numeric": true,
+      "files": 35,
+      "bytes": 489496,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408757645705776384",
+      "numeric": true,
+      "files": 35,
+      "bytes": 1127415,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408757645705792768",
+      "numeric": true,
+      "files": 35,
+      "bytes": 415206,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7408757645705809152",
+      "numeric": true,
+      "files": 35,
+      "bytes": 452412,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7416258989467374091",
+      "numeric": true,
+      "files": 349,
+      "bytes": 1293974,
+      "type_signals": [
+        "AmazingFeature",
+        "AmazingFilter",
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7442228961163088434",
+      "numeric": true,
+      "files": 18,
+      "bytes": 68133,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7447725847449965107",
+      "numeric": true,
+      "files": 79,
+      "bytes": 320827,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7456626609332687397",
+      "numeric": true,
+      "files": 83,
+      "bytes": 364089,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7460040331627598345",
+      "numeric": true,
+      "files": 423,
+      "bytes": 1560085,
+      "type_signals": [
+        "AmazingFeature",
+        "AmazingFilter",
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7493863675460160807",
+      "numeric": true,
+      "files": 34,
+      "bytes": 209249,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7564727861634944292",
+      "numeric": true,
+      "files": 31,
+      "bytes": 73089,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7566153810800954665",
+      "numeric": true,
+      "files": 21,
+      "bytes": 45134,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7594398229333019967",
+      "numeric": true,
+      "files": 3,
+      "bytes": 6878,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7594398775116893446",
+      "numeric": true,
+      "files": 3,
+      "bytes": 10091,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7594400577153453348",
+      "numeric": true,
+      "files": 3,
+      "bytes": 6018,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7594401058609171731",
+      "numeric": true,
+      "files": 3,
+      "bytes": 5975,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7594401455352597823",
+      "numeric": true,
+      "files": 3,
+      "bytes": 4175,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7598113292887854346",
+      "numeric": true,
+      "files": 3,
+      "bytes": 14196,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7598460431144963366",
+      "numeric": true,
+      "files": 30,
+      "bytes": 158799,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "7641495580497169706",
+      "numeric": true,
+      "files": 3,
+      "bytes": 13277,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "82432976",
+      "numeric": true,
+      "files": 20,
+      "bytes": 41793,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "82432977",
+      "numeric": true,
+      "files": 28,
+      "bytes": 64672,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "82432978",
+      "numeric": true,
+      "files": 32,
+      "bytes": 68199,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "82432979",
+      "numeric": true,
+      "files": 20,
+      "bytes": 42427,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "82432980",
+      "numeric": true,
+      "files": 20,
+      "bytes": 46850,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "83108788",
+      "numeric": true,
+      "files": 34,
+      "bytes": 83586,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "83244815",
+      "numeric": true,
+      "files": 27,
+      "bytes": 366203,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "83244852",
+      "numeric": true,
+      "files": 27,
+      "bytes": 312128,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "89209183",
+      "numeric": true,
+      "files": 30,
+      "bytes": 79610,
+      "type_signals": [
+        "AmazingFeature"
+      ]
+    },
+    {
+      "cache_kind": "effect",
+      "id": "model",
+      "numeric": false,
+      "files": 46,
+      "bytes": 96002326,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "effect",
+      "id": "script_segment_js",
+      "numeric": false,
+      "files": 5,
+      "bytes": 1339033,
+      "type_signals": []
+    },
+    {
+      "cache_kind": "artistEffect",
+      "id": "7114534269543828766",
+      "numeric": true,
+      "files": 18,
+      "bytes": 100053,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "artistEffect",
+      "id": "7202575978646737469",
+      "numeric": true,
+      "files": 40,
+      "bytes": 88370,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "artistEffect",
+      "id": "7202576698775179837",
+      "numeric": true,
+      "files": 22,
+      "bytes": 43088,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "artistEffect",
+      "id": "7397035364310848051",
+      "numeric": true,
+      "files": 51,
+      "bytes": 111300,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "artistEffect",
+      "id": "7438821504986402059",
+      "numeric": true,
+      "files": 50,
+      "bytes": 127972,
+      "type_signals": [
+        "InfoSticker"
+      ]
+    },
+    {
+      "cache_kind": "artistEffect",
+      "id": "7681134759530990910",
+      "numeric": true,
+      "files": 7,
+      "bytes": 14990487,
+      "type_signals": [
+        "Default",
+        "InfoSticker",
+        "LyricStyle",
+        "all_sentence"
+      ]
+    },
+    {
+      "cache_kind": "artistEffect",
+      "id": "vimo_banner",
+      "numeric": false,
+      "files": 3,
+      "bytes": 25028,
+      "type_signals": []
+    }
+  ],
+  "limits": [
+    "these are ids the app cached; no title, category or scenario is written next to them on disk",
+    "the resource metadata table (Cache/ressdk_db/.../rp.db) has a full schema but zero rows, so names cannot be read from it",
+    "the app is 11.7.0.14614 here, newer than the 11.6.0.14552 this repository has canaries for"
+  ]
+}

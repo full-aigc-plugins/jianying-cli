@@ -42,7 +42,7 @@ jianying media catalog --domain <domain> --search 关键词 --json
 
 ## 注意
 
-- 贴纸没有内嵌目录，而且**当前没有受支持的登记路径**（2026-10-22 实测）：`media harvest-enums add` 只接受 video_effects / filters / transitions / masks / audio_effects，传 sticker 会被拒绝；`sync` 又会跳过编辑器建的可加密草稿。因此贴纸编号目前只能由调用方直接给出，执行端只做形状校验（非空、≤64 字符、仅字母数字与 `-_.:`）。
+- 贴纸没有内嵌目录，但**可以从应用缓存里逆向取证**（2026-10-22 实测）：`User Data\Cache\artistEffect\<resource_id>\...\config.json` 会把类型写成 `InfoSticker`，据此已登记 21 个真实贴纸编号到 `user-enums.json`。缓存里**不写标题、分类和场景**，所以这些编号只能按 id 引用；`media harvest-enums add sticker <slug> <id>` 可继续补登记。
 - 编号是 `resource_id`（16 位以上数字串），不是 `effect_id`，两者不要混用。
 - 表里的每一行都由脚本从 `catalogs/` 复制而来，`--check` 会拦住手工改动。
 
