@@ -5,3 +5,5 @@ __pycache__/
 .DS_Store
 
 /dist/
+# 运行时任务日志（docs/job-lifecycle.md）：本地状态，不入库
+.jianying-jobs/

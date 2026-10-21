@@ -196,6 +196,12 @@
       Windows 报 os error 193）；`release-artifacts.yml` 的签名/公证链路（需 macOS + 证书）。
       *2026-10-21 release-artifacts.yml 的可本机部分*：用 CI 的身份变量（`JIANYING_BUILD_CONTRACT_STATE=committed_unreleased`、`RELEASE_REF=`、`SOURCE_COMMIT=<HEAD>`）重建 release 二进制后，`tools/generate_sbom.py` 产出 **237 个 package** 的 SPDX SBOM；`tools/package_release.py --platform win32-x64` 产出 `jianying-cli-1.7.0-win32-x64.zip`（8,385,794 B）、sha256 sidecar 自校验通过、`release-entry.json` 带内容状态/发布引用/二进制与 SBOM 摘要；压缩包内含二进制、LICENSE、SBOM、SHA256SUMS、THIRD_PARTY_NOTICES、manifest.json、CAPABILITIES.json 与 6 个 schema。三平台 release index 只有单平台时**按设计拒绝**（exactly one entry for each supported platform），属 CI 组装步骤。
       *再补一条证据*：`parity_run.py --report` 的报告与 `provenance/PARITY_RUN.json` **逐字节相同**（本地 cmp 通过），并在 `tests/test_release_tools.py` 加了两个守卫——provenance 证据必须是 LF、八条 cmp 门禁的写入器必须显式 `newline="\n"`；守卫在人为去掉 flag 时确实变红（已验证后恢复）。
+
+      *2026-10-21 产品侧（release 二进制）复核*：用当前 HEAD 重建 release 二进制后，`tools/package_release.py` 产出 `jianying-cli-1.7.0-win32-x64.zip`（8,385,799 B），再用**产品自己的命令**验证这个包：
+      - `jianying release verify <bundle> --json` → `data.ok=true`，**11 个文件**逐个 sha256/大小复核全部通过，能力契约 **171 declared / 171 embedded，mismatches=[]**；
+      - 负例：把 `THIRD_PARTY_NOTICES.md` 改一个字符后重跑 → `data.ok=false`、`files_failed=1`，失败项正是 `THIRD_PARTY_NOTICES.md`、`reason="sha256 mismatch"`，能力契约仍 171/171。（注：按既有契约，篡改只体现在 `data.ok` 里、进程退出码为 0；只有 manifest schema 不受支持才 exit 1——这是被 `tests/release_verify_contract.rs` 固定住的设计，不是缺陷。）
+      - `jianying selftest --json` → `ok=true`，7 项：**5 pass / 2 skip**（skip 的是 media 与 render，需要 ffprobe/ffmpeg 与真实素材）；      - `jianying doctor --json` / `status --json` → ok，`editors_running=[]`，能力 **171（supported 150 / 其他 21）**；
+      - CLI 自带 MCP 服务 `jianying mcp serve` 走 stdio：`initialize` 返回 `jianying-cli 1.7.0`，`tools/list` **17 个工具**，`tools/call jianying_doctor` 与 `jianying_capabilities` 均返回完整 JSON。
       *2026-10-20 本机复跑（非 mac/真机部分）*：`python tools/parity_run.py --bin target/release/jianying.exe
       --pyjyd-src <checkout>/pyJianYingDraft` → **55 passed / 0 failed**（对照 pyJYD 6bb2d06）；
       `python tools/gen_catalogs.py <checkout>/pyJianYingDraft --check` → **catalogs up to date**；
