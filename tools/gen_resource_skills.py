@@ -93,6 +93,20 @@ TYPES = {
     },
 }
 
+# 2026-10-22 在剪映 11.7.0.14614 的「特效」面板上逐个点开并抄下的分类；
+# 以及面板名称能在内嵌目录里命中、因此可以直接引用真实 resource_id 的样本。
+VERIFIED_EFFECT_PANEL = {
+    "editor_version": "11.7.0.14614",
+    "observed_at": "2026-10-22",
+    "categories": ["热门", "万圣节", "基础", "动感", "氛围", "创意", "暗黑", "边框", "多屏", "音效",
+                   "光", "景心", "音频", "旅行", "自然", "奇幻", "复古", "电影", "bling", "扭曲",
+                   "综合", "分屏", "宠物", "投影", "绘画", "黑屏", "人物特效"],
+    "matched_names": ["放大镜", "模糊", "天使光", "爆炸", "星光", "荧光扫描", "金粉飘落",
+                      "放大镜视角", "深深感人", "回忆检索"],
+    "unmatched_examples": ["海边光斑", "多彩涂鸦", "丁达尔光线", "碎片重叠", "水中倒影"],
+    "evidence": "docs/runbooks/evidence/official-resource/PANEL_NAME_BRIDGE_20261022.json",
+}
+
 
 def load_catalog(name):
     path = CATALOGS / name
@@ -191,6 +205,21 @@ def render_skill(key, spec):
         "- 表里的每一行都由脚本从 `catalogs/` 复制而来，`--check` 会拦住手工改动。",
         "",
     ]
+
+    if key == "effect":
+        panel = VERIFIED_EFFECT_PANEL
+        body += ["## 已在真机面板核验的样本", "",
+                 f"在剪映 **{panel['editor_version']}**（{panel['observed_at']}）的「特效」面板上逐个点开读到的分类：", "",
+                 "、".join(panel["categories"]), "",
+                 "下面这些面板名称在内嵌目录里能命中，因此可以直接引用其真实编号（其余面板项要么不在当前目录快照里，"
+                 "要么已被改名，别凭名字猜编号）：", ""]
+        catalog_entries = {e.get("name"): e for e in load_catalog("video_scene_effects.json")[0]}
+        for name in panel["matched_names"]:
+            entry = catalog_entries.get(name)
+            if entry:
+                vip = "（VIP）" if entry.get("vip") else ""
+                body.append(f"- `{entry['resource_id']}` — {name}{vip}")
+        body += ["", f"未命中的例子：{'、'.join(panel['unmatched_examples'])}。证据：`{panel['evidence']}`。", ""]
 
     if rows:
         body += ["## 清单", "", "| 目录 | 内容 | 条数 | 全量表 |", "| --- | --- | --- | --- |"]
