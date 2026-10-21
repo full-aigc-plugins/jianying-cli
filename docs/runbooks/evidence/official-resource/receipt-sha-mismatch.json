@@ -1,0 +1,23 @@
+{
+  "schema_version": "jianying-official-resource-receipt/v1",
+  "asset_id": "fixture-transition-0001",
+  "title": "synthetic fixture (not a real asset)",
+  "resource_kind": "transition",
+  "tier": "professional",
+  "identity": {
+    "kind": "downloaded_file",
+    "file": {
+      "path": "C:\\Users\\hnxyh\\AppData\\Local\\Temp\\official-fixtures\\resource-tampered.dat",
+      "sha256": "502fe63fcb538fb6994183e92bc5eb27a320c6fbd4d72203ff3e49d91062b91e",
+      "byte_length": 39
+    }
+  },
+  "acquired_at_epoch_seconds": 1760000000,
+  "terms_reference": "synthetic-fixture-terms",
+  "allowed_usages": [
+    "personal",
+    "commercial"
+  ],
+  "restrictions": [],
+  "preview_only": false
+}

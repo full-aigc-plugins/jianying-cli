@@ -1,0 +1,9 @@
+{
+  "schema_version": "jianying-entitlement/v1",
+  "edition": "basic",
+  "status": "active",
+  "source": "gui_observed",
+  "observed_at_epoch_seconds": 1760000000,
+  "expires_at_epoch_seconds": 1762592000,
+  "capabilities": []
+}

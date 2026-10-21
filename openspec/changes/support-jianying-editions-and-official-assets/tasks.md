@@ -59,6 +59,19 @@
 
 - [ ] 4.1 使用当前专业账号取得一项明确可下载的官方素材，保存不含秘密的视觉、权益和许可证据。
 - [ ] 4.2 用发布 Rust CLI 验证收据并编译真实草稿，证明篡改文件、过期权益和用途冲突均被拒绝。
+  - *2026-10-21 拒绝路径已用产品命令跑通（4.2 仍未勾）*：按 `schemas/jianying-entitlement-v1` 与
+    `schemas/jianying-official-resource-receipt-v1` 造了**合成**凭据/收据，逐条驱动
+    `jianying media official verify … --usage … --at 1760000100`，结果：
+    ① 有效专业凭据 + 匹配资源 → `status: verified`（正对照）；
+    ② 过期 → `invalid entitlement evidence: expiry must be later than observation`；
+    ③ basic 版验专业素材 → `runtime edition basic does not satisfy required edition professional`；
+    ④ 非 active → `runtime entitlement is not active: inactive`；
+    ⑤ 不允许的用途 editorial → `official asset usage is not allowed: editorial`；
+    ⑥ 内容被改（sha256 不符）→ `official asset identity mismatch`；
+    ⑦ 收据声明 A 而实传 B → 同样 identity mismatch；⑧ `preview_only` → 拒绝交付。
+    证据（含 9 个 fixture 的 sha256 与逐条命令）：`docs/runbooks/evidence/official-resource/REFUSAL_MATRIX_20261021.json`。
+    **仍缺**：真实官方素材下载、价格文件/政府授权/用户可见提示（收据契约里没有这三类字段），以及 register/list/show。
+    合成 fixture 在自身 `title` 里写明“synthetic fixture (not a real asset)”，不会被误当真实素材。
 - [ ] 4.3 在真实剪映完成冷重开、连续播放和原生导出，独立验证媒体流、时长、画面、音轨与来源归属。
 - [ ] 4.4 完成基础版降级环境验收，证明专业素材不被静默替换且本地素材工作流仍可运行。
 - [ ] 4.5 运行完整测试、OpenSpec strict、发布制品黑盒与三宿主验收；全部证据完成后再启用默认路由、同步并归档。

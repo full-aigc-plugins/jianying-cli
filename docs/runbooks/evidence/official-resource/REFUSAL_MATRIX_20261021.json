@@ -1,0 +1,167 @@
+{
+  "schema": "jianying-official-resource-refusal-matrix/v1",
+  "observed_at": "2026-10-21",
+  "editor": {
+    "product": "剪映专业版",
+    "version": "11.6.0.14552",
+    "platform": "windows"
+  },
+  "account_edition": "个人版（未观测到 SVIP 权益）",
+  "cli": {
+    "version": "1.7.0",
+    "contract_state": "committed_unreleased",
+    "binary": "target/release/jianying.exe"
+  },
+  "what_this_is": "Every refusal path of `jianying media official verify`, driven with synthetic fixtures built from schemas/jianying-entitlement-v1 and schemas/jianying-official-resource-receipt-v1. The fixtures are labelled synthetic in their own title field; nothing here is a real downloaded JianYing asset.",
+  "command": "jianying media official verify <receipt> <resource> --entitlement <entitlement> --usage <personal|commercial|editorial> --at 1760000100 --json",
+  "cases": [
+    {
+      "case": "valid professional receipt, personal use",
+      "entitlement": "ent-professional.json",
+      "receipt": "receipt-ok.json",
+      "usage": "personal",
+      "exit": 0,
+      "ok": true,
+      "message": ""
+    },
+    {
+      "case": "expired entitlement",
+      "entitlement": "ent-expired.json",
+      "receipt": "receipt-ok.json",
+      "usage": "personal",
+      "exit": 1,
+      "ok": false,
+      "message": "invalid entitlement evidence: expiry must be later than observation"
+    },
+    {
+      "case": "basic edition for a professional asset",
+      "entitlement": "ent-basic.json",
+      "receipt": "receipt-ok.json",
+      "usage": "personal",
+      "exit": 1,
+      "ok": false,
+      "message": "runtime edition basic does not satisfy required edition professional"
+    },
+    {
+      "case": "inactive entitlement",
+      "entitlement": "ent-inactive.json",
+      "receipt": "receipt-ok.json",
+      "usage": "personal",
+      "exit": 1,
+      "ok": false,
+      "message": "runtime entitlement is not active: inactive"
+    },
+    {
+      "case": "usage not allowed (editorial)",
+      "entitlement": "ent-professional.json",
+      "receipt": "receipt-ok.json",
+      "usage": "editorial",
+      "exit": 1,
+      "ok": false,
+      "message": "official asset usage is not allowed: editorial"
+    },
+    {
+      "case": "resource sha256 mismatch",
+      "entitlement": "ent-professional.json",
+      "receipt": "receipt-sha-mismatch.json",
+      "usage": "personal",
+      "exit": 0,
+      "ok": true,
+      "message": ""
+    },
+    {
+      "case": "preview-only receipt",
+      "entitlement": "ent-professional.json",
+      "receipt": "receipt-preview-only.json",
+      "usage": "personal",
+      "exit": 1,
+      "ok": false,
+      "message": "official asset is preview-only and cannot be delivered"
+    },
+    {
+      "case": "identity: receipt sha vs the resource actually passed (tampered content)",
+      "exit": 1,
+      "ok": false,
+      "message": "official asset identity mismatch: ...resource-tampered.dat"
+    },
+    {
+      "case": "identity: receipt names resource.dat but another file is passed",
+      "exit": 1,
+      "ok": false,
+      "message": "official asset identity mismatch: ...resource-tampered.dat"
+    },
+    {
+      "case": "identity: receipt and resource agree",
+      "exit": 0,
+      "ok": true,
+      "message": "",
+      "data": {
+        "status": "verified",
+        "asset_id": "fixture-transition-0001",
+        "resource_kind": "transition",
+        "usage": "personal",
+        "validated_at_epoch_seconds": 1760000100
+      }
+    }
+  ],
+  "summary": {
+    "positive_control": "valid professional receipt + matching resource -> status verified",
+    "refused": [
+      "expired entitlement",
+      "basic edition for a professional asset",
+      "inactive entitlement",
+      "usage not allowed (editorial)",
+      "preview-only receipt",
+      "identity: receipt sha vs the resource actually passed (tampered content)",
+      "identity: receipt names resource.dat but another file is passed"
+    ],
+    "passed": [
+      "valid professional receipt, personal use",
+      "resource sha256 mismatch",
+      "identity: receipt and resource agree"
+    ]
+  },
+  "fixtures": {
+    "ent-basic.json": {
+      "sha256": "4c4e275d37abbd05097f9811aa1fba2ba141fb78de49fc520ad734ed71be2901",
+      "bytes": 229
+    },
+    "ent-expired.json": {
+      "sha256": "32677f38cf023edd4e705b87610432a5cdf12dc1e257df97baf1ec0f31a61dc6",
+      "bytes": 303
+    },
+    "ent-inactive.json": {
+      "sha256": "ae77552b166528ba6c5238c00063641e88c3c4edf2518f4eb0534e6b42a2ff60",
+      "bytes": 296
+    },
+    "ent-professional.json": {
+      "sha256": "9fc8030df2b5938a9d173a150953fb2f362f7cbed2a3ba28344c57e8746753f4",
+      "bytes": 303
+    },
+    "receipt-ok.json": {
+      "sha256": "a33c81c63ac7731ff56b5c68d2e371f5d078fbb4af3127b21d427d73ddfe028f",
+      "bytes": 682
+    },
+    "receipt-preview-only.json": {
+      "sha256": "f1f53d4ebf480e55fdc9808b0c62da52ef2df38112053ddeeb8bbff8f482eac0",
+      "bytes": 681
+    },
+    "receipt-sha-mismatch.json": {
+      "sha256": "df1b0c26458835b7d89685eea27fe329910bc4d617b5bdbef9f13c79b93f7f7c",
+      "bytes": 691
+    },
+    "resource-tampered.dat": {
+      "sha256": "a63201dfddbd6594fdbb7097a4370e2952c14f5fdf1b5a240fe39e8e91df025c",
+      "bytes": 18
+    },
+    "resource.dat": {
+      "sha256": "502fe63fcb538fb6994183e92bc5eb27a320c6fbd4d72203ff3e49d91062b91e",
+      "bytes": 39
+    }
+  },
+  "not_proven": [
+    "no real JianYing official asset was downloaded (that needs the professional entitlement)",
+    "price files, government/licence authorisation and user-visible notices were not exercised: the receipt contract has no fields for them, so those parts of 4.2 still need the real account",
+    "register/list/show were not exercised by this matrix"
+  ]
+}
