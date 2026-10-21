@@ -179,6 +179,21 @@
 ` 变成 `
 `，导致 CI 的 `cmp` 门禁在 Windows 上**永远无法通过**。现在统一
       传 `newline="\n"`，上面两个"逐字节相同"就是修好后的结果。
+
+      *2026-10-21 其余能在本机复核的 CI 步骤（逐条）*：
+      - `cargo test --workspace` → 123 targets / **377 passed / 0 failed**（不是只跑 `-p jianying-cli`）；
+      - `python -m unittest tests/test_release_tools.py tests/test_verify_release_runtime.py` → **32 tests OK**；
+        `tools/verify_release_runtime.py --binary target/release/jianying.exe` → 通过（身份、必需 capability、
+        云 TTS、本地 ASR、runtime 发现命令面、离线审批计划）；
+      - `capcut_interchange_differential.py` → 2 passed，**逐字节相同**；
+        `capcut_material_discovery_differential.py` → 2 passed，**逐字节相同**；
+      - `capcut_utility_differential.py` → **42 passed / 0 failed**，但报告与基线**不同**：3 个用例在 Windows 上
+        上游 CLI 把管道 JSON 在 65536 字节处截断（harness 记为 `approved-upstream-stdout-truncation`），
+        macOS 基线是 `exact`。属上游平台差异，不是被测实现差异；
+      - `tools/check_provenance.py --root .` 与 `--self-test-negative-cases` → 均 ok（86 条命令证据、
+        55 fixtures、各类差分计数与 `migration_rollback: passed`）。
+      **本机无法复核**：media analysis / media mutation 两个差分（harness 用 `#!/bin/sh` 脚本冒充 ffmpeg，
+      Windows 报 os error 193）；`release-artifacts.yml` 的签名/公证链路（需 macOS + 证书）。
       *2026-10-20 本机复跑（非 mac/真机部分）*：`python tools/parity_run.py --bin target/release/jianying.exe
       --pyjyd-src <checkout>/pyJianYingDraft` → **55 passed / 0 failed**（对照 pyJYD 6bb2d06）；
       `python tools/gen_catalogs.py <checkout>/pyJianYingDraft --check` → **catalogs up to date**；
