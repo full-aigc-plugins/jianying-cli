@@ -2,7 +2,7 @@
 
 use serde_json::{json, Value};
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
 fn run(args: &[&str]) -> Output {
@@ -10,7 +10,10 @@ fn run(args: &[&str]) -> Output {
         .args(args)
         .env(
             "JIANYING_CLI_PROCESS_LIST",
-            std::env::temp_dir().join("no-editor.txt"),
+            Path::new(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/tests/fixtures/empty-processes.txt"
+            )),
         )
         .output()
         .unwrap()

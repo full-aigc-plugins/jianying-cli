@@ -34,7 +34,12 @@ def run_json(binary: Path, *args: str) -> dict:
         [str(binary), *args],
         capture_output=True,
         encoding="utf-8",
-        env={**os.environ, "JIANYING_CLI_PROCESS_LIST": os.path.join(os.environ.get("TEMP", "/tmp"), "no-editor.txt")},
+        env={
+            **os.environ,
+            "JIANYING_CLI_PROCESS_LIST": str(
+                ROOT / "tests" / "fixtures" / "empty-processes.txt"
+            ),
+        },
     )
     if result.returncode != 0:
         raise SystemExit(f"command failed ({result.returncode}): {' '.join(args)}\n{result.stdout}{result.stderr}")
@@ -120,7 +125,11 @@ def main() -> int:
 
     out = (ROOT / args.out).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    out.write_text(
+        json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     print(json.dumps({"ok": True, "out": str(out), "selftest": snapshot["selftest"]["summary"]}, ensure_ascii=False))
     return 0
 

@@ -232,7 +232,7 @@ def main() -> int:
     args = parser.parse_args()
 
     env = dict(os.environ)
-    env["JIANYING_CLI_PROCESS_LIST"] = str(Path(tempfile.gettempdir()) / "no-editor.txt")
+    env["JIANYING_CLI_PROCESS_LIST"] = str(ROOT / "tests" / "fixtures" / "empty-processes.txt")
     env["PYTHONUTF8"] = "1"
 
     cases = sorted(path for path in CASES.glob("*/case.json"))
@@ -259,7 +259,11 @@ def main() -> int:
         },
         "cases": records,
     }
-    args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.report.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     print(json.dumps({"ok": report["summary"]["failed"] == 0, **report["summary"]}))
     return 0 if report["summary"]["failed"] == 0 else 1
 

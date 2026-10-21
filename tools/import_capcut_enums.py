@@ -46,7 +46,9 @@ def main() -> int:
         raise RuntimeError(f"enum catalogue shape drifted: {actual!r}")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
-        json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        json.dumps(value, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
     return 0
 

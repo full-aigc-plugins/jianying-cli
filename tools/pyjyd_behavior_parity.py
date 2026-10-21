@@ -37,7 +37,7 @@ def main() -> int:
     os.environ["PYJYD_REPO"] = str(args.pyjyd_src.resolve())
     env["PYJYD_REPO"] = str(args.pyjyd_src.resolve())
     env["PYTHONPATH"] = str(ROOT / "tools")
-    env["JIANYING_CLI_PROCESS_LIST"] = str(Path(tempfile.gettempdir()) / "no-editor.txt")
+    env["JIANYING_CLI_PROCESS_LIST"] = str(ROOT / "tests" / "fixtures" / "empty-processes.txt")
     env["PYTHONUTF8"] = "1"
 
     sys.path.insert(0, str(EXAMPLES))
@@ -99,7 +99,11 @@ def main() -> int:
         },
         "cases": records,
     }
-    args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.report.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     summary = report["summary"]
     print(
         json.dumps(

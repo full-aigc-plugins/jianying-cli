@@ -205,6 +205,17 @@
       结果：`capcut_media_analysis_differential.py` **3 passed、报告逐字节相同**；`capcut_media_mutation_differential.py` **6 passed、报告逐字节相同**。
       **七个差分里六个**在本机与基线逐字节一致（project 11 / timeline 32 / media analysis 3 / media mutation 6 / material discovery 2 / interchange 2）。
       剩下的 `capcut_utility_differential.py`（42 passed）报告差 3 行：上游 Node CLI 在 macOS 上把管道里的 JSON 截断在 65536 字节（基线记为 `approved-upstream-stdout-truncation`），而在本机 Windows 上上游吐出了完整 JSON（记为 `exact`）。这是上游按平台的管道行为差异，harness 两条分支都判通过；要让它也逐字节一致，只能把上游改成写文件采集并重生成基线——那会改动 macOS 的既有证据，我没有单方面动它。
+
+      *2026-10-21 继承上一条的回归修复*：把「读不到进程清单」改成硬错误之后，仓库里有 3 个工具和 5 个 Rust 契约测试
+      仍把注入点指向一个**从不存在的** `%TEMP%/no-editor.txt`——它们过去靠“文件不存在 = 没有编辑器”侥幸通过。
+      现在全部改指仓库内已提交的 `tests/fixtures/empty-processes.txt`（Rust 侧用 `CARGO_MANIFEST_DIR` 拼接）。
+      修复后复跑并逐字节比对：`pyjyd_behavior_parity.py` **9/9 passed**，`PYJYD_BEHAVIOR_PARITY.json` **逐字节相同**；
+      `pyjyd_examples_parity.py` **6/6 passed**，`PYJYD_EXAMPLES_PARITY.json` **逐字节相同**；
+      `pyjyd_api_coverage.py` 68 类/85 方法（covered 62/85），`PYJYD_API_COVERAGE.json` **逐字节相同**；
+      `editor_skill_coverage.py` 13 方法 + 14 脚本（covered 17 / partial 3 / out_of_scope 8），
+      `EDITOR_SKILL_COVERAGE.json` **逐字节相同**——它原来也漏了 `newline="\n"`，本轮一并修掉。
+      另外 4 个写入器（behavior/examples parity、goal snapshot、enum 导入）也补上了 `newline="\n"`；
+      `GOAL_SNAPSHOT.json` 含 `generated_at` 时间戳，本来就不可逐字节复现，未列入 cmp 门禁。
       - `jianying selftest --json` → `ok=true`，7 项：**5 pass / 2 skip**（skip 的是 media 与 render，需要 ffprobe/ffmpeg 与真实素材）；
       - `jianying doctor --json` / `status --json` → ok，`editors_running=[]`，能力 **171（supported 150 / 其他 21）**；
       - CLI 自带 MCP 服务 `jianying mcp serve` 走 stdio：`initialize` 返回 `jianying-cli 1.7.0`，`tools/list` **17 个工具**，`tools/call jianying_doctor` 与 `jianying_capabilities` 均返回完整 JSON。

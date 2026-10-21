@@ -1,6 +1,7 @@
 //! 能力适用性合同：`applies_to` 可声明草稿线格式，非法声明必须失败。
 
 use serde_json::{json, Value};
+use std::path::Path;
 use std::process::{Command, Output};
 
 fn run(args: &[&str]) -> Output {
@@ -8,7 +9,10 @@ fn run(args: &[&str]) -> Output {
         .args(args)
         .env(
             "JIANYING_CLI_PROCESS_LIST",
-            std::env::temp_dir().join("no-editor.txt"),
+            Path::new(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/tests/fixtures/empty-processes.txt"
+            )),
         )
         .output()
         .unwrap()
