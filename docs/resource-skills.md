@@ -92,3 +92,25 @@ python tools/plan_resource_lint.py plan.json --entitlement evidence.json --json
 （复现见 `docs/runbooks/evidence/official-resource/UNVALIDATED_RESOURCE_ID_20261022.json`）。在执行前请先跑
 `tools/plan_resource_lint.py`。校验若要进产品，需要区分三类：滤镜/特效有目录可查，转场按 `name` 也可查，
 而贴纸的编号来自应用侧、本来就不在目录里，不能一刀切。
+
+### 2026-10-22 更新：上面那条「已知缺口」已经收敛
+
+原文说 `jianying job run` 不校验 `resource_id`、随便一个 `9999999999999999999` 也能构建成功。这条**已不成立**：
+
+- **解析层**：`catalogs::resolve` 现在同时接受显示名与数字 `resource_id`（此前只认名字，编号会被当成未知名字）；
+  回归测试 `tests/job_cli_contract.rs::filter_and_effect_segments_accept_the_numeric_resource_id`。
+- **段级校验**：滤镜/特效段的 `resource_id` 必须在目录里，否则 `is not in the bundled catalog`；
+  转场、字体、文本动画、蒙版走同一条解析路径，六类逐一实测落地（`RESOURCE_ALIGNMENT_MATRIX_20261022.json`）。
+- **贴纸**：没有内嵌目录，只做形状校验（非空、≤64 字符、仅 `[A-Za-z0-9-_.:]`），靠
+  `media harvest-enums add sticker` 登记后再引用；测试 `add_registers_a_sticker_id_and_refuses_a_blank_one`。
+
+### 三个与之配套的工具（都在 `tools/`，都有测试）
+
+| 工具 | 用途 | 关键行为 |
+| --- | --- | --- |
+| `plan_resource_lint.py` | 查计划**或**草稿的资源引用 | `--draft <dir>` 读 `draft_content.json`；加密草稿报 `draft_content_encrypted` 而不是抛栈；能识别 `masks`/`fonts`/`material_animations` 等素材桶 |
+| `prepare_editor_copy.py` | 给剪映准备一份可打开的副本 | 复制目录、把素材绝对路径改指副本自己的 `assets/`、写回明文；加密源直接拒绝 |
+| `export_reconciliation.py` | 成片与草稿对账 | 省略 `--export` 时自动找最新 `.mp4/.mov`；比对时长（默认 120 ms 容差）、宽高比、帧率；代理渲染用 `--duration-source video` |
+
+另外 `render proxy` 的返回现在带 `unsupported_features`、`skipped_material_counts`、`draft_has_unrendered_features`
+与 `fps_source`——调用方可以机读地知道「这次渲染漏了转场/特效/蒙版」和「帧率是草稿给的还是回退的」。
