@@ -5,7 +5,10 @@
 two directly: it reads the draft timeline (canvas, fps, last segment end, track and segment counts) and
 probes the exported file with ffprobe, then reports every difference.
 
-    python tools/export_reconciliation.py --draft <dir> --export <file> [--json] [--tolerance-ms 120]
+    python tools/export_reconciliation.py --draft <dir> [--export <file>] [--json] [--tolerance-ms 120]
+
+    Omitting --export searches the home directory (and Videos/Desktop/Downloads/Documents) for the newest
+    .mp4/.mov younger than --max-age-minutes, so "I exported it" is enough to get a verdict.
 
 Exit code 0 means the export agrees with the draft within tolerance; 1 means it does not, and the
 findings say which fact disagreed. An encrypted draft is reported, never parsed.
@@ -106,30 +109,42 @@ def reconcile(draft, export, tolerance_ms):
     return findings
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--draft", required=True, help="draft directory")
-    parser.add_argument("--export", required=True, help="exported video file")
-    parser.add_argument("--tolerance-ms", type=float, default=120.0)
-    parser.add_argument("--duration-source", choices=("all", "video"), default="all",
-                        help="all tracks, or only video tracks (a proxy renders just those)")
-    parser.add_argument("--json", action="store_true")
-    args = parser.parse_args()
+DEFAULT_EXPORT_DIRS = ("Videos", "Desktop", "Downloads", "Documents")
 
-    document, failures = read_draft(args.draft)
-    if document is None:
-        report = {"ok": False, "draft": args.draft, "export": args.export, "findings": failures}
-    else:
-        export, failures = probe_export(Path(args.export))
-        if export is None:
-            report = {"ok": False, "draft": args.draft, "export": args.export, "findings": failures}
-        else:
-            draft = draft_facts(document, args.duration_source)
-            findings = failures + reconcile(draft, export, args.tolerance_ms)
-            report = {"ok": not findings, "draft": args.draft, "export": args.export,
-                      "draft_facts": draft, "export_facts": export, "findings": findings}
 
-    if args.json:
+def find_latest_export(directory, max_age_minutes):
+    """在常见导出目录里找最新的成片；找不到就返回 None，由调用方报错。"""
+    import time
+    cutoff = time.time() - max_age_minutes * 60
+    candidates = []
+    for child in Path(directory).glob("*"):
+        if child.is_file() and child.suffix.lower() in {".mp4", ".mov"}:
+            stat = child.stat()
+            if stat.st_size > 10_000 and stat.st_mtime >= cutoff:
+                candidates.append((stat.st_mtime, child))
+    if not candidates:
+        return None
+    candidates.sort(reverse=True)
+    return candidates[0][1]
+
+
+def locate_export(directory, max_age_minutes):
+    """先看给定目录，再依次看用户的常见导出目录。"""
+    seen = find_latest_export(directory, max_age_minutes)
+    if seen is not None:
+        return seen
+    home = Path.home()
+    for name in DEFAULT_EXPORT_DIRS:
+        candidate = home / name
+        if candidate.is_dir():
+            found = find_latest_export(candidate, max_age_minutes)
+            if found is not None:
+                return found
+    return None
+
+
+def emit(report, as_json):
+    if as_json:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     else:
         print(f"ok={report['ok']}")
@@ -139,6 +154,50 @@ def main():
         for finding in report["findings"]:
             print(f"  {finding['kind']}: {json.dumps(finding, ensure_ascii=False)[:160]}")
     return 0 if report["ok"] else 1
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--draft", required=True, help="draft directory")
+    parser.add_argument("--export", help="exported video file; omit to locate the newest one")
+    parser.add_argument("--export-dir", help="directory to search when --export is omitted (default: home)")
+    parser.add_argument("--max-age-minutes", type=float, default=180.0,
+                        help="when --export is omitted, only files younger than this are considered")
+    parser.add_argument("--tolerance-ms", type=float, default=120.0)
+    parser.add_argument("--duration-source", choices=("all", "video"), default="all",
+                        help="all tracks, or only video tracks (a proxy renders just those)")
+    parser.add_argument("--json", action="store_true")
+    args = parser.parse_args()
+
+    export_path = Path(args.export) if args.export else None
+    located = None
+    if export_path is None:
+        located = locate_export(args.export_dir or Path.home(), args.max_age_minutes)
+        export_path = located
+
+    if export_path is None:
+        report = {"ok": False, "draft": args.draft, "export": None,
+                  "findings": [{"kind": "export_not_found",
+                                "detail": f"no .mp4/.mov newer than {args.max_age_minutes:g} min in the searched directories"}]}
+        emit(report, args.json)
+        return 1
+
+    document, failures = read_draft(args.draft)
+    if document is None:
+        report = {"ok": False, "draft": args.draft, "export": args.export, "findings": failures}
+    else:
+        export, failures = probe_export(export_path)
+        if export is None:
+            report = {"ok": False, "draft": args.draft,
+                      "export": str(export_path) if export_path else None, "findings": failures}
+        else:
+            draft = draft_facts(document, args.duration_source)
+            findings = failures + reconcile(draft, export, args.tolerance_ms)
+            report = {"ok": not findings, "draft": args.draft, "export": str(export_path),
+                      "export_located_automatically": located is not None,
+                      "draft_facts": draft, "export_facts": export, "findings": findings}
+
+    return emit(report, args.json)
 
 
 if __name__ == "__main__":

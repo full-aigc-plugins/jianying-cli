@@ -1228,3 +1228,28 @@ class ExportReconciliation(unittest.TestCase):
                                   "--duration-source", "video")
         self.assertEqual(completed.returncode, 1)
         self.assertIn("export_unprobeable", completed.stdout)
+
+
+class ExportAutoLocation(unittest.TestCase):
+    """`--export` 省略时应在给定目录里挑最新的成片；挑不到就明确报 export_not_found。"""
+
+    def _run(self, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "export_reconciliation.py"), *args],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+
+    def test_no_candidate_reports_export_not_found(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = Path(tmp) / "draft"
+            draft.mkdir()
+            (draft / "draft_content.json").write_text(json.dumps({
+                "canvas_config": {"width": 1080, "height": 1920},
+                "fps": 30.0, "duration": 1_000_000,
+                "tracks": [{"type": "video", "segments": [{"target_timerange": {"start": 0, "duration": 1_000_000}}]}],
+            }), encoding="utf-8", newline="\n")
+            empty = Path(tmp) / "exports"
+            empty.mkdir()
+            completed = self._run("--draft", str(draft), "--export-dir", str(empty))
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("export_not_found", completed.stdout)
