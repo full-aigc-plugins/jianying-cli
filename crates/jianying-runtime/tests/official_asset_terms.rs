@@ -106,3 +106,18 @@ fn complete_terms_verify_and_keep_the_notice() {
     assert_eq!(back, receipt);
     let _ = std::fs::remove_dir_all(dir);
 }
+
+#[test]
+fn the_4_1_label_alone_satisfies_terms() {
+    // 4.1 以“不可商用标注即许可证据”收口；这里证明该标注能原样进入契约并通过严格校验，
+    // 价格与授权文件在缺失时都是可选的（业主已确认可为空）。
+    let terms = OfficialAssetTerms::new("不可商用")
+        .unwrap()
+        .with_user_visible_notice("不可商用");
+    let receipt = receipt().with_terms(terms);
+    receipt.validate_document().unwrap();
+    receipt.verify_terms().unwrap();
+    let terms = receipt.terms().unwrap();
+    assert_eq!(terms.reference(), "不可商用");
+    assert_eq!(terms.user_visible_notice(), Some("不可商用"));
+}

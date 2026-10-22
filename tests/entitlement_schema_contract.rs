@@ -44,6 +44,27 @@ fn checked_in_schemas_are_closed_and_cover_every_runtime_resource_kind() {
         receipt["properties"]["schema_version"]["const"],
         "jianying-official-resource-receipt/v1"
     );
+    // 4.2 的契约扩展：terms 块必须存在，reference 必填，价格/授权/界面提示可选
+    let terms = &receipt["properties"]["terms"];
+    assert_eq!(terms["type"], "object");
+    assert_eq!(terms["additionalProperties"], false);
+    assert_eq!(terms["required"], serde_json::json!(["reference"]));
+    for optional in [
+        "price_reference",
+        "price_sha256",
+        "authorisation_reference",
+        "user_visible_notice",
+    ] {
+        assert!(
+            terms["properties"].get(optional).is_some(),
+            "schema lost the {optional} field"
+        );
+    }
+    assert_eq!(
+        terms["properties"]["price_sha256"]["pattern"],
+        "^[0-9a-f]{64}$"
+    );
+
     let kinds = receipt["properties"]["resource_kind"]["enum"]
         .as_array()
         .unwrap();
