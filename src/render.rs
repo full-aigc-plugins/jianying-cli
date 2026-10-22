@@ -491,6 +491,20 @@ fn render_impl(
             String::from_utf8_lossy(&output.stderr).trim()
         );
     }
+    let count = |bucket: &str| {
+        tl["materials"][bucket]
+            .as_array()
+            .map_or(0usize, |items| items.len())
+    };
+    let skipped_counts = serde_json::json!({
+        "transitions": count("transitions"),
+        "effects": count("effects"),
+        "masks": count("masks"),
+    });
+    let has_skipped = skipped_counts
+        .as_object()
+        .is_some_and(|map| map.values().any(|value| value.as_u64().unwrap_or(0) > 0));
+
     Ok(serde_json::json!({
         "status": if frame_at_us.is_some() { "frame" } else { "rendered" },
         "at_us": frame_at_us,
@@ -505,6 +519,9 @@ fn render_impl(
         "caption_font_file": caption_font,
         // 机读的限制说明：只在 note 里写一句人话，调用方无法据此判断“这次渲染漏了什么”。
         "unsupported_features": ["transition", "effect", "mask"],
+        // 这份草稿里实际存在、但代理没有渲染的素材数量
+        "skipped_material_counts": skipped_counts,
+        "draft_has_unrendered_features": has_skipped,
         "preview_approximations": ["background_blur"],
         "truth_source": "jianying_native_export",
     }))
