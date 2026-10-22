@@ -1,0 +1,31 @@
+{
+  "schema": "jianying-43-acceptance-summary/v1",
+  "task": "4.3 基础版降级环境之外的那条：真实素材在编辑器内的读取、播放、导出连续性",
+  "observed_at": "2026-10-22",
+  "evidence": [
+    {
+      "name": "编辑器内播放（真实官方素材草稿）",
+      "file": "official-resource/EDITOR_PLAYBACK_20261022.json",
+      "proves": "剪映 打开 auto-canary-review（CLI 建草稿的副本，含真实素材），素材面板列出该 mp4，时间轴有片段，预览渲染真实画面，播放头 00:00:00:00 → 00:00:02:06",
+      "does_not_prove": "没有导出；两张播后截图落在同一结束时间码"
+    },
+    {
+      "name": "导出对账（真实剪映导出）",
+      "file": "official-resource/EXPORT_RECONCILIATION_20261022.json",
+      "proves": "canary-11.6.mp4（1080x1920 h264 30fps 4.017s）与 canary-11.6 草稿时间线（4.0s）一致，差 17ms",
+      "does_not_prove": "这份导出不是真实素材那份草稿；该草稿无 fps 字段，未比对帧率"
+    },
+    {
+      "name": "CLI 代理渲染（真实素材草稿）",
+      "file": "official-resource/PROXY_RENDER_20261022.json",
+      "proves": "auto-canary 能被 CLI 端到端渲染（540x960 / 30fps / aac / 1.7907s vs 源 1.8s）",
+      "does_not_prove": "代理不渲染转场/特效/蒙版，也不是剪映内导出"
+    }
+  ],
+  "gap": "三项证据覆盖了“打开 + 播放 + 导出对账 + CLI 渲染”，但没有一项同时满足“真实官方素材草稿 + 剪映内导出”：真实素材的导出文件尚未产生（导出这一步两次尝试都被桌面争用挡住），因此 4.3 保持未勾",
+  "how_to_close": [
+    "在剪映里打开 auto-canary-review，点击导出，使用默认路径",
+    "python tools/export_reconciliation.py --draft <draft dir>   # 自动定位最新成片并对账",
+    "把结果写入 EDITOR_EXPORT 证据后，4.3 的三条证据即来自同一份真实素材草稿"
+  ]
+}
