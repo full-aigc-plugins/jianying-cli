@@ -1,0 +1,46 @@
+{
+  "schema": "jianying-export-reconciliation/v1",
+  "observed_at": "2026-10-22T09:35+08:00",
+  "purpose": "4.3 export half: reconcile a real 剪映 export against the draft that produced it",
+  "draft": {
+    "path": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Projects\\com.lveditor.draft\\canary-11.6",
+    "draft_content_sha256": "b4a51a3f299312037e01e3be3900552d381d3298020cbeac52e93678348f17e2"
+  },
+  "export": {
+    "path": "C:\\Users\\hnxyh\\Videos\\canary-11.6.mp4",
+    "bytes": 105811,
+    "sha256": "0fa30ad7d73a5f6ed7b5cfe402cc784c9a41fbfcab621799e3a4b9014da69f13",
+    "produced_at": "2026-10-21 14:56 (file mtime)"
+  },
+  "reconciliation": {
+    "ok": true,
+    "draft": "C:\\Users\\hnxyh\\AppData\\Local\\JianyingPro\\User Data\\Projects\\com.lveditor.draft\\canary-11.6",
+    "export": "C:\\Users\\hnxyh\\Videos\\canary-11.6.mp4",
+    "draft_facts": {
+      "width": 1080,
+      "height": 1920,
+      "ratio": "9:16",
+      "fps": null,
+      "duration_us": 4000000,
+      "tracks": 1,
+      "segments": 2
+    },
+    "export_facts": {
+      "duration_s": 4.017007,
+      "codec": "h264",
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0
+    },
+    "findings": []
+  },
+  "what_this_shows": [
+    "a genuine 剪映 export matches its draft canvas exactly (1080x1920), at 30 fps h264",
+    "duration 4.017006 s against the draft timeline 4.0 s - a 17 ms difference, inside the 120 ms tolerance"
+  ],
+  "what_this_does_not_show": [
+    "the export is of canary-11.6, not of the real-asset draft auto-canary-review; the official-material export is still missing",
+    "no observation of the export step itself - only the resulting file",
+    "the draft has no fps field (the editor dropped it on save), so fps was not compared for this pair"
+  ]
+}
