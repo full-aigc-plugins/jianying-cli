@@ -1180,3 +1180,51 @@ class PlanResourceLintDrafts(unittest.TestCase):
         self.assertEqual(completed.returncode, 1)
         self.assertIn("draft_content_encrypted", completed.stdout)
         self.assertNotIn("Traceback", completed.stderr)
+
+
+class ExportReconciliation(unittest.TestCase):
+    """`tools/export_reconciliation.py`：导出文件要与草稿事实对得上，加密草稿要明确报出。"""
+
+    def _run(self, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "export_reconciliation.py"), *args],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+
+    def _draft(self, tmp, *, width=1080, height=1920, fps=30.0, duration_us=2_000_000, track_type="video"):
+        draft = Path(tmp) / "draft"
+        draft.mkdir()
+        (draft / "draft_content.json").write_text(json.dumps({
+            "canvas_config": {"width": width, "height": height, "ratio": "9:16"},
+            "fps": fps,
+            "duration": duration_us,
+            "tracks": [{"type": track_type, "segments": [
+                {"target_timerange": {"start": 0, "duration": duration_us}}]}],
+        }), encoding="utf-8", newline="\n")
+        return draft
+
+    def test_missing_export_file_is_reported_not_crashed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = self._draft(tmp)
+            completed = self._run("--draft", str(draft), "--export", str(Path(tmp) / "nope.mp4"))
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("export_unprobeable", completed.stdout)
+        self.assertNotIn("Traceback", completed.stderr)
+
+    def test_encrypted_draft_is_named(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = Path(tmp) / "draft"
+            draft.mkdir()
+            (draft / "draft_content.json").write_bytes(b"E2c546X0dd5kydoYh01EdFbD+ab/cd==")
+            completed = self._run("--draft", str(draft), "--export", str(Path(tmp) / "x.mp4"))
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("draft_content_encrypted", completed.stdout)
+
+    def test_duration_source_video_ignores_other_tracks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = self._draft(tmp, duration_us=2_000_000, track_type="text")
+            # 没有导出文件时也要先报 draft 读成功，说明 --duration-source 不影响读取
+            completed = self._run("--draft", str(draft), "--export", str(Path(tmp) / "x.mp4"),
+                                  "--duration-source", "video")
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("export_unprobeable", completed.stdout)
