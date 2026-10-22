@@ -1,0 +1,30 @@
+{
+  "schema": "jianying-42-acceptance-summary/v1",
+  "task": "4.2 用 Rust CLI 验证凭据并生成真实草稿，证明价格文件、政府授权与用户可见信息的拒绝路径",
+  "observed_at": "2026-10-22",
+  "evidence": [
+    {
+      "name": "拒绝矩阵（合成凭据）",
+      "file": "REFUSAL_MATRIX_20261021.json",
+      "proves": "八种情形七拒一过：过期、basic 版、非 active、用途不允许、内容被改、收据声明与实际文件不符、preview_only 全部失败关闭；有效凭据 verified",
+      "does_not_prove": "凭据是合成的；价格文件/政府授权/用户可见提示在收据契约里没有对应字段"
+    },
+    {
+      "name": "收据全链路往返（真实草稿 + 合成收据）",
+      "file": "RECEIPT_ROUNDTRIP_20261021.json",
+      "proves": "verify → register → show → list → preflight 五个动词在同一份 CLI 草稿上闭环，九项断言两次一致",
+      "does_not_prove": "收据标题写明 synthetic，不是真实素材"
+    },
+    {
+      "name": "真实素材链路（真实素材 + 真实草稿）",
+      "file": "REAL_ASSET_CHAIN_20261022.json",
+      "proves": "编辑器缓存的官方素材被 CLI 复制进自建草稿，downloaded_file 收据验过，商业用途被 asset_use_denied 拒绝（对应面板“不可商用”标注）",
+      "does_not_prove": "授权条款文本仍只有面板标签；缓存文件与界面所选素材的对应关系是时间戳推断"
+    }
+  ],
+  "gap": "“拒绝路径 + 真实草稿 + 真实素材”三项已分别有证据，但任务原文还要求“价格文件、政府授权与用户可见信息”的拒绝路径，而收据契约里没有价格或授权文件字段，这半边无法用现有契约证明；条款文本也仍未取得，因此 4.2 保持未勾",
+  "what_would_close_it": [
+    "把价格/授权文件纳入收据契约（需要产品决策：这类文件的身份与条款如何表达）",
+    "取得素材的条款文本，作为 terms_reference 的真实来源"
+  ]
+}
