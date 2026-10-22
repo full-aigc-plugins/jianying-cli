@@ -1,0 +1,13 @@
+{
+  "schema": "jianying-gui-automation-hazard/v1",
+  "observed_at": "2026-10-22T09:45+08:00",
+  "incident": "while trying to click 导出 in a contended desktop, two clicks landed in the draft title field and left the text \"JianyingPro\" in the rename box; the rename was never confirmed with Enter, so no draft was renamed",
+  "why_it_happened": "the editor window was un-maximised and pushed behind other windows between the capture and the click; the coordinates that hit 导出 when maximised hit the title area instead",
+  "decision": "stop synthetic clicking on this machine: the desktop is shared with other sessions, and the failure mode is not a failed test but an unintended edit to the owner's drafts",
+  "what_stays_valid": [
+    "the playback observation in EDITOR_PLAYBACK_20261022.json (draft opened, playhead 00:00:00:00 → 00:00:02:06)",
+    "the export reconciliation in EXPORT_RECONCILIATION_20261022.json (canary-11.6.mp4 vs its draft, +17 ms)",
+    "the prepared plain copies: auto-canary-export and auto-canary-e2e"
+  ],
+  "safe_alternative": "the owner exports once from 剪映 and says so; tools/export_reconciliation.py then locates the file itself and reconciles it - no synthetic input, no chance of touching a draft"
+}
