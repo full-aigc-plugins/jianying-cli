@@ -1,0 +1,52 @@
+{
+  "schema": "jianying-editor-playback-observation/v1",
+  "observed_at": "2026-10-22T09:20+08:00",
+  "purpose": "4.3: observe inside 剪映 that a CLI-built draft carrying the real official asset opens and plays",
+  "sequence": [
+    "restarted 剪映 to reach a clean home page (56)",
+    "double-clicked the draft auto-canary-review in 本地草稿 (57)",
+    "pressed play and let the 2 s clip run; the playhead reached 00:00:02:06 (58, 59)"
+  ],
+  "facts": {
+    "draft": "auto-canary-review (copy of the CLI-built auto-canary)",
+    "asset_in_panel": "2d89c299…4c94.mp4, 00:02",
+    "timeline": "video track with the clip, text track 官方素材联调 above it",
+    "preview": "a real frame of the asset rendered at 00:00:00:xx",
+    "playhead": "00:00:00:00 before play → 00:00:02:06 after, i.e. playback advanced to the end of the 2 s timeline"
+  },
+  "screenshots": [
+    {
+      "file": "56-home-after-restart.png",
+      "sha256": "b539d8d3dd724e68899eb1c9db5d068ef1c2c716aff479fc321e495cad4bf323",
+      "bytes": 670353,
+      "shows": "home page listing auto-canary-review among the drafts"
+    },
+    {
+      "file": "57-review-draft-open.png",
+      "sha256": "bff529a579a8210dfd1ccb23d96d7f6a9865a92eb9dd644cf442bd18e9ee5ffe",
+      "bytes": 743123,
+      "shows": "the draft opened: media in the panel, clip on the timeline, real frame in the preview"
+    },
+    {
+      "file": "58-playback-frame-a.png",
+      "sha256": "42d6875a5261f0474d976180140e1b4b6bf978648d46824af3be5a6532f3f6f1",
+      "bytes": 377582,
+      "shows": "playhead at 00:00:02:06 after play"
+    },
+    {
+      "file": "59-playback-frame-b.png",
+      "sha256": "6acaf60d337552b70b85d0766e23697ff2f9988c032bd02ecf55c1f33a444e00",
+      "bytes": 377565,
+      "shows": "same end state, second capture"
+    }
+  ],
+  "what_this_proves": [
+    "the draft the CLI wrote, including the copied official asset, opens in 剪映 without repair",
+    "剪映 plays the timeline to its end (00:00:00:00 → 00:00:02:06)"
+  ],
+  "what_this_does_not_prove": [
+    "no export was performed in the editor, so the export half of 4.3 is still open",
+    "the two post-play captures land on the same end timecode, so they show the end state rather than a mid-playback frame",
+    "a later attempt to capture three progressing frames was covered by another session's window and produced nothing usable; those captures were deleted"
+  ]
+}
