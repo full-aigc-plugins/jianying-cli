@@ -827,17 +827,35 @@ fn run_owned_with_env(args: &[String], name: &str, value: &str) -> Output {
 
 fn serve_once(response: Option<Vec<u8>>) -> MockServer {
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    // 客户端可能因为环境原因连不上（本机曾出现传输层 AddrInUse）；accept 若无超时会让整个测试挂死，
+    // 所以这里改成非阻塞轮询 + 上限，让测试"失败得快"而不是"卡住不返回"。
+    listener.set_nonblocking(true).unwrap();
     let endpoint = format!("http://{}/tts", listener.local_addr().unwrap());
     let requests = Arc::new(Mutex::new(Vec::new()));
     let captured = requests.clone();
     let handle = std::thread::spawn(move || {
-        let (mut stream, _) = listener.accept().unwrap();
-        captured
-            .lock()
-            .unwrap()
-            .push(read_http_request(&mut stream));
-        if let Some(response) = response {
-            stream.write_all(&response).unwrap();
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(15);
+        loop {
+            match listener.accept() {
+                Ok((mut stream, _)) => {
+                    stream.set_nonblocking(false).unwrap();
+                    captured
+                        .lock()
+                        .unwrap()
+                        .push(read_http_request(&mut stream));
+                    if let Some(response) = response {
+                        let _ = stream.write_all(&response);
+                    }
+                    break;
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+                    if std::time::Instant::now() >= deadline {
+                        break;
+                    }
+                    std::thread::sleep(std::time::Duration::from_millis(20));
+                }
+                Err(_) => break,
+            }
         }
     });
     (endpoint, requests, handle)
