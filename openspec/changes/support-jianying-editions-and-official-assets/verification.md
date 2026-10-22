@@ -378,3 +378,26 @@ timeline track-rename → project verify`。两份草稿镜像逐字节一致，
 
 仍未完成、且都需要外部条件：4.1（授权条款）、4.2/4.3（明文草稿里的真实素材 + 编辑器内观察）、
 2.12 尾项（发布设置界面）、4.5（打 tag 与发布）、unify 9.3/9.7（macOS + 真实剪映）。
+
+## 2026-10-22 — 4.3 的操作手册：准备副本 → 人工导出 → 自动对账
+
+4.3 的导出半边需要剪映内的真实导出，而这台机器上做合成点击已被证明不安全（见
+`docs/runbooks/evidence/GUI_AUTOMATION_HAZARD_20261022.json`：两次本要落在「导出」上的点击落进了标题栏，
+差点重命名草稿）。因此流程被拆成"机器做机器的事、人做一次点击"：
+
+1. **准备副本**（可重复、无副作用）
+   ```bash
+   python tools/prepare_editor_copy.py --source <明文草稿> --name <副本名> --overwrite
+   ```
+   它会复制目录、把 videos/audios/images 的绝对路径改指副本自己的 `assets/`、写回明文，并拒绝加密源。
+2. **人工导出**：在剪映里打开该副本，点「导出」，使用默认路径。**不要**打开原稿——剪映保存时会把明文草稿
+   改写成 Base64 信封（`EDITOR_ENCRYPTS_ON_OPEN_20261022.json`），原稿一旦被打开就失去可检查性。
+3. **自动对账**
+   ```bash
+   python tools/export_reconciliation.py --draft <副本目录>
+   ```
+   省略 `--export` 时它会在家目录与 Videos/Desktop/Downloads/Documents 里找最新的 `.mp4/.mov`，
+   然后逐项比对时长（默认 120 ms 容差）、宽高比、帧率；代理渲染用 `--duration-source video`。
+
+已知边界：剪映保存过的草稿会丢 `fps`，代理渲染现在回退 30 并标注 `fps_source`（`RENDER_FPS_FALLBACK_20261022.json`）；
+加密草稿在 `plan_resource_lint --draft` 与对账里都只会报 `draft_content_encrypted`。
