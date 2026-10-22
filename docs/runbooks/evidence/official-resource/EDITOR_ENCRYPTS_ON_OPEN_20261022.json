@@ -1,0 +1,25 @@
+{
+  "schema": "jianying-editor-encrypts-on-open/v1",
+  "observed_at": "2026-10-22T10:15+08:00",
+  "finding": "opening a plain CLI draft in 剪映 and letting it save rewrites draft_content.json into a Base64 envelope. auto-canary-review was plain before I opened it for the 4.3 playback observation and is encrypted now (5308 bytes)",
+  "consequences": [
+    "plan_resource_lint --draft and export_reconciliation answer draft_content_encrypted for that copy",
+    "the provenance of the copy is still fine, but its content can no longer be diffed against what the CLI wrote"
+  ],
+  "replacement_prepared": {
+    "draft": "auto-canary-export",
+    "source": "auto-canary (still plain, fps 30, video + text track)",
+    "video_path_repointed": true,
+    "asset": "assets/video/2d89c29964185f62e14f869e678e4c94.mp4",
+    "draft_content_sha256": "d4ad2f2418296cb16ad9a9cb548ab2b9bda44a3b4dac225a80e02faf9ce719ef",
+    "checks": {
+      "plan_resource_lint --draft": "ok",
+      "render proxy": "rendered, target_fps 30.0, fps_source draft"
+    }
+  },
+  "instruction_for_the_next_export": "open auto-canary-export (not auto-canary-review) in 剪映, press 导出, keep the default path; then python tools/export_reconciliation.py --draft <that dir> finds the newest file and reconciles it",
+  "not_proven": [
+    "whether the editor encrypts on every save or only after a delay - one observation",
+    "whether an encrypted draft can be decrypted by any supported path; none was attempted"
+  ]
+}
