@@ -1,6 +1,6 @@
 use jianying_media::{LocalHttpTtsProvider, TtsAudioFormat, TtsProvider, TtsRequest};
 use std::io::{Read, Write};
-use std::net::TcpListener;
+use std::net::{TcpListener, TcpStream};
 use std::thread;
 
 #[test]
@@ -24,7 +24,8 @@ fn local_http_posts_unified_json_and_persists_binary_audio() {
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     let address = listener.local_addr().unwrap();
     let server = thread::spawn(move || {
-        let (mut stream, _) = listener.accept().unwrap();
+        let mut stream = accept_within(&listener, std::time::Duration::from_secs(15))
+            .expect("client never connected");
         let mut buffer = Vec::new();
         let mut chunk = [0_u8; 4096];
         loop {
@@ -81,4 +82,25 @@ fn local_http_posts_unified_json_and_persists_binary_audio() {
     assert_eq!(artifact.request_id(), Some("local-42"));
     assert_eq!(std::fs::read(output).unwrap(), b"RIFFfixture-wave-bytes");
     let _ = std::fs::remove_dir_all(root);
+}
+
+/// 带超时的 accept：客户端连不上时让测试"失败得快"，而不是永久阻塞。
+fn accept_within(listener: &TcpListener, timeout: std::time::Duration) -> Option<TcpStream> {
+    listener.set_nonblocking(true).ok()?;
+    let deadline = std::time::Instant::now() + timeout;
+    loop {
+        match listener.accept() {
+            Ok((stream, _)) => {
+                stream.set_nonblocking(false).ok()?;
+                return Some(stream);
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+                if std::time::Instant::now() >= deadline {
+                    return None;
+                }
+                std::thread::sleep(std::time::Duration::from_millis(20));
+            }
+            Err(_) => return None,
+        }
+    }
 }

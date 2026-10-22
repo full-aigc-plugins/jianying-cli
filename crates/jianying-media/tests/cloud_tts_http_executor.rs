@@ -259,7 +259,10 @@ fn spawn_server(
 ) -> std::thread::JoinHandle<()> {
     std::thread::spawn(move || {
         for response in responses {
-            let (mut stream, _) = listener.accept().unwrap();
+            let mut stream = match accept_within(&listener, std::time::Duration::from_secs(15)) {
+                Some(stream) => stream,
+                None => break,
+            };
             let request = read_http_request(&mut stream);
             requests.lock().unwrap().push(request);
             stream.write_all(&response).unwrap();
@@ -328,4 +331,25 @@ fn temporary_path(name: &str) -> PathBuf {
     ));
     let _ = std::fs::remove_file(&root);
     root
+}
+
+/// 带超时的 accept：客户端连不上时让测试"失败得快"，而不是永久阻塞。
+fn accept_within(listener: &TcpListener, timeout: std::time::Duration) -> Option<TcpStream> {
+    listener.set_nonblocking(true).ok()?;
+    let deadline = std::time::Instant::now() + timeout;
+    loop {
+        match listener.accept() {
+            Ok((stream, _)) => {
+                stream.set_nonblocking(false).ok()?;
+                return Some(stream);
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+                if std::time::Instant::now() >= deadline {
+                    return None;
+                }
+                std::thread::sleep(std::time::Duration::from_millis(20));
+            }
+            Err(_) => return None,
+        }
+    }
 }
