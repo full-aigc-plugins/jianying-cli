@@ -1,0 +1,17 @@
+{
+  "schema": "jianying-render-fps-fallback/v1",
+  "observed_at": "2026-10-22T10:05+08:00",
+  "finding": "an editor-saved draft can lack the `fps` field; proxy rendering used to refuse it with \"proxy draft fps must be a finite number in [1, 240]\", which made those drafts unpreviewable",
+  "measured": {
+    "canary-11.6 (editor-saved, plain)": "fps=None, tracks=[text] - the refusal was real but the draft has no video anyway",
+    "all editor-saved drafts with video": "encrypted envelope: 10月16日…10月22日, auto-canary-review, material-canary",
+    "synthetic video draft without fps": "copy of auto-canary with fps removed - renders, target_fps 30, fps_source \"default(30)\"",
+    "auto-canary (has fps)": "fps_source \"draft\" - the fallback does not mask a present value"
+  },
+  "fix": "missing fps falls back to 30 and the result says fps_source; a present-but-invalid fps still fails closed",
+  "side_finding": "opening auto-canary-review in the editor rewrote it into an encrypted envelope (the DRAFT_DRIFT class already recorded): the copy the CLI produced is no longer plain JSON after the editor touched it",
+  "not_proven": [
+    "that the fallback matches what the editor would export for a draft that really had no fps",
+    "the real fps of any editor-saved video draft - they are all encrypted here"
+  ]
+}

@@ -181,10 +181,18 @@ fn render_impl(
         crate::probe::ffmpeg_path().ok_or_else(|| anyhow::anyhow!("ffmpeg not found on PATH"))?;
     let width = tl["canvas_config"]["width"].as_u64().unwrap_or(1920);
     let height = tl["canvas_config"]["height"].as_u64().unwrap_or(1080);
-    let fps = tl["fps"]
-        .as_f64()
-        .filter(|fps| fps.is_finite() && (1.0..=240.0).contains(fps))
-        .context("proxy draft fps must be a finite number in [1, 240]")?;
+    // 剪映自己保存草稿时会丢掉 `fps` 字段（实测 canary-11.6），此时给代理渲染一个默认值并标注来源，
+    // 而不是直接拒绝——拒绝会让“编辑器保存过的草稿”完全无法生成预览。
+    let (fps, fps_source) = match tl["fps"].as_f64() {
+        Some(value) if value.is_finite() && (1.0..=240.0).contains(&value) => (value, "draft"),
+        Some(value) if !value.is_finite() => {
+            bail!("proxy draft fps must be finite, observed {value}");
+        }
+        Some(value) => {
+            bail!("proxy draft fps must be within [1, 240], observed {value}");
+        }
+        None => (30.0, "default(30)"),
+    };
     let out_w = ((width as f64 * scale).round() as i64) & !1;
     let out_h = ((height as f64 * scale).round() as i64) & !1;
 
@@ -514,6 +522,7 @@ fn render_impl(
         "video_tracks_flattened": input_idx,
         "background_blur_segments": background_blur_segments,
         "target_fps": fps,
+        "fps_source": fps_source,
         "audio_segments_mixed": if has_audio { aidx - input_idx } else { 0 },
         "captions_burned": if burn_captions { drawtext.len() } else { 0 },
         "caption_font_file": caption_font,
