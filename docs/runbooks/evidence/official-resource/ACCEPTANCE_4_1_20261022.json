@@ -1,0 +1,84 @@
+{
+  "schema": "jianying-acceptance-4-1/v1",
+  "task": "4.1 使用当前专业账号取得一项明确可下载的官方素材，保存不含秘密的视觉、权益和许可证据。",
+  "observed_at": "2026-10-22T11:20+08:00",
+  "owner_decision": {
+    "decided_at": "2026-10-22T11:17+08:00",
+    "statement": "不可商用作为授权证据",
+    "effect": "the 不可商用 label shown by the official-material panel is accepted as the licence evidence for this task"
+  },
+  "material": {
+    "identity": "downloaded_file 2d89c29964185f62e14f869e678e4c94.mp4",
+    "sha256": "107e163d3b51bf1461eb3d89d6044a582de37a11d03ed0c0feaa118183a9346f",
+    "bytes": 220485,
+    "media": {
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "duration_seconds": 1.8,
+      "video": "h264 1022x662 @ 60/1",
+      "audio": "aac"
+    },
+    "downloaded_from": "User Data\\Cache\\onlineMaterial (the client's own cache, i.e. it was downloaded by the professional account)",
+    "copy_is_byte_identical_in_draft": true
+  },
+  "visual_evidence": {
+    "screenshots_dir": "docs/runbooks/evidence/windows-canary",
+    "count": 36,
+    "screenshots_sha256": {
+      "01-jianying-home.png": "85636e48ddfd04b5ad1cfd7552d5d0e454d7302487519b35d2764fb04eece72a",
+      "02-jianying-maximized.png": "b9bcfe7d5b0b1cb3c115bcd98201d100ffadac6dc074cc7e6bbcd81a19573560",
+      "03-after-double-click.png": "b6d8e1820d7151488eec60ad21006755a2594557e2be52cfb47aeb8c64b192b1",
+      "04-editor-menu.png": "eb91b49b6336ca7719285f9e86a628d20b0e92cf82f0d3efb0a5c808552837ba",
+      "05-export-dialog.png": "3d4b45e7dd6a32f01aaad16451d4e417202ff3a8bd827016eb58bec4bd24c380",
+      "06-export-panel.png": "3443fb6c8fb52cb0955b614ec9615791a5b850508574724c01d5b1158a7b9bcc",
+      "07-export-result.png": "9057f01fdb0527489dd064382c4aeae3fe4d51576c99dca11b35c76791b3b644",
+      "08-exported-frame.png": "88b18a1caa08d8b81f385f5cbcef6809b18118d5fed10212c7383eb2638d1e95",
+      "10-template-home.png": "b7385505f2065d563e49f745fd09a48cc7d4cafb7611c47b09c91fe01c177abd",
+      "11-template-draft-open.png": "ab3dc1143796b8af6ada12771cb78a06e2b2be6174bf8ebd96b18fa6efa211a2",
+      "12-segment-context-menu.png": "1254de10d78587c407dfd994fe6f74b7d006e257841d29d222e28b5ee41bccad",
+      "13-account-svip-home.png": "69d83f72b9c8b42b1c636522633dd96d0bddb99a722df74aa0d9d0166ca6e28d",
+      "14-draft-reopened.png": "dfea9f92ee8936c00e485e1d72cffbb35c3cb1cadeefe1d543b00b2aaffd77b5",
+      "16-official-materials.png": "0369a01cc99af6ce2e83c92bf8e0db38e7f00486119ec4d1d1eccf13d69381e9",
+      "19-timeline-toolbar-strip.png": "1a6ddcfeaace4e224423c199c2bb68bc1fa744c858c09bb5d6f114727a1d066e",
+      "31-official-materials-open.png": "020fd37cb1fbc01755e6c2aed9c2b0caf172112771d539ad75604f6525e2ad35",
+      "32-material-hover.png": "85e7b242f81c46596cfa732ffbd1c333131d7ff2553ba2d3d2ebde27b0ac9668",
+      "33-material-added.png": "2d1f16d5ae68d367f49de5aef0250a687afc377b1e458509a93414cb5544235f",
+      "34-material-dragged.png": "19e003034c24d32a9f50ed5bedb1955f3efd9b88199d63e77abc63f3568a3dd6",
+      "36-home-with-cli-draft.png": "0a4f05c550d063824dfeae4c8ff6f057110d5d2a44247f13727d1cdcb9a0559d",
+      "37-material-canary-open.png": "4de91baebce1c71bc65f64ed7320249a6c79c30f5ce6b76cbccb9e9100de8c36",
+      "39-official-material-on-cli-draft.png": "fb3abfd8fac51daf40340f3c8c0348beeb20d7acb571091eeca47e870634d421",
+      "41-material-added-to-canary.png": "18d6d105dce8868753cb2920d88349ccb7f0757c8b6b06e385cb1619115a60d9",
+      "42-editor-state.png": "0ab7a0046a29e0d15ddc32010a5cd48204bc32a1fcbe7a21e06eaeb929546c24",
+      "43-material-downloaded.png": "6e061f4d8af1d601f2467f9f957535df6937615b2f213c070fb397fb68e71fd1",
+      "44-material-on-timeline.png": "2b15d1c715e1b1b16e66a451a107dab317f5b7fd7bbd4ab121b64610b09e7c49",
+      "46-segment-right-click.png": "10a2e21e19fa7805d0cfd1d1e4eca883bec8133a560fd71647658eb601a64589",
+      "47-preview-bench-controls.png": "e8d1e0d3271329b5b35c4d8705b359396abe32bd83e68e0151556d1b2e048116",
+      "48-top-media-toolbar.png": "bf3dd756c35ac6e89689eb6737d841b1484ba3c25fa9fbda0099f1d4bd37a558",
+      "49-state-now.png": "7a1b145452debaf34193bc6a1dbedf30021c70aff3239e1f6aa8a8aea1e4a3fa",
+      "51-gui-state.png": "84290e164deacdb3d76fcac03516b818893e3197ebb00725238b13b99c9e2c0e",
+      "52-filter-tab.png": "1be1f7e5d2033d97b1f145d82f91ebd6ec83ac6245b9a2768d7f5c78615ed9ba",
+      "56-home-after-restart.png": "b539d8d3dd724e68899eb1c9db5d068ef1c2c716aff479fc321e495cad4bf323",
+      "57-review-draft-open.png": "bff529a579a8210dfd1ccb23d96d7f6a9865a92eb9dd644cf442bd18e9ee5ffe",
+      "58-playback-frame-a.png": "42d6875a5261f0474d976180140e1b4b6bf978648d46824af3be5a6532f3f6f1",
+      "59-playback-frame-b.png": "6acaf60d337552b70b85d0766e23697ff2f9988c032bd02ecf55c1f33a444e00"
+    },
+    "notes": "panel, badge and preview lettering were read from these captures; no account secrets are in them"
+  },
+  "entitlement_evidence": {
+    "account": "小汤圆的首部 (professional), owner confirmed 权益已生效 on 2026-10-21",
+    "receipt": {
+      "schema": "jianying-official-resource-receipt/v1",
+      "tier": "professional",
+      "verify_personal": "verified"
+    }
+  },
+  "licence_evidence": {
+    "panel_label": "不可商用（预览栏，2026-10-21 17:35）",
+    "receipt_terms_reference": "剪映 官方素材面板标签：不可商用（预览栏 2026-10-21）",
+    "basis": "per the owner decision above, the label itself is the licence evidence; no separate terms document was supplied",
+    "scope": "non-commercial only - the contract refuses commercial use with asset_use_denied, which is the mechanism that keeps the label honest"
+  },
+  "not_proven": [
+    "no full licence text or terms page was obtained; the evidence is the label plus the refusal contract",
+    "the mapping between this cached file and the exact panel item is timestamp-based, as recorded in REAL_ASSET_CHAIN"
+  ]
+}

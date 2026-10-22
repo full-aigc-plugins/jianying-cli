@@ -401,3 +401,21 @@ timeline track-rename → project verify`。两份草稿镜像逐字节一致，
 
 已知边界：剪映保存过的草稿会丢 `fps`，代理渲染现在回退 30 并标注 `fps_source`（`RENDER_FPS_FALLBACK_20261022.json`）；
 加密草稿在 `plan_resource_lint --draft` 与对账里都只会报 `draft_content_encrypted`。
+
+## 2026-10-22 — 4.1 收口：以「不可商用」标注为许可证据
+
+业主当日裁决原文：**「不可商用作为授权证据」**。据此把官方素材面板的 `不可商用` 标注认定为 4.1 的许可证据，
+4.1 由未勾改为已勾。此前多轮之所以卡住，是因为我把"标注能否算证据"当成了必须由业主书面条款回答的问题，
+而不是产品/合规口径的裁决；业主给出裁决后即可入证。
+
+入证内容（`docs/runbooks/evidence/official-resource/ACCEPTANCE_4_1_20261022.json`）：
+
+| 维度 | 证据 |
+| --- | --- |
+| 素材身份 | `2d89c299…mp4`，sha256 `107e163d…`，220,485 B，h264 1022x662@60 + aac，1.8 s，来自客户端自身缓存（即专业账号已下载） |
+| 可下载性 | 缓存文件被 CLI 复制进自建草稿，副本与源**字节一致** |
+| 视觉 | `windows-canary` 截图（带 sha256，无账号秘密） |
+| 权益 | 账号「小汤圆的首部」；收据 `tier=professional`、`verify_personal=verified` |
+| 许可 | 面板 `不可商用` 标注 + 收据 `terms_reference`；商业用途被契约以 `asset_use_denied` 拒绝，标注与强制行为一致 |
+
+仍未证明（已写进证据文件）：没有条款全文；缓存文件与面板具体条目的对应仍是时间戳推断。
