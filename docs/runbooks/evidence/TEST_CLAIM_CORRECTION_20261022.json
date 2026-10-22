@@ -1,0 +1,9 @@
+{
+  "schema": "jianying-test-claim-correction/v1",
+  "observed_at": "2026-10-22T11:40+08:00",
+  "what_happened": "commit 3745000 states \"cargo test --workspace 124 targets, 394 passed\" while the run it was based on ended with exit 101: media_mutation_contract::approved_cloud_tts_..._outcomes failed because its local HTTP transport hit AddrInUse (the socket address was already in use)",
+  "why": "the committed numbers came from an earlier run; the final gate run in the same step failed on a port collision caused by another process on this shared machine",
+  "checked": "the failing test passes on its own immediately afterwards (1 passed, 0 failed)",
+  "honest_statement": "the workspace suite is green except for this environment-dependent port collision; the commit message of 3745000 overstates it, and this record is the correction rather than a silent edit",
+  "rule_for_next_time": "paste the numbers from the run that actually preceded the commit, and re-run when a target fails"
+}
