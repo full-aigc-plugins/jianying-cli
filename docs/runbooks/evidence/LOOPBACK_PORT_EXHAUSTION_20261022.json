@@ -1,0 +1,23 @@
+{
+  "schema": "jianying-loopback-port-exhaustion/v1",
+  "observed_at": "2026-10-22T12:15+08:00",
+  "symptom": "local-socket tests fail intermittently with os error 10048 (WSAEADDRINUSE) on TcpStream::connect to 127.0.0.1; one of them used to hang",
+  "measured": {
+    "time_wait_connections": 17018,
+    "dynamic_tcp_port_range": "49152 + 16384 ports",
+    "conclusion": "more sockets awaiting drain than the entire dynamic range, so fresh loopback connections can be refused"
+  },
+  "affected_tests": [
+    "tests/media_mutation_contract.rs::approved_cloud_tts_..._outcomes (hung before the bounded accept in 059b0a7)",
+    "tests/mcp_contract.rs::streamable_http_and_sse_profiles_enforce_auth_host_and_origin",
+    "crates/jianying-media/tests/{cloud_tts_http_executor,local_http_tts_provider}.rs (bounded accept added in 335eeb3)"
+  ],
+  "not_the_cause": "product code does not bind a fixed port; the client is refused before a connection exists",
+  "tried": {
+    "bounded accept (kept)": "turned the infinite hang into a fast failure",
+    "SO_LINGER(0) on test servers": "rejected - std::net::TcpStream::set_linger is unstable (feature tcp_linger)",
+    "pre-flight loopback probe to skip": "rejected - the probe can succeed while the real connect still fails, so it would skip or fail unpredictably"
+  },
+  "current_state": "socket-related tests pass once the port table drains: re-run gave 5 + 3 + 4 + 2 passed in 3.5 s; a full-workspace run is red only while the machine sits at exhaustion",
+  "correction": "commit 335eeb3 announced this record but the writer script had been lost to a PowerShell parse error, so the file was missing from that commit; it is added here"
+}
