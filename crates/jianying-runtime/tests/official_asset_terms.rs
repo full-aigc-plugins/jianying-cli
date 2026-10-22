@@ -4,7 +4,7 @@
 
 use jianying_runtime::{
     OfficialAssetReceipt, OfficialAssetTerms, OfficialAssetTier, OfficialAssetUsage,
-    OfficialResourceKind, RuntimeError, RuntimeFileIdentity,
+    OfficialResourceKind, OfficialResourceReceiptStore, RuntimeError, RuntimeFileIdentity,
 };
 use std::collections::BTreeSet;
 
@@ -120,4 +120,28 @@ fn the_4_1_label_alone_satisfies_terms() {
     let terms = receipt.terms().unwrap();
     assert_eq!(terms.reference(), "不可商用");
     assert_eq!(terms.user_visible_notice(), Some("不可商用"));
+}
+
+#[test]
+fn terms_survive_register_and_show() {
+    // 契约字段要是登记后就丢了，4.2 的证据链只在单元测试里成立；这里走一遍真实的存储往返。
+    let root = std::env::temp_dir().join(format!("terms-store-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    let store = OfficialResourceReceiptStore::new(&root);
+    let terms = OfficialAssetTerms::new("不可商用")
+        .unwrap()
+        .with_user_visible_notice("不可商用");
+    let receipt = receipt().with_terms(terms);
+    store.register(&receipt).unwrap();
+    let shown = store.show(receipt.asset_id()).unwrap();
+    assert_eq!(shown.terms().unwrap().reference(), "不可商用");
+    assert_eq!(
+        shown.terms().unwrap().user_visible_notice(),
+        Some("不可商用")
+    );
+    assert_eq!(shown, receipt);
+    let listed = store.list().unwrap();
+    assert_eq!(listed.len(), 1);
+    assert_eq!(listed[0].terms().unwrap().reference(), "不可商用");
+    let _ = std::fs::remove_dir_all(root);
 }
