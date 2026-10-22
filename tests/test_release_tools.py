@@ -1253,3 +1253,56 @@ class ExportAutoLocation(unittest.TestCase):
             completed = self._run("--draft", str(draft), "--export-dir", str(empty))
         self.assertEqual(completed.returncode, 1)
         self.assertIn("export_not_found", completed.stdout)
+
+
+class PrepareEditorCopy(unittest.TestCase):
+    """`tools/prepare_editor_copy.py`：复制草稿并把素材指到副本；加密源必须拒绝。"""
+
+    def _run(self, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "prepare_editor_copy.py"), *args],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+
+    def _draft(self, tmp, encrypted=False):
+        draft = Path(tmp) / "draft"
+        (draft / "assets" / "video").mkdir(parents=True)
+        (draft / "assets" / "video" / "clip.mp4").write_bytes(b"x" * 2048)
+        if encrypted:
+            (draft / "draft_content.json").write_bytes(b"E2c546X0dd5kydoYh01EdFbD+ab/cd==")
+            return draft
+        (draft / "draft_content.json").write_text(json.dumps({
+            "canvas_config": {"width": 1080, "height": 1920},
+            "fps": 30.0, "duration": 1_000_000,
+            "materials": {"videos": [{"path": str(Path(tmp) / "elsewhere" / "clip.mp4")}]},
+            "tracks": [{"type": "video", "segments": []}],
+        }), encoding="utf-8", newline="\n")
+        return draft
+
+    def test_copy_repoints_media_into_the_copy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = self._draft(tmp)
+            completed = self._run("--source", str(draft), "--name", "copy", "--json")
+            self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+            report = json.loads(completed.stdout)
+            self.assertTrue(report["ok"])
+            copied = json.loads((Path(report["target"]) / "draft_content.json").read_text(encoding="utf-8"))
+            path = copied["materials"]["videos"][0]["path"]
+            self.assertIn("copy", path)
+            self.assertTrue(Path(path).is_file())
+
+    def test_encrypted_source_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = self._draft(tmp, encrypted=True)
+            completed = self._run("--source", str(draft), "--name", "copy", "--json")
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("draft_content_encrypted", completed.stdout)
+
+    def test_existing_target_needs_overwrite(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            draft = self._draft(tmp)
+            first = self._run("--source", str(draft), "--name", "copy")
+            self.assertEqual(first.returncode, 0)
+            second = self._run("--source", str(draft), "--name", "copy", "--json")
+        self.assertEqual(second.returncode, 1)
+        self.assertIn("target_exists", second.stdout)
