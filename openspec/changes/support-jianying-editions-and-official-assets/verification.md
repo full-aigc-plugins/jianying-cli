@@ -419,3 +419,28 @@ timeline track-rename → project verify`。两份草稿镜像逐字节一致，
 | 许可 | 面板 `不可商用` 标注 + 收据 `terms_reference`；商业用途被契约以 `asset_use_denied` 拒绝，标注与强制行为一致 |
 
 仍未证明（已写进证据文件）：没有条款全文；缓存文件与面板具体条目的对应仍是时间戳推断。
+
+## 2026-10-22 — 4.2 收口：收据契约增加条款/价格/授权引用（选项 A）
+
+业主选定提案的 **选项 A**。4.2 此前卡在“契约没有价格与授权文件的位置”，这不是测试不足，而是契约缺字段；
+按 A 以**增量**方式补齐，旧收据不受影响。
+
+| 新增字段（`terms` 块） | 作用 |
+| --- | --- |
+| `reference`（必填） | 条款的稳定标识；面板标注文本（如 `不可商用`）也合法 |
+| `price_reference` + `price_sha256` | 价格文件与其摘要，成对出现才能校验 |
+| `authorisation_reference` | 授权文件（含政府/机构授权）路径 |
+| `user_visible_notice` | 界面原文，把 4.1 的标注直接带进契约 |
+
+对应的拒绝路径（`verify_terms`，五条测试覆盖）：
+
+| 情形 | 错误 |
+| --- | --- |
+| 收据没有 `terms` | `TermsReferenceMissing` |
+| `terms.reference` 为空 | `TermsReferenceMissing` |
+| 价格文件摘要不符 | `PriceDocumentMismatch` |
+| 价格文件不存在 | `PriceDocumentMissing` |
+| 授权文件不存在 | `AuthorisationDocumentMissing` |
+
+设计取舍：`verify` / `verify_draft` **行为不变**（否则所有既有收据会被拒），严格校验放在 `verify_terms`，
+由调用方在需要 4.2 证据时显式调用。schema 与 Rust 结构同步，`terms` 为可选。

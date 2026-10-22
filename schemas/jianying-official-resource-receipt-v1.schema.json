@@ -18,9 +18,17 @@
     "preview_only"
   ],
   "properties": {
-    "schema_version": { "const": "jianying-official-resource-receipt/v1" },
-    "asset_id": { "type": "string", "minLength": 1 },
-    "title": { "type": "string", "minLength": 1 },
+    "schema_version": {
+      "const": "jianying-official-resource-receipt/v1"
+    },
+    "asset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
     "resource_kind": {
       "enum": [
         "media",
@@ -40,23 +48,46 @@
         "sound_effect"
       ]
     },
-    "tier": { "enum": ["basic", "professional"] },
+    "tier": {
+      "enum": [
+        "basic",
+        "professional"
+      ]
+    },
     "identity": {
       "oneOf": [
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["kind", "file"],
+          "required": [
+            "kind",
+            "file"
+          ],
           "properties": {
-            "kind": { "const": "downloaded_file" },
+            "kind": {
+              "const": "downloaded_file"
+            },
             "file": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["path", "sha256", "byte_length"],
+              "required": [
+                "path",
+                "sha256",
+                "byte_length"
+              ],
               "properties": {
-                "path": { "type": "string", "minLength": 1 },
-                "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-                "byte_length": { "type": "integer", "minimum": 0 }
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "byte_length": {
+                  "type": "integer",
+                  "minimum": 0
+                }
               }
             }
           }
@@ -64,29 +95,95 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["kind", "resource_id", "resource_sha256", "observed_draft_sha256"],
+          "required": [
+            "kind",
+            "resource_id",
+            "resource_sha256",
+            "observed_draft_sha256"
+          ],
           "properties": {
-            "kind": { "const": "draft_resource" },
-            "resource_id": { "type": "string", "minLength": 1 },
-            "resource_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-            "observed_draft_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            "kind": {
+              "const": "draft_resource"
+            },
+            "resource_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "resource_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "observed_draft_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
           }
         }
       ]
     },
-    "acquired_at_epoch_seconds": { "type": "integer", "minimum": 1 },
-    "terms_reference": { "type": "string", "minLength": 1 },
+    "acquired_at_epoch_seconds": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "terms_reference": {
+      "type": "string",
+      "minLength": 1
+    },
     "allowed_usages": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "enum": ["personal", "commercial", "editorial"] }
+      "items": {
+        "enum": [
+          "personal",
+          "commercial",
+          "editorial"
+        ]
+      }
     },
     "restrictions": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "preview_only": { "type": "boolean" }
+    "preview_only": {
+      "type": "boolean"
+    },
+    "terms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference"
+      ],
+      "description": "条款、价格与授权文件的引用；4.2 的拒绝路径依据这三项",
+      "properties": {
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "条款的稳定标识；面板标注文本（如“不可商用”）也合法"
+        },
+        "price_reference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "价格文件路径"
+        },
+        "price_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "authorisation_reference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "授权文件路径"
+        },
+        "user_visible_notice": {
+          "type": "string",
+          "minLength": 1,
+          "description": "界面提示原文"
+        }
+      }
+    }
   }
 }

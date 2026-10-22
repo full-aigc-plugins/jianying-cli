@@ -82,6 +82,20 @@ pub enum RuntimeError {
     PreviewOnlyAsset,
     #[error("official asset usage is not allowed: {0}")]
     AssetUsageNotAllowed(String),
+    #[error(
+        "official asset receipt carries no terms reference; a receipt without terms cannot be authorised"
+    )]
+    TermsReferenceMissing,
+    #[error("price document does not match the receipt: {path} (expected {expected}, observed {observed})")]
+    PriceDocumentMismatch {
+        path: PathBuf,
+        expected: String,
+        observed: String,
+    },
+    #[error("price document declared by the receipt is missing: {0}")]
+    PriceDocumentMissing(PathBuf),
+    #[error("authorisation document declared by the receipt is missing: {0}")]
+    AuthorisationDocumentMissing(PathBuf),
     #[error("invalid official asset receipt: {0}")]
     InvalidAssetReceipt(String),
     #[error("official asset receipt is not registered: {0}")]

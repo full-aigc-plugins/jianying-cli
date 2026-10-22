@@ -4,7 +4,130 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+/// 条款、价格与授权文件的引用块（4.2 的契约扩展）。
+///
+/// 4.2 要求证明“价格文件、政府授权与用户可见信息”的拒绝路径，而原收据只表达素材本身，
+/// 没有这些字段的位置。这里把三者表达为“引用 + 可选文件摘要”，从而可以校验：
+/// 缺条款、价格文件与声明不符、授权文件缺失。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct OfficialAssetTerms {
+    /// 条款的稳定标识；不可为空，面板标注文本（例如“不可商用”）也算合法引用。
+    reference: String,
+    /// 价格文件路径；有路径就必须有摘要，两者一起构成可校验的声明。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    price_reference: Option<PathBuf>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    price_sha256: Option<String>,
+    /// 授权文件（含政府/机构授权）路径。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    authorisation_reference: Option<PathBuf>,
+    /// 界面原文，例如“不可商用”；用于把 4.1 的标注直接带进契约。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_visible_notice: Option<String>,
+}
+
+impl OfficialAssetTerms {
+    /// 构造条款块；空引用直接拒绝，价格路径必须与摘要成对出现。
+    pub fn new(reference: impl Into<String>) -> Result<Self, RuntimeError> {
+        let reference = reference.into();
+        if reference.trim().is_empty() {
+            return Err(RuntimeError::TermsReferenceMissing);
+        }
+        Ok(Self {
+            reference,
+            price_reference: None,
+            price_sha256: None,
+            authorisation_reference: None,
+            user_visible_notice: None,
+        })
+    }
+
+    /// 绑定价格文件与其 sha256。
+    pub fn with_price(mut self, path: impl Into<PathBuf>, sha256: impl Into<String>) -> Self {
+        self.price_reference = Some(path.into());
+        self.price_sha256 = Some(sha256.into());
+        self
+    }
+
+    /// 绑定授权文件。
+    pub fn with_authorisation(mut self, path: impl Into<PathBuf>) -> Self {
+        self.authorisation_reference = Some(path.into());
+        self
+    }
+
+    /// 记录界面提示原文。
+    pub fn with_user_visible_notice(mut self, notice: impl Into<String>) -> Self {
+        self.user_visible_notice = Some(notice.into());
+        self
+    }
+
+    /// 返回条款引用。
+    pub fn reference(&self) -> &str {
+        &self.reference
+    }
+
+    /// 返回界面提示原文。
+    pub fn user_visible_notice(&self) -> Option<&str> {
+        self.user_visible_notice.as_deref()
+    }
+
+    /// 校验条款块：引用非空；价格文件存在且摘要一致；授权文件存在。
+    pub fn verify(&self) -> Result<(), RuntimeError> {
+        if self.reference.trim().is_empty() {
+            return Err(RuntimeError::TermsReferenceMissing);
+        }
+        if let Some(path) = &self.price_reference {
+            if !path.is_file() {
+                return Err(RuntimeError::PriceDocumentMissing(path.clone()));
+            }
+            let expected = self.price_sha256.clone().ok_or_else(|| {
+                RuntimeError::InvalidAssetReceipt(
+                    "price document must be paired with a sha256".to_owned(),
+                )
+            })?;
+            let observed = sha256_of_file(path)?;
+            if !observed.eq_ignore_ascii_case(&expected) {
+                return Err(RuntimeError::PriceDocumentMismatch {
+                    path: path.clone(),
+                    expected,
+                    observed,
+                });
+            }
+        }
+        if let Some(path) = &self.authorisation_reference {
+            if !path.is_file() {
+                return Err(RuntimeError::AuthorisationDocumentMissing(path.clone()));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// 计算文件 sha256；失败时带上路径，方便调用方判断是权限还是文件消失。
+fn sha256_of_file(path: &Path) -> Result<String, RuntimeError> {
+    use sha2::{Digest, Sha256};
+    use std::io::Read;
+    let mut file = std::fs::File::open(path).map_err(|error| RuntimeError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })?;
+    let mut hasher = Sha256::new();
+    let mut buffer = [0u8; 64 * 1024];
+    loop {
+        let read = file.read(&mut buffer).map_err(|error| RuntimeError::Io {
+            path: path.to_path_buf(),
+            message: error.to_string(),
+        })?;
+        if read == 0 {
+            break;
+        }
+        hasher.update(&buffer[..read]);
+    }
+    Ok(format!("{:x}", hasher.finalize()))
+}
 
 /// 将官方素材、实际下载文件、权益层级和允许用途绑定的不可变收据。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -21,6 +144,9 @@ pub struct OfficialAssetReceipt {
     allowed_usages: BTreeSet<OfficialAssetUsage>,
     restrictions: BTreeSet<String>,
     preview_only: bool,
+    /// 条款/价格/授权引用；旧收据没有该字段，因此保持可选。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    terms: Option<OfficialAssetTerms>,
 }
 
 impl OfficialAssetReceipt {
@@ -84,6 +210,7 @@ impl OfficialAssetReceipt {
             allowed_usages,
             restrictions,
             preview_only,
+            terms: None,
         })
     }
 
@@ -121,6 +248,7 @@ impl OfficialAssetReceipt {
             allowed_usages,
             restrictions,
             preview_only,
+            terms: None,
         };
         receipt.validate_document()?;
         Ok(receipt)
@@ -200,6 +328,27 @@ impl OfficialAssetReceipt {
             ));
         }
         Ok(())
+    }
+
+    /// 挂上条款/价格/授权引用。
+    pub fn with_terms(mut self, terms: OfficialAssetTerms) -> Self {
+        self.terms = Some(terms);
+        self
+    }
+
+    /// 返回已挂的条款块。
+    pub fn terms(&self) -> Option<&OfficialAssetTerms> {
+        self.terms.as_ref()
+    }
+
+    /// 严格校验条款：没有挂条款视为缺失，价格/授权文件按声明核对。
+    ///
+    /// `verify` / `verify_draft` 保持不变以兼容旧收据；4.2 的拒绝路径由本方法提供。
+    pub fn verify_terms(&self) -> Result<(), RuntimeError> {
+        match &self.terms {
+            Some(terms) => terms.verify(),
+            None => Err(RuntimeError::TermsReferenceMissing),
+        }
     }
 
     /// 返回稳定官方资源标识。

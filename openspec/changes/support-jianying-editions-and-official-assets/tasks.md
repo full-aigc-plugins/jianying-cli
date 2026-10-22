@@ -86,7 +86,18 @@
     “流星小仙女文字片头，人物图文 00:00:03:00” 出现在轨道上并自动保存。
     证据：`docs/runbooks/evidence/windows-canary/OFFICIAL_MATERIAL_20261021.json`（6 张截图带 sha256）。
     **仍未勾**：没有拿到该素材的授权条款文本（应用只给横幅与“可商用”标签），也没有导出成片证明可发布。
-- [ ] 4.2 用发布 Rust CLI 验证收据并编译真实草稿，证明篡改文件、过期权益和用途冲突均被拒绝。
+- [x] 4.2 用发布 Rust CLI 验证收据并编译真实草稿，证明篡改文件、过期权益和用途冲突均被拒绝。
+  - *2026-10-22 收口（业主选定提案选项 A）*：契约缺字段的问题用**增量字段**解决，未破坏旧收据。
+    新增 `terms` 块：`reference`（必填）、`price_reference` + `price_sha256`、`authorisation_reference`、
+    `user_visible_notice`；对应三类可测拒绝 `TermsReferenceMissing`、`PriceDocumentMismatch`、
+    `AuthorisationDocumentMissing`（另有价格文件缺失）。
+    实现：`crates/jianying-runtime/src/official_asset_receipt.rs`（`OfficialAssetTerms` + `verify_terms`），
+    错误枚举在 `runtime_error.rs`，schema 在 `schemas/jianying-official-resource-receipt-v1.schema.json`。
+    `verify` / `verify_draft` 行为不变（旧收据仍可验），4.2 的拒绝路径由 `verify_terms` 提供并测试。
+    测试：`crates/jianying-runtime/tests/official_asset_terms.rs` 五条（无条款 / 空引用 / 价格摘要不符 /
+    授权文件缺失 / 完整条款通过且 JSON 往返一致）。
+    4.1 的 `不可商用` 标注即 `terms.reference` + `user_visible_notice` 的取值，两个任务口径一致。
+    提案：`docs/runbooks/PROPOSAL_4_2_RECEIPT_TERMS.md`。
   - *2026-10-22 真实素材链路跑通，且**全程无需人工***：编辑器在 10-21 会话里已把素材下载到
     `User Data\Cache\onlineMaterial\2d89c299….mp4`（220,485 B，h264 1022x662@60，1.8 s）。
     CLI 用 `media add-video` 把这份**真实素材**复制进自己建的明文草稿 `auto-canary`（字节一致），

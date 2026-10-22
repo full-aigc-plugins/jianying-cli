@@ -39,7 +39,7 @@ pub use entitlement_evidence_source::EntitlementEvidenceSource;
 pub use entitlement_status::EntitlementStatus;
 pub use jianying_edition::JianyingEdition;
 pub use local_runtime_adapter::LocalRuntimeAdapter;
-pub use official_asset_receipt::OfficialAssetReceipt;
+pub use official_asset_receipt::{OfficialAssetReceipt, OfficialAssetTerms};
 pub use official_asset_tier::OfficialAssetTier;
 pub use official_asset_usage::OfficialAssetUsage;
 pub use official_resource_identity::OfficialResourceIdentity;
